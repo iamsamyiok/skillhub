@@ -1,0 +1,22 @@
+# SkillHub
+
+> 面向人类与 AI Agent 的技能（skill）下载站（GitHub Pages 静态镜像）。下载 https://iamsamyiok.github.io/skillhub/downloads/{id}.zip（Windows）或 {id}.tar.gz；SKILL.md 原文 https://iamsamyiok.github.io/skillhub/skills-md/{id}.md。完整 API 与管理功能请自托管本仓库。
+
+## Skills
+
+- [fe-visual-review](https://iamsamyiok.github.io/skillhub/skills-md/fe-visual-review.md): 前端界面视觉审查 skill：给网页 URL 或截图，用 AGNES agnes-2.5-flash 识图模型以资深前端 QA 视角全方位审查（美观/结构/可用性/一致性四维评分 + 16 类 LLM 生成页面高频缺陷模式库 + 响应式三视口对比 + 放大微观复查），输出精确、Agent 可直接执行修复的结构化问题报告
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/fe-visual-review.zip
+- [image-analysis](https://iamsamyiok.github.io/skillhub/skills-md/image-analysis.md): 识图理解（图片分析）：描述图片内容、提取图中文字（OCR）、分析页面/设计稿布局、比较图片。当用户给出图片并要求分析、理解、识别、提取文字、描述、总结、审查布局时使用。支持公网图片 URL 与本地图片（先上传）。
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/image-analysis.zip
+- [oss-scout](https://iamsamyiok.github.io/skillhub/skills-md/oss-scout.md): 智能选型 GitHub 开源项目：自然语言需求 → 搜索 → 深读 → 对比推荐报告。Use when 用户想找开源项目、开源替代品、选型对比、评估某个 repo 是否可用，或提到"站在开源肩膀上""找现成的库/框架/工具"。
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/oss-scout.zip
+- [text-to-diagram](https://iamsamyiok.github.io/skillhub/skills-md/text-to-diagram.md): 把一段自由文本抽取为逻辑图结构化 JSON（nodes/links/groups/graphMeta）。当用户要求把文本转成流程图、因果图、协作图、逻辑图、示意图、时间线，或要求生成图示/画图/梳理流程时使用。Agent 只输出 JSON，绝不输出 SVG/HTML/Mermaid 或任何坐标尺寸，布局与渲染交给本地渲
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/text-to-diagram.zip
+- [text-to-image](https://iamsamyiok.github.io/skillhub/skills-md/text-to-image.md): 文字转图片（文生图）：把文字描述生成为海报、插画、产品概念图、营销素材、角色场景视觉草案等图片。当用户要求生成图片、画一张图、做海报/插画/配图/封面/壁纸，或提到"文生图""生成图片素材"时使用。有参考图需要修改时应使用图片编辑能力而非本技能的纯文生图流程。
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/text-to-image.zip
+- [use-tinyfish](https://iamsamyiok.github.io/skillhub/skills-md/use-tinyfish.md): Use TinyFish for web search, fetching URLs, reading pages, current information, source-backed answers, research, docs, pricing/product pages, extraction, scrapi
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.zip
+
+## Source
+
+- 仓库（自托管 node server.js）: https://github.com/iamsamyiok/skillhub

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理后台 · SkillHub</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner">
+  <a class="logo" href="/"><span class="logo-mark">S</span>SkillHub</a>
+  <nav>
+    <a href="/">浏览</a>
+    <a href="/setup">密钥配置</a>
+    <a href="/ai">Agent 接入</a>
+    <a href="/admin" class="active">管理</a>
+  </nav>
+</div></header>
+
+<!-- 登录 -->
+<div class="auth-card" id="auth">
+  <h2>登录管理后台</h2>
+  <p style="color:var(--muted);font-size:13px;margin:0">首次部署的初始账密见 <code>data/initial-credentials.txt</code></p>
+  <form id="login-form">
+    <div class="field"><label>用户名</label><input name="user" autocomplete="username" required></div>
+    <div class="field"><label>密码</label><input name="password" type="password" autocomplete="current-password" required></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center">登录</button>
+    <div class="msg err" id="login-msg"></div>
+  </form>
+</div>
+
+<!-- 管理台 -->
+<main class="wrap hidden" id="panel" style="padding-bottom:40px">
+  <div class="admin-head">
+    <h2>技能管理</h2>
+    <span id="who" style="color:var(--muted);font-size:13px"></span>
+    <button class="btn btn-primary" id="btn-new">+ 新建技能</button>
+    <button class="btn btn-ghost" id="btn-logout">退出</button>
+  </div>
+
+  <table class="admin-table" id="tbl">
+    <thead><tr><th>技能</th><th>分类</th><th>版本</th><th>下载</th><th>更新时间</th><th style="width:150px">操作</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <div class="panel" style="margin-top:22px">
+    <h3>Agent 管理令牌</h3>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px">AI Agent 用 <code>X-API-Token</code> 请求头即可调用管理 API（新建/更新/删除技能），与人工登录等效。</p>
+    <button class="btn btn-ghost" id="btn-token">生成新令牌</button>
+    <div class="msg ok" id="token-msg"></div>
+  </div>
+
+  <div class="panel">
+    <h3>修改密码</h3>
+    <form id="pw-form" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+      <div class="field" style="flex:1;min-width:220px;margin:0"><label>新密码（至少 8 位）</label><input name="password" type="password" required></div>
+      <button class="btn btn-ghost">更新密码</button>
+      <div class="msg" id="pw-msg" style="flex-basis:100%"></div>
+    </form>
+  </div>
+</main>
+
+<!-- 新建/编辑弹层 -->
+<div id="editor" class="hidden" style="position:fixed;inset:0;background:rgba(15,18,35,.5);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:40px 16px">
+  <div style="background:#fff;border-radius:16px;max-width:760px;width:100%;padding:26px 30px;box-shadow:0 24px 60px -12px rgba(0,0,0,.4)">
+    <h3 id="ed-title" style="margin:0 0 14px;font-size:18px">新建技能</h3>
+    <form id="ed-form">
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:200px"><label>技能 ID（小写字母数字-._）</label><input name="id" required pattern="[a-z0-9][a-z0-9._-]*"></div>
+        <div class="field" style="flex:1;min-width:160px"><label>分类</label><input name="category" placeholder="如：开发工具" list="cat-list"><datalist id="cat-list"></datalist></div>
+        <div class="field" style="flex:1;min-width:160px"><label>标签（逗号分隔）</label><input name="tags" placeholder="cli,自动化"></div>
+      </div>
+      <div class="field"><label>SKILL.md 内容（YAML frontmatter + 正文）</label>
+        <textarea name="skillmd" rows="10" required style="font-family:ui-monospace,monospace;font-size:13px"></textarea></div>
+      <div class="field"><label>附加文件（每行一个：路径 = 内容，可留空）</label>
+        <textarea name="extra" rows="4" placeholder="bin/tool.cjs = console.log('hi')" style="font-family:ui-monospace,monospace;font-size:13px"></textarea></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button type="button" class="btn btn-ghost" id="ed-cancel">取消</button>
+        <button class="btn btn-primary" id="ed-save">保存</button>
+      </div>
+      <div class="msg err" id="ed-msg"></div>
+    </form>
+  </div>
+</div>
+
+<script src="/admin.js"></script>
+</body>
+</html>

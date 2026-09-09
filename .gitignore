@@ -1,0 +1,5 @@
+data/initial-credentials.txt
+data/initial-agent-token.txt
+data/auth.json
+data/tokens.json
+node_modules/

@@ -1,0 +1,78 @@
+{
+  "skills": {
+    "text-to-diagram": {
+      "category": "开发工具",
+      "tags": [
+        "图表",
+        "可视化",
+        "cli"
+      ],
+      "downloads": 1,
+      "createdAt": "2026-09-09T14:10:50.365Z",
+      "updatedAt": "2026-09-09T14:10:50.505Z"
+    },
+    "fe-visual-review": {
+      "category": "前端开发",
+      "tags": [
+        "识图",
+        "QA",
+        "视觉审查"
+      ],
+      "downloads": 5,
+      "createdAt": "2026-09-09T14:10:50.525Z",
+      "updatedAt": "2026-09-09T14:10:50.525Z"
+    },
+    "oss-scout": {
+      "category": "研究分析",
+      "tags": [
+        "开源选型",
+        "github"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-09T14:10:50.547Z",
+      "updatedAt": "2026-09-09T14:10:50.547Z"
+    },
+    "use-tinyfish": {
+      "category": "网络与搜索",
+      "tags": [
+        "搜索",
+        "浏览器",
+        "抓取"
+      ],
+      "downloads": 1,
+      "createdAt": "2026-09-09T14:10:50.548Z",
+      "updatedAt": "2026-09-09T14:10:50.548Z"
+    },
+    "text-to-image": {
+      "category": "图像生成",
+      "tags": [
+        "文生图",
+        "生成图片",
+        "图片生成",
+        "画图",
+        "海报",
+        "插画",
+        "配图",
+        "素材"
+      ],
+      "downloads": 2,
+      "createdAt": "2026-09-09T14:36:35.241Z",
+      "updatedAt": "2026-09-09T14:45:26.676Z"
+    },
+    "image-analysis": {
+      "category": "图像理解",
+      "tags": [
+        "识图",
+        "看图",
+        "图片理解",
+        "图像分析",
+        "OCR",
+        "提取文字",
+        "布局分析"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-09T14:36:35.246Z",
+      "updatedAt": "2026-09-09T14:45:26.680Z"
+    }
+  }
+}

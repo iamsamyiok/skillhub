@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>密钥与用户配置生成器 · SkillHub</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner">
+  <a class="logo" href="/"><span class="logo-mark">S</span>SkillHub</a>
+  <nav>
+    <a href="/">浏览</a>
+    <a href="/setup" class="active">密钥配置</a>
+    <a href="/ai">Agent 接入</a>
+    <a href="/admin">管理</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <div class="crumb"><a href="/">SkillHub</a> / 密钥与用户配置生成器</div>
+
+  <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:14px 18px;margin:6px 0 18px;font-size:13.5px;color:#92400e">
+    <b>隐私说明：</b>所有密钥只在你浏览器本地拼装成配置文本，<b>不会发送到任何服务器</b>。生成后请下载保存到安全位置（如 <code>~/.secrets/credentials.env</code>，权限 600），切勿提交到 git 仓库。
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start" id="setup-grid">
+    <div>
+      <div class="panel">
+        <h3>1. 选择要配置的技能</h3>
+        <div id="skill-picks" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+      </div>
+      <div class="panel">
+        <h3>2. 填写变量（留空项不会写入）</h3>
+        <div id="fields"></div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <input id="ck-name" placeholder="自定义变量名，如 OPENAI_API_KEY" style="flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:inherit">
+          <button class="btn btn-ghost" id="ck-add">+ 添加自定义变量</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>3. 输出格式</h3>
+        <label style="margin-right:18px;font-size:14px"><input type="radio" name="fmt" value="export" checked> shell 导出式（export KEY=…，source 即用）</label>
+        <label style="font-size:14px"><input type="radio" name="fmt" value="dotenv"> dotenv 式（KEY=…，适合 .env）</label>
+        <div class="action-row">
+          <button class="btn btn-primary" id="btn-copy">复制配置内容</button>
+          <button class="btn btn-ghost" id="btn-download">下载 credentials.env</button>
+          <button class="btn btn-ghost" id="btn-git">同时生成 git 用户命令</button>
+        </div>
+        <div class="msg" id="setup-msg"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="position:sticky;top:70px">
+      <h3>生成的配置（实时预览）</h3>
+      <pre id="preview" style="background:#14172b;color:#d5daf5;padding:16px 18px;border-radius:11px;font-size:12.5px;overflow-x:auto;min-height:220px;white-space:pre-wrap"></pre>
+      <div id="git-cmds" class="hidden">
+        <h3 style="margin-top:14px">Git 用户信息（一次性执行）</h3>
+        <pre id="git-preview" style="background:#14172b;color:#d5daf5;padding:14px 16px;border-radius:11px;font-size:12.5px;white-space:pre-wrap"></pre>
+        <button class="btn btn-ghost" id="btn-git-copy">复制 git 命令</button>
+      </div>
+    </div>
+  </div>
+</main>
+<footer><div class="wrap">SkillHub · <a href="/llms.txt">llms.txt</a> · <a href="/skills.txt">skills.txt</a> · <a href="/ai">Agent 接入</a></div></footer>
+<script src="/setup.js"></script>
+</body>
+</html>

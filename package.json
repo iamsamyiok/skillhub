@@ -1,0 +1,11 @@
+{
+  "name": "skillhub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "为人类与 AI Agent 提供技能浏览/检索/下载/管理的零依赖站点",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seeds.js"
+  }
+}
