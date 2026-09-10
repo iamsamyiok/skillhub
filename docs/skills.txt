@@ -1,9 +1,10 @@
 # name | category | version | description | zip | tar.gz
 
-fe-visual-review | 前端开发 | 1.0.0 | 前端界面视觉审查 skill：给网页 URL 或截图，用 AGNES agnes-2.5-flash 识图模型以资深前端 QA 视角全方位审查（美观/结构/可用性/一致性四维评分 + 16 类 LLM 生成页面高频缺陷模式库 + 响应式三视口对比 + 放大微观复查），输出精确、Agent 可直接执行修复的结构化问题报告与改进建议。适用于：Agent 生成前端后的自检、页面验收、布局问题排查、美化改进。 | ./downloads/fe-visual-review.zip | ./downloads/fe-visual-review.tar.gz
 grilling | 需求梳理 | 1.0.0 | 拷问式需求访谈（Grilling）：对计划、决策或想法进行多轮穷追式提问压力测试，按轮次展开设计树，每题附推荐答案。当用户想压测自己的方案、梳理需求，或提到 grill/拷问/挑战我的想法 时使用。stress-test a plan or decision | ./downloads/grilling.zip | ./downloads/grilling.tar.gz
 image-analysis | 图像理解 | 1.0.1 | 识图理解（图片分析）：描述图片内容、提取图中文字（OCR）、分析页面/设计稿布局、比较图片。当用户给出图片并要求分析、理解、识别、提取文字、描述、总结、审查布局时使用。支持公网图片 URL 与本地图片（先上传）。 | ./downloads/image-analysis.zip | ./downloads/image-analysis.tar.gz
 oss-scout | 研究分析 | 1.0.0 | 智能选型 GitHub 开源项目：自然语言需求 → 搜索 → 深读 → 对比推荐报告。Use when 用户想找开源项目、开源替代品、选型对比、评估某个 repo 是否可用，或提到"站在开源肩膀上""找现成的库/框架/工具"。 | ./downloads/oss-scout.zip | ./downloads/oss-scout.tar.gz
+page-visual-review | 前端开发 | 1.1.0 | 前端界面视觉审查 skill：给网页 URL 或截图，用 AGNES agnes-2.5-flash 识图模型以资深前端 QA 视角全方位审查（美观/结构/可用性/一致性四维评分 + 16 类 LLM 生成页面高频缺陷模式库 + 响应式三视口对比 + 放大微观复查），输出精确、Agent 可直接执行修复的结构化问题报告与改进建议。适用于：Agent 生成前端后的自检、页面验收、布局问题排查、美化改进。 | ./downloads/page-visual-review.zip | ./downloads/page-visual-review.tar.gz
+show-deploy | 开发工具 | 1.0.0 | 临时静态站点部署（Show Deploy）：把项目构建产物打包上传到 Show 托管，获得 48 小时自动过期的公网预览 URL，仅需 bash+tar+curl 无需安装 CLI。当用户说 deploy to show、发布预览、preview this site、想要前端构建的临时在线链接时使用。temporary static hosting preview | ./downloads/show-deploy.zip | ./downloads/show-deploy.tar.gz
 skill-creator | 技能开发 | 1.0.0 | 技能创建器（Skill Creator）：从零创建新技能、修改和改进现有技能、运行评估测试（evals）、做技能性能基准分析、优化技能描述的触发准确率。当用户想创建、编辑、优化、评测任何 skill 时使用。create, improve, and evaluate agent skills | ./downloads/skill-creator.zip | ./downloads/skill-creator.tar.gz
 skill-updater | 技能开发 | v0.2.0 | >- | ./downloads/skill-updater.zip | ./downloads/skill-updater.tar.gz
 text-to-diagram | 开发工具 | 1.3.1 | 把一段自由文本抽取为逻辑图结构化 JSON（nodes/links/groups/graphMeta）。当用户要求把文本转成流程图、因果图、协作图、逻辑图、示意图、时间线，或要求生成图示/画图/梳理流程时使用。Agent 只输出 JSON，绝不输出 SVG/HTML/Mermaid 或任何坐标尺寸，布局与渲染交给本地渲染器。 | ./downloads/text-to-diagram.zip | ./downloads/text-to-diagram.tar.gz

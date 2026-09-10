@@ -185,7 +185,7 @@ node bin/ttg.js -i graph.json -o out.svg --html out.html --visual --thorough
 手动复审（审已有图页、或需要 URL 审查已部署页面时）：
 
 ```bash
-node 当前工作区/.opencode/skills/fe-visual-review/bin/fe-review.cjs <图页URL或截图> --thorough --focus "这是一张图表（SVG），从图表可读性角度审查：节点文字、边标签、图例、分组框、连线走向" --json /tmp/t2d-visual.json
+node 当前工作区/.opencode/skills/page-visual-review/bin/fe-review.cjs <图页URL或截图> --thorough --focus "这是一张图表（SVG），从图表可读性角度审查：节点文字、边标签、图例、分组框、连线走向" --json /tmp/t2d-visual.json
 ```
 
 判定：major/critical 级问题 → 回改渲染或布局参数后重编译复审；minor/cosmetic 可接受。已知噪声：图表场景下"可点击区域过小"类 interaction 告警多为误报（图非交互控件）。密集图表（>15 元素）审查时 fe-review 的 scan 会自动按区域限量枚举，报告更聚焦。

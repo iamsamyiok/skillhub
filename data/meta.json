@@ -11,17 +11,6 @@
       "createdAt": "2026-09-09T14:10:50.365Z",
       "updatedAt": "2026-09-09T14:10:50.505Z"
     },
-    "fe-visual-review": {
-      "category": "前端开发",
-      "tags": [
-        "识图",
-        "QA",
-        "视觉审查"
-      ],
-      "downloads": 5,
-      "createdAt": "2026-09-09T14:10:50.525Z",
-      "updatedAt": "2026-09-10T14:17:10.000Z"
-    },
     "oss-scout": {
       "category": "研究分析",
       "tags": [
@@ -117,6 +106,32 @@
       "downloads": 0,
       "createdAt": "2026-09-10T14:33:19.000Z",
       "updatedAt": "2026-09-10T14:33:19.000Z"
+    },
+    "page-visual-review": {
+      "category": "前端开发",
+      "tags": [
+        "识图",
+        "QA",
+        "视觉审查"
+      ],
+      "downloads": 5,
+      "createdAt": "2026-09-09T14:10:50.525Z",
+      "updatedAt": "2026-09-10T14:52:37.000Z"
+    },
+    "show-deploy": {
+      "category": "开发工具",
+      "tags": [
+        "部署",
+        "静态站点",
+        "预览",
+        "临时托管",
+        "show",
+        "preview",
+        "deploy"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-10T14:52:54.000Z",
+      "updatedAt": "2026-09-10T14:52:54.000Z"
     }
   }
 }

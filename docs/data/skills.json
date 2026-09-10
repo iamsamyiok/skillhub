@@ -1,5 +1,5 @@
 {
-  "total": 9,
+  "total": 10,
   "categories": [
     "前端开发",
     "图像理解",
@@ -11,30 +11,6 @@
     "需求梳理"
   ],
   "items": [
-    {
-      "id": "fe-visual-review",
-      "name": "fe-visual-review",
-      "description": "前端界面视觉审查 skill：给网页 URL 或截图，用 AGNES agnes-2.5-flash 识图模型以资深前端 QA 视角全方位审查（美观/结构/可用性/一致性四维评分 + 16 类 LLM 生成页面高频缺陷模式库 + 响应式三视口对比 + 放大微观复查），输出精确、Agent 可直接执行修复的结构化问题报告与改进建议。适用于：Agent 生成前端后的自检、页面验收、布局问题排查、美化改进。",
-      "version": "1.0.0",
-      "category": "前端开发",
-      "tags": [
-        "识图",
-        "QA",
-        "视觉审查"
-      ],
-      "downloads": 5,
-      "updatedAt": "2026-09-10T14:17:10.000Z",
-      "files": [
-        {
-          "path": "SKILL.md",
-          "size": 5037
-        },
-        {
-          "path": "bin/fe-review.cjs",
-          "size": 22388
-        }
-      ]
-    },
     {
       "id": "grilling",
       "name": "grilling",
@@ -111,6 +87,54 @@
         {
           "path": "scripts/oss_scout.py",
           "size": 8804
+        }
+      ]
+    },
+    {
+      "id": "page-visual-review",
+      "name": "page-visual-review",
+      "description": "前端界面视觉审查 skill：给网页 URL 或截图，用 AGNES agnes-2.5-flash 识图模型以资深前端 QA 视角全方位审查（美观/结构/可用性/一致性四维评分 + 16 类 LLM 生成页面高频缺陷模式库 + 响应式三视口对比 + 放大微观复查），输出精确、Agent 可直接执行修复的结构化问题报告与改进建议。适用于：Agent 生成前端后的自检、页面验收、布局问题排查、美化改进。",
+      "version": "1.1.0",
+      "category": "前端开发",
+      "tags": [
+        "识图",
+        "QA",
+        "视觉审查"
+      ],
+      "downloads": 5,
+      "updatedAt": "2026-09-10T14:52:37.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 5043
+        },
+        {
+          "path": "bin/fe-review.cjs",
+          "size": 22388
+        }
+      ]
+    },
+    {
+      "id": "show-deploy",
+      "name": "show-deploy",
+      "description": "临时静态站点部署（Show Deploy）：把项目构建产物打包上传到 Show 托管，获得 48 小时自动过期的公网预览 URL，仅需 bash+tar+curl 无需安装 CLI。当用户说 deploy to show、发布预览、preview this site、想要前端构建的临时在线链接时使用。temporary static hosting preview",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "部署",
+        "静态站点",
+        "预览",
+        "临时托管",
+        "show",
+        "preview",
+        "deploy"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-10T14:52:54.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 3232
         }
       ]
     },
@@ -301,7 +325,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 10907
+          "size": 10909
         }
       ]
     },

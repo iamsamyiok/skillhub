@@ -1,10 +1,10 @@
 ---
-name: fe-visual-review
-version: 1.0.0
+name: page-visual-review
+version: 1.1.0
 description: 前端界面视觉审查 skill：给网页 URL 或截图，用 AGNES agnes-2.5-flash 识图模型以资深前端 QA 视角全方位审查（美观/结构/可用性/一致性四维评分 + 16 类 LLM 生成页面高频缺陷模式库 + 响应式三视口对比 + 放大微观复查），输出精确、Agent 可直接执行修复的结构化问题报告与改进建议。适用于：Agent 生成前端后的自检、页面验收、布局问题排查、美化改进。
 ---
 
-# fe-visual-review — 前端界面视觉审查
+# page-visual-review — 前端界面视觉审查
 
 解决"大模型看不到自己写的页面长什么样"的问题：代码写完 ≠ 页面没问题。本 skill 截图真实渲染结果，用识图模型对照 **LLM 生成页面高频缺陷模式库** 逐项排查，产出结构化报告（位置三要素 + 证据 + 影响 + 可执行修复 + 置信度 + 四维评分 + 优先级改进建议），供用户阅读或直接交给编码 Agent 修复。
 
@@ -34,7 +34,7 @@ description: 前端界面视觉审查 skill：给网页 URL 或截图，用 AGNE
 
 ```bash
 # LLM 生成页面推荐组合：响应式 + 放大复查
-node 当前工作区/.opencode/skills/fe-visual-review/bin/fe-review.cjs <URL> \
+node 当前工作区/.opencode/skills/page-visual-review/bin/fe-review.cjs <URL> \
   --responsive --thorough --json /tmp/fe-report.json --out /tmp/fe-report.md
 ```
 

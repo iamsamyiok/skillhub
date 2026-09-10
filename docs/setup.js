@@ -14,7 +14,7 @@ const PRESETS = [
     ],
   },
   {
-    id: 'fe-visual-review', label: '前端视觉审查（同 AGNES 识图）', note: '与识图理解共用凭据',
+    id: 'page-visual-review', label: '前端视觉审查（同 AGNES 识图）', note: '与识图理解共用凭据',
     vars: [
       ['AGNES_API_KEY', 'AGNES API Key', 'sk-...'],
       ['AGNES_BASE_URL', '服务地址', 'https://api.agnes-ai.cn/v1', 'https://api.agnes-ai.cn/v1'],
