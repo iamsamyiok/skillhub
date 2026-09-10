@@ -102,6 +102,21 @@
       "downloads": 0,
       "createdAt": "2026-09-10T13:59:55.000Z",
       "updatedAt": "2026-09-10T13:59:55.000Z"
+    },
+    "skill-updater": {
+      "category": "技能开发",
+      "tags": [
+        "技能进化",
+        "自动更新",
+        "skill",
+        "进化",
+        "SkillEvo",
+        "evals",
+        "自动优化"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-10T14:33:19.000Z",
+      "updatedAt": "2026-09-10T14:33:19.000Z"
     }
   }
 }

@@ -1,0 +1,24 @@
+# skill_updater 本地配置
+# LLM: 任何 OpenAI 兼容端点 (vLLM/ollama/网关均可)。密钥从环境变量读取, 本文件不存明文。
+llm:
+  base_url: https://api.agnes-ai.cn/v1
+  model: agnes-2.5-flash
+  api_key_env: AGNES_API_KEY      # export AGNES_API_KEY=... 在 ~/.secrets/credentials.env
+  temperature: 0.3
+  timeout: 180
+  max_tokens: 4096
+
+# 熔断: 候选连续 N 轮未达晋升阈值(均分超 champion+delta)则终止更新, 保留旧版
+breaker:
+  max_consecutive_failures: 2
+
+# replay 池: 样本不足则进入 incubating (与 SkillEvo 行为一致), 不执行更新
+replay:
+  min_samples: 2
+  max_samples: 12
+
+paths:
+  # 归档目录 (相对 skills 根目录)
+  archive: ../skill_archive
+  # 反馈库 (SQLite, 自动创建): samples 表存回放样本, evolutions 表存演进历史
+  feedback_db: ./feedback.db

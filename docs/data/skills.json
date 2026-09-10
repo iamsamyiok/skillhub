@@ -1,5 +1,5 @@
 {
-  "total": 8,
+  "total": 9,
   "categories": [
     "前端开发",
     "图像理解",
@@ -202,6 +202,86 @@
         {
           "path": "scripts/utils.py",
           "size": 1661
+        }
+      ]
+    },
+    {
+      "id": "skill-updater",
+      "name": "skill-updater",
+      "description": ">-",
+      "version": "v0.2.0",
+      "category": "技能开发",
+      "tags": [
+        "技能进化",
+        "自动更新",
+        "skill",
+        "进化",
+        "SkillEvo",
+        "evals",
+        "自动优化"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-10T14:33:19.000Z",
+      "files": [
+        {
+          "path": "LICENSE",
+          "size": 1237
+        },
+        {
+          "path": "SKILL.md",
+          "size": 4004
+        },
+        {
+          "path": "references/autoskill_core.md",
+          "size": 3551
+        },
+        {
+          "path": "references/skill_spec.md",
+          "size": 2276
+        },
+        {
+          "path": "requirements.txt",
+          "size": 24
+        },
+        {
+          "path": "scripts/config.yaml",
+          "size": 842
+        },
+        {
+          "path": "scripts/evolve.py",
+          "size": 23753
+        },
+        {
+          "path": "scripts/skillevo/NOTICE.md",
+          "size": 774
+        },
+        {
+          "path": "scripts/skillevo/__init__.py",
+          "size": 349
+        },
+        {
+          "path": "scripts/skillevo/config.py",
+          "size": 4018
+        },
+        {
+          "path": "scripts/skillevo/evals.py",
+          "size": 13635
+        },
+        {
+          "path": "scripts/skillevo/io_utils.py",
+          "size": 1879
+        },
+        {
+          "path": "scripts/skillevo/models.py",
+          "size": 3981
+        },
+        {
+          "path": "scripts/skillevo/mutators.py",
+          "size": 8196
+        },
+        {
+          "path": "scripts/skillevo/registry.py",
+          "size": 2766
         }
       ]
     },

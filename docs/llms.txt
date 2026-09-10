@@ -14,6 +14,8 @@
   - 下载: ./downloads/oss-scout.zip
 - [skill-creator](./skills-md/skill-creator.md): 技能创建器（Skill Creator）：从零创建新技能、修改和改进现有技能、运行评估测试（evals）、做技能性能基准分析、优化技能描述的触发准确率。当用户想创建、编辑、优化、评测任何 skill 时使用。create, improve, and evaluate agent skills
   - 下载: ./downloads/skill-creator.zip
+- [skill-updater](./skills-md/skill-updater.md): >-
+  - 下载: ./downloads/skill-updater.zip
 - [text-to-diagram](./skills-md/text-to-diagram.md): 把一段自由文本抽取为逻辑图结构化 JSON（nodes/links/groups/graphMeta）。当用户要求把文本转成流程图、因果图、协作图、逻辑图、示意图、时间线，或要求生成图示/画图/梳理流程时使用。Agent 只输出 JSON，绝不输出 SVG/HTML/Mermaid 或任何坐标尺寸，布局与渲染交给本地渲
   - 下载: ./downloads/text-to-diagram.zip
 - [text-to-image](./skills-md/text-to-image.md): 文字转图片（文生图）：把文字描述生成为海报、插画、产品概念图、营销素材、角色场景视觉草案等图片。当用户要求生成图片、画一张图、做海报/插画/配图/封面/壁纸，或提到"文生图""生成图片素材"时使用。有参考图需要修改时应使用图片编辑能力而非本技能的纯文生图流程。
