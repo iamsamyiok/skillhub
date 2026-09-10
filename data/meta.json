@@ -73,6 +73,35 @@
       "downloads": 0,
       "createdAt": "2026-09-09T14:36:35.246Z",
       "updatedAt": "2026-09-10T13:14:39.000Z"
+    },
+    "grilling": {
+      "category": "需求梳理",
+      "tags": [
+        "拷问",
+        "需求梳理",
+        "压力测试",
+        "访谈",
+        "决策树",
+        "grill",
+        "stress-test"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-10T13:59:55.000Z",
+      "updatedAt": "2026-09-10T13:59:55.000Z"
+    },
+    "skill-creator": {
+      "category": "技能开发",
+      "tags": [
+        "技能创建",
+        "skill",
+        "评估",
+        "元技能",
+        "skill开发",
+        "evals"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-10T13:59:55.000Z",
+      "updatedAt": "2026-09-10T13:59:55.000Z"
     }
   }
 }

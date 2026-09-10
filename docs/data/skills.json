@@ -1,12 +1,14 @@
 {
-  "total": 6,
+  "total": 8,
   "categories": [
     "前端开发",
     "图像理解",
     "图像生成",
     "开发工具",
+    "技能开发",
     "研究分析",
-    "网络与搜索"
+    "网络与搜索",
+    "需求梳理"
   ],
   "items": [
     {
@@ -30,6 +32,34 @@
         {
           "path": "bin/fe-review.cjs",
           "size": 22388
+        }
+      ]
+    },
+    {
+      "id": "grilling",
+      "name": "grilling",
+      "description": "拷问式需求访谈（Grilling）：对计划、决策或想法进行多轮穷追式提问压力测试，按轮次展开设计树，每题附推荐答案。当用户想压测自己的方案、梳理需求，或提到 grill/拷问/挑战我的想法 时使用。stress-test a plan or decision",
+      "version": "1.0.0",
+      "category": "需求梳理",
+      "tags": [
+        "拷问",
+        "需求梳理",
+        "压力测试",
+        "访谈",
+        "决策树",
+        "grill",
+        "stress-test"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-10T13:59:55.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 2143
+        },
+        {
+          "path": "agents/openai.yaml",
+          "size": 113
         }
       ]
     },
@@ -81,6 +111,97 @@
         {
           "path": "scripts/oss_scout.py",
           "size": 8804
+        }
+      ]
+    },
+    {
+      "id": "skill-creator",
+      "name": "skill-creator",
+      "description": "技能创建器（Skill Creator）：从零创建新技能、修改和改进现有技能、运行评估测试（evals）、做技能性能基准分析、优化技能描述的触发准确率。当用户想创建、编辑、优化、评测任何 skill 时使用。create, improve, and evaluate agent skills",
+      "version": "1.0.0",
+      "category": "技能开发",
+      "tags": [
+        "技能创建",
+        "skill",
+        "评估",
+        "元技能",
+        "skill开发",
+        "evals"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-10T13:59:55.000Z",
+      "files": [
+        {
+          "path": "LICENSE.txt",
+          "size": 11345
+        },
+        {
+          "path": "SKILL.md",
+          "size": 33168
+        },
+        {
+          "path": "agents/analyzer.md",
+          "size": 10376
+        },
+        {
+          "path": "agents/comparator.md",
+          "size": 7287
+        },
+        {
+          "path": "agents/grader.md",
+          "size": 9049
+        },
+        {
+          "path": "assets/eval_review.html",
+          "size": 7058
+        },
+        {
+          "path": "eval-viewer/generate_review.py",
+          "size": 16365
+        },
+        {
+          "path": "eval-viewer/viewer.html",
+          "size": 44998
+        },
+        {
+          "path": "references/schemas.md",
+          "size": 12061
+        },
+        {
+          "path": "scripts/__init__.py",
+          "size": 0
+        },
+        {
+          "path": "scripts/aggregate_benchmark.py",
+          "size": 14386
+        },
+        {
+          "path": "scripts/generate_report.py",
+          "size": 12847
+        },
+        {
+          "path": "scripts/improve_description.py",
+          "size": 11116
+        },
+        {
+          "path": "scripts/package_skill.py",
+          "size": 4234
+        },
+        {
+          "path": "scripts/quick_validate.py",
+          "size": 3972
+        },
+        {
+          "path": "scripts/run_eval.py",
+          "size": 11464
+        },
+        {
+          "path": "scripts/run_loop.py",
+          "size": 13605
+        },
+        {
+          "path": "scripts/utils.py",
+          "size": 1661
         }
       ]
     },
