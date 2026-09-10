@@ -37,7 +37,7 @@
       "id": "image-analysis",
       "name": "image-analysis",
       "description": "识图理解（图片分析）：描述图片内容、提取图中文字（OCR）、分析页面/设计稿布局、比较图片。当用户给出图片并要求分析、理解、识别、提取文字、描述、总结、审查布局时使用。支持公网图片 URL 与本地图片（先上传）。",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "category": "图像理解",
       "tags": [
         "识图",
@@ -49,11 +49,11 @@
         "布局分析"
       ],
       "downloads": 0,
-      "updatedAt": "2026-09-09T14:45:26.680Z",
+      "updatedAt": "2026-09-10T13:14:39.000Z",
       "files": [
         {
           "path": "SKILL.md",
-          "size": 2262
+          "size": 2685
         }
       ]
     },
@@ -120,7 +120,7 @@
         "配图",
         "素材"
       ],
-      "downloads": 2,
+      "downloads": 3,
       "updatedAt": "2026-09-09T14:45:26.676Z",
       "files": [
         {
