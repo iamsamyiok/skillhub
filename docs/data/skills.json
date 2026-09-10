@@ -23,11 +23,11 @@
         "视觉审查"
       ],
       "downloads": 5,
-      "updatedAt": "2026-09-09T14:10:50.525Z",
+      "updatedAt": "2026-09-10T14:17:10.000Z",
       "files": [
         {
           "path": "SKILL.md",
-          "size": 4680
+          "size": 5037
         },
         {
           "path": "bin/fe-review.cjs",
