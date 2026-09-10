@@ -2,13 +2,10 @@
 
 为人类与 AI Agent 提供技能（skill）的浏览、检索、下载与管理。
 
-- **在线静态站点**：https://iamsamyiok.github.io/skillhub/ （GitHub Pages，浏览/搜索/ZIP 下载/密钥配置生成器）
+- **在线静态站点**：https://iamsamyiok.github.io/skillhub/ （GitHub Pages，已上线：浏览/搜索/ZIP 下载/密钥配置生成器）
 - **完整版（含管理与 API）**：clone 本仓库后 `node server.js` 自托管
 
-## 一键开启在线站点（管理员一次性操作，二选一）
-
-1. 仓库 **Settings → Pages → Build and deployment → Source 选 "GitHub Actions"**，然后到 Actions 页重跑 "Deploy static site to GitHub Pages"；或
-2. **Settings → Actions → General → Workflow permissions 选 "Read and write"**，再重跑该 workflow。
+> Pages 由 `.github/workflows/deploy-pages.yml` 自动部署：push 到 main 即自动构建 `docs/` 并发布（workflow 已完成管理员一次性开启）。
 
 ---
 
