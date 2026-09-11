@@ -13,6 +13,7 @@ permissions:
   contents: write        # 推分支
   pull-requests: write   # 建/合并 PR
   issues: write          # 回写结果评论
+  actions: write         # 触发 deploy-pages workflow
 
 concurrency:
   group: auto-code-${{ github.event.issue.number }}
@@ -162,6 +163,15 @@ jobs:
             --body "由 Issue #${{ github.event.issue.number }} 自动生成。CI 验证(语法/测试/冒烟)已通过, 合并后将自动部署 Pages。" \
             --head "$BR" --base main
           gh pr merge --squash --delete-branch
+
+      - name: Trigger Pages deploy
+        if: success() && env.NO_CHANGES != '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sleep 5
+          gh workflow run deploy-pages.yml --ref main
+          echo "已显式触发 deploy-pages (GITHUB_TOKEN 的合并 push 不会连锁触发其他 workflow)"
 
       - name: Report result
         if: always()
