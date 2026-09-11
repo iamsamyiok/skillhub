@@ -1,20 +1,19 @@
 # FEEDBACK-CHANGES.md
 
 ## 反馈要点
-用户 iamsamyiok 在 skill.html 详情页评论建议：下载区域仅有一个下载按钮，希望增加一个「复制下载链接」小按钮，点击后将当前技能的 zip 下载地址复制到剪贴板并提示已复制，样式与现有深色主题一致。
+用户反馈：详情页的下载链接可以复制了，但分享整页不方便。要求在下载区域增加一个「分享本页」按钮，点击后复制当前技能详情页的完整网址（浏览器地址栏 URL），并像「复制下载链接」一样给出「已复制 ✓」的临时提示，复用现有按钮样式。
 
 ## 修改内容
-- **public/app.js**（`initSkill()` 函数，约第 167 行）：
-  - 在 `action-row` 的「下载 ZIP」按钮后新增 `<button class="btn btn-ghost" id="copy-zip-url">复制下载链接</button>`
-  - 新增 `copy-zip-url` 按钮的点击事件：调用 `navigator.clipboard.writeText(dlUrl)` 复制 ZIP 下载地址，按钮文字临时改为「已复制 ✓」，1.5 秒后恢复
-- **public/style.css**：无修改（复用已有的 `btn btn-ghost` 样式，与「tar.gz」和「查看 SKILL.md 原文」按钮保持一致）
+仅修改了 `public/app.js`，共 2 处改动：
 
-## 未修改原因说明
-- 无。反馈完全在前端范围内，已落实。
-- 未引入任何新依赖或后端变更。
+### 1. 添加「分享本页」按钮（约第 168 行）
+在 `action-row` 的按钮列表中，紧接「复制下载链接」按钮之后插入了一个新的 `<button class="btn btn-ghost" id="copy-page-url">分享本页</button>`，与现有按钮样式完全一致。
 
-## 如何验证
-1. 浏览器访问任意技能详情页，如 `/skill.html?id=book-to-skill`
-2. 在「操作行」应看到：「下载 ZIP」(渐变主色)、「复制下载链接」(幽灵按钮)、「tar.gz」(幽灵按钮)
-3. 点击「复制下载链接」，按钮文字临时变为「已复制 ✓」，1.5 秒后恢复
-4. 粘贴剪贴板内容，应为该技能的 ZIP 下载 URL（静态模式为 `./downloads/<id>.zip`，API 模式为 `/api/skills/<id>/download`）
+### 2. 添加点击事件处理器（约第 181 行之后）
+新增了 `copy-page-url` 按钮的 click 事件监听，逻辑与「复制下载链接」完全对称：
+- 调用 `navigator.clipboard.writeText(location.href)` 复制完整页面 URL
+- 将按钮文本改为「已复制 ✓」
+- 1500ms 后恢复为「分享本页」
+
+## 验证方式
+在浏览器中打开任意技能详情页（如 `skill.html?id=book-to-skill`），在下载按钮区域应能看到新增的「分享本页」按钮。点击后按钮文本应变为「已复制 ✓」，并在 1.5 秒后恢复。粘贴剪贴板内容应为完整的页面 URL（含 `?id=xxx` 参数）。
