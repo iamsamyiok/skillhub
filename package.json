@@ -6,6 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
-    "seed": "node seeds.js"
+    "seed": "node seeds.js",
+    "test": "node test/health.js"
   }
 }

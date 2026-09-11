@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillHub 状态</title>
+<style>
+:root {
+  --brand: #4f46e5;
+  --brand-2: #7c3aed;
+  --ok: #059669;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: linear-gradient(140deg, #171a2e 0%, #232052 55%, #3b2a72 100%);
+  color: #eef0ff;
+  font: 15px/1.65 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.card {
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 18px;
+  padding: 40px 48px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.35);
+  min-width: 280px;
+}
+.logo {
+  font-size: 13px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #8b90c4;
+  margin-bottom: 20px;
+}
+.dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--ok);
+  display: inline-block;
+  margin-right: 8px;
+  box-shadow: 0 0 8px var(--ok);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .55; }
+}
+h1 { margin: 0 0 8px; font-size: 22px; font-weight: 700; }
+.status { margin: 16px 0; font-size: 15px; color: #cdd2f5; }
+.time { font-size: 13px; color: #8b90c4; margin-top: 10px; }
+a { color: #aab1e0; }
+a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">SkillHub</div>
+  <h1><span class="dot"></span>服务正常</h1>
+  <div class="status">所有系统运行中</div>
+  <div class="time" id="clock">--</div>
+  <div style="margin-top:20px;font-size:12.5px;color:#8b90c4">
+    <a href="/">返回首页</a>
+  </div>
+</div>
+<script>
+function tick() {
+  var now = new Date();
+  var pad = function(n){ return ('0'+n).slice(-2); };
+  var s = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+' '+
+          pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+  document.getElementById('clock').textContent = '当前时间：' + s;
+}
+tick();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
