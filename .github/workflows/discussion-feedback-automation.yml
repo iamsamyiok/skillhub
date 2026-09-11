@@ -65,17 +65,18 @@ jobs:
           COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
           COMMENT_URL: ${{ github.event.comment.html_url }}
         run: |
-          # env 传递避免 shell 注入
+          # 写到工作区内(opencode headless 默认拒绝读工作区外的 /tmp/*);
+          # AI 读取后由 Detect changes 步骤删除, 不进入 PR
           {
-            printf '%s\n' "## 原始评论"
+            printf '%s\n' "# 反馈评论"
             printf '%s\n' "- 页面: ${DISCUSSION_TITLE} (Discussion #${DISCUSSION_NUMBER})"
             printf '%s\n' "- 评论人: ${COMMENT_AUTHOR}"
             printf '%s\n' "- 评论链接: ${COMMENT_URL}"
             printf '%s\n' "- 评论正文(首行的 /ai-fix 是触发词, 请忽略):"
             printf '%s\n' ""
             printf '%s\n' "$COMMENT_BODY"
-          } > /tmp/feedback-comment.txt
-          cat /tmp/feedback-comment.txt
+          } > feedback-comment.md
+          cat feedback-comment.md
 
       - name: Generate improvement with OpenCode
         env:
@@ -85,7 +86,7 @@ jobs:
           cat > /tmp/feedback-prompt.txt <<'PROMPT_EOF'
           你是 SkillHub(技能下载站)的网页改进工程师。用户通过网站评论组件(Giscus, 存入 GitHub Discussions)提交了一条反馈, 触发词为 /ai-fix。
 
-          任务: 读取反馈内容(在 /tmp/feedback-comment.txt), 分析其中的页面改进建议, 然后修改网站源码落实改进。
+          任务: 读取当前目录下 feedback-comment.md(用户反馈原文), 分析其中的页面改进建议, 然后修改网站源码落实改进。
 
           硬性规则:
           1. 只允许修改 public/ 目录下的 HTML/CSS/JS 文件(即网站前端页面)。禁止修改 .github/ 目录、skills/ 目录、data/ 目录、server.js、package.json 等任何其他文件。
@@ -107,6 +108,7 @@ jobs:
 
       - name: Detect changes
         run: |
+          rm -f feedback-comment.md
           if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
             echo "NO_CHANGES=1" >> "$GITHUB_ENV"
             echo "无文件变更"
@@ -138,20 +140,35 @@ jobs:
 
           改动说明见 PR 中的 FEEDBACK-CHANGES.md。合并本 PR 后 deploy-pages.yml 将自动重新部署站点。" \
             --head "$BR" --base main
+          PR_URL=$(gh pr view "$BR" --json url --jq '.url')
+          echo "PR_URL=${PR_URL}" >> "$GITHUB_ENV"
 
       - name: Report result
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FEEDBACK_PAT: ${{ secrets.FEEDBACK_PAT }}
           DISCUSSION_NUMBER: ${{ github.event.discussion.number }}
-          PR_URL: ${{ env.NO_CHANGES == '1' && 'no-pr' || 'see-pr' }}
+          DISCUSSION_ID: ${{ github.event.discussion.node_id }}
         run: |
           if [ "${{ job.status }}" = "success" ] && [ "${{ env.NO_CHANGES }}" != "1" ]; then
-            PR_LINK=$(gh pr list --head "$(git branch --show-current)" --json url --jq '.[0].url' 2>/dev/null || true)
-            BODY="✅ AI 已根据 /ai-fix 反馈生成页面改进: ${PR_LINK:-PR 已创建}。人工审核合并后站点将自动重新部署。"
+            BODY="✅ AI 已根据 /ai-fix 反馈生成页面改进: ${PR_URL:-PR 已创建}。人工审核合并后站点将自动重新部署。"
           elif [ "${{ env.NO_CHANGES }}" = "1" ]; then
             BODY="⚠️ AI 已读取 /ai-fix 反馈, 但没有产生页面改动(反馈可能超出前端范畴或描述含糊), 详情见 Actions 日志。"
           else
             BODY="❌ AI 处理反馈失败, 请查看 Actions 日志: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           fi
-          gh api -X POST "/repos/${{ github.repository }}/discussions/${DISCUSSION_NUMBER}/comments" -f body="$BODY" --jq '.html_url'
+
+          # GITHUB_TOKEN 无权访问 Discussions API(GitHub 限制), 配置 FEEDBACK_PAT 则回写评论区;
+          # 否则降级写入 Actions Summary(Actions 运行页可见)
+          if [ -n "$FEEDBACK_PAT" ]; then
+            DISC_ID=$(gh api graphql -H "Authorization: Bearer $FEEDBACK_PAT" \
+              -f query='query{repository(owner:"${{ github.repository_owner }}",name:"${{ github.event.repository.name }}"){discussion(number:'"${DISCUSSION_NUMBER}"'){id}}}' \
+              --jq '.repository.discussion.id')
+            gh api graphql -H "Authorization: Bearer $FEEDBACK_PAT" \
+              -f query='mutation($id: ID!, $body: String!){addDiscussionComment(input:{discussionId: $id, body: $body}){comment{url}}}' \
+              -F id="$DISC_ID" -f body="$BODY" --jq '.data.addDiscussionComment.comment.url'
+          else
+            echo "$BODY" >> "$GITHUB_STEP_SUMMARY"
+            echo "未配置 FEEDBACK_PAT, 结果仅写入 Actions Summary"
+          fi
