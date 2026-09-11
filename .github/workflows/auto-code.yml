@@ -61,6 +61,8 @@ jobs:
             "model": "agnes/${AGNES_MODEL}"
           }
           EOF
+          echo "== 生成配置校验(无密钥明文) =="
+          python3 -m json.tool "$HOME/.config/opencode/opencode.json"
         env:
           AGNES_BASE_URL: ${{ secrets.AGNES_BASE_URL }}
           AGNES_MODEL: ${{ secrets.AGNES_MODEL }}
@@ -93,7 +95,12 @@ jobs:
             echo "4. 完成后在项目根目录写 IMPLEMENTATION.md, 说明改了什么、如何验证。"
             echo "5. 不要执行 git commit/push, 只改工作区文件, 交给后续流水线处理。"
           } > /tmp/issue-prompt.txt
-          opencode run --model "agnes/${AGNES_MODEL}" "$(cat /tmp/issue-prompt.txt)"
+          opencode --version
+          if ! opencode run --print-logs --model "agnes/${AGNES_MODEL}" "$(cat /tmp/issue-prompt.txt)"; then
+            echo "::error::opencode run 失败, 以下为 opencode 日志:"
+            cat "$HOME/.local/share/opencode/log/"*.log 2>/dev/null | tail -60 || true
+            exit 1
+          fi
         shell: bash
 
       - name: CI verify (syntax + tests + smoke)
