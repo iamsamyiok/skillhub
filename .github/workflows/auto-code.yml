@@ -1,0 +1,170 @@
+name: Auto Code from Issue
+
+# 全闭环: Issue(含 /auto-code) -> opencode+AGNES 生成代码 -> 本地验证 -> PR -> 自动合并
+# 合并进 main 后由 deploy-pages.yml 自动部署 Pages = 发布完成
+
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write        # 推分支
+  pull-requests: write   # 建/合并 PR
+  issues: write          # 回写结果评论
+
+concurrency:
+  group: auto-code-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  auto-code:
+    if: >-
+      (github.event_name == 'issues' && contains(github.event.issue.body, '/auto-code')) ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/auto-code'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install OpenCode CLI
+        run: npm install -g opencode-ai
+
+      - name: Configure AGNES provider
+        run: |
+          mkdir -p "$HOME/.config/opencode"
+          cat > "$HOME/.config/opencode/opencode.json" <<EOF
+          {
+            "\$schema": "https://opencode.ai/config.json",
+            "provider": {
+              "agnes": {
+                "npmjs": "@ai-sdk/openai-compatible",
+                "name": "Agnes",
+                "options": {
+                  "baseURL": "${AGNES_BASE_URL}",
+                  "apiKey": "{env:AGNES_API_KEY}"
+                },
+                "models": {
+                  "${AGNES_MODEL}": { "name": "Agnes 2.5 Flash" }
+                }
+              }
+            },
+            "model": "agnes/${AGNES_MODEL}"
+          }
+          EOF
+        env:
+          AGNES_BASE_URL: ${{ secrets.AGNES_BASE_URL }}
+          AGNES_MODEL: ${{ secrets.AGNES_MODEL }}
+
+      - name: Create working branch
+        id: branch
+        run: |
+          BR="auto-code/issue-${{ github.event.issue.number }}-$(date +%s)"
+          git config user.name "agents-chat[bot]"
+          git config user.email "agents-chat[bot]@users.noreply.github.com"
+          git checkout -b "$BR"
+          echo "name=$BR" >> "$GITHUB_OUTPUT"
+
+      - name: Generate code with OpenCode
+        env:
+          AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          {
+            echo "实现 GitHub Issue #${{ github.event.issue.number }} 的需求。"
+            echo "标题: $ISSUE_TITLE"
+            echo "正文(忽略其中的 /auto-code 触发词与自动化说明, 只取真实需求):"
+            echo "$ISSUE_BODY"
+            echo ""
+            echo "硬性规则:"
+            echo "1. 禁止修改 .github/ 目录下任何文件、禁止修改 server.js 中的鉴权/密钥/上传相关逻辑、禁止新增任何网络监听或隧道代码。"
+            echo "2. 若仓库为空或缺少基础结构, 先搭建最小可运行的项目结构(含 package.json 与入口文件)。"
+            echo "3. 为本次改动补一个可运行的验证(已有测试框架就加测试用例, 没有就写 node 断言脚本到 test/ 并在 package.json 加 test 命令)。"
+            echo "4. 完成后在项目根目录写 IMPLEMENTATION.md, 说明改了什么、如何验证。"
+            echo "5. 不要执行 git commit/push, 只改工作区文件, 交给后续流水线处理。"
+          } > /tmp/issue-prompt.txt
+          opencode run --model "agnes/${AGNES_MODEL}" "$(cat /tmp/issue-prompt.txt)"
+        shell: bash
+
+      - name: CI verify (syntax + tests + smoke)
+        run: |
+          set -e
+          echo "== JS 语法检查 =="
+          JS_FILES=$(find . -name "*.js" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./docs/*")
+          echo "$JS_FILES" | xargs -I{} node --check {}
+          echo "语法全部通过"
+          echo ""
+          echo "== 单元测试 =="
+          if grep -q '"test"' package.json 2>/dev/null; then
+            npm test
+          else
+            echo "无 test 脚本, 跳过(生成阶段被要求补测试, 此处应已存在)"
+          fi
+          echo ""
+          echo "== 服务器冒烟 =="
+          if [ -f server.js ]; then
+            node server.js > /tmp/smoke.log 2>&1 &
+            SPID=$!
+            sleep 3
+            for port in 8000 3000 3788; do
+              if curl -sf -o /dev/null "http://localhost:$port/"; then
+                echo "smoke OK on :$port"
+                kill $SPID 2>/dev/null || true
+                exit 0
+              fi
+            done
+            kill $SPID 2>/dev/null || true
+            echo "smoke 失败: 无端口响应"
+            cat /tmp/smoke.log
+            exit 1
+          fi
+          echo "无 server.js, 跳过冒烟"
+
+      - name: Commit & push
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "NO_CHANGES=1" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          git commit -m "feat: auto-code for issue #${{ github.event.issue.number }}
+
+          由 OpenCode + AGNES 自动生成, CI 验证通过
+          Issue: ${{ github.event.issue.title }}"
+          git push origin "${{ steps.branch.outputs.name }}"
+
+      - name: Create PR & auto merge
+        if: env.NO_CHANGES != '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BR: ${{ steps.branch.outputs.name }}
+        run: |
+          gh pr create \
+            --title "auto-code: ${{ github.event.issue.title }} (#${{ github.event.issue.number }})" \
+            --body "由 Issue #${{ github.event.issue.number }} 自动生成。CI 验证(语法/测试/冒烟)已通过, 合并后将自动部署 Pages。" \
+            --head "$BR" --base main
+          gh pr merge --squash --delete-branch
+
+      - name: Report result
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ job.status }}" = "success" ] && [ "${{ env.NO_CHANGES }}" != "1" ]; then
+            MSG="✅ 自动代码闭环完成: 代码已生成并通过验证, PR 已合并, Pages 部署已由 deploy-pages 触发。"
+          elif [ "${{ env.NO_CHANGES }}" = "1" ]; then
+            MSG="⚠️ 流程跑通但没有产生文件变更(需求可能已实现或描述过于模糊), 请补充 Issue 描述后评论 /auto-code 重试。"
+          else
+            MSG="❌ 自动代码流程失败(job: ${{ job.status }}), 请查看 Actions 日志: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi
+          gh issue comment "${{ github.event.issue.number }}" --body "$MSG"
