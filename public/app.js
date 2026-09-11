@@ -165,6 +165,7 @@ async function initSkill() {
       </div>
       <div class="action-row">
         <a class="btn btn-primary" href="${dlUrl}" download>下载 ZIP</a>
+        <button class="btn btn-ghost" id="copy-zip-url">复制下载链接</button>
         <a class="btn btn-ghost" href="${tgzUrl}" download>tar.gz</a>
         <a class="btn btn-ghost" href="${rawMdUrl(s.id)}" target="_blank">查看 SKILL.md 原文</a>
         <button class="btn btn-ghost" id="copy-curl">复制 Agent 安装命令</button>
@@ -176,6 +177,12 @@ async function initSkill() {
       </div>
     </div>
     <div class="md-body" id="md">加载中…</div>`;
+
+  document.getElementById('copy-zip-url').addEventListener('click', async (e) => {
+    await navigator.clipboard.writeText(dlUrl);
+    e.target.textContent = '已复制 ✓';
+    setTimeout(() => (e.target.textContent = '复制下载链接'), 1500);
+  });
 
   document.getElementById('copy-curl').addEventListener('click', async (e) => {
     await navigator.clipboard.writeText(curlCmd);
