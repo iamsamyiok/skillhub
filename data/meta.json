@@ -132,6 +132,19 @@
       "downloads": 0,
       "createdAt": "2026-09-10T14:52:54.000Z",
       "updatedAt": "2026-09-10T14:52:54.000Z"
+    },
+    "book-to-skill": {
+      "category": "知识转化",
+      "tags": [
+        "书籍转化",
+        "知识提炼",
+        "SKILL.md",
+        "技能生成",
+        "book-to-skill"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-11T00:00:00.000Z",
+      "updatedAt": "2026-09-11T00:00:00.000Z"
     }
   }
 }
