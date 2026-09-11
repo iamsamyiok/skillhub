@@ -1,0 +1,157 @@
+name: Discussion Feedback Automation
+
+# Giscus 评论落到仓库 Discussions。带 /ai-fix 触发词的评论会唤起
+# OpenCode Agent 读取反馈并修改 public/ 下的页面源码, 自动创建 PR;
+# 其余评论仅保存为 Discussion, 不消耗任何 LLM 调用。
+# PR 由人工审核合并(真人 push main 会自动触发 deploy-pages.yml 重新部署)。
+on:
+  discussion_comment:
+    types: [created]
+
+permissions:
+  contents: write        # 推分支
+  pull-requests: write   # 创建 PR
+  discussions: write     # 回写结果到 Discussion
+
+concurrency:
+  group: feedback-${{ github.event.discussion.number }}
+  cancel-in-progress: false
+
+jobs:
+  ai-improve:
+    if: github.event.comment.user.type != 'Bot' && contains(github.event.comment.body, '/ai-fix')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NO_CHANGES: ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install OpenCode CLI
+        run: npm install -g opencode-ai
+
+      - name: Configure AGNES provider
+        run: |
+          mkdir -p "$HOME/.config/opencode"
+          cat > "$HOME/.config/opencode/opencode.json" <<EOF
+          {
+            "\$schema": "https://opencode.ai/config.json",
+            "provider": {
+              "agnes": {
+                "npmjs": "@ai-sdk/openai-compatible",
+                "name": "Agnes",
+                "options": {
+                  "baseURL": "${AGNES_BASE_URL}",
+                  "apiKey": "{env:AGNES_API_KEY}"
+                },
+                "models": {
+                  "${AGNES_MODEL}": { "name": "Agnes 2.5 Flash" }
+                }
+              }
+            },
+            "model": "agnes/${AGNES_MODEL}"
+          }
+          EOF
+          python3 -m json.tool "$HOME/.config/opencode/opencode.json"
+        env:
+          AGNES_BASE_URL: ${{ secrets.AGNES_BASE_URL }}
+          AGNES_MODEL: ${{ secrets.AGNES_MODEL }}
+
+      - name: Save comment to file
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          DISCUSSION_TITLE: ${{ github.event.discussion.title }}
+          DISCUSSION_NUMBER: ${{ github.event.discussion.number }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          COMMENT_URL: ${{ github.event.comment.html_url }}
+        run: |
+          # env 传递避免 shell 注入
+          {
+            printf '%s\n' "## 原始评论"
+            printf '%s\n' "- 页面: ${DISCUSSION_TITLE} (Discussion #${DISCUSSION_NUMBER})"
+            printf '%s\n' "- 评论人: ${COMMENT_AUTHOR}"
+            printf '%s\n' "- 评论链接: ${COMMENT_URL}"
+            printf '%s\n' "- 评论正文(首行的 /ai-fix 是触发词, 请忽略):"
+            printf '%s\n' ""
+            printf '%s\n' "$COMMENT_BODY"
+          } > /tmp/feedback-comment.txt
+          cat /tmp/feedback-comment.txt
+
+      - name: Generate improvement with OpenCode
+        env:
+          AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
+          AGNES_MODEL: ${{ secrets.AGNES_MODEL }}
+        run: |
+          cat > /tmp/feedback-prompt.txt <<'PROMPT_EOF'
+          你是 SkillHub(技能下载站)的网页改进工程师。用户通过网站评论组件(Giscus, 存入 GitHub Discussions)提交了一条反馈, 触发词为 /ai-fix。
+
+          任务: 读取反馈内容(在 /tmp/feedback-comment.txt), 分析其中的页面改进建议, 然后修改网站源码落实改进。
+
+          硬性规则:
+          1. 只允许修改 public/ 目录下的 HTML/CSS/JS 文件(即网站前端页面)。禁止修改 .github/ 目录、skills/ 目录、data/ 目录、server.js、package.json 等任何其他文件。
+          2. 反馈若要求的内容超出前端页面范畴(如后端功能、新技能发布), 请在 FEEDBACK-CHANGES.md 中说明"该反馈超出网页前端范畴", 不做任何代码修改, 正常结束。
+          3. 若反馈描述含糊导致无法形成具体改进, 同样写明原因后结束, 不要凭空猜测大改。
+          4. 保持纯静态站点架构, 不新增任何后端服务、网络监听或第三方脚本依赖。
+          5. 改动保持克制, 只做反馈明确要求的改进, 不顺手重构其他部分。
+          6. 完成后在仓库根目录写 FEEDBACK-CHANGES.md, 说明: 反馈要点、修改了哪些文件哪些位置、如何验证。
+          7. 不要执行 git commit/push, 只修改工作区文件, 交给后续流水线处理。
+
+          可参考: public/skill.html 是技能详情页(含 Giscus 评论组件), public/app.js 负责页面渲染, public/style.css 是全站样式。站点为深色主题。
+          PROMPT_EOF
+          opencode --version
+          if ! opencode run --print-logs --model "agnes/${AGNES_MODEL}" "$(cat /tmp/feedback-prompt.txt)"; then
+            echo "::error::opencode run 失败, 以下为 opencode 日志:"
+            cat "$HOME/.local/share/opencode/log/"*.log 2>/dev/null | tail -60 || true
+            exit 1
+          fi
+
+      - name: Detect changes
+        run: |
+          if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
+            echo "NO_CHANGES=1" >> "$GITHUB_ENV"
+            echo "无文件变更"
+          else
+            git status --short
+          fi
+
+      - name: Create PR
+        if: env.NO_CHANGES != '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCUSSION_NUMBER: ${{ github.event.discussion.number }}
+          DISCUSSION_TITLE: ${{ github.event.discussion.title }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          COMMENT_URL: ${{ github.event.comment.html_url }}
+        run: |
+          BR="feedback/discussion-${DISCUSSION_NUMBER}-$(date +%s)"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BR"
+          git add -A
+          git commit -m "feedback: 根据 Discussion #${DISCUSSION_NUMBER} 的反馈改进页面" --author="${COMMENT_AUTHOR} <${COMMENT_AUTHOR}@users.noreply.github.com>"
+          git push origin "$BR"
+          gh pr create \
+            --title "feedback: ${DISCUSSION_TITLE} 的页面反馈改进" \
+            --body "由 Discussion #${DISCUSSION_NUMBER} 中 ${COMMENT_AUTHOR} 的评论自动生成。
+
+          原始评论: ${COMMENT_URL}
+
+          改动说明见 PR 中的 FEEDBACK-CHANGES.md。合并本 PR 后 deploy-pages.yml 将自动重新部署站点。" \
+            --head "$BR" --base main
+
+      - name: Report result
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCUSSION_NUMBER: ${{ github.event.discussion.number }}
+          PR_URL: ${{ env.NO_CHANGES == '1' && 'no-pr' || 'see-pr' }}
+        run: |
+          if [ "${{ job.status }}" = "success" ] && [ "${{ env.NO_CHANGES }}" != "1" ]; then
+            PR_LINK=$(gh pr list --head "$(git branch --show-current)" --json url --jq '.[0].url' 2>/dev/null || true)
+            BODY="✅ AI 已根据 /ai-fix 反馈生成页面改进: ${PR_LINK:-PR 已创建}。人工审核合并后站点将自动重新部署。"
+          elif [ "${{ env.NO_CHANGES }}" = "1" ]; then
+            BODY="⚠️ AI 已读取 /ai-fix 反馈, 但没有产生页面改动(反馈可能超出前端范畴或描述含糊), 详情见 Actions 日志。"
+          else
+            BODY="❌ AI 处理反馈失败, 请查看 Actions 日志: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi
+          gh api -X POST "/repos/${{ github.repository }}/discussions/${DISCUSSION_NUMBER}/comments" -f body="$BODY" --jq '.html_url'
