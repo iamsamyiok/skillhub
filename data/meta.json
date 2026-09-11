@@ -134,6 +134,7 @@
       "updatedAt": "2026-09-10T14:52:54.000Z"
     },
     "book-to-skill": {
+      "version": "1.1.0",
       "category": "知识转化",
       "tags": [
         "书籍转化",

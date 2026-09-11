@@ -7,6 +7,6 @@
   "scripts": {
     "start": "node server.js",
     "seed": "node seeds.js",
-    "test": "node test/health.test.js"
+    "test": "node test/health.test.js && node test/validate_skill.test.js"
   }
 }

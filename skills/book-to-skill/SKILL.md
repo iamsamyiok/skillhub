@@ -1,7 +1,9 @@
 ---
 name: book-to-skill
-version: 1.0.0
+version: 1.1.0
 description: 书籍→技能包转化（Book-to-Skill）：把一本书、长文档或章节笔记提炼成符合规范的可复用 SKILL.md 技能包。当用户要求"把这本书变成技能""从文档提取方法论""生成 SKILL.md""把知识转化为工作流"或类似意图时使用。convert a book or long document into a reusable skill package
+category: 知识转化
+tags: [书籍转化, 知识提炼, SKILL.md, 技能生成, book-to-skill]
 ---
 
 # Skill: book-to-skill（书籍→技能包转化）
@@ -92,6 +94,18 @@ skills/<skill-name>/
 - 技能目录名用 kebab-case（如 `book-to-skill`）
 - `SKILL.md` 顶部必须有 YAML frontmatter
 - 如有必要，可在 `references/` 放置原文摘录供复核
+
+### 第 6 步：校验生成的技能包
+
+使用仓库内置的校验脚本验证输出是否符合规范：
+
+```bash
+python3 skills/book-to-skill/scripts/validate_skill.py skills/<skill-name>
+```
+
+- 通过时输出 `OK`（exit 0）
+- 失败时逐条列出问题并 exit 1
+- 也可将 `templates/SKILL.template.md` 作为骨架参考，确保 frontmatter 占位符与实际字段一致
 
 ## 输出规范（SKILL.md 模板）
 
