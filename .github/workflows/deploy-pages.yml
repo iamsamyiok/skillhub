@@ -24,6 +24,16 @@ jobs:
       - uses: actions/checkout@v4
       # 前提：仓库 Settings → Pages → Source 选 "GitHub Actions"（管理员一次性操作）
       - uses: actions/configure-pages@v5
+      - name: Rebuild static site
+        run: |
+          node export-static.js --site-url https://iamsamyiok.github.io/skillhub
+          # 白名单外的静态页(auto-code 生成的新页面等)原样带上
+          for f in public/*.html; do
+            base=$(basename "$f")
+            case " index.html skill.html ai.html setup.html " in *" $base "*) continue ;; esac
+            cp "$f" docs/
+            echo "extra page: $base"
+          done
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs
