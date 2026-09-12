@@ -162,6 +162,24 @@
       "downloads": 0,
       "createdAt": "2026-09-12T17:23:44.984Z",
       "updatedAt": "2026-09-12T17:23:44.984Z"
+    },
+    "text-to-d2": {
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "图表",
+        "文本转图",
+        "D2",
+        "可视化",
+        "流程图",
+        "架构图",
+        "语义抽取",
+        "text-to-diagram",
+        "d2-chart"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-12T17:54:12.772Z",
+      "updatedAt": "2026-09-12T17:54:12.772Z"
     }
   }
 }

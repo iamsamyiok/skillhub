@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D2 图表预览</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.5 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; height: 100vh; display: flex; flex-direction: column; background: #f6f7f9; }
+  header { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #fff; border-bottom: 1px solid #e3e6ea; flex-wrap: wrap; }
+  header h1 { font-size: 15px; margin: 0 8px 0 0; }
+  header .sp { flex: 1; }
+  button, select { border: 1px solid #d0d5dd; background: #fff; border-radius: 6px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
+  button:hover { background: #f0f4ff; border-color: #4a90d9; }
+  button.primary { background: #2f6fed; border-color: #2f6fed; color: #fff; }
+  button.primary:hover { background: #2560d0; }
+  button:disabled { opacity: .5; cursor: wait; }
+  label.ck { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; cursor: pointer; }
+  main { flex: 1; display: flex; min-height: 0; }
+  #srcPane { width: 42%; display: flex; flex-direction: column; border-right: 1px solid #e3e6ea; min-width: 280px; }
+  #srcHead, #pvHead { padding: 5px 12px; font-size: 12px; color: #667; background: #eef0f3; border-bottom: 1px solid #e3e6ea; }
+  #d2src { flex: 1; resize: none; border: 0; outline: 0; padding: 12px; font: 13px/1.6 ui-monospace, "SF Mono", Consolas, monospace; white-space: pre; overflow: auto; background: #fff; }
+  #pvPane { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  #preview { flex: 1; overflow: auto; background: #fff; display: flex; align-items: flex-start; justify-content: center; padding: 16px; }
+  #preview svg { max-width: 100%; height: auto; }
+  #preview.empty::after { content: "渲染结果将显示在这里"; color: #aab; align-self: center; }
+  #err { display: none; background: #fdf1f0; color: #c0392b; border-top: 1px solid #f5c6c2; padding: 8px 14px; font-size: 12.5px; white-space: pre-wrap; max-height: 32vh; overflow: auto; }
+  footer { padding: 4px 12px; font-size: 12px; color: #889; background: #fff; border-top: 1px solid #e3e6ea; }
+  @media print { header, #srcPane, footer, #err { display: none !important; } main { display: block; } #pvPane { border: 0; } #preview { overflow: visible; } }
+</style>
+<!--D2_LIB_INLINE-->
+</head>
+<body>
+<header>
+  <h1>D2 图表预览</h1>
+  <select id="layoutSel" title="布局引擎">
+    <option value="dagre">布局: dagre</option>
+    <option value="elk">布局: elk</option>
+  </select>
+  <select id="themeSel" title="主题">
+    <option value="0">主题: 默认</option>
+    <option value="1">主题: 中性灰</option>
+    <option value="4">主题: Flagship</option>
+    <option value="5">主题: Cool Aubergine</option>
+    <option value="100">主题: Dark Mauve</option>
+    <option value="200">主题: Dark Flagship</option>
+    <option value="300">主题: Terminal</option>
+    <option value="302">主题: Origami</option>
+  </select>
+  <label class="ck" title="手绘风格"><input type="checkbox" id="sketchCk"> 手绘</label>
+  <button class="primary" id="renderBtn">▶ 重新渲染</button>
+  <div class="sp"></div>
+  <button id="saveBtn" title="下载 .d2 源码">💾 保存源码</button>
+  <button id="svgBtn" title="导出矢量图">导出 SVG</button>
+  <button id="pngBtn" title="导出位图">导出 PNG</button>
+  <button id="pdfBtn" title="浏览器打印，可另存为 PDF">打印 / PDF</button>
+</header>
+<main>
+  <div id="srcPane">
+    <div id="srcHead">D2 源码（可直接编辑）</div>
+    <textarea id="d2src" spellcheck="false" placeholder="在此输入 D2 源码…&#10;例：a: 用户 {shape: person}&#10;b: 服务端&#10;a -> b: 请求"></textarea>
+  </div>
+  <div id="pvPane">
+    <div id="pvHead">预览</div>
+    <div id="preview" class="empty"></div>
+    <div id="err"></div>
+  </div>
+</main>
+<footer><span id="stat">就绪</span><span id="libState"></span></footer>
+
+<script type="module">
+const $ = (id) => document.getElementById(id);
+const src = $('d2src');
+const preview = $('preview');
+const errBox = $('err');
+const stat = $('stat');
+const renderBtn = $('renderBtn');
+
+let d2 = null;
+
+async function loadD2() {
+  let C = window.D2Class || null;
+  if (!C) {
+    try { ({ D2: C } = await import('../vendor/d2.browser.js')); }
+    catch {
+      ({ D2: C } = await import('https://esm.sh/@terrastruct/d2@0.1.33'));
+      $('libState').textContent = ' · 渲染库来自 CDN（联网加载）';
+    }
+  } else {
+    $('libState').textContent = ' · 渲染库已内嵌（离线可用）';
+  }
+  const t0 = performance.now();
+  d2 = new C();
+  await d2.version();
+  return performance.now() - t0;
+}
+
+// 源码注入优先级：内嵌（standalone）> URL ?src= > localStorage > 示例
+function initialSrc() {
+  if (typeof window.EMBEDDED_D2 === 'string' && window.EMBEDDED_D2.trim()) return window.EMBEDDED_D2;
+  const q = new URLSearchParams(location.search).get('src');
+  if (q) try { return decodeURIComponent(escape(atob(q))); } catch { /* 忽略非法参数 */ }
+  try { const s = localStorage.getItem('d2-src'); if (s) return s; } catch { /* file:// 可能不可用 */ }
+  return [
+    'title: |#',
+    '  D2 图表示例',
+    '#|',
+    '',
+    'user: 用户 {shape: person}',
+    'agent: Agent {shape: hexagon}',
+    'web: 前端网页',
+    'd2: D2 渲染器 {shape: cylinder}',
+    '',
+    'Sys: 系统 {',
+    '  web',
+    '  d2',
+    '}',
+    '',
+    'user -> agent: 自然语言描述',
+    'agent -> Sys.web: D2 源码',
+    'Sys.web -> Sys.d2: 渲染',
+    'Sys.web -> user: SVG 预览 {style.stroke-dash: 4}'
+  ].join('\n');
+}
+
+function showErr(msg) {
+  errBox.style.display = msg ? 'block' : 'none';
+  errBox.textContent = msg || '';
+  if (msg) { preview.classList.add('empty'); preview.innerHTML = ''; }
+}
+
+// 解析 compile 抛出的结构化错误 JSON：[{range, errmsg}]
+function fmtCompileError(e) {
+  try {
+    const items = JSON.parse(e.message);
+    if (Array.isArray(items)) {
+      return items.map((it) => {
+        const m = /:(\d+):(\d+):/.exec(it.errmsg || '');
+        return (m ? `第 ${m[1]} 行第 ${m[2]} 列：` : '') + (it.errmsg || '').replace(/^index:\d+:\d+:\s*/, '');
+      }).join('\n');
+    }
+  } catch { /* 非结构化错误原样输出 */ }
+  return String(e.message || e);
+}
+
+async function render() {
+  if (!d2) return;
+  const source = src.value;
+  renderBtn.disabled = true;
+  stat.textContent = '渲染中…';
+  const t0 = performance.now();
+  // 渲染引擎跑在 Web Worker 里：个别环境（file:// 直开 + 严格浏览器策略）会静默卡死，给出可行动的提示
+  const watchdog = setTimeout(() => {
+    stat.textContent = '渲染长时间无响应';
+    showErr('渲染引擎长时间无响应：当前打开方式可能限制了 Web Worker。\n请在本目录运行 python3 -m http.server 8899 后访问 http://localhost:8899/web/ ，或改用 Firefox 打开本文件。');
+  }, 25000);
+  try {
+    const opts = {
+      layout: $('layoutSel').value,
+      themeID: Number($('themeSel').value),
+      sketch: $('sketchCk').checked,
+      scale: 1
+    };
+    const { diagram, renderOptions } = await d2.compile(source, opts);
+    const svg = await d2.render(diagram, renderOptions);
+    preview.innerHTML = svg;
+    preview.classList.remove('empty');
+    showErr('');
+    try { localStorage.setItem('d2-src', source); } catch { /* ignore */ }
+    stat.textContent = `渲染成功 · ${(performance.now() - t0).toFixed(0)} ms · ${source.split('\n').length} 行`;
+  } catch (e) {
+    showErr(fmtCompileError(e));
+    stat.textContent = '渲染失败';
+  } finally {
+    clearTimeout(watchdog);
+    renderBtn.disabled = false;
+  }
+}
+
+function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
+
+$('renderBtn').onclick = render;
+$('layoutSel').onchange = render;
+$('themeSel').onchange = render;
+$('sketchCk').onchange = render;
+src.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); render(); }
+});
+$('saveBtn').onclick = () => download(new Blob([src.value], { type: 'text/plain' }), 'diagram.d2');
+$('svgBtn').onclick = () => {
+  const svgEl = preview.querySelector('svg');
+  if (!svgEl) return;
+  download(new Blob([new XMLSerializer().serializeToString(svgEl)], { type: 'image/svg+xml' }), 'diagram.svg');
+};
+$('pngBtn').onclick = () => {
+  const svgEl = preview.querySelector('svg');
+  if (!svgEl) return;
+  const xml = new XMLSerializer().serializeToString(svgEl);
+  const vb = (svgEl.getAttribute('viewBox') || '').split(/\s+/).map(Number);
+  const w = vb.length === 4 ? vb[2] : svgEl.clientWidth || 800;
+  const h = vb.length === 4 ? vb[3] : svgEl.clientHeight || 600;
+  const scale = 2; // 2x 输出提升清晰度
+  const img = new Image();
+  img.onload = () => {
+    const cv = document.createElement('canvas');
+    cv.width = w * scale; cv.height = h * scale;
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+    cv.toBlob((b) => b && download(b, 'diagram.png'), 'image/png');
+  };
+  img.src = URL.createObjectURL(new Blob([xml], { type: 'image/svg+xml;charset=utf-8' }));
+};
+$('pdfBtn').onclick = () => window.print();
+
+loadD2()
+  .then((ms) => { stat.textContent = `渲染引擎就绪（初始化 ${(ms / 1000).toFixed(1)}s）`; src.value = initialSrc(); render(); })
+  .catch((e) => { stat.textContent = '初始化失败'; showErr('渲染引擎加载失败：' + (e && e.message || e) + '\n请检查网络（首次加载需下载渲染库）或使用 build_preview.mjs 生成内嵌版。'); });
+</script>
+</body>
+</html>
