@@ -1,0 +1,15 @@
+{
+  "name": "d2-chart-skill",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@terrastruct/d2": "^0.1.33"
+  }
+}
