@@ -201,7 +201,10 @@ $('svgBtn').onclick = () => {
 $('pngBtn').onclick = () => {
   const svgEl = preview.querySelector('svg');
   if (!svgEl) return;
-  const xml = new XMLSerializer().serializeToString(svgEl);
+  // canvas 位图路径加载不了 SVG 内嵌哈希字体（d2-*-font-bold 等），加粗中文会乱码：
+  // 导出前统一替换为系统字体栈（页面内预览仍用原内嵌字体，不受影响）
+  const FONT_STACK = 'PingFang SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif';
+  const xml = new XMLSerializer().serializeToString(svgEl).replace(/font-family:\s*[^;"}]*/g, 'font-family: ' + FONT_STACK);
   const vb = (svgEl.getAttribute('viewBox') || '').split(/\s+/).map(Number);
   const w = vb.length === 4 ? vb[2] : svgEl.clientWidth || 800;
   const h = vb.length === 4 ? vb[3] : svgEl.clientHeight || 600;
