@@ -26,7 +26,7 @@ jobs:
       - uses: actions/configure-pages@v5
       - name: Rebuild static site
         run: |
-          node export-static.js --site-url https://iamsamyiok.github.io/skillhub
+          node export-static.js --site-url https://iamsamyiok.github.io/skillhub --repo-url https://github.com/${{ github.repository }}
           # 白名单外的静态页(auto-code 生成的新页面等)原样带上
           for f in public/*.html; do
             base=$(basename "$f")
