@@ -1,0 +1,37 @@
+{
+  "graphMeta": { "title": "text-to-d2 文本转图工作流", "graphKind": "flowchart", "allowCycle": true },
+  "nodes": [
+    { "id": "n1", "label": "长文本输入", "nodeType": "entity" },
+    { "id": "n2", "label": "语义抽取", "nodeType": "process", "description": "继承 text-to-diagram：类型决策表+泳道分组" },
+    { "id": "n3", "label": "复杂时序?", "nodeType": "decision" },
+    { "id": "n4", "label": "Mermaid 降级", "nodeType": "note" },
+    { "id": "n5", "label": "TTG 语义 JSON", "nodeType": "state" },
+    { "id": "n6", "label": "语义桥转换", "nodeType": "process", "description": "继承 d2-chart：shape 映射+限定路径" },
+    { "id": "n7", "label": "结构校验", "nodeType": "decision" },
+    { "id": "n8", "label": "D2 源码生成", "nodeType": "process" },
+    { "id": "n9", "label": "编译器验证", "nodeType": "decision" },
+    { "id": "n10", "label": "离线预览页", "nodeType": "state" },
+    { "id": "n11", "label": "SVG/PNG 导出", "nodeType": "process" },
+    { "id": "L1", "label": "虚线 = 回退/回改路径", "nodeType": "note" }
+  ],
+  "links": [
+    { "source": "n1", "target": "n2", "linkType": "sequence" },
+    { "source": "n2", "target": "n3", "linkType": "sequence" },
+    { "source": "n3", "target": "n4", "linkType": "condition", "label": "是" },
+    { "source": "n3", "target": "n5", "linkType": "condition", "label": "否" },
+    { "source": "n5", "target": "n6", "linkType": "sequence" },
+    { "source": "n6", "target": "n7", "linkType": "sequence" },
+    { "source": "n7", "target": "n5", "linkType": "feedback" },
+    { "source": "n7", "target": "n8", "linkType": "condition", "label": "通过" },
+    { "source": "n8", "target": "n9", "linkType": "sequence" },
+    { "source": "n9", "target": "n6", "linkType": "feedback" },
+    { "source": "n9", "target": "n10", "linkType": "condition", "label": "通过" },
+    { "source": "n10", "target": "n11", "linkType": "sequence" },
+    { "source": "L1", "target": "n3", "linkType": "association" }
+  ],
+  "groups": [
+    { "id": "g1", "label": "语义抽取层（text-to-diagram）", "kind": "phase", "members": ["n1", "n2", "n3", "n4", "n5"] },
+    { "id": "g2", "label": "生成交付层（d2-chart）", "kind": "phase", "members": ["n6", "n7", "n8", "n9"] },
+    { "id": "g3", "label": "交付物", "kind": "cluster", "members": ["n10", "n11"] }
+  ]
+}

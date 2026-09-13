@@ -1,0 +1,38 @@
+title: "text-to-d2 文本转图工作流"
+direction: down
+
+g1: "语义抽取层（text-to-diagram）" {
+  n1: "长文本输入" {shape: rectangle}
+  n2: "语义抽取" {shape: rectangle}
+  n3: "复杂时序?" {shape: diamond}
+  n4: "Mermaid 降级" {shape: callout}
+  n5: "TTG 语义 JSON" {shape: oval}
+}
+
+g2: "生成交付层（d2-chart）" {
+  n6: "语义桥转换" {shape: rectangle}
+  n7: "结构校验" {shape: diamond}
+  n8: "D2 源码生成" {shape: rectangle}
+  n9: "编译器验证" {shape: diamond}
+}
+
+g3: "交付物" {
+  n10: "离线预览页" {shape: oval}
+  n11: "SVG/PNG 导出" {shape: rectangle}
+}
+
+L1: "虚线 = 回退/回改路径" {shape: callout}
+
+g1.n1 -> g1.n2
+g1.n2 -> g1.n3
+g1.n3 -> g1.n4: "是"
+g1.n3 -> g1.n5: "否"
+g1.n5 -> g2.n6
+g2.n6 -> g2.n7
+g2.n7 -> g1.n5 {style.stroke-dash: 4}
+g2.n7 -> g2.n8: "通过"
+g2.n8 -> g2.n9
+g2.n9 -> g2.n6 {style.stroke-dash: 4}
+g2.n9 -> g3.n10: "通过"
+g3.n10 -> g3.n11
+L1 <-> g1.n3

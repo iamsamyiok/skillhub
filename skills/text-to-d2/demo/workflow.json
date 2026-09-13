@@ -1,0 +1,172 @@
+{
+  "chart_type": "flowchart",
+  "direction": "down",
+  "nodes": [
+    {
+      "id": "n1",
+      "label": "长文本输入",
+      "shape": "rectangle"
+    },
+    {
+      "id": "n2",
+      "label": "语义抽取",
+      "shape": "rectangle"
+    },
+    {
+      "id": "n3",
+      "label": "复杂时序?",
+      "shape": "diamond"
+    },
+    {
+      "id": "n4",
+      "label": "Mermaid 降级",
+      "shape": "callout"
+    },
+    {
+      "id": "n5",
+      "label": "TTG 语义 JSON",
+      "shape": "oval"
+    },
+    {
+      "id": "n6",
+      "label": "语义桥转换",
+      "shape": "rectangle"
+    },
+    {
+      "id": "n7",
+      "label": "结构校验",
+      "shape": "diamond"
+    },
+    {
+      "id": "n8",
+      "label": "D2 源码生成",
+      "shape": "rectangle"
+    },
+    {
+      "id": "n9",
+      "label": "编译器验证",
+      "shape": "diamond"
+    },
+    {
+      "id": "n10",
+      "label": "离线预览页",
+      "shape": "oval"
+    },
+    {
+      "id": "n11",
+      "label": "SVG/PNG 导出",
+      "shape": "rectangle"
+    },
+    {
+      "id": "L1",
+      "label": "虚线 = 回退/回改路径",
+      "shape": "callout"
+    }
+  ],
+  "connections": [
+    {
+      "from": "n1",
+      "to": "n2",
+      "label": ""
+    },
+    {
+      "from": "n2",
+      "to": "n3",
+      "label": ""
+    },
+    {
+      "from": "n3",
+      "to": "n4",
+      "label": "是"
+    },
+    {
+      "from": "n3",
+      "to": "n5",
+      "label": "否"
+    },
+    {
+      "from": "n5",
+      "to": "n6",
+      "label": ""
+    },
+    {
+      "from": "n6",
+      "to": "n7",
+      "label": ""
+    },
+    {
+      "from": "n7",
+      "to": "n5",
+      "label": "",
+      "style": {
+        "stroke-dash": "4"
+      }
+    },
+    {
+      "from": "n7",
+      "to": "n8",
+      "label": "通过"
+    },
+    {
+      "from": "n8",
+      "to": "n9",
+      "label": ""
+    },
+    {
+      "from": "n9",
+      "to": "n6",
+      "label": "",
+      "style": {
+        "stroke-dash": "4"
+      }
+    },
+    {
+      "from": "n9",
+      "to": "n10",
+      "label": "通过"
+    },
+    {
+      "from": "n10",
+      "to": "n11",
+      "label": ""
+    },
+    {
+      "from": "L1",
+      "to": "n3",
+      "label": "",
+      "bidirectional": true
+    }
+  ],
+  "containers": [
+    {
+      "id": "g1",
+      "label": "语义抽取层（text-to-diagram）",
+      "children": [
+        "n1",
+        "n2",
+        "n3",
+        "n4",
+        "n5"
+      ]
+    },
+    {
+      "id": "g2",
+      "label": "生成交付层（d2-chart）",
+      "children": [
+        "n6",
+        "n7",
+        "n8",
+        "n9"
+      ]
+    },
+    {
+      "id": "g3",
+      "label": "交付物",
+      "children": [
+        "n10",
+        "n11"
+      ]
+    }
+  ],
+  "title": "text-to-d2 文本转图工作流"
+}
