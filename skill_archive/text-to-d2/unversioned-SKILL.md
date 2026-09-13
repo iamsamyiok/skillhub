@@ -1,7 +1,6 @@
 ---
 name: text-to-d2
 description: 文本转 D2 图表（text-to-d2）：融合语义抽取与视觉交付——从长文本抽取逻辑结构（判断/条件/因果/角色/泳道分组，支持 evidence 溯源），自动映射为 shape 语义化 D2 图表，浏览器本地 WASM 渲染，产单文件离线交互预览页，可导出 SVG/PNG/PDF。适用于把文档/流程说明/事故分析/方案描述转成精美架构图、流程图、因果图。当用户要求把一段文字/文档转成图、画流程图/架构图/因果图时使用。text to diagram, d2, architecture diagram, flowchart
-version: v0.1.1
 ---
 
 # Skill: text-to-d2（文本转 D2 图表）
@@ -16,7 +15,7 @@ version: v0.1.1
 
 - 文本含真实流程/结构/因果 → 继续；
 - 纯概念罗列、无可抽取关系 → 输出 `{"error":"cannot_extract_graph","reason":"..."}`；
-- **复杂时序**（多参与者往返消息）→ 本 skill 时序场景已硬拦截。给用户的降级指引要可执行：「D2 不擅长复杂时序，请用 Mermaid sequenceDiagram——可在 https://mermaid.live 直接粘贴预览，或 `npm i -g @mermaid-js/mermaid-cli` 后 `mmdc -i seq.mmd -o seq.svg` 导出」，而不是只说一句"换 Mermaid"；
+- **复杂时序**（多参与者往返消息）→ 建议用户改用 Mermaid，本 skill 时序场景已硬拦截；
 - 用户要的是单张架构/关系图（无长文本）→ 跳过抽取规范直接给简版 TTG JSON 也行。
 
 ### Step 2 语义抽取（产 TTG JSON）
@@ -72,19 +71,11 @@ node scripts/ttg_to_spec.mjs graph.ttg.json -o mychart --preview
 | `graphMeta.title` | D2 顶层标题 |
 
 - 失败：逐条打印 `[路径] 错误` + 修复提示 → 修正 TTG JSON → 重跑（自动修复循环）；
-- WARN 行（如长标签、未分组长链）不阻塞，但建议采纳。**游离节点告警**（`没有任何连线与分组引用`）：该节点渲染后是孤立方块——回原文复核，真有关系就补连线（association），没有就删节点，别留着污染画面。
-
-### 图例（legend）变通方案
-
-D2 无原生图例，两种变通：
-1. **note 节点当图例**：`legend: "虚线 = 回环反馈；双向 = 无流向关联" {shape: callout}`；
-2. **容器图例**：把含义写进分组 label（如 `g2: "处置阶段（虚线回环指回告警）"`）。
-在 Step 2 抽取时若有 feedback/association 等非直觉线型，就主动加一个 legend note 节点。
+- WARN 行（如长标签、未分组长链）不阻塞，但建议采纳。
 
 ### Step 4 交付
 
 - 告知用户：双击 `mychart-preview.html` 离线预览；网页内可改源码（Ctrl+Enter 重渲染）、切主题/布局/手绘风、导出 SVG/PNG、打印 PDF；
-- **手改源码注意**：D2 源码的引号、花括号必须成对——删中文标签时连同一对引号一起处理，漏半个引号整页解析失败（白屏时页面会显示错误面板，按提示行:列修复）；
 - 打开无响应时页面会提示：`python3 -m http.server` 起本地服务或改用 Firefox（个别浏览器对 file:// 的 Worker 有限制）；
 - 高要求场景（对外汇报）：导出 SVG 后可用 page-visual-review skill 做识图审查（文字重叠、连线压字、对比度），major 问题回改后重导；
 - 仅需校验已有 D2 文件：`node scripts/check_d2.mjs file.d2`。
@@ -95,12 +86,7 @@ D2 无原生图例，两种变通：
 2. **容器作用域**：容器内节点连线必须 `SYS.W` 限定路径——桥自动处理，手写 D2 必错；
 3. **连线样式**：必须 `style.xxx: 值` 形式且值不带引号；
 4. **手绘开关**：d2-config 里是 `sketch: true`；
-5. **大图性能**：WASM 渲染建议 ≤ 50 节点；高品质 PNG 用本地 d2 CLI；
-6. **frontmatter description 必须单行**：SkillHub 等下载站导出器按行解析 YAML，多行折叠标量（`>` 或换行续行）会被截断；
-
-## SkillEvo Mutation Guards
-
-- Output valid JSON only, with no markdown fences or extra commentary.
+5. **大图性能**：WASM 渲染建议 ≤ 50 节点；高品质 PNG 用本地 d2 CLI。
 
 ## 项目结构与脚本
 

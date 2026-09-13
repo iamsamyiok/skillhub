@@ -3,3 +3,4 @@ data/initial-agent-token.txt
 data/auth.json
 data/tokens.json
 node_modules/
+__pycache__/

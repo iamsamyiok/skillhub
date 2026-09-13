@@ -109,6 +109,21 @@ test('未知 nodeType/linkType/graphKind 拦截', () => {
   assert.ok(r.errors.some((e) => e.path === 'links[0].linkType'));
 });
 
+test('游离节点告警（无连线无分组引用）', () => {
+  const r = ttgToSpec({
+    nodes: [{ id: 'a', label: 'A' }, { id: 'orphan', label: '孤儿' }],
+    links: [{ source: 'a', target: 'a', linkType: 'sequence' }]
+  });
+  assert.equal(r.ok, true);
+  assert.ok(r.warnings.some((w) => /orphan/.test(w.message) && /孤立/.test(w.message)));
+  const r2 = ttgToSpec({
+    nodes: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
+    links: [],
+    groups: [{ id: 'g1', label: '组', members: ['b'] }]
+  });
+  assert.ok(!r2.warnings.some((w) => /"b"/.test(w.message)));
+});
+
 test('端到端：桥输出通过 spec 校验与真实 D2 编译', async () => {
   const r = ttgToSpec(okTtg);
   assert.equal(r.ok, true);

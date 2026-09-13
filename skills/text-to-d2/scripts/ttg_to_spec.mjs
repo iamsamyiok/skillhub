@@ -138,6 +138,15 @@ export function ttgToSpec(ttg) {
     connections: specConns,
     containers
   };
+  // 游离节点（无任何连线引用且不在任何分组）：图上会是孤立方块，提醒抽取层复核
+  const linked = new Set();
+  for (const c of specConns) { linked.add(c.from); linked.add(c.to); }
+  const grouped = new Set(containers.flatMap((c) => c.children));
+  nodes.forEach((n, i) => {
+    if (n && n.id && !linked.has(n.id) && !grouped.has(n.id) && ids.has(n.id)) {
+      warn(`nodes[${i}]`, `节点 "${n.id}" 没有任何连线与分组引用，渲染后是孤立方块：请复核它是否真的存在于原文关系中，无关系可删或补一条关联连线`);
+    }
+  });
   if (typeof meta.title === 'string' && meta.title.trim().length) spec.title = meta.title.trim();
   if (nodes.length && !groups.length && specNodes.length >= 10) {
     warn('$', '节点 ≥10 且未分组：线性长链建议在抽取层按阶段 groups 分组，可读性更好（ttg 泳道经验）');

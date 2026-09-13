@@ -1,0 +1,1 @@
+{"from": "", "to": "v0.1.0", "note": "完善事项：游离节点告警指引、description 单行约束、手改源码引号成对提示、图例变通方案、Mermaid 降级指引", "mutation": "heuristic:json_parseable", "avg_gain": 1.667, "at": "2026-09-13T01:57:07"}
