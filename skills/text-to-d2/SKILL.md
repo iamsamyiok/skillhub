@@ -99,6 +99,7 @@ D2 无原生图例，两种变通：
 5. **大图性能**：WASM 渲染建议 ≤ 50 节点；高品质 PNG 用本地 d2 CLI；
 6. **frontmatter description 必须单行**：SkillHub 等下载站导出器按行解析 YAML，多行折叠标量（`>` 或换行续行）会被截断——任何自动改写本文件的工具（含 SkillEvo 变异）提交前都要复核这一条；
 7. **深色主题导出注意**：200/201 等深色主题在白底纸张或透明 PNG 里对比度差——对外打印/截图交付优先浅色主题（0/4/100），深色仅用于屏幕演示；
+8. **PNG 导出乱码（canvas 字体坑）**：页面预览正常、导出 PNG 加粗文字乱码——D2 SVG 的加粗字用内嵌哈希字体（`d2-<hash>-font-bold`），`serializeToString → blob → Image → canvas` 位图路径加载不了它。预览页导出函数已内置修复：导出前把 `font-family` 统一替换为系统 CJK 字体栈；若在无任何 CJK 字体的环境导出（`fc-match sans-serif:lang=zh-cn` 查无），需先 `apt-get install -y fonts-noto-cjk`。同一 PNG 反复"修好仍乱码"时优先怀疑查看端缓存——换文件名重新交付；
 
 ## SkillEvo Mutation Guards
 
