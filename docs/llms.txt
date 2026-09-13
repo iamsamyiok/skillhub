@@ -4,23 +4,51 @@
 
 ## Skills
 
+- [book-to-skill](https://iamsamyiok.github.io/skillhub/skills-md/book-to-skill.md): 书籍→技能包转化（Book-to-Skill）：把一本书、长文档或章节笔记提炼成符合规范的可复用 SKILL.md 技能包。当用户要求"把这本书变成技能""从文档提取方法论""生成 SKILL.md""把知识转化为工作流"或类似意图时使用。convert a book or long document into a r
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/book-to-skill.zip
+- [d2-chart](https://iamsamyiok.github.io/skillhub/skills-md/d2-chart.md): D2 图表生成：自然语言转 D2 图表，JSON 中间层防错设计（LLM 产 spec、脚本转换、结构校验 + 编译器验证双层拦截），浏览器本地 WASM 渲染，产单文件离线预览页，可导出 SVG/PNG/PDF。适用于流程图、系统架构图、关系图、组织架构图、简单 ER 图。当用户要求画图、画架构图/流程图/拓扑图、生
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/d2-chart.zip
+- [docx](https://iamsamyiok.github.io/skillhub/skills-md/docx.md): Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files) or Word templates (.dotx files). Triggers include: any 
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/docx.zip
+- [find-skills](https://iamsamyiok.github.io/skillhub/skills-md/find-skills.md): Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express int
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/find-skills.zip
+- [firecrawl](https://iamsamyiok.github.io/skillhub/skills-md/firecrawl.md): Any live-web task via the Firecrawl CLI — including ordinary web research: searching the web, reading or extracting pages, gathering sources, discovering site U
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/firecrawl.zip
 - [grilling](https://iamsamyiok.github.io/skillhub/skills-md/grilling.md): 拷问式需求访谈（Grilling）：对计划、决策或想法进行多轮穷追式提问压力测试，按轮次展开设计树，每题附推荐答案。当用户想压测自己的方案、梳理需求，或提到 grill/拷问/挑战我的想法 时使用。stress-test a plan or decision
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/grilling.zip
 - [image-analysis](https://iamsamyiok.github.io/skillhub/skills-md/image-analysis.md): 识图理解（图片分析）：描述图片内容、提取图中文字（OCR）、分析页面/设计稿布局、比较图片。当用户给出图片并要求分析、理解、识别、提取文字、描述、总结、审查布局时使用。支持公网图片 URL 与本地图片（先上传）。
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/image-analysis.zip
+- [mcp-builder](https://iamsamyiok.github.io/skillhub/skills-md/mcp-builder.md): Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when b
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/mcp-builder.zip
 - [oss-scout](https://iamsamyiok.github.io/skillhub/skills-md/oss-scout.md): 智能选型 GitHub 开源项目：自然语言需求 → 搜索 → 深读 → 对比推荐报告。Use when 用户想找开源项目、开源替代品、选型对比、评估某个 repo 是否可用，或提到"站在开源肩膀上""找现成的库/框架/工具"。
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/oss-scout.zip
 - [page-visual-review](https://iamsamyiok.github.io/skillhub/skills-md/page-visual-review.md): 前端界面视觉审查 skill：给网页 URL 或截图，用 AGNES agnes-2.5-flash 识图模型以资深前端 QA 视角全方位审查（美观/结构/可用性/一致性四维评分 + 16 类 LLM 生成页面高频缺陷模式库 + 响应式三视口对比 + 放大微观复查），输出精确、Agent 可直接执行修复的结构化问题报告
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/page-visual-review.zip
+- [pdf](https://iamsamyiok.github.io/skillhub/skills-md/pdf.md): Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple P
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/pdf.zip
+- [planning-with-files](https://iamsamyiok.github.io/skillhub/skills-md/planning-with-files.md): Persistent file-based planning for multi-step AI-agent work. Keeps task_plan.md, findings.md, and progress.md on disk; lifecycle hooks inject selected project p
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/planning-with-files.zip
+- [pptx](https://iamsamyiok.github.io/skillhub/skills-md/pptx.md): Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentat
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/pptx.zip
 - [show-deploy](https://iamsamyiok.github.io/skillhub/skills-md/show-deploy.md): 临时静态站点部署（Show Deploy）：把项目构建产物打包上传到 Show 托管，获得 48 小时自动过期的公网预览 URL，仅需 bash+tar+curl 无需安装 CLI。当用户说 deploy to show、发布预览、preview this site、想要前端构建的临时在线链接时使用。temporary
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/show-deploy.zip
 - [skill-creator](https://iamsamyiok.github.io/skillhub/skills-md/skill-creator.md): 技能创建器（Skill Creator）：从零创建新技能、修改和改进现有技能、运行评估测试（evals）、做技能性能基准分析、优化技能描述的触发准确率。当用户想创建、编辑、优化、评测任何 skill 时使用。create, improve, and evaluate agent skills
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/skill-creator.zip
 - [skill-updater](https://iamsamyiok.github.io/skillhub/skills-md/skill-updater.md): >-
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/skill-updater.zip
+- [text-to-d2](https://iamsamyiok.github.io/skillhub/skills-md/text-to-d2.md): 文本转 D2 图表（text-to-d2）：融合语义抽取与视觉交付——从长文本抽取逻辑结构（判断/条件/因果/角色/泳道分组，支持 evidence 溯源），自动映射为 shape 语义化 D2 图表，浏览器本地 WASM 渲染，产单文件离线交互预览页，可导出 SVG/PNG/PDF。适用于把文档/流程说明/事故分析/
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/text-to-d2.zip
 - [text-to-diagram](https://iamsamyiok.github.io/skillhub/skills-md/text-to-diagram.md): 把一段自由文本抽取为逻辑图结构化 JSON（nodes/links/groups/graphMeta）。当用户要求把文本转成流程图、因果图、协作图、逻辑图、示意图、时间线，或要求生成图示/画图/梳理流程时使用。Agent 只输出 JSON，绝不输出 SVG/HTML/Mermaid 或任何坐标尺寸，布局与渲染交给本地渲
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/text-to-diagram.zip
 - [text-to-image](https://iamsamyiok.github.io/skillhub/skills-md/text-to-image.md): 文字转图片（文生图）：把文字描述生成为海报、插画、产品概念图、营销素材、角色场景视觉草案等图片。当用户要求生成图片、画一张图、做海报/插画/配图/封面/壁纸，或提到"文生图""生成图片素材"时使用。有参考图需要修改时应使用图片编辑能力而非本技能的纯文生图流程。
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/text-to-image.zip
+- [unslop](https://iamsamyiok.github.io/skillhub/skills-md/unslop.md): Remove AI writing patterns from prose using either audit-only detection or a two-pass rewrite flow (diagnosis then reconstruction). Use this skill when editing,
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/unslop.zip
 - [use-tinyfish](https://iamsamyiok.github.io/skillhub/skills-md/use-tinyfish.md): Use TinyFish for web search, fetching URLs, reading pages, current information, source-backed answers, research, docs, pricing/product pages, extraction, scrapi
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.zip
+- [xlsx](https://iamsamyiok.github.io/skillhub/skills-md/xlsx.md): Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xl
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/xlsx.zip
+
+## Source
+
+- 仓库（自托管 node server.js）: https://github.com/iamsamyiok/skillhub

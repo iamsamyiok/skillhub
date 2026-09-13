@@ -125,3 +125,8 @@ footer { border-top: 1px solid var(--line); color: #8a92a8; font-size: 12.5px; p
   .grid { grid-template-columns: 1fr; }
   .md-body { padding: 22px 18px; }
 }
+
+/* Agent 首屏静态清单（导出器注入，人类低调、机器可直接读） */
+.agent-index { background: var(--card); border-bottom: 1px solid var(--line); padding: 18px 0 6px; }
+.agent-index h2 { font-size: 15px; margin: 0 0 8px; color: var(--muted); }
+.agent-index pre { margin: 0 0 12px; font: 12px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--muted); background: #f9fafe; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; overflow: auto; max-height: 340px; }

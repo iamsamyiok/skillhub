@@ -13,7 +13,7 @@
     <a href="./index.html">浏览</a>
     <a href="./setup.html">密钥配置</a>
     <a href="./ai.html">Agent 接入</a>
-    <a href="./index.html">管理</a>
+    <a href="https://github.com/iamsamyiok/skillhub#自托管>管理</a>
   </nav>
 </div></header>
 <main class="wrap" id="detail"></main>
@@ -22,5 +22,30 @@
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 <script src="./flags.js"></script>
 <script src="./app.js"></script>
+<section class="wrap" style="margin:2.5rem auto;max-width:900px;padding:0 1rem;border-top:1px solid rgba(255,255,255,.08)">
+  <h2 style="margin-top:2rem">评论反馈</h2>
+  <p style="opacity:.7;font-size:.92em">针对该技能留言。评论以 <code>/ai-fix</code> 开头并写清改进建议时，AI 会自动读取反馈、修改页面并发起 PR；普通评论仅保存，不触发 AI。</p>
+  <div id="giscus"></div>
+</section>
+<script>
+(function () {
+  var s = document.createElement('script');
+  s.src = 'https://giscus.app/client.js';
+  s.setAttribute('data-repo', 'iamsamyiok/skillhub');
+  s.setAttribute('data-repo-id', 'R_kgDOUTtGUg');
+  s.setAttribute('data-category', 'General');
+  s.setAttribute('data-category-id', 'DIC_kwDOUTtGUs4DFYT0');
+  s.setAttribute('data-mapping', 'url');
+  s.setAttribute('data-strict', '1');
+  s.setAttribute('data-reactions-enabled', '1');
+  s.setAttribute('data-emit-metadata', '0');
+  s.setAttribute('data-input-position', 'top');
+  s.setAttribute('data-theme', 'transparent_dark');
+  s.setAttribute('data-lang', 'zh-CN');
+  s.setAttribute('crossorigin', 'anonymous');
+  s.async = true;
+  document.getElementById('giscus').appendChild(s);
+})();
+</script>
 </body>
 </html>

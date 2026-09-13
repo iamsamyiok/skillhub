@@ -1,16 +1,434 @@
 {
-  "total": 10,
+  "total": 22,
   "categories": [
+    "写作工具",
     "前端开发",
     "图像理解",
     "图像生成",
+    "工作流",
     "开发工具",
     "技能开发",
+    "文档处理",
+    "知识转化",
     "研究分析",
     "网络与搜索",
     "需求梳理"
   ],
   "items": [
+    {
+      "id": "book-to-skill",
+      "name": "book-to-skill",
+      "description": "书籍→技能包转化（Book-to-Skill）：把一本书、长文档或章节笔记提炼成符合规范的可复用 SKILL.md 技能包。当用户要求\"把这本书变成技能\"\"从文档提取方法论\"\"生成 SKILL.md\"\"把知识转化为工作流\"或类似意图时使用。convert a book or long document into a reusable skill package",
+      "version": "1.1.0",
+      "category": "知识转化",
+      "tags": [
+        "书籍转化",
+        "知识提炼",
+        "SKILL.md",
+        "技能生成",
+        "book-to-skill"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-11T00:00:00.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 6997
+        },
+        {
+          "path": "scripts/validate_skill.py",
+          "size": 4638
+        },
+        {
+          "path": "templates/SKILL.template.md",
+          "size": 785
+        }
+      ]
+    },
+    {
+      "id": "d2-chart",
+      "name": "d2-chart",
+      "description": "D2 图表生成：自然语言转 D2 图表，JSON 中间层防错设计（LLM 产 spec、脚本转换、结构校验 + 编译器验证双层拦截），浏览器本地 WASM 渲染，产单文件离线预览页，可导出 SVG/PNG/PDF。适用于流程图、系统架构图、关系图、组织架构图、简单 ER 图。当用户要求画图、画架构图/流程图/拓扑图、生成 D2 源码、把描述转成图表时使用。d2 diagram, chart generation, architecture diagram",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "图表",
+        "D2",
+        "可视化",
+        "架构图",
+        "流程图",
+        "图表生成",
+        "d2"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-12T17:23:44.984Z",
+      "files": [
+        {
+          "path": ".gitignore",
+          "size": 30
+        },
+        {
+          "path": "README.md",
+          "size": 3419
+        },
+        {
+          "path": "SKILL.md",
+          "size": 7068
+        },
+        {
+          "path": "package-lock.json",
+          "size": 582
+        },
+        {
+          "path": "package.json",
+          "size": 268
+        },
+        {
+          "path": "scripts/build_preview.mjs",
+          "size": 2589
+        },
+        {
+          "path": "scripts/check_d2.mjs",
+          "size": 1698
+        },
+        {
+          "path": "scripts/generate.mjs",
+          "size": 3634
+        },
+        {
+          "path": "scripts/json_to_d2.mjs",
+          "size": 3363
+        },
+        {
+          "path": "scripts/validate_spec.mjs",
+          "size": 6602
+        },
+        {
+          "path": "test/json_to_d2.test.mjs",
+          "size": 3921
+        },
+        {
+          "path": "test/validate_spec.test.mjs",
+          "size": 4949
+        },
+        {
+          "path": "vendor/d2.browser.js",
+          "size": 8194866
+        },
+        {
+          "path": "web/index.html",
+          "size": 9808
+        }
+      ]
+    },
+    {
+      "id": "docx",
+      "name": "docx",
+      "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files) or Word templates (.dotx files). Triggers include: any mention of 'Word doc', 'word document', '.docx', '.dotx', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx or .dotx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a 'report', 'memo', 'letter', 'template', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation.",
+      "version": "1.0.0",
+      "category": "文档处理",
+      "tags": [
+        "Word",
+        "文档",
+        "生成"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "files": [
+        {
+          "path": "LICENSE.txt",
+          "size": 1467
+        },
+        {
+          "path": "SKILL.md",
+          "size": 6911
+        },
+        {
+          "path": "scripts/__init__.py",
+          "size": 1
+        },
+        {
+          "path": "scripts/accept_changes.py",
+          "size": 4051
+        },
+        {
+          "path": "scripts/comment.py",
+          "size": 14054
+        },
+        {
+          "path": "scripts/merge_runs.py",
+          "size": 9398
+        },
+        {
+          "path": "scripts/office/helpers/__init__.py",
+          "size": 3358
+        },
+        {
+          "path": "scripts/office/helpers/pptx_chart.py",
+          "size": 5862
+        },
+        {
+          "path": "scripts/office/helpers/pptx_slide.py",
+          "size": 1675
+        },
+        {
+          "path": "scripts/office/helpers/pptx_theme.py",
+          "size": 3510
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+          "size": 74984
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+          "size": 6956
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+          "size": 51302
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+          "size": 624
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+          "size": 152039
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+          "size": 1231
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+          "size": 8862
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+          "size": 14795
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+          "size": 83612
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+          "size": 1269
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+          "size": 7328
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+          "size": 6382
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+          "size": 1248
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+          "size": 880
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+          "size": 2608
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+          "size": 3507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+          "size": 7507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+          "size": 23313
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+          "size": 1367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+          "size": 242277
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+          "size": 26148
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+          "size": 25279
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+          "size": 535
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+          "size": 5712
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+          "size": 4010
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+          "size": 171367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+          "size": 4646
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+          "size": 1963
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+          "size": 2515
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+          "size": 2856
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+          "size": 1344
+        },
+        {
+          "path": "scripts/office/schemas/mce/mc.xsd",
+          "size": 3127
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2010.xsd",
+          "size": 26549
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2012.xsd",
+          "size": 3745
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2018.xsd",
+          "size": 901
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+          "size": 1778
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+          "size": 1002
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+          "size": 600
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+          "size": 745
+        },
+        {
+          "path": "scripts/office/soffice.py",
+          "size": 5927
+        },
+        {
+          "path": "scripts/office/validate.py",
+          "size": 6142
+        },
+        {
+          "path": "scripts/office/validators/__init__.py",
+          "size": 336
+        },
+        {
+          "path": "scripts/office/validators/base.py",
+          "size": 33756
+        },
+        {
+          "path": "scripts/office/validators/docx.py",
+          "size": 17482
+        },
+        {
+          "path": "scripts/office/validators/pptx.py",
+          "size": 15966
+        },
+        {
+          "path": "scripts/office/validators/redlining.py",
+          "size": 11231
+        },
+        {
+          "path": "scripts/templates/comments.xml",
+          "size": 2603
+        },
+        {
+          "path": "scripts/templates/commentsExtended.xml",
+          "size": 2611
+        },
+        {
+          "path": "scripts/templates/commentsExtensible.xml",
+          "size": 2707
+        },
+        {
+          "path": "scripts/templates/commentsIds.xml",
+          "size": 2619
+        },
+        {
+          "path": "scripts/templates/people.xml",
+          "size": 115
+        }
+      ]
+    },
+    {
+      "id": "find-skills",
+      "name": "find-skills",
+      "description": "Helps users discover and install agent skills when they ask questions like \"how do I do X\", \"find a skill for X\", \"is there a skill that can...\", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "技能发现",
+        "生态",
+        "cli"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 5472
+        }
+      ]
+    },
+    {
+      "id": "firecrawl",
+      "name": "firecrawl",
+      "description": "Any live-web task via the Firecrawl CLI — including ordinary web research: searching the web, reading or extracting pages, gathering sources, discovering site URLs, bulk extraction, downloading a site, change alerts, or pages needing clicks/login — web only; local files route to firecrawl-parse. For papers use firecrawl-research-index; for library, API, error, or bug questions use firecrawl-developer-index.",
+      "version": "1.0.0",
+      "category": "网络与搜索",
+      "tags": [
+        "抓取",
+        "爬虫",
+        "需APIKey"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 9534
+        },
+        {
+          "path": "rules/install.md",
+          "size": 2889
+        },
+        {
+          "path": "rules/security.md",
+          "size": 1395
+        }
+      ]
+    },
     {
       "id": "grilling",
       "name": "grilling",
@@ -64,6 +482,62 @@
       ]
     },
     {
+      "id": "mcp-builder",
+      "name": "mcp-builder",
+      "description": "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "MCP",
+        "脚手架",
+        "server"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "files": [
+        {
+          "path": "LICENSE.txt",
+          "size": 11345
+        },
+        {
+          "path": "SKILL.md",
+          "size": 9092
+        },
+        {
+          "path": "reference/evaluation.md",
+          "size": 21663
+        },
+        {
+          "path": "reference/mcp_best_practices.md",
+          "size": 7330
+        },
+        {
+          "path": "reference/node_mcp_server.md",
+          "size": 28550
+        },
+        {
+          "path": "reference/python_mcp_server.md",
+          "size": 25099
+        },
+        {
+          "path": "scripts/connections.py",
+          "size": 4875
+        },
+        {
+          "path": "scripts/evaluation.py",
+          "size": 12579
+        },
+        {
+          "path": "scripts/example_evaluation.xml",
+          "size": 1194
+        },
+        {
+          "path": "scripts/requirements.txt",
+          "size": 29
+        }
+      ]
+    },
+    {
       "id": "oss-scout",
       "name": "oss-scout",
       "description": "智能选型 GitHub 开源项目：自然语言需求 → 搜索 → 深读 → 对比推荐报告。Use when 用户想找开源项目、开源替代品、选型对比、评估某个 repo 是否可用，或提到\"站在开源肩膀上\"\"找现成的库/框架/工具\"。",
@@ -111,6 +585,454 @@
         {
           "path": "bin/fe-review.cjs",
           "size": 22388
+        }
+      ]
+    },
+    {
+      "id": "pdf",
+      "name": "pdf",
+      "description": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.",
+      "version": "1.0.0",
+      "category": "文档处理",
+      "tags": [
+        "PDF",
+        "文档",
+        "OCR"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "files": [
+        {
+          "path": "LICENSE.txt",
+          "size": 1467
+        },
+        {
+          "path": "SKILL.md",
+          "size": 8072
+        },
+        {
+          "path": "forms.md",
+          "size": 11854
+        },
+        {
+          "path": "reference.md",
+          "size": 16692
+        },
+        {
+          "path": "scripts/check_bounding_boxes.py",
+          "size": 2774
+        },
+        {
+          "path": "scripts/check_fillable_fields.py",
+          "size": 268
+        },
+        {
+          "path": "scripts/convert_pdf_to_images.py",
+          "size": 1008
+        },
+        {
+          "path": "scripts/create_validation_image.py",
+          "size": 1258
+        },
+        {
+          "path": "scripts/extract_form_field_info.py",
+          "size": 4300
+        },
+        {
+          "path": "scripts/extract_form_structure.py",
+          "size": 3945
+        },
+        {
+          "path": "scripts/fill_fillable_fields.py",
+          "size": 3819
+        },
+        {
+          "path": "scripts/fill_pdf_form_with_annotations.py",
+          "size": 3235
+        }
+      ]
+    },
+    {
+      "id": "planning-with-files",
+      "name": "planning-with-files",
+      "description": "Persistent file-based planning for multi-step AI-agent work. Keeps task_plan.md, findings.md, and progress.md on disk; lifecycle hooks inject selected project planning context. Automatic recovery reads project planning files only. Explicit session-catchup.py --metadata reads same-project local agent session records and emits aggregate counts only; --replay may emit bounded nonce-framed excerpts. Optional gated mode can request continuation only when the host supports it and never runs commands declared in Markdown. The skill has no network upload path. Use for research or work needing 5+ tool calls.",
+      "version": "1.0.0",
+      "category": "工作流",
+      "tags": [
+        "规划",
+        "任务管理",
+        "持久化"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 37303
+        },
+        {
+          "path": "examples.md",
+          "size": 4518
+        },
+        {
+          "path": "reference.md",
+          "size": 8455
+        },
+        {
+          "path": "scripts/attest-plan.ps1",
+          "size": 21021
+        },
+        {
+          "path": "scripts/attest-plan.sh",
+          "size": 11104
+        },
+        {
+          "path": "scripts/check-complete.ps1",
+          "size": 10767
+        },
+        {
+          "path": "scripts/check-complete.sh",
+          "size": 11710
+        },
+        {
+          "path": "scripts/gate-stop.sh",
+          "size": 1452
+        },
+        {
+          "path": "scripts/init-session.ps1",
+          "size": 6490
+        },
+        {
+          "path": "scripts/init-session.sh",
+          "size": 12883
+        },
+        {
+          "path": "scripts/inject-plan.py",
+          "size": 59441
+        },
+        {
+          "path": "scripts/inject-plan.sh",
+          "size": 61086
+        },
+        {
+          "path": "scripts/ledger-append.ps1",
+          "size": 6844
+        },
+        {
+          "path": "scripts/ledger-append.sh",
+          "size": 12190
+        },
+        {
+          "path": "scripts/ledger-summary.ps1",
+          "size": 5335
+        },
+        {
+          "path": "scripts/ledger-summary.sh",
+          "size": 6705
+        },
+        {
+          "path": "scripts/phase-status.ps1",
+          "size": 9412
+        },
+        {
+          "path": "scripts/phase-status.sh",
+          "size": 6866
+        },
+        {
+          "path": "scripts/plan-doctor.sh",
+          "size": 8531
+        },
+        {
+          "path": "scripts/resolve-plan-dir.ps1",
+          "size": 9083
+        },
+        {
+          "path": "scripts/resolve-plan-dir.sh",
+          "size": 15178
+        },
+        {
+          "path": "scripts/session-catchup.py",
+          "size": 35868
+        },
+        {
+          "path": "scripts/set-active-plan.ps1",
+          "size": 1645
+        },
+        {
+          "path": "scripts/set-active-plan.sh",
+          "size": 1505
+        },
+        {
+          "path": "scripts/skill-hook.sh",
+          "size": 17435
+        },
+        {
+          "path": "templates/analytics_findings.md",
+          "size": 1803
+        },
+        {
+          "path": "templates/analytics_task_plan.md",
+          "size": 2352
+        },
+        {
+          "path": "templates/findings.md",
+          "size": 1161
+        },
+        {
+          "path": "templates/loop.md",
+          "size": 2143
+        },
+        {
+          "path": "templates/progress.md",
+          "size": 1547
+        },
+        {
+          "path": "templates/task_plan.md",
+          "size": 2257
+        },
+        {
+          "path": "templates/task_plan_autonomous.md",
+          "size": 3268
+        }
+      ]
+    },
+    {
+      "id": "pptx",
+      "name": "pptx",
+      "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \\\"deck,\\\" \\\"slides,\\\" \\\"presentation,\\\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
+      "version": "1.0.0",
+      "category": "文档处理",
+      "tags": [
+        "PPT",
+        "幻灯片",
+        "演示"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "files": [
+        {
+          "path": "LICENSE.txt",
+          "size": 1467
+        },
+        {
+          "path": "SKILL.md",
+          "size": 20796
+        },
+        {
+          "path": "scripts/__init__.py",
+          "size": 0
+        },
+        {
+          "path": "scripts/add_slide.py",
+          "size": 14537
+        },
+        {
+          "path": "scripts/clean.py",
+          "size": 10415
+        },
+        {
+          "path": "scripts/office/helpers/__init__.py",
+          "size": 3358
+        },
+        {
+          "path": "scripts/office/helpers/pptx_chart.py",
+          "size": 5862
+        },
+        {
+          "path": "scripts/office/helpers/pptx_slide.py",
+          "size": 1675
+        },
+        {
+          "path": "scripts/office/helpers/pptx_theme.py",
+          "size": 3510
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+          "size": 74984
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+          "size": 6956
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+          "size": 51302
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+          "size": 624
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+          "size": 152039
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+          "size": 1231
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+          "size": 8862
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+          "size": 14795
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+          "size": 83612
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+          "size": 1269
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+          "size": 7328
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+          "size": 6382
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+          "size": 1248
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+          "size": 880
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+          "size": 2608
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+          "size": 3507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+          "size": 7507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+          "size": 23313
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+          "size": 1367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+          "size": 242277
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+          "size": 26148
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+          "size": 25279
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+          "size": 535
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+          "size": 5712
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+          "size": 4010
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+          "size": 171367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+          "size": 4646
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+          "size": 1963
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+          "size": 2515
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+          "size": 2856
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+          "size": 1344
+        },
+        {
+          "path": "scripts/office/schemas/mce/mc.xsd",
+          "size": 3127
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2010.xsd",
+          "size": 26549
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2012.xsd",
+          "size": 3745
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2018.xsd",
+          "size": 901
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+          "size": 1778
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+          "size": 1002
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+          "size": 600
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+          "size": 745
+        },
+        {
+          "path": "scripts/office/soffice.py",
+          "size": 5927
+        },
+        {
+          "path": "scripts/office/validate.py",
+          "size": 6142
+        },
+        {
+          "path": "scripts/office/validators/__init__.py",
+          "size": 336
+        },
+        {
+          "path": "scripts/office/validators/base.py",
+          "size": 33756
+        },
+        {
+          "path": "scripts/office/validators/docx.py",
+          "size": 17482
+        },
+        {
+          "path": "scripts/office/validators/pptx.py",
+          "size": 15966
+        },
+        {
+          "path": "scripts/office/validators/redlining.py",
+          "size": 11231
+        },
+        {
+          "path": "scripts/thumbnail.py",
+          "size": 9802
         }
       ]
     },
@@ -284,6 +1206,34 @@
           "size": 349
         },
         {
+          "path": "scripts/skillevo/__pycache__/__init__.cpython-311.pyc",
+          "size": 572
+        },
+        {
+          "path": "scripts/skillevo/__pycache__/config.cpython-311.pyc",
+          "size": 8524
+        },
+        {
+          "path": "scripts/skillevo/__pycache__/evals.cpython-311.pyc",
+          "size": 18812
+        },
+        {
+          "path": "scripts/skillevo/__pycache__/io_utils.cpython-311.pyc",
+          "size": 4923
+        },
+        {
+          "path": "scripts/skillevo/__pycache__/models.cpython-311.pyc",
+          "size": 9243
+        },
+        {
+          "path": "scripts/skillevo/__pycache__/mutators.cpython-311.pyc",
+          "size": 10218
+        },
+        {
+          "path": "scripts/skillevo/__pycache__/registry.cpython-311.pyc",
+          "size": 5039
+        },
+        {
           "path": "scripts/skillevo/config.py",
           "size": 4018
         },
@@ -306,6 +1256,112 @@
         {
           "path": "scripts/skillevo/registry.py",
           "size": 2766
+        }
+      ]
+    },
+    {
+      "id": "text-to-d2",
+      "name": "text-to-d2",
+      "description": "文本转 D2 图表（text-to-d2）：融合语义抽取与视觉交付——从长文本抽取逻辑结构（判断/条件/因果/角色/泳道分组，支持 evidence 溯源），自动映射为 shape 语义化 D2 图表，浏览器本地 WASM 渲染，产单文件离线交互预览页，可导出 SVG/PNG/PDF。适用于把文档/流程说明/事故分析/方案描述转成精美架构图、流程图、因果图。当用户要求把一段文字/文档转成图、画流程图/架构图/因果图时使用。text to diagram, d2, architecture diagram, flowchart",
+      "version": "v0.1.2",
+      "category": "开发工具",
+      "tags": [
+        "图表",
+        "文本转图",
+        "D2",
+        "可视化",
+        "流程图",
+        "架构图",
+        "语义抽取",
+        "text-to-diagram",
+        "d2-chart"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-12T17:54:12.772Z",
+      "files": [
+        {
+          "path": ".gitignore",
+          "size": 70
+        },
+        {
+          "path": "README.md",
+          "size": 2140
+        },
+        {
+          "path": "SKILL.md",
+          "size": 8675
+        },
+        {
+          "path": "demo/workflow-v2.png",
+          "size": 536651
+        },
+        {
+          "path": "demo/workflow.d2",
+          "size": 945
+        },
+        {
+          "path": "demo/workflow.json",
+          "size": 2767
+        },
+        {
+          "path": "demo/workflow.png",
+          "size": 536651
+        },
+        {
+          "path": "demo/workflow.ttg.json",
+          "size": 2393
+        },
+        {
+          "path": "package-lock.json",
+          "size": 582
+        },
+        {
+          "path": "package.json",
+          "size": 268
+        },
+        {
+          "path": "scripts/build_preview.mjs",
+          "size": 2589
+        },
+        {
+          "path": "scripts/check_d2.mjs",
+          "size": 1698
+        },
+        {
+          "path": "scripts/generate.mjs",
+          "size": 3634
+        },
+        {
+          "path": "scripts/json_to_d2.mjs",
+          "size": 3622
+        },
+        {
+          "path": "scripts/ttg_to_spec.mjs",
+          "size": 9987
+        },
+        {
+          "path": "scripts/validate_spec.mjs",
+          "size": 6899
+        },
+        {
+          "path": "test/json_to_d2.test.mjs",
+          "size": 3921
+        },
+        {
+          "path": "test/ttg_to_spec.test.mjs",
+          "size": 5406
+        },
+        {
+          "path": "test/validate_spec.test.mjs",
+          "size": 4949
+        },
+        {
+          "path": "vendor/d2.browser.js",
+          "size": 8194866
+        },
+        {
+          "path": "web/index.html",
+          "size": 10208
         }
       ]
     },
@@ -355,6 +1411,238 @@
       ]
     },
     {
+      "id": "unslop",
+      "name": "unslop",
+      "description": "Remove AI writing patterns from prose using either audit-only detection or a two-pass rewrite flow (diagnosis then reconstruction). Use this skill when editing, reviewing, or rewriting AI-generated content to make it sound human. Triggers on requests to \"humanize\", \"de-slop\", \"fix AI text\", \"make it sound human\", \"remove AI patterns\", or when reviewing text that contains obvious AI tells like \"Here's the thing:\", \"Let that sink in\", or \"In today's fast-paced landscape\". Also use when the user pastes text and says it \"sounds like ChatGPT\", \"sounds robotic\", \"needs to sound more natural\", or asks you to \"clean up\" drafted content before publishing.",
+      "version": "1.0.0",
+      "category": "写作工具",
+      "tags": [
+        "去AI腔",
+        "润色",
+        "文案"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 6767
+        },
+        {
+          "path": "assets/examples/before-after-article.md",
+          "size": 7027
+        },
+        {
+          "path": "assets/examples/before-after-linkedin.md",
+          "size": 6650
+        },
+        {
+          "path": "assets/examples/before-after-sales.md",
+          "size": 6636
+        },
+        {
+          "path": "presets/crisp-human.md",
+          "size": 1104
+        },
+        {
+          "path": "presets/expert-human.md",
+          "size": 3941
+        },
+        {
+          "path": "presets/story-lean.md",
+          "size": 4282
+        },
+        {
+          "path": "presets/warm-human.md",
+          "size": 3779
+        },
+        {
+          "path": "references/calibrate.md",
+          "size": 7462
+        },
+        {
+          "path": "references/commands/cleanup.md",
+          "size": 2636
+        },
+        {
+          "path": "references/commands/contribute.md",
+          "size": 2528
+        },
+        {
+          "path": "references/commands/mimic.md",
+          "size": 3145
+        },
+        {
+          "path": "references/commands/rewrite.md",
+          "size": 2110
+        },
+        {
+          "path": "references/commands/teach.md",
+          "size": 3722
+        },
+        {
+          "path": "references/contribute.md",
+          "size": 3666
+        },
+        {
+          "path": "references/core-contract.md",
+          "size": 4863
+        },
+        {
+          "path": "references/edit-library.md",
+          "size": 14114
+        },
+        {
+          "path": "references/fact-preservation.md",
+          "size": 4889
+        },
+        {
+          "path": "references/harvest.md",
+          "size": 2545
+        },
+        {
+          "path": "references/maintenance.md",
+          "size": 4312
+        },
+        {
+          "path": "references/mimic.md",
+          "size": 10679
+        },
+        {
+          "path": "references/packs/manifest.json",
+          "size": 1826
+        },
+        {
+          "path": "references/packs/pack-facts.md",
+          "size": 1372
+        },
+        {
+          "path": "references/packs/pack-phrases-core.md",
+          "size": 1655
+        },
+        {
+          "path": "references/packs/pack-register-guards.md",
+          "size": 1869
+        },
+        {
+          "path": "references/packs/pack-structure.md",
+          "size": 2482
+        },
+        {
+          "path": "references/packs/pack-voice.md",
+          "size": 3211
+        },
+        {
+          "path": "references/personality-guide.md",
+          "size": 5663
+        },
+        {
+          "path": "references/pipeline.md",
+          "size": 22702
+        },
+        {
+          "path": "references/refresh.md",
+          "size": 3725
+        },
+        {
+          "path": "references/rewrite-examples.md",
+          "size": 777
+        },
+        {
+          "path": "references/rubric.md",
+          "size": 6987
+        },
+        {
+          "path": "references/taboo-phrases.md",
+          "size": 50356
+        },
+        {
+          "path": "scripts/_lang.py",
+          "size": 4599
+        },
+        {
+          "path": "scripts/banned_phrase_scan.py",
+          "size": 32850
+        },
+        {
+          "path": "scripts/calibrate_pairs.py",
+          "size": 23827
+        },
+        {
+          "path": "scripts/calibrate_score.py",
+          "size": 9277
+        },
+        {
+          "path": "scripts/check_packs.py",
+          "size": 2701
+        },
+        {
+          "path": "scripts/check_suggestions.py",
+          "size": 8242
+        },
+        {
+          "path": "scripts/contribute.py",
+          "size": 14205
+        },
+        {
+          "path": "scripts/diff_check.py",
+          "size": 4395
+        },
+        {
+          "path": "scripts/extract_constraints.py",
+          "size": 6976
+        },
+        {
+          "path": "scripts/harvest_classify.py",
+          "size": 7830
+        },
+        {
+          "path": "scripts/harvest_samples.py",
+          "size": 18766
+        },
+        {
+          "path": "scripts/readability_metrics.py",
+          "size": 9772
+        },
+        {
+          "path": "scripts/refresh_status.py",
+          "size": 4766
+        },
+        {
+          "path": "scripts/silhouette_scan.py",
+          "size": 14242
+        },
+        {
+          "path": "scripts/structure_scan.py",
+          "size": 13157
+        },
+        {
+          "path": "scripts/suggest.py",
+          "size": 7832
+        },
+        {
+          "path": "scripts/validate_preservation.py",
+          "size": 14473
+        },
+        {
+          "path": "scripts/voice_card.py",
+          "size": 18548
+        },
+        {
+          "path": "scripts/voice_profile.py",
+          "size": 7083
+        },
+        {
+          "path": "scripts/voice_score.py",
+          "size": 10135
+        },
+        {
+          "path": "scripts/wiki_sync.py",
+          "size": 15624
+        }
+      ]
+    },
+    {
       "id": "use-tinyfish",
       "name": "use-tinyfish",
       "description": "Use TinyFish for web search, fetching URLs, reading pages, current information, source-backed answers, research, docs, pricing/product pages, extraction, scraping, and browser automation. Use whenever the user asks to search, find, look up, research, compare, get information from the web, summarize a URL, fetch page content, or automate a website.",
@@ -371,6 +1659,234 @@
         {
           "path": "SKILL.md",
           "size": 8036
+        }
+      ]
+    },
+    {
+      "id": "xlsx",
+      "name": "xlsx",
+      "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .xltx, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \\\"the xlsx in my downloads\\\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
+      "version": "1.0.0",
+      "category": "文档处理",
+      "tags": [
+        "Excel",
+        "表格",
+        "公式"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "files": [
+        {
+          "path": "LICENSE.txt",
+          "size": 1467
+        },
+        {
+          "path": "SKILL.md",
+          "size": 8598
+        },
+        {
+          "path": "scripts/office/helpers/__init__.py",
+          "size": 3358
+        },
+        {
+          "path": "scripts/office/helpers/pptx_chart.py",
+          "size": 5862
+        },
+        {
+          "path": "scripts/office/helpers/pptx_slide.py",
+          "size": 1675
+        },
+        {
+          "path": "scripts/office/helpers/pptx_theme.py",
+          "size": 3510
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+          "size": 74984
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+          "size": 6956
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+          "size": 51302
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+          "size": 624
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+          "size": 152039
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+          "size": 1231
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+          "size": 8862
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+          "size": 14795
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+          "size": 83612
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+          "size": 1269
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+          "size": 7328
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+          "size": 6382
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+          "size": 1248
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+          "size": 880
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+          "size": 2608
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+          "size": 3507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+          "size": 7507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+          "size": 23313
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+          "size": 1367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+          "size": 242277
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+          "size": 26148
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+          "size": 25279
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+          "size": 535
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+          "size": 5712
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+          "size": 4010
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+          "size": 171367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+          "size": 4646
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+          "size": 1963
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+          "size": 2515
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+          "size": 2856
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+          "size": 1344
+        },
+        {
+          "path": "scripts/office/schemas/mce/mc.xsd",
+          "size": 3127
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2010.xsd",
+          "size": 26549
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2012.xsd",
+          "size": 3745
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2018.xsd",
+          "size": 901
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+          "size": 1778
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+          "size": 1002
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+          "size": 600
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+          "size": 745
+        },
+        {
+          "path": "scripts/office/soffice.py",
+          "size": 5927
+        },
+        {
+          "path": "scripts/office/validate.py",
+          "size": 6142
+        },
+        {
+          "path": "scripts/office/validators/__init__.py",
+          "size": 336
+        },
+        {
+          "path": "scripts/office/validators/base.py",
+          "size": 33756
+        },
+        {
+          "path": "scripts/office/validators/docx.py",
+          "size": 17482
+        },
+        {
+          "path": "scripts/office/validators/pptx.py",
+          "size": 15966
+        },
+        {
+          "path": "scripts/office/validators/redlining.py",
+          "size": 11231
+        },
+        {
+          "path": "scripts/recalc.py",
+          "size": 10670
         }
       ]
     }

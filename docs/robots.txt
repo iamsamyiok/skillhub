@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+# Machine-readable skill index: /llms.txt /skills.json /skills.txt /AGENTS.md

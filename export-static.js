@@ -76,8 +76,41 @@ const base = SITE_URL || '.';
 for (const f of ['index.html', 'skill.html', 'ai.html', 'setup.html']) {
   fs.writeFileSync(path.join(OUT, f), rewrite(fs.readFileSync(path.join(ROOT, 'public', f), 'utf8')));
 }
+
+/* Agent 首屏内联：抓首页 HTML 的 Agent 不执行 JS，也能在第一时间拿到全部清单。
+   两层：body 开头 JSON 数据块（程序解析）+ hero 后纯文本清单（markdown 化抓取可读）。 */
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const agentItems = items.map((s) => ({
+  id: s.id, name: s.name, description: s.description, version: s.version,
+  category: s.category, tags: s.tags, downloads: s.downloads, updatedAt: s.updatedAt,
+  md: `${base}/skills-md/${s.id}.md`, zip: `${base}/downloads/${s.id}.zip`, tgz: `${base}/downloads/${s.id}.tar.gz`,
+}));
+const agentJson = JSON.stringify({ total: agentItems.length, categories, site: base || '.', skills: agentItems }).replace(/<\//g, '<\\/');
+const agentPre = [
+  `ALL SKILLS (${agentItems.length}) — 本清单静态内联于首页，无需 JS。`,
+  `机器索引: ${base}/llms.txt · ${base}/skills.json · ${base}/skills.txt`,
+  `下载: ${base}/downloads/{id}.zip · SKILL.md 原文: ${base}/skills-md/{id}.md`,
+  '',
+  ...agentItems.map((s) => `- ${s.id} | ${s.category} | v${s.version} | ${String(s.description || '').replace(/\s+/g, ' ').slice(0, 150)}\n  md: ${s.md} · zip: ${s.zip}`),
+].join('\n');
+const indexHtml = fs.readFileSync(path.join(ROOT, 'public', 'index.html'), 'utf8');
+fs.writeFileSync(path.join(OUT, 'index.html'), rewrite(indexHtml)
+  .replace('<body>', `<body>\n<script type="application/json" id="skills-data">${agentJson}</script>`)
+  .replace('<main class="wrap">', `<section class="agent-index"><div class="wrap"><h2>Agent 完整技能清单（ALL SKILLS，静态内联）</h2><pre>${esc(agentPre)}</pre></div></section>\n<main class="wrap">`));
+
+/* AGENTS.md（Agent 框架自动发现）与根级 skills.json（便于发现的纯数据端点） */
+fs.writeFileSync(path.join(OUT, 'AGENTS.md'), [
+  '# SkillHub — Agent Guide', '',
+  `- 完整技能清单（JSON）: ${base}/skills.json`,
+  `- 完整技能清单（文本）: ${base}/llms.txt · ${base}/skills.txt`,
+  `- 下载安装: ${base}/downloads/{id}.zip（解压到 ~/.claude/skills/ 或项目 .claude/skills/）`,
+  `- SKILL.md 原文: ${base}/skills-md/{id}.md`,
+  '', `共 ${agentItems.length} 个 skill: ${agentItems.map((s) => s.id).join(', ')}`, '',
+].join('\n'));
+fs.writeFileSync(path.join(OUT, 'skills.json'), JSON.stringify({ total: agentItems.length, categories, site: base || '.', skills: agentItems }, null, 2));
+
 /* robots */
-fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nAllow: /\n');
+fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nAllow: /\n# Machine-readable skill index: /llms.txt /skills.json /skills.txt /AGENTS.md\n');
 /* 静态站说明 */
 fs.writeFileSync(path.join(OUT, 'README-static.md'), '# 本目录为 GitHub Pages 静态站点\n由 `node export-static.js` 生成，勿手工编辑。数据来源：仓库根 `skills/` 与 `data/meta.json`。\n');
 

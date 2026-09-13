@@ -1,0 +1,429 @@
+{
+  "total": 22,
+  "categories": [
+    "写作工具",
+    "前端开发",
+    "图像理解",
+    "图像生成",
+    "工作流",
+    "开发工具",
+    "技能开发",
+    "文档处理",
+    "知识转化",
+    "研究分析",
+    "网络与搜索",
+    "需求梳理"
+  ],
+  "site": "https://iamsamyiok.github.io/skillhub",
+  "skills": [
+    {
+      "id": "book-to-skill",
+      "name": "book-to-skill",
+      "description": "书籍→技能包转化（Book-to-Skill）：把一本书、长文档或章节笔记提炼成符合规范的可复用 SKILL.md 技能包。当用户要求\"把这本书变成技能\"\"从文档提取方法论\"\"生成 SKILL.md\"\"把知识转化为工作流\"或类似意图时使用。convert a book or long document into a reusable skill package",
+      "version": "1.1.0",
+      "category": "知识转化",
+      "tags": [
+        "书籍转化",
+        "知识提炼",
+        "SKILL.md",
+        "技能生成",
+        "book-to-skill"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-11T00:00:00.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/book-to-skill.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/book-to-skill.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/book-to-skill.tar.gz"
+    },
+    {
+      "id": "d2-chart",
+      "name": "d2-chart",
+      "description": "D2 图表生成：自然语言转 D2 图表，JSON 中间层防错设计（LLM 产 spec、脚本转换、结构校验 + 编译器验证双层拦截），浏览器本地 WASM 渲染，产单文件离线预览页，可导出 SVG/PNG/PDF。适用于流程图、系统架构图、关系图、组织架构图、简单 ER 图。当用户要求画图、画架构图/流程图/拓扑图、生成 D2 源码、把描述转成图表时使用。d2 diagram, chart generation, architecture diagram",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "图表",
+        "D2",
+        "可视化",
+        "架构图",
+        "流程图",
+        "图表生成",
+        "d2"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-12T17:23:44.984Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/d2-chart.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/d2-chart.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/d2-chart.tar.gz"
+    },
+    {
+      "id": "docx",
+      "name": "docx",
+      "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files) or Word templates (.dotx files). Triggers include: any mention of 'Word doc', 'word document', '.docx', '.dotx', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx or .dotx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a 'report', 'memo', 'letter', 'template', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation.",
+      "version": "1.0.0",
+      "category": "文档处理",
+      "tags": [
+        "Word",
+        "文档",
+        "生成"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/docx.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/docx.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/docx.tar.gz"
+    },
+    {
+      "id": "find-skills",
+      "name": "find-skills",
+      "description": "Helps users discover and install agent skills when they ask questions like \"how do I do X\", \"find a skill for X\", \"is there a skill that can...\", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "技能发现",
+        "生态",
+        "cli"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/find-skills.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/find-skills.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/find-skills.tar.gz"
+    },
+    {
+      "id": "firecrawl",
+      "name": "firecrawl",
+      "description": "Any live-web task via the Firecrawl CLI — including ordinary web research: searching the web, reading or extracting pages, gathering sources, discovering site URLs, bulk extraction, downloading a site, change alerts, or pages needing clicks/login — web only; local files route to firecrawl-parse. For papers use firecrawl-research-index; for library, API, error, or bug questions use firecrawl-developer-index.",
+      "version": "1.0.0",
+      "category": "网络与搜索",
+      "tags": [
+        "抓取",
+        "爬虫",
+        "需APIKey"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/firecrawl.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/firecrawl.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/firecrawl.tar.gz"
+    },
+    {
+      "id": "grilling",
+      "name": "grilling",
+      "description": "拷问式需求访谈（Grilling）：对计划、决策或想法进行多轮穷追式提问压力测试，按轮次展开设计树，每题附推荐答案。当用户想压测自己的方案、梳理需求，或提到 grill/拷问/挑战我的想法 时使用。stress-test a plan or decision",
+      "version": "1.0.0",
+      "category": "需求梳理",
+      "tags": [
+        "拷问",
+        "需求梳理",
+        "压力测试",
+        "访谈",
+        "决策树",
+        "grill",
+        "stress-test"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-10T13:59:55.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/grilling.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/grilling.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/grilling.tar.gz"
+    },
+    {
+      "id": "image-analysis",
+      "name": "image-analysis",
+      "description": "识图理解（图片分析）：描述图片内容、提取图中文字（OCR）、分析页面/设计稿布局、比较图片。当用户给出图片并要求分析、理解、识别、提取文字、描述、总结、审查布局时使用。支持公网图片 URL 与本地图片（先上传）。",
+      "version": "1.0.1",
+      "category": "图像理解",
+      "tags": [
+        "识图",
+        "看图",
+        "图片理解",
+        "图像分析",
+        "OCR",
+        "提取文字",
+        "布局分析"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-10T13:14:39.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/image-analysis.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/image-analysis.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/image-analysis.tar.gz"
+    },
+    {
+      "id": "mcp-builder",
+      "name": "mcp-builder",
+      "description": "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "MCP",
+        "脚手架",
+        "server"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/mcp-builder.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/mcp-builder.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/mcp-builder.tar.gz"
+    },
+    {
+      "id": "oss-scout",
+      "name": "oss-scout",
+      "description": "智能选型 GitHub 开源项目：自然语言需求 → 搜索 → 深读 → 对比推荐报告。Use when 用户想找开源项目、开源替代品、选型对比、评估某个 repo 是否可用，或提到\"站在开源肩膀上\"\"找现成的库/框架/工具\"。",
+      "version": "1.0.0",
+      "category": "研究分析",
+      "tags": [
+        "开源选型",
+        "github"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-09T14:10:50.547Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/oss-scout.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/oss-scout.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/oss-scout.tar.gz"
+    },
+    {
+      "id": "page-visual-review",
+      "name": "page-visual-review",
+      "description": "前端界面视觉审查 skill：给网页 URL 或截图，用 AGNES agnes-2.5-flash 识图模型以资深前端 QA 视角全方位审查（美观/结构/可用性/一致性四维评分 + 16 类 LLM 生成页面高频缺陷模式库 + 响应式三视口对比 + 放大微观复查），输出精确、Agent 可直接执行修复的结构化问题报告与改进建议。适用于：Agent 生成前端后的自检、页面验收、布局问题排查、美化改进。",
+      "version": "1.1.0",
+      "category": "前端开发",
+      "tags": [
+        "识图",
+        "QA",
+        "视觉审查"
+      ],
+      "downloads": 5,
+      "updatedAt": "2026-09-10T14:52:37.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/page-visual-review.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/page-visual-review.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/page-visual-review.tar.gz"
+    },
+    {
+      "id": "pdf",
+      "name": "pdf",
+      "description": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.",
+      "version": "1.0.0",
+      "category": "文档处理",
+      "tags": [
+        "PDF",
+        "文档",
+        "OCR"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/pdf.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/pdf.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/pdf.tar.gz"
+    },
+    {
+      "id": "planning-with-files",
+      "name": "planning-with-files",
+      "description": "Persistent file-based planning for multi-step AI-agent work. Keeps task_plan.md, findings.md, and progress.md on disk; lifecycle hooks inject selected project planning context. Automatic recovery reads project planning files only. Explicit session-catchup.py --metadata reads same-project local agent session records and emits aggregate counts only; --replay may emit bounded nonce-framed excerpts. Optional gated mode can request continuation only when the host supports it and never runs commands declared in Markdown. The skill has no network upload path. Use for research or work needing 5+ tool calls.",
+      "version": "1.0.0",
+      "category": "工作流",
+      "tags": [
+        "规划",
+        "任务管理",
+        "持久化"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/planning-with-files.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/planning-with-files.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/planning-with-files.tar.gz"
+    },
+    {
+      "id": "pptx",
+      "name": "pptx",
+      "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \\\"deck,\\\" \\\"slides,\\\" \\\"presentation,\\\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
+      "version": "1.0.0",
+      "category": "文档处理",
+      "tags": [
+        "PPT",
+        "幻灯片",
+        "演示"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/pptx.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/pptx.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/pptx.tar.gz"
+    },
+    {
+      "id": "show-deploy",
+      "name": "show-deploy",
+      "description": "临时静态站点部署（Show Deploy）：把项目构建产物打包上传到 Show 托管，获得 48 小时自动过期的公网预览 URL，仅需 bash+tar+curl 无需安装 CLI。当用户说 deploy to show、发布预览、preview this site、想要前端构建的临时在线链接时使用。temporary static hosting preview",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "部署",
+        "静态站点",
+        "预览",
+        "临时托管",
+        "show",
+        "preview",
+        "deploy"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-10T14:52:54.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/show-deploy.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/show-deploy.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/show-deploy.tar.gz"
+    },
+    {
+      "id": "skill-creator",
+      "name": "skill-creator",
+      "description": "技能创建器（Skill Creator）：从零创建新技能、修改和改进现有技能、运行评估测试（evals）、做技能性能基准分析、优化技能描述的触发准确率。当用户想创建、编辑、优化、评测任何 skill 时使用。create, improve, and evaluate agent skills",
+      "version": "1.0.0",
+      "category": "技能开发",
+      "tags": [
+        "技能创建",
+        "skill",
+        "评估",
+        "元技能",
+        "skill开发",
+        "evals"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-10T13:59:55.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/skill-creator.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/skill-creator.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skill-creator.tar.gz"
+    },
+    {
+      "id": "skill-updater",
+      "name": "skill-updater",
+      "description": ">-",
+      "version": "v0.2.0",
+      "category": "技能开发",
+      "tags": [
+        "技能进化",
+        "自动更新",
+        "skill",
+        "进化",
+        "SkillEvo",
+        "evals",
+        "自动优化"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-10T14:33:19.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/skill-updater.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/skill-updater.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skill-updater.tar.gz"
+    },
+    {
+      "id": "text-to-d2",
+      "name": "text-to-d2",
+      "description": "文本转 D2 图表（text-to-d2）：融合语义抽取与视觉交付——从长文本抽取逻辑结构（判断/条件/因果/角色/泳道分组，支持 evidence 溯源），自动映射为 shape 语义化 D2 图表，浏览器本地 WASM 渲染，产单文件离线交互预览页，可导出 SVG/PNG/PDF。适用于把文档/流程说明/事故分析/方案描述转成精美架构图、流程图、因果图。当用户要求把一段文字/文档转成图、画流程图/架构图/因果图时使用。text to diagram, d2, architecture diagram, flowchart",
+      "version": "v0.1.2",
+      "category": "开发工具",
+      "tags": [
+        "图表",
+        "文本转图",
+        "D2",
+        "可视化",
+        "流程图",
+        "架构图",
+        "语义抽取",
+        "text-to-diagram",
+        "d2-chart"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-12T17:54:12.772Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/text-to-d2.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/text-to-d2.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-d2.tar.gz"
+    },
+    {
+      "id": "text-to-diagram",
+      "name": "text-to-diagram",
+      "description": "把一段自由文本抽取为逻辑图结构化 JSON（nodes/links/groups/graphMeta）。当用户要求把文本转成流程图、因果图、协作图、逻辑图、示意图、时间线，或要求生成图示/画图/梳理流程时使用。Agent 只输出 JSON，绝不输出 SVG/HTML/Mermaid 或任何坐标尺寸，布局与渲染交给本地渲染器。",
+      "version": "1.3.1",
+      "category": "开发工具",
+      "tags": [
+        "图表",
+        "可视化",
+        "cli"
+      ],
+      "downloads": 1,
+      "updatedAt": "2026-09-09T14:10:50.505Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/text-to-diagram.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/text-to-diagram.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-diagram.tar.gz"
+    },
+    {
+      "id": "text-to-image",
+      "name": "text-to-image",
+      "description": "文字转图片（文生图）：把文字描述生成为海报、插画、产品概念图、营销素材、角色场景视觉草案等图片。当用户要求生成图片、画一张图、做海报/插画/配图/封面/壁纸，或提到\"文生图\"\"生成图片素材\"时使用。有参考图需要修改时应使用图片编辑能力而非本技能的纯文生图流程。",
+      "version": "1.0.0",
+      "category": "图像生成",
+      "tags": [
+        "文生图",
+        "生成图片",
+        "图片生成",
+        "画图",
+        "海报",
+        "插画",
+        "配图",
+        "素材"
+      ],
+      "downloads": 3,
+      "updatedAt": "2026-09-09T14:45:26.676Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/text-to-image.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/text-to-image.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-image.tar.gz"
+    },
+    {
+      "id": "unslop",
+      "name": "unslop",
+      "description": "Remove AI writing patterns from prose using either audit-only detection or a two-pass rewrite flow (diagnosis then reconstruction). Use this skill when editing, reviewing, or rewriting AI-generated content to make it sound human. Triggers on requests to \"humanize\", \"de-slop\", \"fix AI text\", \"make it sound human\", \"remove AI patterns\", or when reviewing text that contains obvious AI tells like \"Here's the thing:\", \"Let that sink in\", or \"In today's fast-paced landscape\". Also use when the user pastes text and says it \"sounds like ChatGPT\", \"sounds robotic\", \"needs to sound more natural\", or asks you to \"clean up\" drafted content before publishing.",
+      "version": "1.0.0",
+      "category": "写作工具",
+      "tags": [
+        "去AI腔",
+        "润色",
+        "文案"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/unslop.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/unslop.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/unslop.tar.gz"
+    },
+    {
+      "id": "use-tinyfish",
+      "name": "use-tinyfish",
+      "description": "Use TinyFish for web search, fetching URLs, reading pages, current information, source-backed answers, research, docs, pricing/product pages, extraction, scraping, and browser automation. Use whenever the user asks to search, find, look up, research, compare, get information from the web, summarize a URL, fetch page content, or automate a website.",
+      "version": "1.0.0",
+      "category": "网络与搜索",
+      "tags": [
+        "搜索",
+        "浏览器",
+        "抓取"
+      ],
+      "downloads": 1,
+      "updatedAt": "2026-09-09T14:10:50.548Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/use-tinyfish.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.tar.gz"
+    },
+    {
+      "id": "xlsx",
+      "name": "xlsx",
+      "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .xltx, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \\\"the xlsx in my downloads\\\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
+      "version": "1.0.0",
+      "category": "文档处理",
+      "tags": [
+        "Excel",
+        "表格",
+        "公式"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/xlsx.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/xlsx.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/xlsx.tar.gz"
+    }
+  ]
+}
