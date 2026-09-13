@@ -180,6 +180,105 @@
       "downloads": 0,
       "createdAt": "2026-09-12T17:54:12.772Z",
       "updatedAt": "2026-09-12T17:54:12.772Z"
+    },
+    "find-skills": {
+      "category": "开发工具",
+      "tags": [
+        "技能发现",
+        "生态",
+        "cli"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "firecrawl": {
+      "category": "网络与搜索",
+      "tags": [
+        "抓取",
+        "爬虫",
+        "需APIKey"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "pdf": {
+      "category": "文档处理",
+      "tags": [
+        "PDF",
+        "文档",
+        "OCR"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "docx": {
+      "category": "文档处理",
+      "tags": [
+        "Word",
+        "文档",
+        "生成"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "xlsx": {
+      "category": "文档处理",
+      "tags": [
+        "Excel",
+        "表格",
+        "公式"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "pptx": {
+      "category": "文档处理",
+      "tags": [
+        "PPT",
+        "幻灯片",
+        "演示"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "mcp-builder": {
+      "category": "开发工具",
+      "tags": [
+        "MCP",
+        "脚手架",
+        "server"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "planning-with-files": {
+      "category": "工作流",
+      "tags": [
+        "规划",
+        "任务管理",
+        "持久化"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "unslop": {
+      "category": "写作工具",
+      "tags": [
+        "去AI腔",
+        "润色",
+        "文案"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
     }
   }
 }
