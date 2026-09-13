@@ -1,7 +1,7 @@
 ---
 name: text-to-d2
 description: 文本转 D2 图表（text-to-d2）：融合语义抽取与视觉交付——从长文本抽取逻辑结构（判断/条件/因果/角色/泳道分组，支持 evidence 溯源），自动映射为 shape 语义化 D2 图表，浏览器本地 WASM 渲染，产单文件离线交互预览页，可导出 SVG/PNG/PDF。适用于把文档/流程说明/事故分析/方案描述转成精美架构图、流程图、因果图。当用户要求把一段文字/文档转成图、画流程图/架构图/因果图时使用。text to diagram, d2, architecture diagram, flowchart
-version: v0.1.1
+version: v0.1.2
 ---
 
 # Skill: text-to-d2（文本转 D2 图表）
@@ -72,7 +72,8 @@ node scripts/ttg_to_spec.mjs graph.ttg.json -o mychart --preview
 | `graphMeta.title` | D2 顶层标题 |
 
 - 失败：逐条打印 `[路径] 错误` + 修复提示 → 修正 TTG JSON → 重跑（自动修复循环）；
-- WARN 行（如长标签、未分组长链）不阻塞，但建议采纳。**游离节点告警**（`没有任何连线与分组引用`）：该节点渲染后是孤立方块——回原文复核，真有关系就补连线（association），没有就删节点，别留着污染画面。
+- WARN 行（如长标签、未分组长链）不阻塞，但建议采纳。**游离节点告警**（`没有任何连线与分组引用`）：该节点渲染后是孤立方块——回原文复核，真有关系就补连线（association），没有就删节点，别留着污染画面；
+- **密集图调优**（节点多、连线交叉看不清）：`direction` 改 `down` 让主干纵向展开、布局切 `elk`（长边处理更好）、并按阶段 `groups` 分组减少跨组连线。
 
 ### 图例（legend）变通方案
 
@@ -96,7 +97,8 @@ D2 无原生图例，两种变通：
 3. **连线样式**：必须 `style.xxx: 值` 形式且值不带引号；
 4. **手绘开关**：d2-config 里是 `sketch: true`；
 5. **大图性能**：WASM 渲染建议 ≤ 50 节点；高品质 PNG 用本地 d2 CLI；
-6. **frontmatter description 必须单行**：SkillHub 等下载站导出器按行解析 YAML，多行折叠标量（`>` 或换行续行）会被截断；
+6. **frontmatter description 必须单行**：SkillHub 等下载站导出器按行解析 YAML，多行折叠标量（`>` 或换行续行）会被截断——任何自动改写本文件的工具（含 SkillEvo 变异）提交前都要复核这一条；
+7. **深色主题导出注意**：200/201 等深色主题在白底纸张或透明 PNG 里对比度差——对外打印/截图交付优先浅色主题（0/4/100），深色仅用于屏幕演示；
 
 ## SkillEvo Mutation Guards
 
