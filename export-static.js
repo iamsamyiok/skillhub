@@ -32,7 +32,7 @@ function rewrite(html) {
     .replace(/href="\.\/skill\?id=/g, 'href="./skill.html?id=')
     .replace(/href="\.\/ai"/g, 'href="./ai.html"')
     .replace(/href="\.\/setup"/g, 'href="./setup.html"')
-    .replace(/href="\.\/admin"/g, REPO_URL ? `href="${REPO_URL}#自托管` : 'href="./index.html"')
+    .replace(/href="\.\/admin"/g, REPO_URL ? `href="${REPO_URL}#自托管"` : 'href="./index.html"')
     .replace(/href="\.\/llms\.txt"/g, 'href="./llms.txt"')
     .replace(/href="\.\/skills\.txt"/g, 'href="./skills.txt"')
     .replace(/curl \/skills\.txt/g, '下载本页同目录的 skills.txt');
@@ -95,8 +95,12 @@ const agentPre = [
 ].join('\n');
 const indexHtml = fs.readFileSync(path.join(ROOT, 'public', 'index.html'), 'utf8');
 fs.writeFileSync(path.join(OUT, 'index.html'), rewrite(indexHtml)
+  /* hero 统计内联为构建期真实值（JS 会在运行时覆盖，占位符仅兜底） */
+  .replace('— 个技能', `${agentItems.length} 个技能`)
+  .replace('— 个分类', `${categories.length} 个分类`)
   .replace('<body>', `<body>\n<script type="application/json" id="skills-data">${agentJson}</script>`)
-  .replace('<main class="wrap">', `<section class="agent-index"><div class="wrap"><h2>Agent 完整技能清单（ALL SKILLS，静态内联）</h2><pre>${esc(agentPre)}</pre></div></section>\n<main class="wrap">`));
+  /* Agent 清单对人类默认折叠（<details>）：机器照读 JSON 数据块，首屏保持干净 */
+  .replace('<main class="wrap">', `<details class="agent-index"><summary class="wrap">Agent 完整技能清单（ALL SKILLS ${agentItems.length}）<code>skills.json</code><code>llms.txt</code></summary><div class="wrap"><pre>${esc(agentPre)}</pre></div></details>\n<main class="wrap">`));
 
 /* AGENTS.md（Agent 框架自动发现）与根级 skills.json（便于发现的纯数据端点） */
 fs.writeFileSync(path.join(OUT, 'AGENTS.md'), [

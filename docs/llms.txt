@@ -8,6 +8,8 @@
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/book-to-skill.zip
 - [d2-chart](https://iamsamyiok.github.io/skillhub/skills-md/d2-chart.md): D2 图表生成：自然语言转 D2 图表，JSON 中间层防错设计（LLM 产 spec、脚本转换、结构校验 + 编译器验证双层拦截），浏览器本地 WASM 渲染，产单文件离线预览页，可导出 SVG/PNG/PDF。适用于流程图、系统架构图、关系图、组织架构图、简单 ER 图。当用户要求画图、画架构图/流程图/拓扑图、生
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/d2-chart.zip
+- [doc-to-md](https://iamsamyiok.github.io/skillhub/skills-md/doc-to-md.md): >-
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/doc-to-md.zip
 - [docx](https://iamsamyiok.github.io/skillhub/skills-md/docx.md): Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files) or Word templates (.dotx files). Triggers include: any 
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/docx.zip
 - [find-skills](https://iamsamyiok.github.io/skillhub/skills-md/find-skills.md): Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express int
@@ -30,12 +32,16 @@
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/planning-with-files.zip
 - [pptx](https://iamsamyiok.github.io/skillhub/skills-md/pptx.md): Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentat
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/pptx.zip
+- [recorder2skill](https://iamsamyiok.github.io/skillhub/skills-md/recorder2skill.md): Turn a live screen recording into a reusable agent skill. Use when the user asks to record a task ('record my screen while I...', 'watch me do this and automate
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.zip
 - [show-deploy](https://iamsamyiok.github.io/skillhub/skills-md/show-deploy.md): 临时静态站点部署（Show Deploy）：把项目构建产物打包上传到 Show 托管，获得 48 小时自动过期的公网预览 URL，仅需 bash+tar+curl 无需安装 CLI。当用户说 deploy to show、发布预览、preview this site、想要前端构建的临时在线链接时使用。temporary
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/show-deploy.zip
 - [skill-creator](https://iamsamyiok.github.io/skillhub/skills-md/skill-creator.md): 技能创建器（Skill Creator）：从零创建新技能、修改和改进现有技能、运行评估测试（evals）、做技能性能基准分析、优化技能描述的触发准确率。当用户想创建、编辑、优化、评测任何 skill 时使用。create, improve, and evaluate agent skills
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/skill-creator.zip
 - [skill-updater](https://iamsamyiok.github.io/skillhub/skills-md/skill-updater.md): >-
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/skill-updater.zip
+- [slide-maker](https://iamsamyiok.github.io/skillhub/skills-md/slides-maker.md): >-
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/slides-maker.zip
 - [text-to-d2](https://iamsamyiok.github.io/skillhub/skills-md/text-to-d2.md): 文本转 D2 图表（text-to-d2）：融合语义抽取与视觉交付——从长文本抽取逻辑结构（判断/条件/因果/角色/泳道分组，支持 evidence 溯源），自动映射为 shape 语义化 D2 图表，浏览器本地 WASM 渲染，产单文件离线交互预览页，可导出 SVG/PNG/PDF。适用于把文档/流程说明/事故分析/
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/text-to-d2.zip
 - [text-to-diagram](https://iamsamyiok.github.io/skillhub/skills-md/text-to-diagram.md): 把一段自由文本抽取为逻辑图结构化 JSON（nodes/links/groups/graphMeta）。当用户要求把文本转成流程图、因果图、协作图、逻辑图、示意图、时间线，或要求生成图示/画图/梳理流程时使用。Agent 只输出 JSON，绝不输出 SVG/HTML/Mermaid 或任何坐标尺寸，布局与渲染交给本地渲

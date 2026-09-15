@@ -1,5 +1,5 @@
 {
-  "total": 23,
+  "total": 25,
   "categories": [
     "写作工具",
     "前端开发",
@@ -9,6 +9,7 @@
     "开发工具",
     "技能开发",
     "文档处理",
+    "未分类",
     "知识转化",
     "研究分析",
     "网络与搜索",
@@ -118,6 +119,42 @@
         {
           "path": "web/index.html",
           "size": 9808
+        }
+      ]
+    },
+    {
+      "id": "doc-to-md",
+      "name": "doc-to-md",
+      "description": ">-",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "files": [
+        {
+          "path": ".gitignore",
+          "size": 36
+        },
+        {
+          "path": "CONFIG.md",
+          "size": 2056
+        },
+        {
+          "path": "README.md",
+          "size": 2177
+        },
+        {
+          "path": "SKILL.md",
+          "size": 2488
+        },
+        {
+          "path": "scripts/convert.py",
+          "size": 5703
+        },
+        {
+          "path": "scripts/siliconflow_ocr.py",
+          "size": 1605
         }
       ]
     },
@@ -1037,6 +1074,36 @@
       ]
     },
     {
+      "id": "recorder2skill",
+      "name": "recorder2skill",
+      "description": "Turn a live screen recording into a reusable agent skill. Use when the user asks to record a task ('record my screen while I...', 'watch me do this and automate it', 'turn this into a skill') on Windows or Linux. Drives the bundled recorder2skill CLI entirely over shell commands; works in any agent that can run commands and read files.",
+      "version": "1.1.2",
+      "category": "技能开发",
+      "tags": [
+        "屏幕录制",
+        "技能生成",
+        "SKILL.md",
+        "自动化",
+        "recorder2skill"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-15T15:30:00.000Z",
+      "files": [
+        {
+          "path": "INSTALL.md",
+          "size": 631
+        },
+        {
+          "path": "README.md",
+          "size": 631
+        },
+        {
+          "path": "SKILL.md",
+          "size": 9522
+        }
+      ]
+    },
+    {
       "id": "show-deploy",
       "name": "show-deploy",
       "description": "临时静态站点部署（Show Deploy）：把项目构建产物打包上传到 Show 托管，获得 48 小时自动过期的公网预览 URL，仅需 bash+tar+curl 无需安装 CLI。当用户说 deploy to show、发布预览、preview this site、想要前端构建的临时在线链接时使用。temporary static hosting preview",
@@ -1206,34 +1273,6 @@
           "size": 349
         },
         {
-          "path": "scripts/skillevo/__pycache__/__init__.cpython-311.pyc",
-          "size": 572
-        },
-        {
-          "path": "scripts/skillevo/__pycache__/config.cpython-311.pyc",
-          "size": 8524
-        },
-        {
-          "path": "scripts/skillevo/__pycache__/evals.cpython-311.pyc",
-          "size": 18812
-        },
-        {
-          "path": "scripts/skillevo/__pycache__/io_utils.cpython-311.pyc",
-          "size": 4923
-        },
-        {
-          "path": "scripts/skillevo/__pycache__/models.cpython-311.pyc",
-          "size": 9243
-        },
-        {
-          "path": "scripts/skillevo/__pycache__/mutators.cpython-311.pyc",
-          "size": 10218
-        },
-        {
-          "path": "scripts/skillevo/__pycache__/registry.cpython-311.pyc",
-          "size": 5039
-        },
-        {
           "path": "scripts/skillevo/config.py",
           "size": 4018
         },
@@ -1256,6 +1295,570 @@
         {
           "path": "scripts/skillevo/registry.py",
           "size": 2766
+        }
+      ]
+    },
+    {
+      "id": "slides-maker",
+      "name": "slide-maker",
+      "description": ">-",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "files": [
+        {
+          "path": "README.md",
+          "size": 3909
+        },
+        {
+          "path": "SKILL.md",
+          "size": 297270
+        },
+        {
+          "path": "agents/arbiter.md",
+          "size": 11979
+        },
+        {
+          "path": "agents/asset-prep.md",
+          "size": 7957
+        },
+        {
+          "path": "agents/blind-reader.md",
+          "size": 5737
+        },
+        {
+          "path": "agents/content-planner.md",
+          "size": 73720
+        },
+        {
+          "path": "agents/critic.md",
+          "size": 97977
+        },
+        {
+          "path": "agents/openai.yaml",
+          "size": 301
+        },
+        {
+          "path": "agents/slide-design.md",
+          "size": 103033
+        },
+        {
+          "path": "references/animation.md",
+          "size": 23185
+        },
+        {
+          "path": "references/asset-production.md",
+          "size": 27802
+        },
+        {
+          "path": "references/auto-delegation-quality-gates.md",
+          "size": 11478
+        },
+        {
+          "path": "references/bespoke-registers.md",
+          "size": 9478
+        },
+        {
+          "path": "references/canvas-formats.md",
+          "size": 12527
+        },
+        {
+          "path": "references/checkpoint-convention.md",
+          "size": 19828
+        },
+        {
+          "path": "references/codex-runtime.md",
+          "size": 46813
+        },
+        {
+          "path": "references/collaborative-mode.md",
+          "size": 19045
+        },
+        {
+          "path": "references/content-plan-spec.md",
+          "size": 9857
+        },
+        {
+          "path": "references/critic-panel.md",
+          "size": 21918
+        },
+        {
+          "path": "references/data-viz.md",
+          "size": 24859
+        },
+        {
+          "path": "references/deck-setup.md",
+          "size": 8847
+        },
+        {
+          "path": "references/design-by-purpose.md",
+          "size": 25439
+        },
+        {
+          "path": "references/design-by-topic.md",
+          "size": 12623
+        },
+        {
+          "path": "references/design-gallery.md",
+          "size": 21944
+        },
+        {
+          "path": "references/design-intelligence-addendum.md",
+          "size": 33191
+        },
+        {
+          "path": "references/design-principles.md",
+          "size": 77713
+        },
+        {
+          "path": "references/east-asian-aesthetic.md",
+          "size": 5778
+        },
+        {
+          "path": "references/examples/build_example_generic.py",
+          "size": 17638
+        },
+        {
+          "path": "references/examples/section_example.py",
+          "size": 4506
+        },
+        {
+          "path": "references/examples/style_example.py",
+          "size": 5227
+        },
+        {
+          "path": "references/file-inventory.md",
+          "size": 60744
+        },
+        {
+          "path": "references/font-guidance.md",
+          "size": 11756
+        },
+        {
+          "path": "references/form-selection.md",
+          "size": 25147
+        },
+        {
+          "path": "references/generated-template.md",
+          "size": 55440
+        },
+        {
+          "path": "references/handoff-and-iteration.md",
+          "size": 15128
+        },
+        {
+          "path": "references/handoff-checklist.md",
+          "size": 9564
+        },
+        {
+          "path": "references/icons.md",
+          "size": 24768
+        },
+        {
+          "path": "references/image-generation.md",
+          "size": 49163
+        },
+        {
+          "path": "references/interview-protocol.md",
+          "size": 50548
+        },
+        {
+          "path": "references/large-deck-orchestration.md",
+          "size": 12213
+        },
+        {
+          "path": "references/maintenance-boundaries.md",
+          "size": 11916
+        },
+        {
+          "path": "references/multilingual.md",
+          "size": 22225
+        },
+        {
+          "path": "references/redesign-existing-deck.md",
+          "size": 11306
+        },
+        {
+          "path": "references/review-rubrics.md",
+          "size": 71351
+        },
+        {
+          "path": "references/runtime-routing.md",
+          "size": 2601
+        },
+        {
+          "path": "references/schematic-diagrams.md",
+          "size": 21754
+        },
+        {
+          "path": "references/security-and-capabilities.md",
+          "size": 7336
+        },
+        {
+          "path": "references/semantic-color-contract.md",
+          "size": 4404
+        },
+        {
+          "path": "references/style-analysis.md",
+          "size": 6120
+        },
+        {
+          "path": "references/troubleshooting-faq.md",
+          "size": 55548
+        },
+        {
+          "path": "references/user-taste.md",
+          "size": 11616
+        },
+        {
+          "path": "requirements.txt",
+          "size": 882
+        },
+        {
+          "path": "scripts/.deck-cycle-state.json",
+          "size": 99
+        },
+        {
+          "path": "scripts/_console.py",
+          "size": 2382
+        },
+        {
+          "path": "scripts/anchor_proof.py",
+          "size": 9685
+        },
+        {
+          "path": "scripts/anim.py",
+          "size": 10353
+        },
+        {
+          "path": "scripts/arc_divergence.py",
+          "size": 26108
+        },
+        {
+          "path": "scripts/archetypes.py",
+          "size": 7238
+        },
+        {
+          "path": "scripts/archetypes_html.py",
+          "size": 53675
+        },
+        {
+          "path": "scripts/assemble.py",
+          "size": 6951
+        },
+        {
+          "path": "scripts/audience_brief.py",
+          "size": 7469
+        },
+        {
+          "path": "scripts/bespoke_kits.py",
+          "size": 16547
+        },
+        {
+          "path": "scripts/blind_read.py",
+          "size": 63357
+        },
+        {
+          "path": "scripts/canon_probe.py",
+          "size": 14480
+        },
+        {
+          "path": "scripts/check_design_contracts.py",
+          "size": 17554
+        },
+        {
+          "path": "scripts/check_direction_applied.py",
+          "size": 20211
+        },
+        {
+          "path": "scripts/check_env.py",
+          "size": 14217
+        },
+        {
+          "path": "scripts/check_env.sh",
+          "size": 450
+        },
+        {
+          "path": "scripts/check_gate_parity.py",
+          "size": 5459
+        },
+        {
+          "path": "scripts/check_image_provenance.py",
+          "size": 23531
+        },
+        {
+          "path": "scripts/check_inventory.py",
+          "size": 4802
+        },
+        {
+          "path": "scripts/check_param_reach.py",
+          "size": 7644
+        },
+        {
+          "path": "scripts/check_reason_width.py",
+          "size": 4736
+        },
+        {
+          "path": "scripts/check_reference_code.py",
+          "size": 9442
+        },
+        {
+          "path": "scripts/check_register_guard.py",
+          "size": 24418
+        },
+        {
+          "path": "scripts/check_register_pixels.py",
+          "size": 38019
+        },
+        {
+          "path": "scripts/check_skill_lossless.py",
+          "size": 11505
+        },
+        {
+          "path": "scripts/check_style_applied.py",
+          "size": 14743
+        },
+        {
+          "path": "scripts/check_surface.py",
+          "size": 37884
+        },
+        {
+          "path": "scripts/check_tests_wired.py",
+          "size": 3971
+        },
+        {
+          "path": "scripts/check_version.py",
+          "size": 15538
+        },
+        {
+          "path": "scripts/codex_delivery_gate.py",
+          "size": 134495
+        },
+        {
+          "path": "scripts/codex_handoff_guard.py",
+          "size": 2159
+        },
+        {
+          "path": "scripts/codex_visual_contract.py",
+          "size": 12645
+        },
+        {
+          "path": "scripts/component_audit.py",
+          "size": 21777
+        },
+        {
+          "path": "scripts/composition_cues.py",
+          "size": 12899
+        },
+        {
+          "path": "scripts/composition_probe.py",
+          "size": 35970
+        },
+        {
+          "path": "scripts/contact_sheet.py",
+          "size": 4505
+        },
+        {
+          "path": "scripts/crop_helper.py",
+          "size": 12689
+        },
+        {
+          "path": "scripts/deck_cycle.py",
+          "size": 21520
+        },
+        {
+          "path": "scripts/deck_gates.py",
+          "size": 42716
+        },
+        {
+          "path": "scripts/deckkit.py",
+          "size": 628204
+        },
+        {
+          "path": "scripts/delegated_picks.py",
+          "size": 16203
+        },
+        {
+          "path": "scripts/designed_charts.py",
+          "size": 42550
+        },
+        {
+          "path": "scripts/directions_diversity.py",
+          "size": 16109
+        },
+        {
+          "path": "scripts/dispatch_brief.py",
+          "size": 13134
+        },
+        {
+          "path": "scripts/export_notes.py",
+          "size": 3583
+        },
+        {
+          "path": "scripts/extract_deck.py",
+          "size": 9100
+        },
+        {
+          "path": "scripts/extract_pdf.py",
+          "size": 61338
+        },
+        {
+          "path": "scripts/fanout_record.py",
+          "size": 8561
+        },
+        {
+          "path": "scripts/fetch_images.py",
+          "size": 39923
+        },
+        {
+          "path": "scripts/formats.py",
+          "size": 17749
+        },
+        {
+          "path": "scripts/generate_images_codex.py",
+          "size": 26143
+        },
+        {
+          "path": "scripts/generate_images_openai.py",
+          "size": 8570
+        },
+        {
+          "path": "scripts/icons.py",
+          "size": 24515
+        },
+        {
+          "path": "scripts/image_fx.py",
+          "size": 5683
+        },
+        {
+          "path": "scripts/image_prompts.py",
+          "size": 8869
+        },
+        {
+          "path": "scripts/image_qc.py",
+          "size": 28662
+        },
+        {
+          "path": "scripts/ingest.py",
+          "size": 17789
+        },
+        {
+          "path": "scripts/inspect_template.py",
+          "size": 2472
+        },
+        {
+          "path": "scripts/install_skill.py",
+          "size": 10999
+        },
+        {
+          "path": "scripts/lint_deck.py",
+          "size": 231714
+        },
+        {
+          "path": "scripts/maps.py",
+          "size": 15688
+        },
+        {
+          "path": "scripts/material_probe.py",
+          "size": 4644
+        },
+        {
+          "path": "scripts/palette_audit.py",
+          "size": 15501
+        },
+        {
+          "path": "scripts/plan_rhythm.py",
+          "size": 20724
+        },
+        {
+          "path": "scripts/plan_wordcount.py",
+          "size": 3774
+        },
+        {
+          "path": "scripts/preflight_check.py",
+          "size": 38371
+        },
+        {
+          "path": "scripts/presets.py",
+          "size": 35808
+        },
+        {
+          "path": "scripts/register_surface.py",
+          "size": 64183
+        },
+        {
+          "path": "scripts/registry.py",
+          "size": 9330
+        },
+        {
+          "path": "scripts/render_deck.py",
+          "size": 271206
+        },
+        {
+          "path": "scripts/render_deck.sh",
+          "size": 592
+        },
+        {
+          "path": "scripts/roundtrip_budget.py",
+          "size": 11758
+        },
+        {
+          "path": "scripts/roundtrip_report.py",
+          "size": 7219
+        },
+        {
+          "path": "scripts/run_eval.py",
+          "size": 16370
+        },
+        {
+          "path": "scripts/save_register.py",
+          "size": 26538
+        },
+        {
+          "path": "scripts/sigs.py",
+          "size": 25949
+        },
+        {
+          "path": "scripts/skill_fingerprint.py",
+          "size": 6010
+        },
+        {
+          "path": "scripts/slide_index.py",
+          "size": 5179
+        },
+        {
+          "path": "scripts/smoke_component_audit.py",
+          "size": 9925
+        },
+        {
+          "path": "scripts/smoke_deckkit.py",
+          "size": 81350
+        },
+        {
+          "path": "scripts/smoke_directions.py",
+          "size": 21217
+        },
+        {
+          "path": "scripts/smoke_render_slides.py",
+          "size": 5486
+        },
+        {
+          "path": "scripts/taste_ledger.py",
+          "size": 17165
+        },
+        {
+          "path": "scripts/trace_composed.py",
+          "size": 7076
+        },
+        {
+          "path": "scripts/validate_review.py",
+          "size": 47375
+        },
+        {
+          "path": "scripts/written_reason.py",
+          "size": 2932
         }
       ]
     },
@@ -1889,25 +2492,6 @@
           "size": 10670
         }
       ]
-    },
-    {
-      "id": "recorder2skill",
-      "name": "recorder2skill",
-      "description": "屏幕录制→可复用技能（Recorder2Skill）：录制你操作电脑完成任务的屏幕过程，由 agent 分析事件时间线自动生成符合规范的 SKILL.md 技能包。当用户要求“录屏并把我刚才的操作变成技能”“watch me do this and automate it”“turn this into a skill”或类似意图时使用。turn a live screen recording into a reusable agent skill (Windows/Linux)",
-      "version": "1.0.0",
-      "category": "技能开发",
-      "tags": [
-        "屏幕录制",
-        "技能生成",
-        "SKILL.md",
-        "自动化",
-        "recorder2skill"
-      ],
-      "downloads": 0,
-      "updatedAt": "2026-09-15T00:00:00.000Z",
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/recorder2skill.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.tar.gz"
     }
   ]
 }

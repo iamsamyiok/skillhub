@@ -81,18 +81,19 @@ async function initHome() {
   async function load() {
     const data = await filterList(state);
     document.getElementById('stat-skills').textContent = `${data.total} 个技能`;
+    const cats = data.categories || [];
+    if (cats.length) document.getElementById('stat-cats').textContent = `${cats.length} 个分类`;
     grid.innerHTML = data.items.map((s) => `
       <div class="skill-card">
         <div class="head">
           <span class="name">${esc(s.name)}</span>
           <span class="ver">v${esc(s.version)}</span>
+          <span class="cat">${esc(s.category)}</span>
         </div>
-        <div class="desc${s.description.length > 90 ? ' clamped' : ''}">${esc(s.description)}</div>
+        <div class="desc">${esc(s.description)}</div>
         ${(s.tags || []).length ? `<div class="tags-row">${s.tags.map((t) => `<button class="tag-btn" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : ''}
         <div class="foot">
-          <span>${esc(s.category)}</span>
-          <span>↓ ${s.downloads}</span>
-          ${s.updatedAt ? `<span>${new Date(s.updatedAt).toLocaleDateString('zh-CN')}</span>` : ''}
+          ${s.updatedAt ? `<span class="date">更新于 ${new Date(s.updatedAt).toLocaleDateString('zh-CN')}</span>` : ''}
           <span class="foot-btns">
             <a class="mini-btn" href="${skillPageUrl(s.id)}">详情</a>
             <a class="mini-btn primary" href="${downloadUrl(s.id)}" download>下载 ZIP</a>
@@ -154,7 +155,7 @@ async function initSkill() {
   root.innerHTML = `
     <div class="crumb"><a href="/">SkillHub</a> / ${esc(s.category)} / ${esc(s.name)}</div>
     <div class="detail-head">
-      <h1>${esc(s.name)} <span class="ver" style="font-size:13px;color:var(--brand);background:#eef0ff;border-radius:7px;padding:3px 9px;font-weight:600">v${esc(s.version)}</span></h1>
+      <h1>${esc(s.name)} <span class="ver-badge">v${esc(s.version)}</span></h1>
       <p class="detail-desc">${esc(s.description)}</p>
       <div class="meta-row">
         <span>分类 <b>${esc(s.category)}</b></span>
@@ -173,7 +174,7 @@ async function initSkill() {
       </div>
       <div class="agent-snippet">${esc(agentTip)}</div>
       <div class="file-list">
-        <b style="font-size:13.5px">文件清单</b>
+        <b class="file-label">文件清单</b>
         ${s.files.map((f) => `<div class="file"><code>./${esc(f.path)}</code><span class="size">${fmtSize(f.size)}</span></div>`).join('')}
       </div>
     </div>

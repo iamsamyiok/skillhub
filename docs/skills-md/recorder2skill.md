@@ -1,60 +1,160 @@
 ---
 name: recorder2skill
-version: 1.0.0
-description: 屏幕录制→可复用技能（Recorder2Skill）：录制你操作电脑完成任务的屏幕过程，由 agent 分析事件时间线自动生成符合规范的 SKILL.md 技能包。当用户要求"录屏并把我刚才的操作变成技能""watch me do this and automate it""turn this into a skill"或类似意图时使用。turn a live screen recording into a reusable agent skill (Windows/Linux)
-category: 技能开发
-tags: [屏幕录制, 技能生成, SKILL.md, 自动化, recorder2skill]
+version: 1.1.2
+description: "Turn a live screen recording into a reusable agent skill. Use when the user asks to record a task ('record my screen while I...', 'watch me do this and automate it', 'turn this into a skill') on Windows or Linux. Drives the bundled recorder2skill CLI entirely over shell commands; works in any agent that can run commands and read files."
+allowed-tools:
+  - Bash(node scripts/recorder-cli.mjs *)
+  - read
+  - write
 ---
 
-# Skill: recorder2skill（屏幕录制→可复用技能）
+> Companion docs: the repo's `AGENTS.md` describes the equivalent OpenCode
+> plugin flow (`recorder_*` tools). Both share one data root — use one entry
+> point per session. This file is the universal CLI flow.
 
-把"你亲手做一遍任务"变成 agent 可复用的技能：启动屏幕录制 → 你正常完成任务并点 Stop → agent 读取事件时间线（应用切换、窗口标题、浏览器 URL、终端命令、剪贴板、marker）→ 自动撰写并保存符合 Agent Skills 规范的 `SKILL.md`。
+# recorder2skill — record a task, produce a SKILL.md
 
-支持 Windows 和 Linux（X11），全流程通过一条 CLI 驱动，任何能执行命令的 agent 都能用。
+Record the user's screen while they perform a task once, then generalize that
+single run into a standard Agent Skills file (`SKILL.md`) the agent can reuse.
+All state lives under a local data root (`C:\temp\recorder2skill` on Windows,
+`~/.recorder2skill` elsewhere; override with `RECORDER2SKILL_DATA_DIR`; the
+old `RECORDER_DEMO_DATA_DIR` and an existing legacy default dir still work).
 
-## 工作原理
+Every `node scripts/recorder-cli.mjs ...` command below assumes the working
+directory is the recorder2skill repo checkout (relative `scripts/` paths); run
+`node scripts/recorder-cli.mjs doctor` if unsure — it prints the repo root.
+To make this very skill discoverable to an agent, run
+`node scripts/recorder-cli.mjs install-skill opencode` (or `claude`, `codex`,
+`all`); `doctor` reports which agents already have it.
 
-1. **录制**：agent 调 `recorder-cli.mjs start` 拉起录制悬浮条；你像平时一样完成任务，点 Stop（或 `Ctrl+Shift+R`）。录制中随时 `Ctrl+Shift+M` 打标记，帮助 agent 定位关键动作。
-2. **等待处理**：`recorder-cli.mjs wait-ready 600` 阻塞到帧提取、pHash 去重、事件关联完成。
-3. **分析**：`timeline` 给出带毫秒时间戳的有序步骤和自动生成的描述；`events` 提供细粒度事件（文本字段已做 PII 脱敏）；`frames` 给出关键帧 JPEG 路径。
-4. **生成技能**：agent 综合时间线与事件写出 SKILL.md 正文，`save-skill <name> --description "..." --body-file body.md` 落盘为标准技能包（name ≤64、单行 description ≤1024，兼容 OpenCode / Claude Code / Codex CLI 解析器）。
-5. **验证与归档**：`skill-doctor` 校验生成物；`archive` 把会话移入 archived-sessions（绝不删除）。
+## Prerequisites
 
-## 安装
+The recorder must be set up once (see the repo README: `bash scripts/setup.sh`
+or `scripts\setup.ps1`). Verify quickly: `node scripts/recorder-cli.mjs last
+--summary` exiting 0 (or a clear "No sessions" error) means the CLI works.
+`--summary` keeps the answer small (session ids, stats, description, counts)
+for agent context; plain `last` also dumps the full bundle/correlation.
 
-```bash
-git clone https://github.com/iamsamyiok/recorder2skill.git
-cd recorder2skill
-./scripts/setup.sh          # Windows: scripts/setup.ps1
-node scripts/recorder-cli.mjs doctor   # 全部绿即就绪
-```
+## Flow
 
-把本技能目录复制进 agent 的技能目录：
+1. **Start** — run `node scripts/recorder-cli.mjs start`. The command returns
+   only once recording is REALLY live and prints the `sessionId`; tell the
+   user a floating control bar appeared and to do the task now.
+2. **User works; then stops** — the user clicks Stop on the floating bar (or
+   presses Ctrl+Shift+R). Do not poll with other commands meanwhile.
+3. **Wait for processing** — run
+   `node scripts/recorder-cli.mjs wait-ready 600`. It blocks until the session
+   is post-processed (frame extraction, dHash dedupe, timeline bundle) and
+   returns a summary JSON. If it times out, the recording is still running —
+   ask the user to stop it, then re-run.
+4. **Analyze** (see method below) — `timeline` (includes the auto-generated
+   `description` — start from it), then `events` (text fields are
+   PII-redacted), then — only where events are ambiguous — `frames` +
+   viewing the JPEG paths. One recording is enough: `align <id>` returns
+   the step skeleton plus a hint. If the user can record the same task a
+   second time, run `align <id> <id>`: values that vary across recordings
+   are lifted into parameters, so the skill covers the task class instead
+   of one run.
+5. **Write the skill** — compose the SKILL.md body, save it to a temp file,
+   then `node scripts/recorder-cli.mjs save-skill <name> --description "..."
+   --body-file <file> [--tools "pattern1,pattern2"]`. The description is
+   stored single-line (the Codex CLI / Claude Code parser convention).
+   When the recording shows a script or command sequence worth reusing
+   verbatim, bundle it: `--script <file>` copies it under `scripts/` and
+   lists it in a "Bundled scripts" section (note in the body which
+   dependencies the script needs and where to run it from). Report the
+   returned path to the user; if the output mentions `similarTo`, tell the
+   user an existing skill looks related and let them decide. To register the
+   finished skill with an agent in one step, add `--to opencode` / `--to
+   claude,codex` (comma list): it copies the skill into that agent's skill
+   directory and re-runs skill-doctor on the installed copy (`installed` and
+   `doctorOk` come back in the output).
+6. **Validate** — run `node scripts/skill-doctor.mjs <skillDir>` on the
+   generated skill; it must exit 0 (frontmatter, single-line description,
+   cross-parser limits, bundled-script syntax).
+7. **Clean up (optional)** — once the user confirms the skill, move the
+   session out of the active set with
+   `node scripts/recorder-cli.mjs archive <sessionId>` (nothing is deleted;
+   `sessions --all` still lists it).
 
-```bash
-# OpenCode
-cp -r recorder2skill  yourproject/.opencode/skill/
-# Claude Code
-cp -r recorder2skill  yourproject/.claude/skills/
-```
+## Analyzing a session
 
-之后对 agent 说一句即可：*"start recording my screen; I'll do the task, then turn it into a skill"*。
+All times are `atMs` = milliseconds since recording start.
 
-## 对 agent 的使用说明
+Captured event types (what `events` returns by default):
+`app.activate`, `app.title-change`, `browser.url`, `clipboard.change`,
+`terminal.command`, `marker`. Add `--all` (or explicit `--types`) to include
+structural lifecycle events. Press `Ctrl+Shift+M` (Windows/Linux) or
+`Cmd+Shift+M` (macOS) DURING a recording to drop a marker at an intentional
+boundary — markers make step splitting much more reliable. String fields in
+`events` output are redacted for structured PII (email/card/SSN/phone);
+raw values stay on disk only.
 
-完整流程、事件类型表和注意事项见包内 `SKILL.md`。核心命令：
+1. `node scripts/recorder-cli.mjs timeline` — the shape: ordered steps with
+   app / urls / titles / commands / clipboard counts / markers / frame counts.
+   The response also carries `description` (the vendor describer's auto
+   generated markdown) — read it FIRST as the initial hypothesis, then verify
+   and refine against events.
+2. Form a hypothesis about the overall intent from the returned `description`
+   plus apps / urls / commands.
+3. `node scripts/recorder-cli.mjs events` around anything unclear — clipboard
+   text (`textPreview`), exact URLs, the sequence of title changes. Narrow
+   with `--from <ms> --to <ms>` windows.
+4. `node scripts/recorder-cli.mjs frames` — kept frames only (dHash dedupe).
+   View a frame by reading its JPEG path IF you have vision; otherwise rely
+   on the event timeline, which is designed to carry the session on its own.
+   Budget ~5 frames for a 30-60s session.
+5. Cross-correlate signals (clipboard <-> terminal <-> title <-> url) to
+   confirm each step. Filter against the intent: drop recorder bracketing
+   (focusing the recorder to press Start/Stop), OS dialogs, URL tracking
+   params, sub-second focus flickers, off-task detours. Never drop a step
+   that feeds a later one (a copy, a lookup, a login).
 
-```bash
-node scripts/recorder-cli.mjs start          # 拉起录制，确认 recording.json 后返回
-node scripts/recorder-cli.mjs wait-ready 600 # 等待会话处理完成
-node scripts/recorder-cli.mjs timeline       # 有序步骤 + 自动描述
-node scripts/recorder-cli.mjs events         # 事件明细（--types/--from/--to/--limit）
-node scripts/recorder-cli.mjs save-skill <name> --description "..." --body-file body.md
-node scripts/skill-doctor.mjs <skillDir>     # 校验生成物
-```
+## Writing the SKILL.md
 
-## 来源与源码
-
-- 源码仓库：<https://github.com/iamsamyiok/recorder2skill>
-- 基于 microsoft/skill-recorder（MIT）二次开发，vendor 改动全部以 `[RECORDER-DEMO]` 标记并记录在 PATCHES.md
-- 已发布版本：v1.0.0
+- Generalize from the ONE recorded run: if the user acted on 3 rows, the
+  skill handles every row (N). Keep what is essential; drop window
+  positions, timings, and one-off specifics.
+- Scope = trigger: the description only promises what the body actually
+  covers. If the recording covered "record the title", the skill is "titles
+  only" — say so explicitly ("does X only; for Y, use Z instead") so broad
+  phrasings ("open the page and...") do not pull in out-of-scope tasks. A
+  short handoff line naming the alternative tool is worth more than a
+  vague promise the body cannot keep.
+- Semantic mapping to native tools (never replay UI clicks): browser pages ->
+  fetch/webfetch; local files -> read/write/edit; everything shell-shaped ->
+  shell commands for the user's OS (PowerShell on Windows, bash on Linux).
+  Only genuine UI-only steps stay as manual instructions.
+- Cheapest path first: for a narrow goal (one `<title>`), prefer a one-line
+  shell extraction; full-page pulls (webfetch -> markdown) are the fallback
+  when the direct request fails (TLS, anti-bot) — and note their context
+  cost in the skill.
+- Deterministic logic (charset handling, redirect following, regexes, fixed
+  output formats) belongs in a bundled script via `--script`, never as prose
+  the agent re-derives each run; the skill then says "run
+  `scripts/x.ps1 <url>`".
+- Manual steps stay explicit, with handoff and recovery: write WHO does it
+  (the user), WHAT unblocks it (login done / URL left the login page), and
+  how the automated flow resumes. If a browser-automation CLI exists in the
+  user's environment, name its sequence (open headed -> user logs in ->
+  wait for the URL to change -> record the final title).
+- Environment prerequisites get their own check: before the first real step,
+  probe the dependency (`<tool> doctor` / `--version`) and give the failure
+  path (e.g. browser download blocked -> use `--executable-path` to an
+  existing Chromium/Edge; Windows ships msedge.exe).
+- Define every output: file format (UTF-8, one `URL<TAB>title` per line),
+  batch rendering (markdown table), and single-item failure behavior
+  (report and continue).
+- Extract genuinely fixed literals (a canonical URL, a repo slug) as
+  `{{id}}` tokens referenced from the body; variable targets stay as
+  instructions. Anonymize every example host (oa.example.com:2828, "工作台"
+  instead of real names): `save-skill` flags likely-real hosts/IPs as
+  `warnings` — resolve them before telling the user the skill is done.
+- Separate calculation steps (read/derive/decide) from action steps
+  (submit/send/create/delete). Actions are the risky surface; keep them
+  explicit.
+- `description` is the trigger: state what it does AND when to reach for it.
+  The body stays imperative and skimmable: When to use, the ordered
+  procedure, edge cases (empty collection, missing file, one item failing).
+- The skill must do exactly what its description says: no hidden side
+  effects, no destructive steps the user would not expect.

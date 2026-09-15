@@ -1,5 +1,5 @@
 {
-  "total": 23,
+  "total": 25,
   "categories": [
     "写作工具",
     "前端开发",
@@ -9,6 +9,7 @@
     "开发工具",
     "技能开发",
     "文档处理",
+    "未分类",
     "知识转化",
     "研究分析",
     "网络与搜索",
@@ -55,6 +56,19 @@
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/d2-chart.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/d2-chart.zip",
       "tgz": "https://iamsamyiok.github.io/skillhub/downloads/d2-chart.tar.gz"
+    },
+    {
+      "id": "doc-to-md",
+      "name": "doc-to-md",
+      "description": ">-",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/doc-to-md.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/doc-to-md.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/doc-to-md.tar.gz"
     },
     {
       "id": "docx",
@@ -251,6 +265,25 @@
       "tgz": "https://iamsamyiok.github.io/skillhub/downloads/pptx.tar.gz"
     },
     {
+      "id": "recorder2skill",
+      "name": "recorder2skill",
+      "description": "Turn a live screen recording into a reusable agent skill. Use when the user asks to record a task ('record my screen while I...', 'watch me do this and automate it', 'turn this into a skill') on Windows or Linux. Drives the bundled recorder2skill CLI entirely over shell commands; works in any agent that can run commands and read files.",
+      "version": "1.1.2",
+      "category": "技能开发",
+      "tags": [
+        "屏幕录制",
+        "技能生成",
+        "SKILL.md",
+        "自动化",
+        "recorder2skill"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-15T15:30:00.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/recorder2skill.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.tar.gz"
+    },
+    {
       "id": "show-deploy",
       "name": "show-deploy",
       "description": "临时静态站点部署（Show Deploy）：把项目构建产物打包上传到 Show 托管，获得 48 小时自动过期的公网预览 URL，仅需 bash+tar+curl 无需安装 CLI。当用户说 deploy to show、发布预览、preview this site、想要前端构建的临时在线链接时使用。temporary static hosting preview",
@@ -311,6 +344,19 @@
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/skill-updater.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/skill-updater.zip",
       "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skill-updater.tar.gz"
+    },
+    {
+      "id": "slides-maker",
+      "name": "slide-maker",
+      "description": ">-",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/slides-maker.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/slides-maker.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/slides-maker.tar.gz"
     },
     {
       "id": "text-to-d2",
@@ -424,25 +470,6 @@
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/xlsx.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/xlsx.zip",
       "tgz": "https://iamsamyiok.github.io/skillhub/downloads/xlsx.tar.gz"
-    },
-    {
-      "id": "recorder2skill",
-      "name": "recorder2skill",
-      "description": "屏幕录制→可复用技能（Recorder2Skill）：录制你操作电脑完成任务的屏幕过程，由 agent 分析事件时间线自动生成符合规范的 SKILL.md 技能包。当用户要求“录屏并把我刚才的操作变成技能”“watch me do this and automate it”“turn this into a skill”或类似意图时使用。turn a live screen recording into a reusable agent skill (Windows/Linux)",
-      "version": "1.0.0",
-      "category": "技能开发",
-      "tags": [
-        "屏幕录制",
-        "技能生成",
-        "SKILL.md",
-        "自动化",
-        "recorder2skill"
-      ],
-      "downloads": 0,
-      "updatedAt": "2026-09-15T00:00:00.000Z",
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/recorder2skill.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.tar.gz"
     }
   ]
 }

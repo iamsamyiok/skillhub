@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SkillHub · Agent 技能下载站</title>
 <meta name="description" content="为人类与 AI Agent 提供技能的浏览、检索、下载与管理">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Ctext x='16' y='22' font-family='system-ui,sans-serif' font-size='17' font-weight='700' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
 <link rel="llms" href="/llms.txt" type="text/plain">
 <link rel="alternate" type="application/json" href="/skills.json" title="全部技能 JSON 清单">
 <link rel="stylesheet" href="/style.css">
@@ -22,20 +23,19 @@
 
 <section class="hero">
   <div class="wrap">
-    <h1>给人类和 AI Agent 的技能库</h1>
+    <h1>给人类和 <em>AI Agent</em> 的技能库</h1>
     <p class="sub">每个技能是一个可下载的 SKILL.md 工作包：人类在线阅读，Agent 一条命令检索并下载安装。</p>
     <div class="pill-row">
-      <span class="pill" id="stat-skills">- 个技能</span>
-      <span class="pill">tar.gz 一键下载</span>
+      <span class="pill" id="stat-skills">— 个技能</span>
+      <span class="pill" id="stat-cats">— 个分类</span>
+      <span class="pill">SKILL.md 标准格式</span>
       <span class="pill">llms.txt 机器索引</span>
-      <span class="pill">开放 API</span>
-      <span class="pill">Agent 令牌管理</span>
     </div>
     <form class="search-box" onsubmit="return false;">
       <input id="q" type="search" placeholder="搜索技能名称、能力描述、标签…" autocomplete="off">
       <button id="go">搜索</button>
     </form>
-    <p class="agent-tip">Agent 快速开始：<code>curl /skills.txt</code> 列表 → <code>curl /api/skills/{id}/download -o skill.tar.gz</code> 安装，详见 <a href="/ai" style="color:#aab1e0">Agent 接入指南</a></p>
+    <p class="agent-tip">Agent 快速开始：<code>curl /skills.txt</code> 列表 → 下载 <code>downloads/{id}.zip</code> 安装，详见 <a href="/ai">Agent 接入指南</a></p>
   </div>
 </section>
 
@@ -44,8 +44,8 @@
   <div class="grid" id="grid"></div>
   <div class="empty hidden" id="empty">没有匹配的技能，换个关键词试试。</div>
 
-  <h2 style="margin:8px 0 4px;font-size:19px">机器入口</h2>
-  <p style="color:var(--muted);font-size:13.5px;margin:4px 0 12px">为自动化程序准备的稳定接口，人类也可直接点击查看。</p>
+  <h2 class="machines-title">机器入口</h2>
+  <p class="machines-sub">为自动化程序准备的稳定接口，人类也可直接点击查看。</p>
   <div class="for-machines">
     <div class="machine-card">
       <h3>llms.txt 索引</h3>
