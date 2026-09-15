@@ -1,12 +1,16 @@
 ---
 name: recorder2skill
-version: 1.1.0
+version: 1.1.1
 description: "Turn a live screen recording into a reusable agent skill. Use when the user asks to record a task ('record my screen while I...', 'watch me do this and automate it', 'turn this into a skill') on Windows or Linux. Drives the bundled recorder2skill CLI entirely over shell commands; works in any agent that can run commands and read files."
 allowed-tools:
   - Bash(node scripts/recorder-cli.mjs *)
   - read
   - write
 ---
+
+> Companion docs: the repo's `AGENTS.md` describes the equivalent OpenCode
+> plugin flow (`recorder_*` tools). Both share one data root — use one entry
+> point per session. This file is the universal CLI flow.
 
 # recorder2skill — record a task, produce a SKILL.md
 
@@ -16,11 +20,20 @@ All state lives under a local data root (`C:\temp\recorder2skill` on Windows,
 `~/.recorder2skill` elsewhere; override with `RECORDER2SKILL_DATA_DIR`; the
 old `RECORDER_DEMO_DATA_DIR` and an existing legacy default dir still work).
 
+Every `node scripts/recorder-cli.mjs ...` command below assumes the working
+directory is the recorder2skill repo checkout (relative `scripts/` paths); run
+`node scripts/recorder-cli.mjs doctor` if unsure — it prints the repo root.
+To make this very skill discoverable to an agent, run
+`node scripts/recorder-cli.mjs install-skill opencode` (or `claude`, `codex`,
+`all`); `doctor` reports which agents already have it.
+
 ## Prerequisites
 
 The recorder must be set up once (see the repo README: `bash scripts/setup.sh`
-or `scripts\setup.ps1`). Verify quickly: `node scripts/recorder-cli.mjs last`
-exiting 0 (or a clear "No sessions" error) means the CLI works.
+or `scripts\setup.ps1`). Verify quickly: `node scripts/recorder-cli.mjs last
+--summary` exiting 0 (or a clear "No sessions" error) means the CLI works.
+`--summary` keeps the answer small (session ids, stats, description, counts)
+for agent context; plain `last` also dumps the full bundle/correlation.
 
 ## Flow
 
@@ -51,7 +64,11 @@ exiting 0 (or a clear "No sessions" error) means the CLI works.
    lists it in a "Bundled scripts" section (note in the body which
    dependencies the script needs and where to run it from). Report the
    returned path to the user; if the output mentions `similarTo`, tell the
-   user an existing skill looks related and let them decide.
+   user an existing skill looks related and let them decide. To register the
+   finished skill with an agent in one step, add `--to opencode` / `--to
+   claude,codex` (comma list): it copies the skill into that agent's skill
+   directory and re-runs skill-doctor on the installed copy (`installed` and
+   `doctorOk` come back in the output).
 6. **Validate** — run `node scripts/skill-doctor.mjs <skillDir>` on the
    generated skill; it must exit 0 (frontmatter, single-line description,
    cross-parser limits, bundled-script syntax).
