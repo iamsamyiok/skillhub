@@ -1,6 +1,6 @@
 ---
 name: recorder2skill
-version: 1.1.1
+version: 1.1.2
 description: "Turn a live screen recording into a reusable agent skill. Use when the user asks to record a task ('record my screen while I...', 'watch me do this and automate it', 'turn this into a skill') on Windows or Linux. Drives the bundled recorder2skill CLI entirely over shell commands; works in any agent that can run commands and read files."
 allowed-tools:
   - Bash(node scripts/recorder-cli.mjs *)
@@ -115,13 +115,41 @@ raw values stay on disk only.
 - Generalize from the ONE recorded run: if the user acted on 3 rows, the
   skill handles every row (N). Keep what is essential; drop window
   positions, timings, and one-off specifics.
+- Scope = trigger: the description only promises what the body actually
+  covers. If the recording covered "record the title", the skill is "titles
+  only" — say so explicitly ("does X only; for Y, use Z instead") so broad
+  phrasings ("open the page and...") do not pull in out-of-scope tasks. A
+  short handoff line naming the alternative tool is worth more than a
+  vague promise the body cannot keep.
 - Semantic mapping to native tools (never replay UI clicks): browser pages ->
   fetch/webfetch; local files -> read/write/edit; everything shell-shaped ->
   shell commands for the user's OS (PowerShell on Windows, bash on Linux).
   Only genuine UI-only steps stay as manual instructions.
+- Cheapest path first: for a narrow goal (one `<title>`), prefer a one-line
+  shell extraction; full-page pulls (webfetch -> markdown) are the fallback
+  when the direct request fails (TLS, anti-bot) — and note their context
+  cost in the skill.
+- Deterministic logic (charset handling, redirect following, regexes, fixed
+  output formats) belongs in a bundled script via `--script`, never as prose
+  the agent re-derives each run; the skill then says "run
+  `scripts/x.ps1 <url>`".
+- Manual steps stay explicit, with handoff and recovery: write WHO does it
+  (the user), WHAT unblocks it (login done / URL left the login page), and
+  how the automated flow resumes. If a browser-automation CLI exists in the
+  user's environment, name its sequence (open headed -> user logs in ->
+  wait for the URL to change -> record the final title).
+- Environment prerequisites get their own check: before the first real step,
+  probe the dependency (`<tool> doctor` / `--version`) and give the failure
+  path (e.g. browser download blocked -> use `--executable-path` to an
+  existing Chromium/Edge; Windows ships msedge.exe).
+- Define every output: file format (UTF-8, one `URL<TAB>title` per line),
+  batch rendering (markdown table), and single-item failure behavior
+  (report and continue).
 - Extract genuinely fixed literals (a canonical URL, a repo slug) as
   `{{id}}` tokens referenced from the body; variable targets stay as
-  instructions.
+  instructions. Anonymize every example host (oa.example.com:2828, "工作台"
+  instead of real names): `save-skill` flags likely-real hosts/IPs as
+  `warnings` — resolve them before telling the user the skill is done.
 - Separate calculation steps (read/derive/decide) from action steps
   (submit/send/create/delete). Actions are the risky surface; keep them
   explicit.
