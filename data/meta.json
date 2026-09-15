@@ -279,6 +279,19 @@
       "downloads": 0,
       "createdAt": "2026-09-13T05:18:08.341Z",
       "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "recorder2skill": {
+      "category": "技能开发",
+      "tags": [
+        "屏幕录制",
+        "技能生成",
+        "SKILL.md",
+        "自动化",
+        "recorder2skill"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-15T00:00:00.000Z",
+      "updatedAt": "2026-09-15T00:00:00.000Z"
     }
   }
 }

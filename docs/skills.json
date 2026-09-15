@@ -1,5 +1,5 @@
 {
-  "total": 22,
+  "total": 23,
   "categories": [
     "写作工具",
     "前端开发",
@@ -424,6 +424,25 @@
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/xlsx.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/xlsx.zip",
       "tgz": "https://iamsamyiok.github.io/skillhub/downloads/xlsx.tar.gz"
+    },
+    {
+      "id": "recorder2skill",
+      "name": "recorder2skill",
+      "description": "屏幕录制→可复用技能（Recorder2Skill）：录制你操作电脑完成任务的屏幕过程，由 agent 分析事件时间线自动生成符合规范的 SKILL.md 技能包。当用户要求“录屏并把我刚才的操作变成技能”“watch me do this and automate it”“turn this into a skill”或类似意图时使用。turn a live screen recording into a reusable agent skill (Windows/Linux)",
+      "version": "1.0.0",
+      "category": "技能开发",
+      "tags": [
+        "屏幕录制",
+        "技能生成",
+        "SKILL.md",
+        "自动化",
+        "recorder2skill"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-15T00:00:00.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/recorder2skill.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.tar.gz"
     }
   ]
 }
