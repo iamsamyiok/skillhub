@@ -334,6 +334,20 @@
       "downloads": 0,
       "createdAt": "2026-09-18T06:06:17.000Z",
       "updatedAt": "2026-09-18T08:00:00.000Z"
+    },
+    "anysearch": {
+      "version": "3.1.1",
+      "category": "网络与搜索",
+      "tags": [
+        "搜索引擎",
+        "网页抓取",
+        "垂直搜索",
+        "批量搜索",
+        "anysearch"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-18T10:00:00.000Z",
+      "updatedAt": "2026-09-18T10:00:00.000Z"
     }
   }
 }

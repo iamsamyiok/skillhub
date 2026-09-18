@@ -4,6 +4,8 @@
 
 ## Skills
 
+- [anysearch](https://iamsamyiok.github.io/skillhub/skills-md/anysearch.md): 统一实时搜索引擎技能：通用网页搜索、垂直领域搜索（金融/学术/旅行/法律/代码等 17 个领域，先 get_sub_domains 发现子域再搜索）、并行批量搜索、整页内容提取。内置跨平台 CLI 脚本直接调用公开 HTTP 端点，无需安装 MCP 服务器。当用户需要「搜索/查资料/事实核查/读取网页内容/按股票号、C
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/anysearch.zip
 - [book-to-skill](https://iamsamyiok.github.io/skillhub/skills-md/book-to-skill.md): 书籍→技能包转化（Book-to-Skill）：把一本书、长文档或章节笔记提炼成符合规范的可复用 SKILL.md 技能包。当用户要求"把这本书变成技能""从文档提取方法论""生成 SKILL.md""把知识转化为工作流"或类似意图时使用。convert a book or long document into a r
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/book-to-skill.zip
 - [d2-chart](https://iamsamyiok.github.io/skillhub/skills-md/d2-chart.md): D2 图表生成：自然语言转 D2 图表，JSON 中间层防错设计（LLM 产 spec、脚本转换、结构校验 + 编译器验证双层拦截），浏览器本地 WASM 渲染，产单文件离线预览页，可导出 SVG/PNG/PDF。适用于流程图、系统架构图、关系图、组织架构图、简单 ER 图。当用户要求画图、画架构图/流程图/拓扑图、生

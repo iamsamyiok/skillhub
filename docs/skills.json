@@ -1,5 +1,5 @@
 {
-  "total": 26,
+  "total": 27,
   "categories": [
     "写作工具",
     "前端开发",
@@ -17,6 +17,25 @@
   ],
   "site": "https://iamsamyiok.github.io/skillhub",
   "skills": [
+    {
+      "id": "anysearch",
+      "name": "anysearch",
+      "description": "统一实时搜索引擎技能：通用网页搜索、垂直领域搜索（金融/学术/旅行/法律/代码等 17 个领域，先 get_sub_domains 发现子域再搜索）、并行批量搜索、整页内容提取。内置跨平台 CLI 脚本直接调用公开 HTTP 端点，无需安装 MCP 服务器。当用户需要「搜索/查资料/事实核查/读取网页内容/按股票号、CVE、DOI 等标识符查结构化信息/多个独立查询并行执行」时使用。匿名可用，API Key 可提升限额。",
+      "version": "3.1.1",
+      "category": "网络与搜索",
+      "tags": [
+        "搜索引擎",
+        "网页抓取",
+        "垂直搜索",
+        "批量搜索",
+        "anysearch"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-18T10:00:00.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/anysearch.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/anysearch.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/anysearch.tar.gz"
+    },
     {
       "id": "book-to-skill",
       "name": "book-to-skill",
