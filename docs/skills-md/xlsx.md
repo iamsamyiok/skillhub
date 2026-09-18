@@ -1,6 +1,6 @@
 ---
 name: xlsx
-description: "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .xltx, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \"the xlsx in my downloads\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved."
+description: 电子表格处理技能：凡以表格文件为主要输入或输出的任务即触发——打开、读取、编辑、修复现有 .xlsx/.xlsm/.xltx/.csv/.tsv（加列、算公式、排版、做图、清洗脏数据），从零或从其他数据源新建表格，表格格式互转，以及把混乱的表格数据整理成规范表格。当用户按名字或路径提到某个表格文件（如「我下载夹里的 xlsx」）并想处理它时使用；最终交付物为 Word、HTML 报告、独立脚本等场景请勿使用。
 license: Proprietary. LICENSE.txt has complete terms
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: recorder2skill
 version: 1.1.2
-description: "Turn a live screen recording into a reusable agent skill. Use when the user asks to record a task ('record my screen while I...', 'watch me do this and automate it', 'turn this into a skill') on Windows or Linux. Drives the bundled recorder2skill CLI entirely over shell commands; works in any agent that can run commands and read files."
+description: 把一段真实屏幕录制转化为可复用的 Agent 技能。当用户要求录制任务时使用（如「录下我操作的过程」「看我做一遍然后自动化」「把这个变成技能」），支持 Windows 与 Linux；通过 shell 命令驱动内置的 recorder2skill CLI，任何能执行命令、读取文件的 Agent 均可用。
 allowed-tools:
   - Bash(node scripts/recorder-cli.mjs *)
   - read

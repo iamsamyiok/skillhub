@@ -1,6 +1,6 @@
 ---
 name: planning-with-files
-description: "Persistent file-based planning for multi-step AI-agent work. Keeps task_plan.md, findings.md, and progress.md on disk; lifecycle hooks inject selected project planning context. Automatic recovery reads project planning files only. Explicit session-catchup.py --metadata reads same-project local agent session records and emits aggregate counts only; --replay may emit bounded nonce-framed excerpts. Optional gated mode can request continuation only when the host supports it and never runs commands declared in Markdown. The skill has no network upload path. Use for research or work needing 5+ tool calls."
+description: 面向多步骤 Agent 工作的持久化文件式规划：在磁盘上维护 task_plan.md、findings.md、progress.md 三个文件，生命周期钩子注入选定的项目规划上下文；自动恢复仅读取项目规划文件。适用于需要 5 次以上工具调用的研究或工作任务，断点续跑、进度可追溯。
 user-invocable: true
 allowed-tools: "Read Write Edit Bash Glob Grep"
 hooks:

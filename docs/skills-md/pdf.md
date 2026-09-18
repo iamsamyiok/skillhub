@@ -1,6 +1,6 @@
 ---
 name: pdf
-description: Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.
+description: PDF 全能处理技能：读取或提取 PDF 中的文本与表格、合并多个 PDF、拆分 PDF、旋转页面、加水印、生成新 PDF、填写表单、加密解密、提取图片，以及对扫描件 OCR 使其可搜索。当用户提到 .pdf 文件或需要产出 PDF 时使用。
 license: Proprietary. LICENSE.txt has complete terms
 ---
 

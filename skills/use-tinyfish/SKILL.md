@@ -1,6 +1,6 @@
 ---
 name: use-tinyfish
-description: Use TinyFish for web search, fetching URLs, reading pages, current information, source-backed answers, research, docs, pricing/product pages, extraction, scraping, and browser automation. Use whenever the user asks to search, find, look up, research, compare, get information from the web, summarize a URL, fetch page content, or automate a website.
+description: 使用 TinyFish 执行网页搜索、抓取 URL、读取页面、获取最新信息、来源可溯的问答、调研、查文档、看价格与产品页、数据提取、爬取与浏览器自动化。当用户要求搜索、查找、对比、从网页获取信息、总结某个 URL 或自动化网站操作时使用。
 ---
 
 # TinyFish CLI

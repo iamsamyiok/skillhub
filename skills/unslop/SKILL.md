@@ -1,6 +1,6 @@
 ---
 name: unslop
-description: Remove AI writing patterns from prose using either audit-only detection or a two-pass rewrite flow (diagnosis then reconstruction). Use this skill when editing, reviewing, or rewriting AI-generated content to make it sound human. Triggers on requests to "humanize", "de-slop", "fix AI text", "make it sound human", "remove AI patterns", or when reviewing text that contains obvious AI tells like "Here's the thing:", "Let that sink in", or "In today's fast-paced landscape". Also use when the user pastes text and says it "sounds like ChatGPT", "sounds robotic", "needs to sound more natural", or asks you to "clean up" drafted content before publishing.
+description: 去除 AI 写作腔：提供仅审计检测或两遍重写（先诊断后重构）两种流程，编辑、审阅或改写 AI 生成内容使其读起来像人写的。当用户要求「去 AI 味」「拟人化」「修一下 AI 文本」「发布前润色」或文本中存在「让我们深入看看」等明显 AI 痕迹时使用。
 license: MIT
 user-invocable: true
 argument-hint: "[teach · cleanup · rewrite · mimic] [input]"

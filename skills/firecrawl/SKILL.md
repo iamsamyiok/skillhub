@@ -1,6 +1,6 @@
 ---
 name: firecrawl
-description: "Any live-web task via the Firecrawl CLI — including ordinary web research: searching the web, reading or extracting pages, gathering sources, discovering site URLs, bulk extraction, downloading a site, change alerts, or pages needing clicks/login — web only; local files route to firecrawl-parse. For papers use firecrawl-research-index; for library, API, error, or bug questions use firecrawl-developer-index."
+description: 通过 Firecrawl CLI 执行各类实时网页任务：网页搜索、读取与提取页面、收集资料来源、发现站点 URL、批量抓取、整站下载、变更告警，以及需要点击或登录的页面——仅限网页；本地文件请走 firecrawl-parse。论文调研用 firecrawl-research-index；库、API、报错、Bug 类问题用 firecrawl-developer-index。
 allowed-tools: "Bash(firecrawl *) Bash(npx firecrawl-cli *)"
 ---
 

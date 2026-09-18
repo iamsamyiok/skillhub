@@ -1,11 +1,7 @@
 ---
 name: skill-updater
-description: >-
-  基于 AutoSkill (arXiv:2603.01145) 官方 SkillEvo 组件 (vendored, MIT) 的本地 skill
-  自进化更新器。双折回放验收 (mutate_dev/promotion_test)、混合变异 (启发式+LLM)、
-  程序化+LLM 二元规则评估、分数超 champion 才晋升，连续 2 轮无晋升熔断。
-  仅依赖 pyyaml 与 httpx，LLM 用任何 OpenAI 兼容端点。
-version: v0.2.0
+description: 本地 skill 自进化更新器：基于 AutoSkill（arXiv:2603.01145）官方 SkillEvo 组件（vendored，MIT）。双折回放验收（mutate_dev/promotion_test）、混合变异（启发式+LLM）、程序化+LLM 二元规则评估，分数超过 champion 才晋升，连续 2 轮无晋升自动熔断。仅依赖 pyyaml 与 httpx，LLM 可用任何 OpenAI 兼容端点。当用户要「更新/进化某个技能」「优化本地 SKILL.md」时使用。
+version: 0.2.0
 tags:
   - skill
   - evolution

@@ -1,7 +1,7 @@
 ---
 name: text-to-d2
 description: 文本转 D2 图表（text-to-d2）：融合语义抽取与视觉交付——从长文本抽取逻辑结构（判断/条件/因果/角色/泳道分组，支持 evidence 溯源），自动映射为 shape 语义化 D2 图表，浏览器本地 WASM 渲染，产单文件离线交互预览页，可导出 SVG/PNG/PDF。适用于把文档/流程说明/事故分析/方案描述转成精美架构图、流程图、因果图。当用户要求把一段文字/文档转成图、画流程图/架构图/因果图时使用。text to diagram, d2, architecture diagram, flowchart
-version: v0.1.2
+version: 0.1.2
 ---
 
 # Skill: text-to-d2（文本转 D2 图表）
