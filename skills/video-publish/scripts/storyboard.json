@@ -1,0 +1,260 @@
+{
+  "meta": {
+    "title": "本地知识图谱整合器：让 AI 帮你把知识连成一张 3D 网",
+    "resolution": [
+      1920,
+      1080
+    ],
+    "fps": 30,
+    "bgm": "video/assets/bgm.m4a",
+    "bgmDb": -22
+  },
+  "shots": [
+    {
+      "id": "s1",
+      "name": "片头全景",
+      "narration": "如果你的所有知识，能变成一张会发光的三维网络——关系一目了然，还能让 AI 帮你自动建图，会是什么体验？",
+      "minSec": 8,
+      "actions": [
+        {
+          "type": "goto",
+          "url": "http://localhost:3777/"
+        },
+        {
+          "type": "wait",
+          "ms": 5000
+        },
+        {
+          "type": "dragCanvas",
+          "dx": 420,
+          "dy": 60,
+          "steps": 40,
+          "pauseMs": 200
+        },
+        {
+          "type": "wait",
+          "ms": 2500
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "name": "痛点",
+      "narration": "我们的资料散落在文档、表格和聊天记录里。想找两件事之间的关联，只能靠人脑硬记。",
+      "minSec": 7,
+      "actions": [
+        {
+          "type": "clickTab",
+          "tab": "stats"
+        },
+        {
+          "type": "wait",
+          "ms": 2500
+        },
+        {
+          "type": "wait",
+          "ms": 1200
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "name": "AI对话建图",
+      "narration": "现在，你只需要说一句话。它会调用本地的 OpenCode 智能体，联网查证之后，自动把实体和关系写进图谱；每一条都经过规范校验，不合规的写入会被直接拦截。",
+      "minSec": 14,
+      "speed": 6,
+      "actions": [
+        {
+          "type": "fill",
+          "sel": "#agent-input",
+          "text": "请联网查一下冥王星的基本信息，把它加入图谱：物理实体，属性带直径、公转周期，再添加一条关系：冥王星 绕行 太阳（空间类）。完成后不要做其他修改。",
+          "pauseMs": 600
+        },
+        {
+          "type": "press",
+          "key": "Enter"
+        },
+        {
+          "type": "waitAgentDone",
+          "timeoutMs": 480000
+        },
+        {
+          "type": "wait",
+          "ms": 2500
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "name": "3D交互",
+      "narration": "每个实体都是一颗星球，四大类分色分形。一键进入中心模式，逐层展开关系网络；任意两个实体之间的路径，高亮直达。",
+      "minSec": 12,
+      "actions": [
+        {
+          "type": "goto",
+          "url": "http://localhost:3777/#entity={太阳}"
+        },
+        {
+          "type": "wait",
+          "ms": 3500
+        },
+        {
+          "type": "goto",
+          "url": "http://localhost:3777/#ego={太阳}&depth=2"
+        },
+        {
+          "type": "wait",
+          "ms": 4500
+        },
+        {
+          "type": "goto",
+          "url": "http://localhost:3777/#path={水星}-{太阳}"
+        },
+        {
+          "type": "wait",
+          "ms": 4500
+        },
+        {
+          "type": "dragCanvas",
+          "dx": 300,
+          "dy": 40,
+          "steps": 30,
+          "pauseMs": 100
+        },
+        {
+          "type": "wait",
+          "ms": 1500
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "name": "智能提问",
+      "narration": "检索页签输入一个问题，AI 自动编译检索计划，本地只读执行，答案还附带完整的证据链。",
+      "minSec": 10,
+      "speed": 3,
+      "actions": [
+        {
+          "type": "clickTab",
+          "tab": "search"
+        },
+        {
+          "type": "fill",
+          "sel": "#a-question",
+          "text": "哪些行星绕着太阳转？它们和彗星有什么共同点？"
+        },
+        {
+          "type": "click",
+          "sel": "#a-submit"
+        },
+        {
+          "type": "waitAskDone",
+          "timeoutMs": 180000
+        },
+        {
+          "type": "wait",
+          "ms": 3000
+        }
+      ]
+    },
+    {
+      "id": "s6",
+      "name": "保存点Diff",
+      "narration": "每一次写入都会自动打 Git 保存点。勾选任意两个版本，改动差异一目了然；就算 AI 写错了，也能一键回滚。",
+      "minSec": 12,
+      "actions": [
+        {
+          "type": "clickTab",
+          "tab": "version"
+        },
+        {
+          "type": "wait",
+          "ms": 1500
+        },
+        {
+          "type": "diffPick",
+          "indexes": [
+            0,
+            1
+          ]
+        },
+        {
+          "type": "wait",
+          "ms": 2000
+        },
+        {
+          "type": "click",
+          "sel": "#btn-diff-run"
+        },
+        {
+          "type": "wait",
+          "ms": 4000
+        },
+        {
+          "type": "wait",
+          "ms": 1500
+        }
+      ]
+    },
+    {
+      "id": "s7",
+      "name": "隐私与导出",
+      "narration": "数据库、图片、密钥全部存在你自己的电脑上；还能一键导出单文件网页版，发给朋友，浏览器打开就能看。",
+      "minSec": 9,
+      "actions": [
+        {
+          "type": "click",
+          "sel": "#m-file"
+        },
+        {
+          "type": "wait",
+          "ms": 1800
+        },
+        {
+          "type": "press",
+          "key": "Escape"
+        },
+        {
+          "type": "press",
+          "key": "Escape"
+        },
+        {
+          "type": "wait",
+          "ms": 800
+        },
+        {
+          "type": "clickTab",
+          "tab": "mcp"
+        },
+        {
+          "type": "wait",
+          "ms": 2000
+        }
+      ]
+    },
+    {
+      "id": "s8",
+      "name": "结尾",
+      "narration": "开源项目 local-knowledge-graph，一条命令即可体验。GitHub 地址放在简介里，现在就去，为你的知识建一张网。",
+      "minSec": 9,
+      "endCard": true,
+      "actions": [
+        {
+          "type": "wait",
+          "ms": 1000
+        },
+        {
+          "type": "dragCanvas",
+          "dx": -500,
+          "dy": -40,
+          "steps": 40,
+          "pauseMs": 100
+        },
+        {
+          "type": "wait",
+          "ms": 3000
+        }
+      ]
+    }
+  ]
+}
