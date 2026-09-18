@@ -1,5 +1,5 @@
 {
-  "total": 27,
+  "total": 28,
   "categories": [
     "写作工具",
     "前端开发",
@@ -7,6 +7,7 @@
     "图像生成",
     "工作流",
     "开发工具",
+    "开发调试",
     "技能开发",
     "文档处理",
     "知识转化",
@@ -2362,8 +2363,8 @@
     {
       "id": "video-publish",
       "name": "video-publish",
-      "description": "为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站：分镜表 → Playwright CDP 录屏 → edge-tts 配音 → ffmpeg 合成烧录字幕 → biliup-rs 扫码登录投稿，全流程 Agent 自动完成。当用户想\"做功能演示视频/录屏宣传视频/发布B站投稿\"时使用。",
-      "version": "1.1.0",
+      "description": "为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站：分镜表 → Playwright CDP 录屏（支持接入真实 LLM 内核录制真实执行画面）→ edge-tts 配音 → ffmpeg 合成烧录字幕 → biliup-rs 扫码登录投稿，全流程 Agent 自动完成。当用户想\"做功能演示视频/录屏宣传视频/发布B站投稿\"时使用。",
+      "version": "1.4.0",
       "category": "视频创作",
       "tags": [
         "宣传视频",
@@ -2377,7 +2378,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 16057
+          "size": 25433
         },
         {
           "path": "scripts/assets/fontconfig.conf",
@@ -2397,7 +2398,7 @@
         },
         {
           "path": "scripts/record.js",
-          "size": 11172
+          "size": 11266
         },
         {
           "path": "scripts/storyboard.json",
@@ -2406,6 +2407,28 @@
         {
           "path": "scripts/tts.js",
           "size": 1227
+        }
+      ]
+    },
+    {
+      "id": "vision-for-dev",
+      "name": "vision-for-dev",
+      "description": "视觉辅助开发技能：用「识图模型审查 + 像素级测量 + 源码交叉验证」三轨闭环排障 GUI 程序界面问题（豆腐块乱码、按钮重叠、布局错位、黑边阴影、字体渲染等），覆盖交叉编译 + Wine/Xvfb 虚拟显示运行 + 自动化交互截图 + 网页交付的全流程。当用户想\"界面显示不对/截图看看效果/识图检查界面/修复显示问题/做功能截图页面\"时使用。",
+      "version": "1.0.0",
+      "category": "开发调试",
+      "tags": [
+        "视觉辅助开发",
+        "识图审查",
+        "GUI排障",
+        "Wine",
+        "截图自动化"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-18T22:52:50.932Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 6342
         }
       ]
     },

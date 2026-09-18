@@ -348,19 +348,19 @@
       "downloads": 0,
       "createdAt": "2026-09-18T10:00:00.000Z",
       "updatedAt": "2026-09-18T10:00:00.000Z"
+    },
+    "vision-for-dev": {
+      "category": "开发调试",
+      "tags": [
+        "视觉辅助开发",
+        "识图审查",
+        "GUI排障",
+        "Wine",
+        "截图自动化"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-18T22:52:50.932Z",
+      "updatedAt": "2026-09-18T22:52:50.932Z"
     }
-  },
-  "vision-for-dev": {
-    "category": "开发调试",
-    "tags": [
-      "视觉辅助开发",
-      "识图审查",
-      "GUI排障",
-      "Wine",
-      "截图自动化"
-    ],
-    "downloads": 0,
-    "createdAt": "2026-09-18T22:48:21.470Z",
-    "updatedAt": "2026-09-18T22:48:21.470Z"
   }
 }
