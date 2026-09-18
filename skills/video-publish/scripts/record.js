@@ -13,7 +13,7 @@ const { chromium } = require('/usr/local/lib/node_modules/playwright');
 const ROOT = __dirname;
 const OUT_DIR = path.join(ROOT, 'out');
 const FRAME_FPS = 12;
-const BOARD = JSON.parse(fs.readFileSync(path.join(ROOT, 'storyboard.json'), 'utf8'));
+const BOARD = JSON.parse(fs.readFileSync(process.env.STORYBOARD || path.join(ROOT, 'storyboard.json'), 'utf8'));
 // 软渲染下实测 screencast 约 2.6fps@720p，录制分辨率降为 720p（compose 统一放大到 1080p）
 const [W, H] = [1280, 720];
 
