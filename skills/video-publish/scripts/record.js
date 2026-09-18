@@ -115,10 +115,28 @@ async function runActions(page, actions, ctx) {
         break;
       }
       case 'click': {
+        // 弹窗内元素可能超出视口，先滚动到可视区再点（否则遮挡判定超时）
+        await page.locator(a.sel).first().evaluate((e) => e.scrollIntoView({ block: 'center' })).catch(() => {});
         const p = await findSelectorPoint(page, a.sel);
         await vMove(page, p.x, p.y);
         await page.locator(a.sel).first().click({ timeout: 15000 });
         await ripple(page, p.x, p.y);
+        // 点击结果校验：onclick 被页面 JS 换绑/吞掉时（locator.click 能点中但处理函数没跑），
+        // 用 check 表达式验证预期状态，不满足则执行 fallback JS 兜底（例如先关叠层弹窗再直调打开函数）
+        if (a.check) {
+          await sleep(a.checkDelay || 900);
+          const ok = await page.evaluate(a.check).catch(() => false);
+          if (!ok && a.fallback) {
+            await page.evaluate(a.fallback);
+            await sleep(a.fallbackPause || 800);
+          }
+        }
+        break;
+      }
+      // 万能逃生舱：直调页面 JS（如 openXxx() 弹窗函数、清理误开弹窗等）
+      case 'direct': {
+        await page.evaluate(a.js);
+        await sleep(a.pauseMs || 600);
         break;
       }
       case 'clickTab': {

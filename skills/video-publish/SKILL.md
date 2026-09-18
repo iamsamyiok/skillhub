@@ -1,9 +1,3 @@
----
-name: video-publish
-description: 为软件项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站。覆盖分镜表、Playwright CDP 录屏、edge-tts 配音、FFmpeg 合成（变速/定格/ASS 字幕/片尾卡）、B 站扫码登录（biliup-rs 凭据）与自动投稿全流程。当用户要求为软件制作演示/宣传视频、录屏视频或发布 B 站时使用。
-version: 1.0.0
----
-
 # 软件宣传视频制作 + B站发布 完整流程
 
 为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频，并发布到 B 站。全流程可由 Agent 全自动完成，唯一需要用户参与的环节是 B 站扫码登录（和投稿后的 AI 声明勾选）。
@@ -12,7 +6,21 @@ version: 1.0.0
 
 - 为软件项目制作功能演示视频并发布 B 站
 - 任何「网页应用操作录屏 → 配音 → 合成 → 投稿」的流水线需求
-- 本 skill 附带完整可运行管线脚本：`scripts/`（record.js / tts.js / compose.js / build.sh / bili_login.mjs / fontconfig.conf）与示例 `scripts/storyboard.json`。制作新视频时把 `scripts/` 复制到目标项目（如 `video/` 目录）作为起点改造
+- 参考实现位于项目 `video/` 目录（storyboard.json / record.js / tts.js / compose.js / build.sh / bili_login.mjs），skill 附件 `scripts/` 是同一套文件的快照
+
+## 新项目复用：env 零拷贝模式（推荐）
+
+tts.js / compose.js 支持 `STORYBOARD` 与 `OUT_DIR` 环境变量，**新项目无需复制管线代码**，只需新建一个分镜目录 + 一个专属 record.js：
+
+```bash
+mkdir -p video/<项目>/ video/out/<项目>
+# 写 video/<项目>/storyboard.json + video/<项目>/record.js（复用管线核心，重写动作层）
+export STORYBOARD=$PWD/video/<项目>/storyboard.json OUT_DIR=$PWD/video/out/<项目>
+node video/<项目>/record.js                 # 帧存 OUT_DIR/frames/<镜id>/
+node video/tts.js && node video/compose.js  # 产物隔离在 OUT_DIR（tts/、frames/、clip/、final.mp4）
+```
+
+两脚本拼路径的约定：tts.js 写 `OUT_DIR/tts/`，compose.js 读 `OUT_DIR/tts/`；record.js 帧目录必须是 `OUT_DIR/frames/<镜id>/`（compose 按 `frames/` 读取）。三个目录名任何一个对不上都会在合成时报 `No such file or directory`。
 
 ## 前置依赖（一次性安装）
 
@@ -36,7 +44,7 @@ tar xf /tmp/opencode/biliup.tar.xz -C /tmp/opencode
 # 可执行文件：/tmp/opencode/biliupR-v0.2.4-x86_64-linux/biliup
 ```
 
-注意：ffmpeg-static 的 libass 依赖 fontconfig 配置。若 `Fontconfig error` 导致字幕渲染空白，需安装 fontconfig 包；项目已自带最小配置 `scripts/assets/fontconfig.conf`，compose.js 会自动设置 `FONTCONFIG_FILE` 指向它。
+注意：ffmpeg-static 的 libass 依赖 fontconfig 配置。若 `Fontconfig error` 导致字幕渲染空白，需安装 fontconfig 包；项目已自带最小配置 `video/assets/fontconfig.conf`，compose.js 会自动设置 `FONTCONFIG_FILE` 指向它。
 
 ## 管线总览
 
@@ -54,7 +62,16 @@ graph TD
 
 ## 第1步：分镜表 storyboard.json
 
-结构：`meta`（分辨率、录屏端口）+ `shots[]`。每个分镜：
+结构：`meta`（分辨率、录屏端口、`endCard`）+ `shots[]`：
+
+```json
+{
+  "meta": { "resolution": [1280, 720], "fps": 12, "endCard": ["npx <包名>", "github.com/<user>/<repo>"] },
+  "shots": [ ... ]
+}
+```
+
+每个分镜：
 
 ```json
 {
@@ -62,11 +79,16 @@ graph TD
   "title": "AI对话建图",
   "minSec": 14,                  // 最短时长；成片段长 = max(配音时长+1, minSec)
   "timeoutMs": 480000,           // 该镜总超时（AI写入等待长的分镜要加大）
-  "voice": "口播稿文字……",        // edge-tts 配音源，同时生成同名 srt
+  "narration": "口播稿文字……",    // edge-tts 配音源（字段名必须是 narration，tts.js 按此读取；写成 voice 会得到 undefined 报错）
   "actions": [                   // 顺序执行的录屏动作
     { "wait": 3000 },
     { "type": "...", "text": "..." },
-    { "click": "#selector" },
+    { "type": "click", "sel": "#selector" },
+    { "type": "click", "sel": "#openBtn",
+      "check": "document.getElementById('myMask').classList.contains('show')",
+      "checkDelay": 900,
+      "fallback": "document.getElementById('cfgModal')?.classList.remove('show'); openMyMask()" },
+    { "type": "direct", "js": "openStaff()", "pauseMs": 800 },   // 万能逃生舱：直调页面 JS
     { "move": "#selector" },     // 光标移动动画
     { "ripple": true },          // 点击涟漪动画
     { "waitAgentDone": true },   // 等 AI 回复完成（480s 内轮询）
@@ -86,50 +108,56 @@ graph TD
 
 关键经验：
 - **点击必须用 playwright 原生 `locator.click()`**（自带 actionability 检查），光标动画只做 vMove + ripple 装饰。裸 `mouse.down/up` 在软渲染高负载下会被页面吞掉
+- **click 前先 `scrollIntoView({ block: 'center' })`**：弹窗内容超屏时，目标按钮在视口外会导致 click 遮挡判定超时（报 `intercepts pointer events`）
+- **onclick 被页面 JS 换绑/吞掉的兜底**：症状是 `locator.click` 成功但弹窗没开（locator 点中了元素，处理函数却没跑）。用 `check` 表达式点击后验证预期 DOM 状态，不满足时 `fallback` JS 兜底——注意 fallback 里要**先关掉误开的叠层弹窗**（如 `classList.remove('show')`）再直调打开函数，否则旧弹窗遮罩会拦截后续所有点击。确定流程时也可直接用 `direct` 动作直调页面函数
+- **浮层延迟弹出类 UI（自检/引导层）必须「等出现再跳过」**：直接扫一遍找不到就 continue 会提前返回，浮层几秒后弹出会挡住后续所有交互
 - WebGL 3D 画布 `canvas.toDataURL` 返回黑帧（渲染后 buffer 清空），帧源只能用 screencast
 - 动作后留足 settle 等待；打开大浮层后等 2~4 秒；等 AI 完成 `waitAgentDone` 超时给 480 秒
-- 帧有效性判据：黑帧/空白帧 < 20KB，有效帧 100KB+；失败重录前先删对应 `out/frames/{id}` 目录
+- 帧有效性判据：黑帧/空白帧 < 20KB，有效帧 100KB+；**浅色界面（白底应用）有效帧只有 25~50KB**，阈值按界面底色调整，勿套用深色标准
+- 帧目录统一 `out/frames/<id>/`（与 env 模式的 `OUT_DIR/frames/<id>/` 一致）。整理/重录前先 `ls` 验证目录结构再动手——**mv 到已存在的目录会变成嵌套子目录**（`mv raw frames` 得到 `frames/raw/`），清理嵌套时严禁盲目 `rm -rf`，会连有效帧一起删掉
+- 目标应用若有「无人值守自动退出」类机制（如演示页全关 1 分钟自杀），录制期间必须用环境参数禁用（agents-chat 例：`AGENTS_CHAT_AUTOSTOP_IDLE_MS=86400000`），否则录到一半服务没了
+- 录制前的 mock/演示数据定制：直接改全局安装包内的 demo 模块（如 `/usr/local/lib/node_modules/<pkg>/app/mock/*.js`）可去演示水印、定制回复文案；注意 npm 重装会覆盖，录制期间勿重装
 
 用法：
 
 ```bash
-node scripts/record.js              # 录全部分镜（已有帧的镜跳过）
-node scripts/record.js --only s3,s7 # 只录指定镜（逗号分隔）
+node video/record.js              # 录全部分镜（已有帧的镜跳过）
+node video/record.js --only s3,s7 # 只录指定镜（逗号分隔）
 ```
 
 录屏前先起 demo 实例（build.sh 会自动做；手动调试时）：
 
 ```bash
 PORT=3777 node bin/cli.js --demo &   # 一次性临时目录，不污染真实数据
-node scripts/record.js
+node video/record.js
 ```
 
 ## 第3步：配音 tts.js
 
 ```bash
-node scripts/tts.js [--force]
+node video/tts.js [--force]
 ```
 
-- 每镜 `voice` 文字 → `out/tts/{id}.mp3` + `{id}.srt`（zh-CN-XiaoxiaoNeural）
+- 每镜 `narration` 文字 → `out/tts/{id}.mp3` + `{id}.srt`（zh-CN-XiaoxiaoNeural）
 - edge-tts 7.x 无 `--words-in-cue` 参数；字幕即配音文本分句
 - 配音必须与画面动作节奏对齐：改口播稿后要重看对应分镜动作时长是否匹配
 
 ## 第4步：合成 compose.js
 
 ```bash
-node scripts/compose.js
+node video/compose.js
 ```
 
 每镜流程：帧序列 12fps → 按需变速（long 镜加速）→ `tpad` 末帧定格补齐 / `-t` 截断到目标段长 → concat。然后：
 
 - 音轨：每镜 mp3 `apad` 补静音到段长 → concat → mux 进成片（成片必须有音轨，投稿前用 volumedetect 验证 mean/max 音量非 -91dB）
 - 字幕：合并各镜 srt（加 offset）生成 `final.srt`（投稿时可作 CC 上传）；同时生成 `final.ass` 烧录进画面（Default 样式 + 片尾卡 EndCard 样式）
-- 片尾卡：`ass` 滤镜渲染 `npx <包名>` + GitHub 地址两行大字（叠加在末镜后 58% 时段）
+- 片尾卡：`ass` 滤镜渲染两行大字（`meta.endCard[0]` 安装命令大字 + `meta.endCard[1]` 项目地址小字，叠加在末镜后 58% 时段）；未配置 endCard 时回退 local-knowledge-graph 默认文案——**换项目必须检查 meta.endCard，否则片尾会烧上别的项目的地址**
 - 输出 1920x1080 30fps H.264 CRF 21 + AAC
 
 踩坑记录：
 - ffmpeg-static 无 `drawtext`（没编 freetype），文字叠加一律走 `ass`/`subtitles` 滤镜 + libass
-- libass 需要 fontconfig；系统装了 fontconfig 包后仍报 `Failed to load fontconfig fonts` 时，用项目自带 `scripts/assets/fontconfig.conf`（`FONTCONFIG_FILE` 环境变量）
+- libass 需要 fontconfig；系统装了 fontconfig 包后仍报 `Failed to load fontconfig fonts` 时，用项目自带 `video/assets/fontconfig.conf`（`FONTCONFIG_FILE` 环境变量）
 - 字幕/片尾卡渲染验证法：对比目标时段与空白时段同区域平均亮度（signalstats YAVG），差值 >2 说明文字已渲染
 - Node 子进程调用时路径硬编码全局 ffmpeg/ffprobe 位置（npm -g 安装路径）
 
@@ -140,10 +168,17 @@ ffmpeg-static的ffmpeg -i out/final.mp4   # 确认 Duration 与双 Stream（Vide
 ffmpeg-static的ffmpeg -ss <时刻> -i out/final.mp4 -frames:v 1 帧图.jpg   # 抽帧
 ```
 
+vision 审查方法论（agents-chat 视频实测教训）：
+- **全帧问「有没有字幕」会误判**：烧录字幕在画面底部，vision 极易把它读成界面输入框文字，回复「无字幕」。正确做法：`crop=1920:120:0:940` 裁出底部字幕条 + 提问「逐字转录图中所有文字」，转录出 narration 文案即字幕渲染成功
+- 片尾卡居中显示（`\an5`），验证要裁中部区域（`crop=1920:400:0:340`），裁底部只会看到输入框
+- 镜头内容动态可用客观指标验证：同镜头尾两帧 `blend=all_mode=difference` 后 signalstats YAVG >30 说明画面在剧烈变化（消息滚动/动画执行）；vision 对「当前是什么模式/页面」的描述也可能出错，重要结论都要程序化复核
+- 多帧串行 vision 请求容易超 shell 超时：小图（crop 后）比全帧快很多，每批 2~3 帧，max_tokens 控制在 150~300
+- cue 空档属正常：段长 = max(配音+1s, minSec)，配音结束后有几秒无字幕，抽到空档帧别误判为字幕丢失
+
 ## 一键管线 build.sh
 
 ```bash
-bash scripts/build.sh [--only s1,s3] [--force]
+bash video/build.sh [--only s1,s3] [--force]
 ```
 
 自动：起 `--demo` 实例（mkdtemp 一次性目录，PORT=3777）→ record → tts → compose → 关实例（trap 清理）。
@@ -151,8 +186,8 @@ bash scripts/build.sh [--only s1,s3] [--force]
 ## 第5步：B站扫码登录 bili_login.mjs
 
 ```bash
-node scripts/bili_login.mjs [二维码输出路径] [cookies输出路径]
-# 默认输出 bilibili_login_qr.png 与 cookies.json（脚本路径下 out/ 或按参数指定）
+node video/bili_login.mjs [二维码输出路径] [cookies输出路径]
+# 默认 video/out/bilibili_login_qr.png 与 video/out/cookies.json
 ```
 
 把二维码图片告知用户（「项目文件」面板打开扫码）。脚本自动完成：官方扫码 API 生成二维码 → 2 秒轮询（90 次）→ 拿 web cookie → TV 授权链（auth_code → 用 SESSDATA+bili_jct confirm → poll）换 access_token → 生成 biliup-rs 凭据。
@@ -177,8 +212,9 @@ cd <cookies.json所在目录>
   --desc "简介（可含分段时间戳、命令、GitHub链接、AI配音声明）"
 ```
 
+- **biliup 只读执行目录（CWD）下的 `cookies.json`**：登录产物在 `video/out/cookies.json`，投稿前必须 `cd video/out` 或把 cookies 复制到 CWD；报 `open cookies file: cookies.json ... No such file or directory` 就是这个原因。cookies.json 建议另留一份备份（如 `/tmp/opencode/cookies.json`），access_token 30 天有效，过期重跑 bili_login.mjs
 - 常用分区 tid：171=知识区-计算机技术、122=科技区-野生技术协会、231=知识区-设计·创意
-- 封面：从成片抽一帧画面最好看的（`-ss 4` 处全景帧即可），16:9
+- 封面：从成片抽一帧画面信息量最大的帧（演示画面饱满、消息气泡丰富处比开场空页面更合适），`-q:v 2` 高质量 16:9
 - 上传约 3.5MB/s，1 分钟视频 20MB 内几秒传完；完成后日志输出 `bvid`（BV号）即投稿成功
 - biliup 可能警告「客户端接口已失效，将使用APP接口」，属正常，投稿仍成功
 
@@ -195,8 +231,12 @@ cd <cookies.json所在目录>
 
 ## 制作新视频的改造清单
 
-1. 复制 `scripts/` 目录到新项目（如项目 `video/` 目录，或改 storyboard）
-2. 重写 `storyboard.json`：分镜数、口播稿、动作序列、`minSec`
-3. 改 `record.js` 中项目相关的动作辅助函数（如 diffPick、waitAgentDone 按目标项目的 DOM/接口调整）
-4. 改 `compose.js` 片尾卡的命令与 GitHub 地址
-5. 跑 `bash scripts/build.sh` → 抽帧验证 → 登录 → 投稿 → 提醒用户勾 AI 声明
+首选 **env 零拷贝模式**（见开头）：
+
+1. `mkdir -p video/<项目> video/out/<项目>`
+2. 写 `video/<项目>/storyboard.json`：分镜数、`narration` 口播稿、动作序列、`minSec`、`meta.endCard`（安装命令 + 项目地址，**必填**，防止烧上旧项目片尾）
+3. 写 `video/<项目>/record.js`：复用管线核心（CDP screencast 收帧 + 12fps 重采样 + 虚拟光标），只重写项目相关的动作辅助函数与演示实例启动参数；页面有自定义弹窗函数时优先用 `click.check/fallback` 或 `direct` 动作
+4. `export STORYBOARD=... OUT_DIR=...` 后跑 record → tts → compose
+5. 抽帧验证（crop 字幕条转录法 + 帧差动态验证）→ `cd video/out && biliup upload` → 提醒用户勾 AI 声明
+
+旧模式（复制整个 `video/` 再改 compose.js 片尾卡等硬编码）仍可用，但容易漏改片尾卡文案，已被 meta.endCard 参数化取代。

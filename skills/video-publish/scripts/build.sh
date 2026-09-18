@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# build.sh — 一键视频管线：拉起 demo 实例 → 录屏 → 配音 → 合成
-# 用法: bash build.sh [--only s1,s3] [--force]
-# 注意: 本脚本面向目标项目布局（上级目录需有 bin/cli.js，本目录需含 record/tts/compose.js）。
-# 把本 skill 的 scripts/ 目录复制到目标项目（如 video/ 目录）后使用。
+# video/build.sh — 一键视频管线：拉起 demo 实例 → 录屏 → 配音 → 合成
+# 用法: bash video/build.sh [--only s1,s3] [--force]
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -24,13 +22,13 @@ echo "演示实例就绪: http://localhost:$PORT（数据目录 $DEMO_DIR）"
 sleep 2
 
 echo "=== 2/4 分镜录屏 ==="
-node "$(dirname "$0")/record.js" $ONLY
+node video/record.js $ONLY
 
 echo "=== 3/4 AI 配音 ==="
-node "$(dirname "$0")/tts.js" $ONLY
+node video/tts.js $ONLY
 
 echo "=== 4/4 合成 ==="
-node "$(dirname "$0")/compose.js" $ONLY
+node video/compose.js $ONLY
 
 echo ""
-echo "完成 → out/final.mp4"
+echo "完成 → video/out/final.mp4"

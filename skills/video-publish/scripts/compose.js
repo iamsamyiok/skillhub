@@ -8,8 +8,8 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const ROOT = __dirname;
-const OUT = path.join(ROOT, 'out');
-const BOARD = JSON.parse(fs.readFileSync(path.join(ROOT, 'storyboard.json'), 'utf8'));
+const OUT = process.env.OUT_DIR || path.join(ROOT, 'out');
+const BOARD = JSON.parse(fs.readFileSync(process.env.STORYBOARD || path.join(ROOT, 'storyboard.json'), 'utf8'));
 const FF = '/usr/local/lib/node_modules/ffmpeg-static/ffmpeg';
 const FP = '/usr/local/lib/node_modules/ffprobe-static/bin/linux/x64/ffprobe';
 
@@ -110,11 +110,12 @@ BOARD.shots.forEach((shot, i) => {
     events += `Dialogue: 0,${assTime(seg.offset + c.start)},${assTime(seg.offset + Math.min(c.end, seg.dur))},Default,,0,0,0,,${assEscape(c.text)}\n`;
   }
 });
-// 片尾卡：npx 命令 + GitHub 地址（居中两行）
+// 片尾卡：安装命令 + 项目地址（居中两行，可由 storyboard.meta.endCard 覆盖）
+const endCard = BOARD.meta.endCard || ['npx local-knowledge-graph', 'github.com/iamsamyiok/local-knowledge-graph'];
 const s8 = timeline.find((t) => t.id === 's8');
 const cardStart = s8.offset + s8.dur * 0.42;
 const cardEnd = s8.offset + s8.dur;
-events += `Dialogue: 1,${assTime(cardStart)},${assTime(cardEnd)},EndCard,,0,0,0,,{\\an5\\fs64\\b1\\1c&HFFFFFF&\\3c&H4A2A1A&\\3a&H10&\\bord2.4\\shad2}npx local-knowledge-graph\\N{\\fs30\\b0\\1c&HBFD8FF&\\3c&H4A2A1A&\\3a&H10&\\bord1.6}github.com/iamsamyiok/local-knowledge-graph\n`;
+events += `Dialogue: 1,${assTime(cardStart)},${assTime(cardEnd)},EndCard,,0,0,0,,{\\an5\\fs64\\b1\\1c&HFFFFFF&\\3c&H4A2A1A&\\3a&H10&\\bord2.4\\shad2}${endCard[0]}\\N{\\fs30\\b0\\1c&HBFD8FF&\\3c&H4A2A1A&\\3a&H10&\\bord1.6}${endCard[1]}\n`;
 
 const assFile = path.join(OUT, 'final.ass');
 fs.writeFileSync(assFile, `[Script Info]

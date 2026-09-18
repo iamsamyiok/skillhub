@@ -9,8 +9,8 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = __dirname;
-const OUT = path.join(ROOT, 'out', 'tts');
-const BOARD = JSON.parse(fs.readFileSync(path.join(ROOT, 'storyboard.json'), 'utf8'));
+const OUT = process.env.OUT_DIR ? path.join(process.env.OUT_DIR, 'tts') : path.join(ROOT, 'out', 'tts');
+const BOARD = JSON.parse(fs.readFileSync(process.env.STORYBOARD || path.join(ROOT, 'storyboard.json'), 'utf8'));
 const VOICE = process.env.TTS_VOICE || 'zh-CN-XiaoxiaoNeural';
 
 fs.mkdirSync(OUT, { recursive: true });
