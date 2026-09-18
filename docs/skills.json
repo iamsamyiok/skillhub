@@ -1,5 +1,5 @@
 {
-  "total": 25,
+  "total": 26,
   "categories": [
     "写作工具",
     "前端开发",
@@ -9,10 +9,10 @@
     "开发工具",
     "技能开发",
     "文档处理",
-    "未分类",
     "知识转化",
     "研究分析",
     "网络与搜索",
+    "视频创作",
     "需求梳理"
   ],
   "site": "https://iamsamyiok.github.io/skillhub",
@@ -60,12 +60,18 @@
     {
       "id": "doc-to-md",
       "name": "doc-to-md",
-      "description": ">-",
+      "description": "统一文档转 Markdown 技能：Word(.doc/.docx)/Excel/PPT/PDF/RTF/EPUB/CSV 全格式覆盖，自动降级链路 anydoc(本地Rust,毫秒级) → SiliconFlow OCR(扫描件,免费) → markitdown(备选)，无硬编码密钥。当用户需要\"把文档转成md/转markdown/提取内容\"时使用。",
       "version": "1.0.0",
-      "category": "未分类",
-      "tags": [],
+      "category": "文档处理",
+      "tags": [
+        "文档转换",
+        "Markdown",
+        "OCR",
+        "格式批量处理",
+        "doc-to-md"
+      ],
       "downloads": 0,
-      "updatedAt": null,
+      "updatedAt": "2026-09-15T09:26:58.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/doc-to-md.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/doc-to-md.zip",
       "tgz": "https://iamsamyiok.github.io/skillhub/downloads/doc-to-md.tar.gz"
@@ -347,13 +353,19 @@
     },
     {
       "id": "slides-maker",
-      "name": "slide-maker",
-      "description": ">-",
+      "name": "slides-maker",
+      "description": "制作、重设计、评审演示级幻灯片（.pptx）：科研组会、工作汇报、大会演讲、答辩、教学、网络研讨会均适用。支持有模板（跟随模板风格）或无模板（自动设计干净版式），可从提供的代码/文档/图表取材，也可联网调研并核查事实，中英文皆可。当用户想\"做幻灯片/做个PPT/把内容转成slides/优化排版太挤的页面/评审我的演示稿\"时使用。",
       "version": "1.0.0",
-      "category": "未分类",
-      "tags": [],
+      "category": "文档处理",
+      "tags": [
+        "幻灯片",
+        "PPT",
+        "演示设计",
+        "pptx",
+        "slides-maker"
+      ],
       "downloads": 0,
-      "updatedAt": null,
+      "updatedAt": "2026-09-18T08:00:00.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/slides-maker.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/slides-maker.zip",
       "tgz": "https://iamsamyiok.github.io/skillhub/downloads/slides-maker.tar.gz"
@@ -453,6 +465,25 @@
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/use-tinyfish.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.zip",
       "tgz": "https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.tar.gz"
+    },
+    {
+      "id": "video-publish",
+      "name": "video-publish",
+      "description": "为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站：分镜表 → Playwright CDP 录屏 → edge-tts 配音 → ffmpeg 合成烧录字幕 → biliup-rs 扫码登录投稿，全流程 Agent 自动完成。当用户想\"做功能演示视频/录屏宣传视频/发布B站投稿\"时使用。",
+      "version": "1.1.0",
+      "category": "视频创作",
+      "tags": [
+        "宣传视频",
+        "录屏",
+        "TTS配音",
+        "B站投稿",
+        "video-publish"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-18T08:00:00.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/video-publish.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/video-publish.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/video-publish.tar.gz"
     },
     {
       "id": "xlsx",

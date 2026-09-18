@@ -8,7 +8,7 @@
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/book-to-skill.zip
 - [d2-chart](https://iamsamyiok.github.io/skillhub/skills-md/d2-chart.md): D2 图表生成：自然语言转 D2 图表，JSON 中间层防错设计（LLM 产 spec、脚本转换、结构校验 + 编译器验证双层拦截），浏览器本地 WASM 渲染，产单文件离线预览页，可导出 SVG/PNG/PDF。适用于流程图、系统架构图、关系图、组织架构图、简单 ER 图。当用户要求画图、画架构图/流程图/拓扑图、生
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/d2-chart.zip
-- [doc-to-md](https://iamsamyiok.github.io/skillhub/skills-md/doc-to-md.md): >-
+- [doc-to-md](https://iamsamyiok.github.io/skillhub/skills-md/doc-to-md.md): 统一文档转 Markdown 技能：Word(.doc/.docx)/Excel/PPT/PDF/RTF/EPUB/CSV 全格式覆盖，自动降级链路 anydoc(本地Rust,毫秒级) → SiliconFlow OCR(扫描件,免费) → markitdown(备选)，无硬编码密钥。当用户需要"把文档转成md/转m
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/doc-to-md.zip
 - [docx](https://iamsamyiok.github.io/skillhub/skills-md/docx.md): Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files) or Word templates (.dotx files). Triggers include: any 
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/docx.zip
@@ -40,7 +40,7 @@
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/skill-creator.zip
 - [skill-updater](https://iamsamyiok.github.io/skillhub/skills-md/skill-updater.md): >-
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/skill-updater.zip
-- [slide-maker](https://iamsamyiok.github.io/skillhub/skills-md/slides-maker.md): >-
+- [slides-maker](https://iamsamyiok.github.io/skillhub/skills-md/slides-maker.md): 制作、重设计、评审演示级幻灯片（.pptx）：科研组会、工作汇报、大会演讲、答辩、教学、网络研讨会均适用。支持有模板（跟随模板风格）或无模板（自动设计干净版式），可从提供的代码/文档/图表取材，也可联网调研并核查事实，中英文皆可。当用户想"做幻灯片/做个PPT/把内容转成slides/优化排版太挤的页面/评审我的演示稿
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/slides-maker.zip
 - [text-to-d2](https://iamsamyiok.github.io/skillhub/skills-md/text-to-d2.md): 文本转 D2 图表（text-to-d2）：融合语义抽取与视觉交付——从长文本抽取逻辑结构（判断/条件/因果/角色/泳道分组，支持 evidence 溯源），自动映射为 shape 语义化 D2 图表，浏览器本地 WASM 渲染，产单文件离线交互预览页，可导出 SVG/PNG/PDF。适用于把文档/流程说明/事故分析/
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/text-to-d2.zip
@@ -52,6 +52,8 @@
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/unslop.zip
 - [use-tinyfish](https://iamsamyiok.github.io/skillhub/skills-md/use-tinyfish.md): Use TinyFish for web search, fetching URLs, reading pages, current information, source-backed answers, research, docs, pricing/product pages, extraction, scrapi
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.zip
+- [video-publish](https://iamsamyiok.github.io/skillhub/skills-md/video-publish.md): 为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站：分镜表 → Playwright CDP 录屏 → edge-tts 配音 → ffmpeg 合成烧录字幕 → biliup-rs 扫码登录投稿，全流程 Agent 自动完成。当用户想"做功能演示视频/录屏宣传
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/video-publish.zip
 - [xlsx](https://iamsamyiok.github.io/skillhub/skills-md/xlsx.md): Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xl
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/xlsx.zip
 

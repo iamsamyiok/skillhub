@@ -1,12 +1,10 @@
 ---
 name: doc-to-md
-description: >-
-  统一文档转 Markdown 技能：Word(.doc/.docx)/Excel/PPT/PDF/RTF/EPUB/CSV 全格式覆盖。
-  自动降级链路 anydoc(本地Rust,毫秒级) → SiliconFlow OCR(扫描件,免费) → markitdown(备选)。
-  无硬编码密钥——API Key 通过环境变量或 CONFIG.md 指引的配置文件读取。
-  当用户需要"把文档转成md/转markdown/提取内容"时使用。
+description: 统一文档转 Markdown 技能：Word(.doc/.docx)/Excel/PPT/PDF/RTF/EPUB/CSV 全格式覆盖，自动降级链路 anydoc(本地Rust,毫秒级) → SiliconFlow OCR(扫描件,免费) → markitdown(备选)，无硬编码密钥。当用户需要"把文档转成md/转markdown/提取内容"时使用。
 version: 1.0.0
 license: MIT
+category: 文档处理
+tags: [文档转换, Markdown, OCR, 格式批量处理, doc-to-md]
 ---
 
 # Doc to MD — 文档转 Markdown 统一技能

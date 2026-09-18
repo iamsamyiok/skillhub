@@ -1,18 +1,9 @@
 ---
-name: slide-maker
-description: >-
-  Build, redesign, and critique clean, presentation-grade slide decks (.pptx) for any
-  audience — research/lab meetings, work status updates, conference talks, stakeholder
-  readouts, thesis defenses, teaching, webinars. Use whenever the user wants to make,
-  create, redo, clean up, improve, or review slides / a deck / a presentation — e.g.
-  "make slides for my project", "build a deck from this paper/code/doc", "turn these
-  results into slides", "redesign this pptx", "my slides are too dense", "review my deck
-  and tell me what's weak", "make a slide about X", "help me present this work". Works
-  with or without a template (matches theirs, else designs a clean one) and with or
-  without source material (mines provided code/docs/figures, else web-researches and
-  fact-checks), in any language (e.g. English or 中文). Interviews first, then runs an
-  actor–critic loop until an independent critic consents. Trigger even without the words
-  "skill", "deck", or "pptx".
+name: slides-maker
+description: 制作、重设计、评审演示级幻灯片（.pptx）：科研组会、工作汇报、大会演讲、答辩、教学、网络研讨会均适用。支持有模板（跟随模板风格）或无模板（自动设计干净版式），可从提供的代码/文档/图表取材，也可联网调研并核查事实，中英文皆可。当用户想"做幻灯片/做个PPT/把内容转成slides/优化排版太挤的页面/评审我的演示稿"时使用。
+version: 1.0.0
+category: 文档处理
+tags: [幻灯片, PPT, 演示设计, pptx, slides-maker]
 ---
 
 # Slide maker
