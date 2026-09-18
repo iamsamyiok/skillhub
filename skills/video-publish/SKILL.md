@@ -1,7 +1,7 @@
 ---
 name: video-publish
-description: 为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站：分镜表 → Playwright CDP 录屏 → edge-tts 配音 → ffmpeg 合成烧录字幕 → biliup-rs 扫码登录投稿，全流程 Agent 自动完成。当用户想"做功能演示视频/录屏宣传视频/发布B站投稿"时使用。
-version: 1.1.0
+description: 为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站：分镜表 → Playwright CDP 录屏（支持接入真实 LLM 内核录制真实执行画面）→ edge-tts 配音 → ffmpeg 合成烧录字幕 → biliup-rs 扫码登录投稿，全流程 Agent 自动完成。当用户想"做功能演示视频/录屏宣传视频/发布B站投稿"时使用。
+version: 1.2.0
 category: 视频创作
 tags: [宣传视频, 录屏, TTS配音, B站投稿, video-publish]
 ---
@@ -126,6 +126,23 @@ graph TD
 - 目标应用若有「无人值守自动退出」类机制（如演示页全关 1 分钟自杀），录制期间必须用环境参数禁用（agents-chat 例：`AGENTS_CHAT_AUTOSTOP_IDLE_MS=86400000`），否则录到一半服务没了
 - 录制前的 mock/演示数据定制：直接改全局安装包内的 demo 模块（如 `/usr/local/lib/node_modules/<pkg>/app/mock/*.js`）可去演示水印、定制回复文案；注意 npm 重装会覆盖，录制期间勿重装
 
+### 真实 LLM 执行录屏（区别于 mock 回放的专项经验）
+
+mock 回放时长可控，真实 LLM 调用 38~90 秒且结果不可预测，录制策略完全不同：
+
+- **变速压缩**：真实执行分镜录 raw 全程（含等待），storyboard 加 `speed`（群聊对话类 5 倍、生成过程类 3 倍），compose 变速后仍保底 `minSec` 13~17 秒。画面节奏由后期控制，录制只管录全
+- **防截尾（最重要）**：「运行完成」判定分两段——先等**进入运行态**（按钮变停止态）上限给足 90 秒（@路由/任务调度落库有明显延迟，25 秒会提前放行），等恢复后再等**消息区文本 10 秒不变**（流式回复收尾）。只看按钮状态会在 AI 回复出现前截尾，录到一条没有回复的用户消息
+- **每镜动作序列第一个动作必须是 `mode`**：每镜独立 context，默认停在首页模式；省略 mode 会导致目标输入框不可见（`fill` 超时 15 秒）。prep 自动化（跳过引导浮层/展开侧栏）就挂在 mode 动作上
+- **要展示延迟弹出的浮层时（如内核自检），等浮层的动作必须放在 prep 触发之前**：prep 会把浮层关掉，顺序错了录到的就是「浮层已关闭」的空画面。自检检测耗时 30 秒上下，`minSec` 与 `timeoutMs` 都要放大
+- **断点续录**：已有帧的镜自动跳过；单镜失败（选择器错/超时）删掉 `OUT_DIR/frames/<id>/` 后重跑，其余镜不重录。真实调用分镜失败重录前，先在服务端确认上一轮回复已落库，避免画面里混入旧消息
+
+### 真实 LLM 内核演示的接入要点
+
+- **环境变量名查源码确认，别猜**（`AGENTS_CHAT_DATA` 而非想当然的 `DATA_DIR`）；LLM 配置通常有独立持久位置（如 `~/.<app>/config.json`），数据目录重置不丢
+- **key 不得入画**：含 API Key 输入框的配置表单页面严禁录制。录制前用应用的配置 API 预写入（如 `POST /api/llm/config`），录屏只展示「已配置 ✓」的结果状态
+- **模型选型必须实测**：同一厂商不同型号限流差异巨大（实测 glm-4.7-flash/glm-4.5-flash 持续「访问量过大」，glm-4-flash 连续 3 次全过）。录制前对目标模型连续测 3 次，选最稳的；opencode 内核配置与应用内配置两处要同步改
+- **编排类功能可能静默挂死**：让 LLM 按格式输出计划（JSON 编排）时，模型常改用工具写文件、格式不合规导致解析失败，重试调用静默消失（特征：无错误日志、子进程消失、消息数不增）。排查 10 分钟无果就换确定性更高的路径（如 @点名直连），演示画面同样真实且节奏可控——宣传视频要的是「真实执行的画面」，不是「完整功能覆盖」
+
 用法：
 
 ```bash
@@ -182,6 +199,8 @@ vision 审查方法论（agents-chat 视频实测教训）：
 - 镜头内容动态可用客观指标验证：同镜头尾两帧 `blend=all_mode=difference` 后 signalstats YAVG >30 说明画面在剧烈变化（消息滚动/动画执行）；vision 对「当前是什么模式/页面」的描述也可能出错，重要结论都要程序化复核
 - 多帧串行 vision 请求容易超 shell 超时：小图（crop 后）比全帧快很多，每批 2~3 帧，max_tokens 控制在 150~300
 - cue 空档属正常：段长 = max(配音+1s, minSec)，配音结束后有几秒无字幕，抽到空档帧别误判为字幕丢失
+- **抽帧时刻要避开转场与空档**：转场瞬间抽到的帧可能没有字幕（字幕未上/画面切换中），片尾卡要抽末尾 5 秒内（过早会抽到末镜画面）；多点抽样（开头/中段/结尾各 1-2 帧）比单点可靠
+- **真实执行分镜的尾帧验证**：每镜最后一帧交给 vision 问「最后一条消息是谁发的、内容大意」，能答出 AI 回复内容才说明真实执行真的入画（配合服务端消息库核对防截尾）
 
 ## 一键管线 build.sh
 
@@ -222,7 +241,7 @@ cd <cookies.json所在目录>
 
 - **biliup 只读执行目录（CWD）下的 `cookies.json`**：登录产物在 `video/out/cookies.json`，投稿前必须 `cd video/out` 或把 cookies 复制到 CWD；报 `open cookies file: cookies.json ... No such file or directory` 就是这个原因。cookies.json 建议另留一份备份（如 `/tmp/opencode/cookies.json`），access_token 30 天有效，过期重跑 bili_login.mjs
 - 常用分区 tid：171=知识区-计算机技术、122=科技区-野生技术协会、231=知识区-设计·创意
-- 封面：从成片抽一帧画面信息量最大的帧（演示画面饱满、消息气泡丰富处比开场空页面更合适），`-q:v 2` 高质量 16:9
+- 封面：从成片/帧序列抽「信息量最大的真实执行画面」（AI 生成结果弹窗、消息气泡丰富处比开场空页面合适），`-q:v 2` 高质量 16:9。加标题字的正确姿势：ffmpeg-static 无 `drawtext` 滤镜，用 playwright 渲染 HTML（大字 + `linear-gradient` 压暗遮罩 + `text-shadow`）后 `page.screenshot` 输出。**背景图必须用 data URL 嵌入**——`setContent` 后 `file://` 图片会加载失败（得到灰白渐变空背景），嵌入后等 2.5 秒再截图；做完用 vision 复核「标题是否清晰、背景是什么」
 - 上传约 3.5MB/s，1 分钟视频 20MB 内几秒传完；完成后日志输出 `bvid`（BV号）即投稿成功
 - biliup 可能警告「客户端接口已失效，将使用APP接口」，属正常，投稿仍成功
 
@@ -245,6 +264,8 @@ cd <cookies.json所在目录>
 2. 写 `video/<项目>/storyboard.json`：分镜数、`narration` 口播稿、动作序列、`minSec`、`meta.endCard`（安装命令 + 项目地址，**必填**，防止烧上旧项目片尾）
 3. 写 `video/<项目>/record.js`：复用管线核心（CDP screencast 收帧 + 12fps 重采样 + 虚拟光标），只重写项目相关的动作辅助函数与演示实例启动参数；页面有自定义弹窗函数时优先用 `click.check/fallback` 或 `direct` 动作
 4. `export STORYBOARD=... OUT_DIR=...` 后跑 record → tts → compose
-5. 抽帧验证（crop 字幕条转录法 + 帧差动态验证）→ `cd video/out && biliup upload` → 提醒用户勾 AI 声明
+5. 抽帧验证（crop 字幕条转录法 + 帧差动态验证 + 每镜尾帧核对真实执行入画）→ 封面（playwright HTML 法，背景选真实执行高光帧）→ `cd video/out && biliup upload` → 提醒用户勾 AI 声明
+
+接入真实 LLM 内核录制时，先读「真实 LLM 执行录屏」与「真实 LLM 内核演示的接入要点」两节（防截尾、key 不入画、模型选型实测、变速压缩）。
 
 旧模式（复制整个 `video/` 再改 compose.js 片尾卡等硬编码）仍可用，但容易漏改片尾卡文案，已被 meta.endCard 参数化取代。

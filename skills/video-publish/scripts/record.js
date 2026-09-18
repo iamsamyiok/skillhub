@@ -1,9 +1,10 @@
 'use strict';
 
-// video/record.js — Playwright 分镜自动录屏（虚拟光标 + 逐帧截图）
+// video/record.js — Playwright 分镜自动录屏（虚拟光标 + CDP screencast 收帧）
 // 用法: node video/record.js [--only s1,s3]
 // 前置: 端口 3777 有 kg --demo 实例（build.sh 自动拉起）
-// 说明: 软渲染下 recordVideo 时间戳失真，改为 12fps 逐帧截图（时长与真实时间严格对齐）
+// 说明: 软渲染下 recordVideo 时间戳失真、逐帧 screenshot 太慢，改为 CDP
+//       Page.startScreencast 事件收帧，按时间戳重采样成 12fps 帧序列
 
 const path = require('path');
 const fs = require('fs');
