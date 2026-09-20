@@ -1,5 +1,17 @@
 # IMPLEMENTATION.md
 
+## 改动说明（typesafe-ai 技能上架）
+
+### 新增文件
+
+- **`skills/typesafe-ai/SKILL.md`** — TypeSafe 官方 Agent 技能（来源：github.com/typesafe-ai/skills），教编码 Agent 使用 TypeSafe System One 模型（JEV）做结构化判断。正文保持官方原文；frontmatter 按 skillhub 解析器要求做了适配：多行折叠 `description: >` 改为单行、补充 `version: 1.0.0` / `category: 开发工具` / `tags`
+- **`skills/typesafe-ai/LICENSE`** — MIT 许可（官方原文件）
+
+### 修改文件
+
+- **`data/meta.json`** — 新增 `typesafe-ai` 条目（category/tags/version/downloads/createdAt/updatedAt）
+- **`docs/`** — 由 `node export-static.js --site-url https://iamsamyiok.github.io/skillhub --repo-url https://github.com/iamsamyiok/skillhub` 重新生成（30 个技能），含 skills-md/typesafe-ai.md、downloads/typesafe-ai.zip/.tar.gz、skills.json/llms.txt/skills.txt 与首页内联清单
+
 ## 改动说明（Issue #5 — book-to-skill v1.1.0）
 
 ### 新增文件

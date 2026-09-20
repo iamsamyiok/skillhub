@@ -34,6 +34,8 @@
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/planning-with-files.zip
 - [pptx](https://iamsamyiok.github.io/skillhub/skills-md/pptx.md): PowerPoint 处理技能：凡涉及 .pptx 或 .potx 文件（输入、输出或两者）即触发——创建幻灯片、路演稿与演示文稿；读取、解析或提取任意 .pptx/.potx 的文字内容；编辑、修改、更新已有演示；合并或拆分幻灯片文件；处理模板（.potx）、版式、演讲者备注与批注。当用户提到「幻灯片」「演示文稿」「
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/pptx.zip
+- [program-to-gif](https://iamsamyiok.github.io/skillhub/skills-md/program-to-gif.md): 把命令行程序/终端演示录制成高质量 GIF（README 配图、文档嵌入）：自包含 demo 脚本 → VHS tape 声明式录制 → ink 帧分析定位内容边界 → gifsicle 裁剪压缩。沉淀了低内存环境下 vhs 录制卡死、chromium 渲染停摆、pty 背压冻结演示进程等全部踩坑经验与诊断流程。当用户
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/program-to-gif.zip
 - [recorder2skill](https://iamsamyiok.github.io/skillhub/skills-md/recorder2skill.md): 把一段真实屏幕录制转化为可复用的 Agent 技能。当用户要求录制任务时使用（如「录下我操作的过程」「看我做一遍然后自动化」「把这个变成技能」），支持 Windows 与 Linux；通过 shell 命令驱动内置的 recorder2skill CLI，任何能执行命令、读取文件的 Agent 均可用。
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.zip
 - [show-deploy](https://iamsamyiok.github.io/skillhub/skills-md/show-deploy.md): 临时静态站点部署（Show Deploy）：把项目构建产物打包上传到 Show 托管，获得 48 小时自动过期的公网预览 URL，仅需 bash+tar+curl 无需安装 CLI。当用户说 deploy to show、发布预览、preview this site、想要前端构建的临时在线链接时使用。temporary
@@ -50,6 +52,8 @@
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/text-to-diagram.zip
 - [text-to-image](https://iamsamyiok.github.io/skillhub/skills-md/text-to-image.md): 文字转图片（文生图）：把文字描述生成为海报、插画、产品概念图、营销素材、角色场景视觉草案等图片。当用户要求生成图片、画一张图、做海报/插画/配图/封面/壁纸，或提到"文生图""生成图片素材"时使用。有参考图需要修改时应使用图片编辑能力而非本技能的纯文生图流程。
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/text-to-image.zip
+- [typesafe-ai](https://iamsamyiok.github.io/skillhub/skills-md/typesafe-ai.md): Build AI-powered software with TypeSafe: small units of AI intelligence you can use like programming primitives. Its System One models, including Jev, turn natu
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/typesafe-ai.zip
 - [unslop](https://iamsamyiok.github.io/skillhub/skills-md/unslop.md): 去除 AI 写作腔：提供仅审计检测或两遍重写（先诊断后重构）两种流程，编辑、审阅或改写 AI 生成内容使其读起来像人写的。当用户要求「去 AI 味」「拟人化」「修一下 AI 文本」「发布前润色」或文本中存在「让我们深入看看」等明显 AI 痕迹时使用。
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/unslop.zip
 - [use-tinyfish](https://iamsamyiok.github.io/skillhub/skills-md/use-tinyfish.md): 使用 TinyFish 执行网页搜索、抓取 URL、读取页面、获取最新信息、来源可溯的问答、调研、查文档、看价格与产品页、数据提取、爬取与浏览器自动化。当用户要求搜索、查找、对比、从网页获取信息、总结某个 URL 或自动化网站操作时使用。

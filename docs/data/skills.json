@@ -1,5 +1,5 @@
 {
-  "total": 28,
+  "total": 30,
   "categories": [
     "写作工具",
     "前端开发",
@@ -1163,6 +1163,36 @@
       ]
     },
     {
+      "id": "program-to-gif",
+      "name": "program-to-gif",
+      "description": "把命令行程序/终端演示录制成高质量 GIF（README 配图、文档嵌入）：自包含 demo 脚本 → VHS tape 声明式录制 → ink 帧分析定位内容边界 → gifsicle 裁剪压缩。沉淀了低内存环境下 vhs 录制卡死、chromium 渲染停摆、pty 背压冻结演示进程等全部踩坑经验与诊断流程。当用户想\"给程序做演示 GIF / 终端录屏转 GIF / README 放动图\"时使用。",
+      "version": "1.0.0",
+      "category": "视频创作",
+      "tags": [
+        "GIF",
+        "VHS",
+        "终端录制",
+        "演示动图",
+        "README配图"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-19T17:40:00.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 8271
+        },
+        {
+          "path": "scripts/gif-trim.py",
+          "size": 3251
+        },
+        {
+          "path": "scripts/vhs-record.sh",
+          "size": 1903
+        }
+      ]
+    },
+    {
       "id": "recorder2skill",
       "name": "recorder2skill",
       "description": "把一段真实屏幕录制转化为可复用的 Agent 技能。当用户要求录制任务时使用（如「录下我操作的过程」「看我做一遍然后自动化」「把这个变成技能」），支持 Windows 与 Linux；通过 shell 命令驱动内置的 recorder2skill CLI，任何能执行命令、读取文件的 Agent 均可用。",
@@ -2105,6 +2135,33 @@
         {
           "path": "SKILL.md",
           "size": 2545
+        }
+      ]
+    },
+    {
+      "id": "typesafe-ai",
+      "name": "typesafe-ai",
+      "description": "Build AI-powered software with TypeSafe: small units of AI intelligence you can use like programming primitives. Its System One models, including Jev, turn natural language and application state into typed judgments and probabilities that code can combine. Use when a feature needs programmable common sense, when brainstorming what AI could make possible in an app, or when an LLM prompt-and-parse step could become a structured decision. Applications include routing, ranking, extraction, verification, and interactive experiences.",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "TypeSafe",
+        "JEV",
+        "System One",
+        "结构化决策",
+        "AI开发",
+        "Jev"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-20T02:00:00.000Z",
+      "files": [
+        {
+          "path": "LICENSE",
+          "size": 1068
+        },
+        {
+          "path": "SKILL.md",
+          "size": 9997
         }
       ]
     },
