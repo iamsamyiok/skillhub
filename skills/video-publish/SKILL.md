@@ -1,9 +1,9 @@
 ---
 name: video-publish
 description: 为项目/产品制作宣传或解说视频并发布到 B 站，三种模式：①卡片模式（HTML卡片+配音+推镜，零录屏，最快）②录屏模式（Playwright CDP 真实录屏，支持真实 LLM 执行画面）③LLM 一键成稿（一句话主题→分镜表草稿）。TTS 供应商链（SiliconFlow CosyVoice2 自然女声→edge-tts→SAPI 兜底）按句生成保精确字幕，可选 BGM 闪避混音与 9:16 竖版裁切，biliup-rs 扫码登录投稿。当用户想"做宣传视频/功能演示视频/榜单盘点视频/发布B站投稿"时使用。
-version: 2.0.0
+version: 2.1.0
 category: 视频创作
-tags: [宣传视频, 录屏, 卡片视频, TTS配音, 精确字幕, BGM, 竖版, B站投稿, video-publish]
+tags: [宣传视频, 录屏, 卡片视频, 入场动画, 转场, TTS配音, 精确字幕, BGM, 竖版, B站投稿, video-publish]
 ---
 
 # 软件宣传视频制作 + B站发布 完整流程
@@ -196,20 +196,27 @@ node video/tts.mjs [--force]
 - 女声音色速查：diana=灵动愉悦（默认）、bella=激情（偶发空响应）、anna=平稳温婉、claire=温柔；换音色只改 `TTS_VOICE`
 - 旧 `tts.js`（edge-tts 单供应商）保留兼容,新任务一律用 `tts.mjs`
 
-## 卡片模式（v2 新增：零录屏，最快出片）
+## 卡片模式（v2 新增：零录屏，最快出片；v2.1 引入 HyperFrames 式动画与转场）
 
-适合产品宣传、榜单盘点、知识解说。画面 = 每镜一张全屏 HTML 卡片（深色科技风、品牌色可配、右上角常驻「AI 生成」角标）+ 缓慢推镜，配音与卡片一一对应。
+适合产品宣传、榜单盘点、知识解说。画面 = 每镜一张全屏 HTML 卡片（深色科技风、品牌色可配、右上角常驻「AI 生成」角标）+ 确定性入场动画 + 交叉溶解转场，配音与卡片一一对应。
 
 ```bash
 export STORYBOARD=$PWD/video/<项目>/storyboard.json OUT_DIR=$PWD/video/out/<项目>
 export SILICONFLOW_API_KEY=<key>            # 或用 edge-tts 兜底
 node video/tts.mjs && NODE_PATH=$(npm root -g) node video/cards.mjs
-# 产物: OUT/final-cards.mp4 (1080p30, H.264, 44.1kHz 立体声, faststart)
+# 产物: OUT/final-cards.mp4 (1080p30 yuv420p, H.264, 44.1kHz 立体声, faststart)
+# 环境变量: NO_ANIMATE=1 关动画退回静态推镜 | XFADE=0.4 调转场时长(秒,0=硬切)
 ```
 
-分镜约定：`meta.cards: { accent, accent2, aiBadge }` 配主题色与角标开关；每镜 `card: { kicker, title, sub, hook, note?, brands?[] }`。title 中出现的 `SkillHub`/`AI` 自动高亮主题色；`brands` 渲染等宽字体徽章行（适合列技能名/包名）；**最后一镜务必带 `decl:"本视频由 AI 生成"` + 口播声明**。
+分镜约定：`meta.cards: { accent, accent2, aiBadge }` 配主题色与角标开关；每镜 `card: { kicker, title, sub, hook, note?, brands?[], decl? }`。title 中出现的 `SkillHub`/`AI` 自动高亮主题色；`brands` 渲染等宽字体徽章行（适合列技能名/包名）；**最后一镜务必带 `decl:"本视频由 AI 生成"` + 口播声明**。
 
-实战校准值（两支成片验证）：推镜每帧 +0.00045 上限 1.10（静态卡片感的关键解药）；音频 `adelay=250ms` 起播、成片段长 = 配音 + 0.8s 尾气；卡片文字必须先截图自查（截断/中文渲染/溢出）再进合成；成片验证 = volumedetect（mean/max 非 -91dB）+ 抽帧 vision 逐字转录。
+**v2.1 动画与质检（借鉴 HyperFrames 框架，零新依赖）**：
+- **确定性入场动画**：每卡元素（角标→kicker→标题→副标→hook→徽章→声明）错峰 0.15s 淡入+上滑。实现 = 纯 CSS animation（`both paused`）+ WAAPI `getAnimations()[i].currentTime` 逐帧 seek，前 1.2s（36 帧@30fps）逐帧截图，其后定格 + zoompan 慢推。**确定性**（同输入同输出）是能逐帧截图的前提——禁 Math.random()/时间类逻辑
+- **交叉溶解转场**：段间 xfade 0.4s + 音频 acrossfade（HF 规则：场景间必须有转场，禁跳切）；转场吃掉的时长要在 offset 逐级累减中扣除
+- **溢出自检**（HF inspect 轻量版）：截图前扫描各元素包围盒，超出卡片 1920x1080 舞台即告警。**坑：必须用卡片自身包围盒做参照系**——`getBoundingClientRect()` 是视口坐标，第 2 张之后的卡片在页面 y=1080 以下，按视口判断会全部误报
+- **对比度审计**（HF validate 轻量版）：正文/背景、主题色/背景的 WCAG 对比度自查（4.5:1 / 3:1），不达标直接报错
+- 人声从入场动画结束后起播（adelay=ENTRANCE*1000），节奏是「动画引入→人声进入→定格讲解」
+- 成片校验：pix_fmt 必须 yuv420p（xfade 串联末级记得 `format=yuv420p`，否则输出 4:4:4 兼容性差）+ volumedetect + 抽帧确认动画真的在动（对比 0.4s/1.0s 两帧元素位置）
 
 ## LLM 一键成稿（v2 新增：第 0 步起稿器）
 
