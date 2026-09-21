@@ -1,22 +1,37 @@
 ---
 name: video-publish
-description: 为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站：分镜表 → Playwright CDP 录屏（支持接入真实 LLM 内核录制真实执行画面）→ edge-tts 配音 → ffmpeg 合成烧录字幕 → biliup-rs 扫码登录投稿，全流程 Agent 自动完成。当用户想"做功能演示视频/录屏宣传视频/发布B站投稿"时使用。
-version: 1.5.0
+description: 为项目/产品制作宣传或解说视频并发布到 B 站，三种模式：①卡片模式（HTML卡片+配音+推镜，零录屏，最快）②录屏模式（Playwright CDP 真实录屏，支持真实 LLM 执行画面）③LLM 一键成稿（一句话主题→分镜表草稿）。TTS 供应商链（SiliconFlow CosyVoice2 自然女声→edge-tts→SAPI 兜底）按句生成保精确字幕，可选 BGM 闪避混音与 9:16 竖版裁切，biliup-rs 扫码登录投稿。当用户想"做宣传视频/功能演示视频/榜单盘点视频/发布B站投稿"时使用。
+version: 2.0.0
 category: 视频创作
-tags: [宣传视频, 录屏, TTS配音, B站投稿, video-publish]
+tags: [宣传视频, 录屏, 卡片视频, TTS配音, 精确字幕, BGM, 竖版, B站投稿, video-publish]
 ---
 
 # 软件宣传视频制作 + B站发布 完整流程
 
-为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频，并发布到 B 站。全流程可由 Agent 全自动完成，唯一需要用户参与的环节是 B 站扫码登录（和投稿后的 AI 声明勾选）。
+为项目制作宣传/解说视频并发布到 B 站。全流程可由 Agent 全自动完成，唯一需要用户参与的环节是 B 站扫码登录（和投稿后的 AI 声明勾选）。
 
-内容侧规范（分镜结构、前 3 秒钩子库、口播检查单、字幕/BGM 参数、封面标题公式）见同目录 **content-playbook.md**，写分镜表和投稿元数据前必读。
+## 三种模式速查（先选模式，再读对应章节）
+
+| 模式 | 适用 | 速度 | 关键脚本 |
+|---|---|---|---|
+| **卡片模式**（v2 新增，最快） | 产品宣传、榜单盘点、知识解说——画面是精美卡片+推镜 | 2 分钟成片 ≈ 10 分钟制作 | `tts.mjs` + `cards.mjs` |
+| **录屏模式**（v1 即有，最真实） | 软件功能演示——真实操作画面 | 取决于录制与真实执行 | `record.js` + `tts.mjs` + `compose.js` |
+| **LLM 一键成稿**（v2 新增，起稿器） | 任何模式的第 0 步：一句话主题 → 分镜表草稿 | 秒级出草稿，**必须人工复核** | `gen-storyboard.mjs` |
+
+模式可组合：LLM 起草 → 选卡片或录屏呈现 → `post.mjs` 加 BGM/竖版 → biliup 投稿。
+
+## 密钥与隐私红线（先读这个）
+
+- **环境变量必须真正导出给子进程**：Node 脚本读的是 `process.env`，`source 密钥文件` 只产生 shell 变量（curl 的 `$VAR` 展开能用，node 读不到！）——正确姿势 `set -a && source <密钥文件> && set +a` 或逐个 `export KEY=...`。实测踩过：source 后 curl 正常、node 报缺 key，排查 10 分钟
+- 所有密钥**只走环境变量**（`SILICONFLOW_API_KEY`、`LLM_API_KEY`/`AGNES_API_KEY`），任何脚本**零硬编码**；本 skill 的任何文件不携带、不回显、不落盘密钥
+- 录屏场景补充红线：含 API Key 输入框的页面严禁入画，用配置 API 预写入后只录「已配置 ✓」状态（详见录屏章节）
+- 密钥统一存放在用户本机的密钥保险库文件（不进仓库、不进 skill、不进云端）；会话记忆只存「去哪个文件读」的指针。key 疑似泄露的唯一处置 = 平台轮换 + 同步更新保险库与 CI Secrets
 
 ## 适用场景
 
-- 为软件项目制作功能演示视频并发布 B 站
-- 任何「网页应用操作录屏 → 配音 → 合成 → 投稿」的流水线需求
-- 参考实现位于项目 `video/` 目录（storyboard.json / record.js / tts.js / compose.js / build.sh / bili_login.mjs），skill 附件 `scripts/` 是同一套文件的快照
+- 卡片模式：项目/产品宣传、Top-N 榜单、知识科普类短视频
+- 录屏模式：为软件项目制作功能演示视频并发布 B 站
+- 参考实现位于项目 `video/` 目录（storyboard.json / record.js / tts.mjs / cards.mjs / compose.js / build.sh / bili_login.mjs），skill 附件 `scripts/` 是同一套文件的快照
 
 ## 新项目复用：env 零拷贝模式（推荐）
 
@@ -109,14 +124,7 @@ graph TD
 }
 ```
 
-写口播稿与动作的对应原则：每个分镜配音 20~80 字（约 8~25 秒），动作时长略长于配音；数字 id 深链（如 `#entity=6`）从 demo 数据映射查询数据库得到。
-
-**narration 写作硬规则**（详见 content-playbook.md 第 3 节检查单，违规=重写）：
-- s1 第一句必须是钩子（痛点直击/反常识/结果前置），3 秒内出现具体名词+数字；禁"大家好/今天给大家分享"式开场
-- 每镜只讲一个信息点，结尾埋通向下一镜的悬念；单句 ≤15 字
-- 每镜字数 ≈ 目标秒数 × 3~4（中文口播每秒 3-4 字）
-- 禁用 AI 套话（首先/其次/综上所述/赋能/底层逻辑）；抽象概念配具象类比
-- 末镜含结果回收 + 三连软引导 + 资源指引
+写口播稿与动作的对应原则：每个分镜配音 20~60 字（约 8~20 秒），动作时长略长于配音；数字 id 深链（如 `#entity=6`）从 demo 数据映射查询数据库得到。
 
 ## 第2步：录屏 record.js
 
@@ -169,17 +177,63 @@ PORT=3777 node bin/cli.js --demo &   # 一次性临时目录，不污染真实�
 node video/record.js
 ```
 
-## 第3步：配音 tts.js
+## 第3步：配音 tts.mjs（v2 供应商链，替代旧 tts.js）
 
 ```bash
-node video/tts.js [--force]
+export SILICONFLOW_API_KEY=<key>            # 只走环境变量
+export TTS_VOICE="FunAudioLLM/CosyVoice2-0.5B:diana"   # 可选,默认 diana 灵动女声
+node video/tts.mjs [--force]
 ```
 
-- 每镜 `narration` 文字 → `out/tts/{id}.mp3` + `{id}.srt`（zh-CN-XiaoxiaoNeural）
-- edge-tts 7.x 无 `--words-in-cue` 参数；字幕即配音文本分句
-- 配音必须与画面动作节奏对齐：改口播稿后要重看对应分镜动作时长是否匹配
+供应商自动降级链：**SiliconFlow CosyVoice2**（首选,自然度最高）→ **edge-tts** → **SAPI Huihui**（100% 离线兜底）。`TTS_PROVIDER=siliconflow|edge|sapi` 可强制指定。
 
-## 第4步：合成 compose.js
+- 契约与旧 tts.js 完全一致：每镜 `narration` → `OUT/tts/{id}.mp3` + `{id}.srt`；额外产出 `OUT/tts/index.json`（每镜时长,供 compose/cards 使用）
+- **按句生成是核心机制**：CosyVoice2 对长输入会静默截断（实测 90 字只读出 3 秒），按 `。！？` 拆句逐句生成再以 0.15s 静音拼接——副作用是**每句时长精确可测，字幕天然对齐**，不需要 whisper ASR（MoneyPrinterTurbo 用 ASR 对齐,本管线按句生成直接省掉这一步）
+- 三个供应商各自的坑（全部已内置到脚本）：
+  - siliconflow：音色参数格式必须是 `{model}:{name}`（如 `FunAudioLLM/CosyVoice2-0.5B:diana`）,裸名或 `speech:名` 都报 20047 Invalid voice；偶发 0 字节响应,须重试+大小校验
+  - edge-tts：部分网络间歇性 NoAudioReceived（0 字节但 exit 0）,必须校验产物；CLI 参数是 `--write-media` 不是 `--output`
+  - sapi：仅 Windows,离线 100% 可用但平直；用 PowerShell System.Speech,输出 wav 再转 mp3
+- 女声音色速查：diana=灵动愉悦（默认）、bella=激情（偶发空响应）、anna=平稳温婉、claire=温柔；换音色只改 `TTS_VOICE`
+- 旧 `tts.js`（edge-tts 单供应商）保留兼容,新任务一律用 `tts.mjs`
+
+## 卡片模式（v2 新增：零录屏，最快出片）
+
+适合产品宣传、榜单盘点、知识解说。画面 = 每镜一张全屏 HTML 卡片（深色科技风、品牌色可配、右上角常驻「AI 生成」角标）+ 缓慢推镜，配音与卡片一一对应。
+
+```bash
+export STORYBOARD=$PWD/video/<项目>/storyboard.json OUT_DIR=$PWD/video/out/<项目>
+export SILICONFLOW_API_KEY=<key>            # 或用 edge-tts 兜底
+node video/tts.mjs && NODE_PATH=$(npm root -g) node video/cards.mjs
+# 产物: OUT/final-cards.mp4 (1080p30, H.264, 44.1kHz 立体声, faststart)
+```
+
+分镜约定：`meta.cards: { accent, accent2, aiBadge }` 配主题色与角标开关；每镜 `card: { kicker, title, sub, hook, note?, brands?[] }`。title 中出现的 `SkillHub`/`AI` 自动高亮主题色；`brands` 渲染等宽字体徽章行（适合列技能名/包名）；**最后一镜务必带 `decl:"本视频由 AI 生成"` + 口播声明**。
+
+实战校准值（两支成片验证）：推镜每帧 +0.00045 上限 1.10（静态卡片感的关键解药）；音频 `adelay=250ms` 起播、成片段长 = 配音 + 0.8s 尾气；卡片文字必须先截图自查（截断/中文渲染/溢出）再进合成；成片验证 = volumedetect（mean/max 非 -91dB）+ 抽帧 vision 逐字转录。
+
+## LLM 一键成稿（v2 新增：第 0 步起稿器）
+
+```bash
+export LLM_API_KEY=<key>    # 兼容 AGNES_API_KEY;LLM_BASE_URL/LLM_MODEL 可换供应商
+node video/gen-storyboard.mjs --topic "安利 SkillHub 技能库" --shots 7 \
+  --facts "31个技能;14个分类;网址 xxx" --out video/<项目>/storyboard.draft.json
+```
+
+- 输出符合管线 schema 的分镜表草稿（含 card 字段），冷开场、单镜单点、片尾 AI 声明+三连引导都写进了 prompt 约束
+- **草稿必须逐镜复核**：LLM 会编造数字/功能，`--facts` 传入已核实事实能大幅抑制，但不能替代人工/Agent 核对；复核通过后 rename 成 storyboard.json 投产
+- 实测 agnes-2.5-flash 即可胜任；响应要剥 ```json 围栏再解析（脚本已内置）
+
+## 后期 post.mjs（v2 新增：BGM 混音 + 竖版裁切）
+
+```bash
+node video/post.mjs bgm OUT/final.mp4 <你有权使用的BGM.mp3>   # 人声闪避混音(sidechaincompress,BGM_VOLUME 默认 0.12)
+node video/post.mjs vertical OUT/final.mp4                    # 1080p 横版 → 1080x1920 竖版(抖音/小红书/视频号)
+```
+
+- BGM 合规：只用自有/授权素材；若平台（B 站创作中心）提供正版曲库，优先投稿时在站内配置，本地 BGM 是备选
+- 一套素材双平台：横版投 B 站 + 竖版投抖音系，`vertical` 一条命令完成
+
+## 第4步：合成 compose.js（录屏模式）
 
 ```bash
 node video/compose.js
@@ -197,10 +251,6 @@ node video/compose.js
 - libass 需要 fontconfig；系统装了 fontconfig 包后仍报 `Failed to load fontconfig fonts` 时，用项目自带 `video/assets/fontconfig.conf`（`FONTCONFIG_FILE` 环境变量）
 - 字幕/片尾卡渲染验证法：对比目标时段与空白时段同区域平均亮度（signalstats YAVG），差值 >2 说明文字已渲染
 - Node 子进程调用时路径硬编码全局 ffmpeg/ffprobe 位置（npm -g 安装路径）
-- **compose.js 对已存在的 clip 会跳过**：改了帧或配音后必须 `node video/compose.js --force` 全量重建，否则输出时长/画面与改动前完全一致（吃过亏：成片 115.516s 一字不差，新内容根本没进去）
-- **断点续录的跳过判据必须是"目录里存在帧文件"而非"目录存在"**：失败尝试留下的空目录会让后续重录全部被跳过，且静默输出"已完成"
-- **幻灯片截图要校验图片新鲜度**（mtime > 截图开始时间）：chromium 偶发挂死时 try/catch 会吞掉失败，旧 png 顶替新图入帧；同时建议截图失败自动重试一次
-- 成片响度建议 `loudnorm=I=-14:LRA=11:TP=-1.5`（B 站 -14 LUFS）；BGM 若内嵌，用 sidechaincompress 自动闪避（参数见 content-playbook.md）
 
 验证成片（视觉识别走用户的 vision 模型，或抽帧后确认）：
 
@@ -256,9 +306,8 @@ cd <cookies.json所在目录>
 ```
 
 - **biliup 只读执行目录（CWD）下的 `cookies.json`**：登录产物在 `video/out/cookies.json`，投稿前必须 `cd video/out` 或把 cookies 复制到 CWD；报 `open cookies file: cookies.json ... No such file or directory` 就是这个原因。cookies.json 建议另留一份备份（如 `/tmp/opencode/cookies.json`），access_token 30 天有效，过期重跑 bili_login.mjs
-- 常用分区 tid：**以 member API 实测为准**——`GET https://member.bilibili.com/x/vupre/web/archive/pre`（带登录 cookie）返回 `data.typelist` 全量分区树。已验证（2026-09）：**188=科技**（一级），子分区 **231=计算机技术**、230=软件应用、95=数码、232=科工机械、233=极客DIY。网传"171=知识区-计算机技术"已过时，投稿前用 API 核对
-- 封面：从成片/帧序列抽「信息量最大的真实执行画面」（AI 生成结果弹窗、消息气泡丰富处比开场空页面合适），`-q:v 2` 高质量 16:9。封面设计规范（高对比配色、大字+价值副标题、与前 3 秒高光帧视觉一致）见 content-playbook.md 第 5 节。加标题字的正确姿势：ffmpeg-static 无 `drawtext` 滤镜，用 playwright/chromium 渲染 HTML（大字 + `linear-gradient` 压暗遮罩 + `text-shadow`）后截图输出。**背景图必须用 data URL 嵌入**——`setContent` 后 `file://` 图片会加载失败（得到灰白渐变空背景），嵌入后等 2.5 秒再截图；做完用 vision 复核「标题是否清晰、背景是什么」
-- 标题公式：痛点 + 解决方案 + 数据锚点，核心关键词前置（标题前 15 字参与 B 站搜索匹配）；标签前 3 个放核心搜索词，大词+长尾词组合；简介含章节时间戳/命令/链接（驱动收藏）+ AI 配音声明——完整模板见 content-playbook.md 第 6 节
+- 常用分区 tid：171=知识区-计算机技术、122=科技区-野生技术协会、231=知识区-设计·创意
+- 封面：从成片/帧序列抽「信息量最大的真实执行画面」（AI 生成结果弹窗、消息气泡丰富处比开场空页面合适），`-q:v 2` 高质量 16:9。加标题字的正确姿势：ffmpeg-static 无 `drawtext` 滤镜，用 playwright 渲染 HTML（大字 + `linear-gradient` 压暗遮罩 + `text-shadow`）后 `page.screenshot` 输出。**背景图必须用 data URL 嵌入**——`setContent` 后 `file://` 图片会加载失败（得到灰白渐变空背景），嵌入后等 2.5 秒再截图；做完用 vision 复核「标题是否清晰、背景是什么」
 - 上传约 3.5MB/s，1 分钟视频 20MB 内几秒传完；完成后日志输出 `bvid`（BV号）即投稿成功
 - biliup 可能警告「客户端接口已失效，将使用APP接口」，属正常，投稿仍成功
 
