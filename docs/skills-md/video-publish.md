@@ -1,7 +1,7 @@
 ---
 name: video-publish
 description: 为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站：分镜表 → Playwright CDP 录屏（支持接入真实 LLM 内核录制真实执行画面）→ edge-tts 配音 → ffmpeg 合成烧录字幕 → biliup-rs 扫码登录投稿，全流程 Agent 自动完成。当用户想"做功能演示视频/录屏宣传视频/发布B站投稿"时使用。
-version: 1.4.0
+version: 1.5.0
 category: 视频创作
 tags: [宣传视频, 录屏, TTS配音, B站投稿, video-publish]
 ---
@@ -9,6 +9,8 @@ tags: [宣传视频, 录屏, TTS配音, B站投稿, video-publish]
 # 软件宣传视频制作 + B站发布 完整流程
 
 为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频，并发布到 B 站。全流程可由 Agent 全自动完成，唯一需要用户参与的环节是 B 站扫码登录（和投稿后的 AI 声明勾选）。
+
+内容侧规范（分镜结构、前 3 秒钩子库、口播检查单、字幕/BGM 参数、封面标题公式）见同目录 **content-playbook.md**，写分镜表和投稿元数据前必读。
 
 ## 适用场景
 
@@ -107,7 +109,14 @@ graph TD
 }
 ```
 
-写口播稿与动作的对应原则：每个分镜配音 20~60 字（约 8~20 秒），动作时长略长于配音；数字 id 深链（如 `#entity=6`）从 demo 数据映射查询数据库得到。
+写口播稿与动作的对应原则：每个分镜配音 20~80 字（约 8~25 秒），动作时长略长于配音；数字 id 深链（如 `#entity=6`）从 demo 数据映射查询数据库得到。
+
+**narration 写作硬规则**（详见 content-playbook.md 第 3 节检查单，违规=重写）：
+- s1 第一句必须是钩子（痛点直击/反常识/结果前置），3 秒内出现具体名词+数字；禁"大家好/今天给大家分享"式开场
+- 每镜只讲一个信息点，结尾埋通向下一镜的悬念；单句 ≤15 字
+- 每镜字数 ≈ 目标秒数 × 3~4（中文口播每秒 3-4 字）
+- 禁用 AI 套话（首先/其次/综上所述/赋能/底层逻辑）；抽象概念配具象类比
+- 末镜含结果回收 + 三连软引导 + 资源指引
 
 ## 第2步：录屏 record.js
 
@@ -188,6 +197,10 @@ node video/compose.js
 - libass 需要 fontconfig；系统装了 fontconfig 包后仍报 `Failed to load fontconfig fonts` 时，用项目自带 `video/assets/fontconfig.conf`（`FONTCONFIG_FILE` 环境变量）
 - 字幕/片尾卡渲染验证法：对比目标时段与空白时段同区域平均亮度（signalstats YAVG），差值 >2 说明文字已渲染
 - Node 子进程调用时路径硬编码全局 ffmpeg/ffprobe 位置（npm -g 安装路径）
+- **compose.js 对已存在的 clip 会跳过**：改了帧或配音后必须 `node video/compose.js --force` 全量重建，否则输出时长/画面与改动前完全一致（吃过亏：成片 115.516s 一字不差，新内容根本没进去）
+- **断点续录的跳过判据必须是"目录里存在帧文件"而非"目录存在"**：失败尝试留下的空目录会让后续重录全部被跳过，且静默输出"已完成"
+- **幻灯片截图要校验图片新鲜度**（mtime > 截图开始时间）：chromium 偶发挂死时 try/catch 会吞掉失败，旧 png 顶替新图入帧；同时建议截图失败自动重试一次
+- 成片响度建议 `loudnorm=I=-14:LRA=11:TP=-1.5`（B 站 -14 LUFS）；BGM 若内嵌，用 sidechaincompress 自动闪避（参数见 content-playbook.md）
 
 验证成片（视觉识别走用户的 vision 模型，或抽帧后确认）：
 
@@ -243,8 +256,9 @@ cd <cookies.json所在目录>
 ```
 
 - **biliup 只读执行目录（CWD）下的 `cookies.json`**：登录产物在 `video/out/cookies.json`，投稿前必须 `cd video/out` 或把 cookies 复制到 CWD；报 `open cookies file: cookies.json ... No such file or directory` 就是这个原因。cookies.json 建议另留一份备份（如 `/tmp/opencode/cookies.json`），access_token 30 天有效，过期重跑 bili_login.mjs
-- 常用分区 tid：171=知识区-计算机技术、122=科技区-野生技术协会、231=知识区-设计·创意
-- 封面：从成片/帧序列抽「信息量最大的真实执行画面」（AI 生成结果弹窗、消息气泡丰富处比开场空页面合适），`-q:v 2` 高质量 16:9。加标题字的正确姿势：ffmpeg-static 无 `drawtext` 滤镜，用 playwright 渲染 HTML（大字 + `linear-gradient` 压暗遮罩 + `text-shadow`）后 `page.screenshot` 输出。**背景图必须用 data URL 嵌入**——`setContent` 后 `file://` 图片会加载失败（得到灰白渐变空背景），嵌入后等 2.5 秒再截图；做完用 vision 复核「标题是否清晰、背景是什么」
+- 常用分区 tid：**以 member API 实测为准**——`GET https://member.bilibili.com/x/vupre/web/archive/pre`（带登录 cookie）返回 `data.typelist` 全量分区树。已验证（2026-09）：**188=科技**（一级），子分区 **231=计算机技术**、230=软件应用、95=数码、232=科工机械、233=极客DIY。网传"171=知识区-计算机技术"已过时，投稿前用 API 核对
+- 封面：从成片/帧序列抽「信息量最大的真实执行画面」（AI 生成结果弹窗、消息气泡丰富处比开场空页面合适），`-q:v 2` 高质量 16:9。封面设计规范（高对比配色、大字+价值副标题、与前 3 秒高光帧视觉一致）见 content-playbook.md 第 5 节。加标题字的正确姿势：ffmpeg-static 无 `drawtext` 滤镜，用 playwright/chromium 渲染 HTML（大字 + `linear-gradient` 压暗遮罩 + `text-shadow`）后截图输出。**背景图必须用 data URL 嵌入**——`setContent` 后 `file://` 图片会加载失败（得到灰白渐变空背景），嵌入后等 2.5 秒再截图；做完用 vision 复核「标题是否清晰、背景是什么」
+- 标题公式：痛点 + 解决方案 + 数据锚点，核心关键词前置（标题前 15 字参与 B 站搜索匹配）；标签前 3 个放核心搜索词，大词+长尾词组合；简介含章节时间戳/命令/链接（驱动收藏）+ AI 配音声明——完整模板见 content-playbook.md 第 6 节
 - 上传约 3.5MB/s，1 分钟视频 20MB 内几秒传完；完成后日志输出 `bvid`（BV号）即投稿成功
 - biliup 可能警告「客户端接口已失效，将使用APP接口」，属正常，投稿仍成功
 

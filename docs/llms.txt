@@ -20,6 +20,8 @@
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/firecrawl.zip
 - [grilling](https://iamsamyiok.github.io/skillhub/skills-md/grilling.md): 拷问式需求访谈（Grilling）：对计划、决策或想法进行多轮穷追式提问压力测试，按轮次展开设计树，每题附推荐答案。当用户想压测自己的方案、梳理需求，或提到 grill/拷问/挑战我的想法 时使用。stress-test a plan or decision
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/grilling.zip
+- [handoff](https://iamsamyiok.github.io/skillhub/skills-md/handoff.md): Hand off the current work to another AI coding tool (Codex), or resume work that another tool handed off, via a structured HANDOFF.md document in the project ro
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/handoff.zip
 - [image-analysis](https://iamsamyiok.github.io/skillhub/skills-md/image-analysis.md): 识图理解（图片分析）：描述图片内容、提取图中文字（OCR）、分析页面/设计稿布局、比较图片。当用户给出图片并要求分析、理解、识别、提取文字、描述、总结、审查布局时使用。支持公网图片 URL 与本地图片（先上传）。
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/image-analysis.zip
 - [mcp-builder](https://iamsamyiok.github.io/skillhub/skills-md/mcp-builder.md): 创建高质量 MCP（Model Context Protocol）服务器的指南：通过设计良好的工具让大模型与外部服务交互。构建 MCP 服务器集成外部 API 或服务时使用，支持 Python（FastMCP）与 Node/TypeScript（MCP SDK）两种技术栈。

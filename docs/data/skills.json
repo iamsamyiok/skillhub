@@ -1,5 +1,5 @@
 {
-  "total": 30,
+  "total": 31,
   "categories": [
     "写作工具",
     "前端开发",
@@ -580,6 +580,33 @@
         {
           "path": "agents/openai.yaml",
           "size": 113
+        }
+      ]
+    },
+    {
+      "id": "handoff",
+      "name": "handoff",
+      "description": "Hand off the current work to another AI coding tool (Codex), or resume work that another tool handed off, via a structured HANDOFF.md document in the project root. Use when the user wants to switch between Claude Code and Codex mid-task, \"hand off\", \"交接\", \"save progress for the other tool\", \"pick up / resume / 接续 where the other tool left off\", or run `/handoff save` or `/handoff resume`.",
+      "version": "1.0.0",
+      "category": "工作流",
+      "tags": [
+        "交接",
+        "handoff",
+        "Claude Code",
+        "Codex",
+        "HANDOFF.md",
+        "AI协作"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-21T00:00:00.000Z",
+      "files": [
+        {
+          "path": "LICENSE",
+          "size": 1065
+        },
+        {
+          "path": "SKILL.md",
+          "size": 4175
         }
       ]
     },
@@ -2421,7 +2448,7 @@
       "id": "video-publish",
       "name": "video-publish",
       "description": "为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站：分镜表 → Playwright CDP 录屏（支持接入真实 LLM 内核录制真实执行画面）→ edge-tts 配音 → ffmpeg 合成烧录字幕 → biliup-rs 扫码登录投稿，全流程 Agent 自动完成。当用户想\"做功能演示视频/录屏宣传视频/发布B站投稿\"时使用。",
-      "version": "1.4.0",
+      "version": "1.5.0",
       "category": "视频创作",
       "tags": [
         "宣传视频",
@@ -2435,7 +2462,11 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 25433
+          "size": 27731
+        },
+        {
+          "path": "content-playbook.md",
+          "size": 7261
         },
         {
           "path": "scripts/assets/fontconfig.conf",
