@@ -1,0 +1,53 @@
+{
+  "asset_id": "tree_round_v1",
+  "name": "Round Canopy Tree",
+  "category": "vegetation",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "random",
+  "asset_module": "asset.js",
+  "max_triangles": 700,
+  "footprint": {
+    "type": "circle",
+    "radius_param": "crown_radius"
+  },
+  "height": {
+    "param": "total_height"
+  },
+  "params_schema": {
+    "type": "object",
+    "required": [
+      "total_height"
+    ],
+    "properties": {
+      "total_height": {
+        "type": "number",
+        "min": 3.5,
+        "max": 6.5,
+        "default": 5,
+        "description": "ground to crown top"
+      },
+      "crown_radius": {
+        "type": "number",
+        "min": 1.2,
+        "max": 2.4,
+        "default": 1.7,
+        "description": "canopy mean radius"
+      },
+      "hue_shift": {
+        "type": "number",
+        "min": -0.06,
+        "max": 0.06,
+        "default": 0,
+        "description": "foliage hue variation"
+      },
+      "irregularity": {
+        "type": "number",
+        "min": 0.05,
+        "max": 0.25,
+        "default": 0.14,
+        "description": "canopy lumps"
+      }
+    }
+  }
+}

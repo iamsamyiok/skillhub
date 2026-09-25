@@ -1,5 +1,5 @@
 {
-  "total": 31,
+  "total": 32,
   "categories": [
     "写作工具",
     "前端开发",
@@ -2447,8 +2447,8 @@
     {
       "id": "video-publish",
       "name": "video-publish",
-      "description": "为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站：分镜表 → Playwright CDP 录屏（支持接入真实 LLM 内核录制真实执行画面）→ edge-tts 配音 → ffmpeg 合成烧录字幕 → biliup-rs 扫码登录投稿，全流程 Agent 自动完成。当用户想\"做功能演示视频/录屏宣传视频/发布B站投稿\"时使用。",
-      "version": "1.5.0",
+      "description": "为项目/产品制作宣传或解说视频并发布到 B 站，三种模式：①卡片模式（HTML卡片+配音+推镜，零录屏，最快）②录屏模式（Playwright CDP 真实录屏，支持真实 LLM 执行画面）③LLM 一键成稿（一句话主题→分镜表草稿）。TTS 供应商链（SiliconFlow CosyVoice2 自然女声→edge-tts→SAPI 兜底）按句生成保精确字幕，可选 BGM 闪避混音与 9:16 竖版裁切，biliup-rs 扫码登录投稿。当用户想\"做宣传视频/功能演示视频/榜单盘点视频/发布B站投稿\"时使用。",
+      "version": "2.1.0",
       "category": "视频创作",
       "tags": [
         "宣传视频",
@@ -2462,7 +2462,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 27731
+          "size": 32749
         },
         {
           "path": "content-playbook.md",
@@ -2481,8 +2481,20 @@
           "size": 940
         },
         {
+          "path": "scripts/cards.mjs",
+          "size": 14244
+        },
+        {
           "path": "scripts/compose.js",
           "size": 7621
+        },
+        {
+          "path": "scripts/gen-storyboard.mjs",
+          "size": 4540
+        },
+        {
+          "path": "scripts/post.mjs",
+          "size": 2367
         },
         {
           "path": "scripts/record.js",
@@ -2495,6 +2507,10 @@
         {
           "path": "scripts/tts.js",
           "size": 1227
+        },
+        {
+          "path": "scripts/tts.mjs",
+          "size": 8985
         }
       ]
     },
@@ -2517,6 +2533,281 @@
         {
           "path": "SKILL.md",
           "size": 6342
+        }
+      ]
+    },
+    {
+      "id": "world-generator",
+      "name": "world-generator",
+      "description": "通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（内嵌 Three.js 零外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。",
+      "version": "1.0.0",
+      "category": "前端开发",
+      "tags": [
+        "3D",
+        "Three.js",
+        "程序化生成",
+        "场景生成",
+        "交互编辑",
+        "参数化"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-25T00:00:00.000Z",
+      "files": [
+        {
+          "path": "LICENSE",
+          "size": 1085
+        },
+        {
+          "path": "README.md",
+          "size": 3369
+        },
+        {
+          "path": "SKILL.md",
+          "size": 16940
+        },
+        {
+          "path": "engine/assets/bench_v1/asset.js",
+          "size": 1657
+        },
+        {
+          "path": "engine/assets/bench_v1/definition.json",
+          "size": 1144
+        },
+        {
+          "path": "engine/assets/bicycle_v1/asset.js",
+          "size": 5475
+        },
+        {
+          "path": "engine/assets/bicycle_v1/definition.json",
+          "size": 1039
+        },
+        {
+          "path": "engine/assets/building_tower_v1/asset.js",
+          "size": 2462
+        },
+        {
+          "path": "engine/assets/building_tower_v1/definition.json",
+          "size": 1364
+        },
+        {
+          "path": "engine/assets/car_sedan_v1/asset.js",
+          "size": 2516
+        },
+        {
+          "path": "engine/assets/car_sedan_v1/definition.json",
+          "size": 1176
+        },
+        {
+          "path": "engine/assets/chair_v1/asset.js",
+          "size": 1101
+        },
+        {
+          "path": "engine/assets/chair_v1/definition.json",
+          "size": 780
+        },
+        {
+          "path": "engine/assets/hedge_bush_v1/asset.js",
+          "size": 2161
+        },
+        {
+          "path": "engine/assets/hedge_bush_v1/definition.json",
+          "size": 925
+        },
+        {
+          "path": "engine/assets/hut_cabin_v1/asset.js",
+          "size": 1697
+        },
+        {
+          "path": "engine/assets/hut_cabin_v1/definition.json",
+          "size": 1293
+        },
+        {
+          "path": "engine/assets/patio_umbrella_v1/asset.js",
+          "size": 1048
+        },
+        {
+          "path": "engine/assets/patio_umbrella_v1/definition.json",
+          "size": 981
+        },
+        {
+          "path": "engine/assets/pool_v1/asset.js",
+          "size": 1435
+        },
+        {
+          "path": "engine/assets/pool_v1/definition.json",
+          "size": 1032
+        },
+        {
+          "path": "engine/assets/rock_boulder_v1/asset.js",
+          "size": 1108
+        },
+        {
+          "path": "engine/assets/rock_boulder_v1/definition.json",
+          "size": 1103
+        },
+        {
+          "path": "engine/assets/street_lamp_v1/asset.js",
+          "size": 1060
+        },
+        {
+          "path": "engine/assets/street_lamp_v1/definition.json",
+          "size": 956
+        },
+        {
+          "path": "engine/assets/sun_lounger_v1/asset.js",
+          "size": 1989
+        },
+        {
+          "path": "engine/assets/sun_lounger_v1/definition.json",
+          "size": 1166
+        },
+        {
+          "path": "engine/assets/table_desk_v1/asset.js",
+          "size": 778
+        },
+        {
+          "path": "engine/assets/table_desk_v1/definition.json",
+          "size": 982
+        },
+        {
+          "path": "engine/assets/tree_conifer_v1/asset.js",
+          "size": 1044
+        },
+        {
+          "path": "engine/assets/tree_conifer_v1/definition.json",
+          "size": 1281
+        },
+        {
+          "path": "engine/assets/tree_round_v1/asset.js",
+          "size": 1863
+        },
+        {
+          "path": "engine/assets/tree_round_v1/definition.json",
+          "size": 1126
+        },
+        {
+          "path": "engine/assets/villa_modern_v1/asset.js",
+          "size": 2803
+        },
+        {
+          "path": "engine/assets/villa_modern_v1/definition.json",
+          "size": 1386
+        },
+        {
+          "path": "engine/edit-server.mjs",
+          "size": 3787
+        },
+        {
+          "path": "engine/index.mjs",
+          "size": 23157
+        },
+        {
+          "path": "engine/lib/elevation.mjs",
+          "size": 1745
+        },
+        {
+          "path": "engine/lib/expand.mjs",
+          "size": 4938
+        },
+        {
+          "path": "engine/lib/geom.mjs",
+          "size": 2281
+        },
+        {
+          "path": "engine/lib/plan-lint.mjs",
+          "size": 4304
+        },
+        {
+          "path": "engine/lib/registry.mjs",
+          "size": 1423
+        },
+        {
+          "path": "engine/lib/rng.mjs",
+          "size": 625
+        },
+        {
+          "path": "engine/lib/schema-rules.mjs",
+          "size": 6945
+        },
+        {
+          "path": "engine/lib/solve.mjs",
+          "size": 11905
+        },
+        {
+          "path": "engine/lib/validate-assets.mjs",
+          "size": 4293
+        },
+        {
+          "path": "engine/packer.mjs",
+          "size": 6146
+        },
+        {
+          "path": "engine/screenshot.mjs",
+          "size": 1908
+        },
+        {
+          "path": "engine/test-edit-flow.mjs",
+          "size": 5532
+        },
+        {
+          "path": "engine/viewer-template.html",
+          "size": 32161
+        },
+        {
+          "path": "engine/visual-check.mjs",
+          "size": 4069
+        },
+        {
+          "path": "package.json",
+          "size": 625
+        },
+        {
+          "path": "scenes/bicycle/scene-plan.json",
+          "size": 896
+        },
+        {
+          "path": "scenes/campus/patch-1.json",
+          "size": 682
+        },
+        {
+          "path": "scenes/campus/refine-1.json",
+          "size": 3553
+        },
+        {
+          "path": "scenes/campus/refine-2.json",
+          "size": 855
+        },
+        {
+          "path": "scenes/campus/scene-plan.json",
+          "size": 3481
+        },
+        {
+          "path": "scenes/demo/scene-plan.json",
+          "size": 3485
+        },
+        {
+          "path": "scenes/forest/scene-plan.json",
+          "size": 4255
+        },
+        {
+          "path": "scenes/villa/instance-list.json",
+          "size": 18489
+        },
+        {
+          "path": "scenes/villa/patch-1.json",
+          "size": 1003
+        },
+        {
+          "path": "scenes/villa/refine-1.json",
+          "size": 3324
+        },
+        {
+          "path": "scenes/villa/scene-plan.json",
+          "size": 14768
+        },
+        {
+          "path": "scenes/villa/validation-report.md",
+          "size": 994
         }
       ]
     },

@@ -1,0 +1,48 @@
+{
+  "description": "Villa dusk mood: warm glass, bright garden lamps, unify umbrella palette",
+  "time_of_day": 17.3,
+  "patches": [
+    {
+      "op": "reparam",
+      "instance_id": "inst_zone_villa_pad_villa_modern_v1_001",
+      "params": {
+        "glass_glow": 0.9
+      }
+    },
+    {
+      "op": "reparam",
+      "instance_id": "inst_zone_lawn_street_lamp_v1_001",
+      "params": {
+        "glow": 0.95
+      }
+    },
+    {
+      "op": "reparam",
+      "instance_id": "inst_zone_lawn_street_lamp_v1_002",
+      "params": {
+        "glow": 0.95
+      }
+    },
+    {
+      "op": "reparam",
+      "instance_id": "inst_zone_lawn_street_lamp_v1_003",
+      "params": {
+        "glow": 0.95
+      }
+    },
+    {
+      "op": "reparam",
+      "instance_id": "inst_zone_lawn_street_lamp_v1_004",
+      "params": {
+        "glow": 0.95
+      }
+    },
+    {
+      "op": "reparam",
+      "instance_id": "inst_zone_pool_patio_umbrella_v1_002",
+      "params": {
+        "canopy_hue": 0.08
+      }
+    }
+  ]
+}

@@ -1,0 +1,710 @@
+{
+  "scene_meta": {
+    "name": "Riverside Modern Villa",
+    "seed": 2026,
+    "global_safety_distance": 0.3,
+    "elevation": {
+      "type": "noise",
+      "amplitude": 0.1,
+      "frequency": 0.06,
+      "octaves": 2,
+      "base": 0.0,
+      "seed": 11
+    },
+    "world_bounds_hint": {
+      "width": 62,
+      "depth": 52
+    }
+  },
+  "zones": [
+    {
+      "zone_id": "zone_driveway",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          19,
+          16.5
+        ],
+        "width": 6.5,
+        "depth": 17
+      },
+      "elevation": {
+        "type": "flat",
+        "height": 0.15
+      },
+      "color": "#63656c",
+      "constraints": [],
+      "allow_asset_types": [
+        "vehicle",
+        "furniture"
+      ],
+      "placements": [
+        {
+          "asset_id": "car_sedan_v1",
+          "count": 2,
+          "rotation_y": 1.5708,
+          "params": {
+            "body_hue": {
+              "values": [
+                0.05,
+                0.58
+              ]
+            },
+            "body_light": {
+              "min": 0.38,
+              "max": 0.5
+            }
+          },
+          "constraints": [
+            "inside_zone",
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "min_distance_to_asset_type": [
+                "car_sedan_v1",
+                3.0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_villa_pad",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          20,
+          -6
+        ],
+        "width": 17,
+        "depth": 16
+      },
+      "elevation": {
+        "type": "flat",
+        "height": 0.16
+      },
+      "color": "#b0a894",
+      "constraints": [],
+      "allow_asset_types": [
+        "building",
+        "vegetation"
+      ],
+      "placements": [
+        {
+          "asset_id": "villa_modern_v1",
+          "count": 1,
+          "params": {
+            "width": {
+              "min": 9.5,
+              "max": 11
+            },
+            "depth": {
+              "min": 7.5,
+              "max": 8.5
+            },
+            "upper_scale": {
+              "min": 0.65,
+              "max": 0.75
+            },
+            "glass_glow": {
+              "min": 0.4,
+              "max": 0.8
+            }
+          },
+          "constraints": [
+            "inside_zone",
+            "no_overlap",
+            "keep_inside_bounds"
+          ]
+        },
+        {
+          "asset_id": "hedge_bush_v1",
+          "count": 6,
+          "params": {
+            "radius": {
+              "min": 0.5,
+              "max": 0.7
+            },
+            "flower": 0,
+            "hue_shift": {
+              "min": -0.02,
+              "max": 0.02
+            }
+          },
+          "constraints": [
+            "inside_zone",
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "max_elevation_diff": [
+                0.05
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_pool",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          -16,
+          16
+        ],
+        "width": 17,
+        "depth": 12.5
+      },
+      "elevation": {
+        "type": "flat",
+        "height": 0.14
+      },
+      "color": "#8d9a9c",
+      "constraints": [],
+      "allow_asset_types": [
+        "structure",
+        "furniture"
+      ],
+      "placements": [
+        {
+          "asset_id": "pool_v1",
+          "count": 1,
+          "params": {
+            "width": {
+              "min": 6.5,
+              "max": 7.0
+            },
+            "depth": {
+              "min": 3.6,
+              "max": 4.4
+            },
+            "water_hue": {
+              "min": 0.52,
+              "max": 0.58
+            }
+          },
+          "constraints": [
+            "inside_zone",
+            "no_overlap",
+            "keep_inside_bounds"
+          ]
+        },
+        {
+          "asset_id": "patio_umbrella_v1",
+          "count": 2,
+          "params": {
+            "canopy_radius": {
+              "min": 1.1,
+              "max": 1.3
+            },
+            "canopy_hue": {
+              "values": [
+                0.05,
+                0.45
+              ]
+            }
+          },
+          "constraints": [
+            "inside_zone",
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "min_distance_to_asset_type": [
+                "pool_v1",
+                5.6
+              ]
+            },
+            {
+              "min_distance_to_asset_type": [
+                "patio_umbrella_v1",
+                3.2
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_lawn",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          2,
+          2
+        ],
+        "width": 56,
+        "depth": 46
+      },
+      "elevation": {
+        "type": "noise",
+        "amplitude": 0.1,
+        "frequency": 0.06,
+        "octaves": 2,
+        "base": 0.0,
+        "seed": 11
+      },
+      "color": "#6f8f52",
+      "constraints": [],
+      "allow_asset_types": [
+        "*"
+      ],
+      "placements": [
+        {
+          "asset_id": "tree_round_v1",
+          "count": 8,
+          "params": {
+            "total_height": {
+              "min": 4,
+              "max": 6
+            },
+            "crown_radius": {
+              "min": 1.4,
+              "max": 2.1
+            },
+            "hue_shift": {
+              "min": -0.05,
+              "max": 0.05
+            }
+          },
+          "constraints": [
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "min_distance_to_asset_type": [
+                "villa_modern_v1",
+                16
+              ]
+            },
+            {
+              "min_distance_to_asset_type": [
+                "pool_v1",
+                6.5
+              ]
+            },
+            {
+              "min_distance_to_asset_type": [
+                "car_sedan_v1",
+                4.5
+              ]
+            },
+            {
+              "max_elevation_diff": [
+                0.3
+              ]
+            }
+          ]
+        },
+        {
+          "asset_id": "hedge_bush_v1",
+          "count": 6,
+          "params": {
+            "radius": {
+              "min": 0.45,
+              "max": 0.6
+            },
+            "flower": {
+              "min": 0.6,
+              "max": 1.0
+            }
+          },
+          "constraints": [
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "min_distance_to_asset_type": [
+                "tree_round_v1",
+                2.5
+              ]
+            },
+            {
+              "min_distance_to_asset_type": [
+                "car_sedan_v1",
+                3.5
+              ]
+            },
+            {
+              "max_elevation_diff": [
+                0.3
+              ]
+            }
+          ]
+        },
+        {
+          "asset_id": "street_lamp_v1",
+          "count": 4,
+          "params": {
+            "pole_height": {
+              "min": 2.8,
+              "max": 3.6
+            },
+            "glow": {
+              "min": 0.5,
+              "max": 0.9
+            }
+          },
+          "constraints": [
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "min_distance_to_asset_type": [
+                "villa_modern_v1",
+                4.5
+              ]
+            },
+            {
+              "min_distance_to_asset_type": [
+                "street_lamp_v1",
+                7
+              ]
+            },
+            {
+              "min_distance_to_asset_type": [
+                "tree_round_v1",
+                2.5
+              ]
+            }
+          ]
+        },
+        {
+          "asset_id": "bench_v1",
+          "count": 2,
+          "params": {
+            "length": {
+              "min": 1.5,
+              "max": 1.9
+            }
+          },
+          "constraints": [
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "min_distance_to_asset_type": [
+                "villa_modern_v1",
+                6
+              ]
+            },
+            {
+              "min_distance_to_asset_type": [
+                "patio_umbrella_v1",
+                2.5
+              ]
+            },
+            {
+              "max_elevation_diff": [
+                0.2
+              ]
+            }
+          ]
+        },
+        {
+          "asset_id": "rock_boulder_v1",
+          "count": 5,
+          "params": {
+            "radius": {
+              "min": 0.3,
+              "max": 0.6
+            },
+            "squash": {
+              "min": 0.55,
+              "max": 0.8
+            },
+            "irregularity": {
+              "min": 0.1,
+              "max": 0.3
+            }
+          },
+          "constraints": [
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "min_distance_to_asset_type": [
+                "tree_round_v1",
+                1.2
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_entry_court",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          19.5,
+          5.5
+        ],
+        "width": 13,
+        "depth": 7
+      },
+      "elevation": {
+        "type": "flat",
+        "height": 0.16
+      },
+      "color": "#b0a894",
+      "constraints": [],
+      "allow_asset_types": [
+        "furniture",
+        "vegetation"
+      ],
+      "placements": [
+        {
+          "asset_id": "hedge_bush_v1",
+          "count": 2,
+          "params": {
+            "radius": {
+              "min": 0.45,
+              "max": 0.55
+            },
+            "flower": {
+              "min": 0.8,
+              "max": 1.0
+            }
+          },
+          "constraints": [
+            "inside_zone",
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "min_distance_to_asset_type": [
+                "car_sedan_v1",
+                2.5
+              ]
+            },
+            {
+              "min_distance_to_asset_type": [
+                "villa_modern_v1",
+                3.0
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_path_main",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          2.8,
+          12
+        ],
+        "width": 20.6,
+        "depth": 2.4
+      },
+      "elevation": {
+        "type": "flat",
+        "height": 0.13
+      },
+      "color": "#a8a294",
+      "constraints": [],
+      "allow_asset_types": [
+        "furniture"
+      ],
+      "placements": [
+        {
+          "asset_id": "street_lamp_v1",
+          "count": 3,
+          "params": {
+            "pole_height": 2.2,
+            "glow": 0.6
+          },
+          "constraints": [
+            "inside_zone",
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "min_distance_to_asset_type": [
+                "street_lamp_v1",
+                5.5
+              ]
+            },
+            {
+              "min_distance_to_asset_type": [
+                "tree_round_v1",
+                2.5
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_path_north",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          11.75,
+          7.05
+        ],
+        "width": 2.5,
+        "depth": 10.1
+      },
+      "elevation": {
+        "type": "flat",
+        "height": 0.13
+      },
+      "color": "#a8a294",
+      "constraints": [],
+      "allow_asset_types": [
+        "furniture"
+      ],
+      "placements": [
+        {
+          "asset_id": "street_lamp_v1",
+          "count": 1,
+          "params": {
+            "pole_height": 2.2,
+            "glow": 0.6
+          },
+          "constraints": [
+            "inside_zone",
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "min_distance_to_asset_type": [
+                "tree_round_v1",
+                2.5
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "zone_id": "np_drive",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          19,
+          16.5
+        ],
+        "width": 7.3,
+        "depth": 17.8
+      },
+      "terrain": false,
+      "color": "#63656c",
+      "constraints": [
+        "no_placement"
+      ],
+      "allow_asset_types": [],
+      "placements": [],
+      "except_zones": [
+        "zone_driveway"
+      ]
+    },
+    {
+      "zone_id": "np_court",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          19.5,
+          5.5
+        ],
+        "width": 13.8,
+        "depth": 7.8
+      },
+      "terrain": false,
+      "color": "#b0a894",
+      "constraints": [
+        "no_placement"
+      ],
+      "allow_asset_types": [],
+      "placements": [],
+      "except_zones": [
+        "zone_entry_court"
+      ]
+    },
+    {
+      "zone_id": "np_path_h",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          2.8,
+          12
+        ],
+        "width": 21,
+        "depth": 3.2
+      },
+      "terrain": false,
+      "color": "#a8a294",
+      "constraints": [
+        "no_placement"
+      ],
+      "allow_asset_types": [],
+      "placements": [],
+      "except_zones": [
+        "zone_path_main",
+        "zone_path_north"
+      ]
+    },
+    {
+      "zone_id": "np_path_v",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          11.8,
+          6.45
+        ],
+        "width": 3.2,
+        "depth": 10.6
+      },
+      "terrain": false,
+      "color": "#a8a294",
+      "constraints": [
+        "no_placement"
+      ],
+      "allow_asset_types": [],
+      "placements": [],
+      "except_zones": [
+        "zone_path_main",
+        "zone_path_north"
+      ]
+    },
+    {
+      "zone_id": "np_pad",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          20,
+          -6
+        ],
+        "width": 17.8,
+        "depth": 16.8
+      },
+      "terrain": false,
+      "color": "#b0a894",
+      "constraints": [
+        "no_placement"
+      ],
+      "allow_asset_types": [],
+      "placements": [],
+      "except_zones": [
+        "zone_villa_pad"
+      ]
+    },
+    {
+      "zone_id": "np_deck",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          -16,
+          16
+        ],
+        "width": 17.8,
+        "depth": 13.3
+      },
+      "terrain": false,
+      "color": "#8d9a9c",
+      "constraints": [
+        "no_placement"
+      ],
+      "allow_asset_types": [],
+      "placements": [],
+      "except_zones": [
+        "zone_pool"
+      ]
+    }
+  ]
+}

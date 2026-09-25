@@ -1,0 +1,35 @@
+{
+  "scene_meta": {
+    "name": "Bicycle Showcase",
+    "seed": 7,
+    "global_safety_distance": 0.2,
+    "elevation": { "type": "flat", "height": 0.05 },
+    "world_bounds_hint": { "width": 5, "depth": 4 }
+  },
+  "zones": [
+    {
+      "zone_id": "zone_showcase",
+      "boundary": { "type": "rect", "center": [0, 0], "width": 4.2, "depth": 3.4 },
+      "elevation": { "type": "flat", "height": 0.05 },
+      "color": "#a9a8a0",
+      "constraints": [],
+      "allow_asset_types": ["vehicle"],
+      "placements": [
+        {
+          "asset_id": "bicycle_v1",
+          "count": 1,
+          "params": {
+            "wheel_radius": 0.34,
+            "frame_hue": 0.07,
+            "frame_light": { "min": 0.48, "max": 0.55 }
+          },
+          "constraints": [
+            "inside_zone",
+            "no_overlap",
+            "keep_inside_bounds"
+          ]
+        }
+      ]
+    }
+  ]
+}

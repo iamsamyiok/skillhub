@@ -1,0 +1,56 @@
+{
+  "asset_id": "car_sedan_v1",
+  "name": "Sedan Car",
+  "category": "vehicle",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "fixed",
+  "asset_module": "asset.js",
+  "max_triangles": 500,
+  "footprint": {
+    "type": "box",
+    "hw_param": "half_length",
+    "hd_param": "half_width"
+  },
+  "height": {
+    "param": "half_length",
+    "factor": 0,
+    "offset": 1.55
+  },
+  "params_schema": {
+    "type": "object",
+    "required": [
+      "body_hue"
+    ],
+    "properties": {
+      "body_hue": {
+        "type": "number",
+        "min": 0,
+        "max": 1,
+        "default": 0.58,
+        "description": "body paint hue"
+      },
+      "body_light": {
+        "type": "number",
+        "min": 0.25,
+        "max": 0.72,
+        "default": 0.45,
+        "description": "body paint lightness"
+      },
+      "half_length": {
+        "type": "number",
+        "min": 2.15,
+        "max": 2.2,
+        "default": 2.2,
+        "description": "footprint half length (x)"
+      },
+      "half_width": {
+        "type": "number",
+        "min": 0.93,
+        "max": 0.98,
+        "default": 0.98,
+        "description": "footprint half width (z)"
+      }
+    }
+  }
+}

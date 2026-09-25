@@ -1,0 +1,36 @@
+# Validation Report — scenes/villa (patch)
+- time: 2026-09-25T03:40:00.503Z
+- world: scenes/villa/world.html
+
+## Errors
+- none
+
+## Warnings
+- [PATCH] moved 'inst_zone_villa_pad_villa_modern_v1_001' now overlaps 'inst_zone_villa_bike_bicycle_v1_001' (accepted, explicit user move)
+
+## patch
+- solved: -, failed: -, attempts: -
+
+## Asset Validation
+| asset | status | max tris | issues |
+|---|---|---|---|
+| bench_v1 | OK | 132 | - |
+| bicycle_v1 | OK | 1748 | - |
+| building_tower_v1 | OK | 232 | - |
+| car_sedan_v1 | OK | 416 | - |
+| chair_v1 | OK | 96 | - |
+| hedge_bush_v1 | OK | 370 | - |
+| hut_cabin_v1 | OK | 42 | - |
+| patio_umbrella_v1 | OK | 156 | - |
+| pool_v1 | OK | 84 | - |
+| rock_boulder_v1 | OK | 80 | - |
+| street_lamp_v1 | OK | 236 | - |
+| sun_lounger_v1 | OK | 84 | - |
+| table_desk_v1 | OK | 60 | - |
+| tree_conifer_v1 | OK | 124 | - |
+| tree_round_v1 | OK | 268 | - |
+| villa_modern_v1 | OK | 120 | - |
+
+## Next Action (routing)
+- type: **OK**
+- message: All stages passed.

@@ -1,0 +1,63 @@
+{
+  "asset_id": "hut_cabin_v1",
+  "name": "Wooden Cabin",
+  "category": "structure",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "random",
+  "asset_module": "asset.js",
+  "max_triangles": 400,
+  "footprint": {
+    "type": "box",
+    "hw_param": "half_width",
+    "hd_param": "half_depth"
+  },
+  "height": {
+    "param": "wall_height",
+    "factor": 1.3,
+    "offset": 0.6
+  },
+  "params_schema": {
+    "type": "object",
+    "required": [
+      "width"
+    ],
+    "properties": {
+      "width": {
+        "type": "number",
+        "min": 3.5,
+        "max": 6.5,
+        "default": 4.5,
+        "description": "body width"
+      },
+      "depth": {
+        "type": "number",
+        "min": 3.0,
+        "max": 5.5,
+        "default": 4.0,
+        "description": "body depth"
+      },
+      "wall_height": {
+        "type": "number",
+        "min": 2.0,
+        "max": 3.2,
+        "default": 2.5,
+        "description": "wall height"
+      },
+      "roof_overhang": {
+        "type": "number",
+        "min": 0.2,
+        "max": 0.7,
+        "default": 0.4,
+        "description": "roof overhang"
+      },
+      "wood_tint": {
+        "type": "number",
+        "min": -0.05,
+        "max": 0.05,
+        "default": 0,
+        "description": "wood tint shift"
+      }
+    }
+  }
+}

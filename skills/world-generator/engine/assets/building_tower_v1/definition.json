@@ -1,0 +1,63 @@
+{
+  "asset_id": "building_tower_v1",
+  "name": "Frame Tower (open floors)",
+  "category": "building",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "fixed",
+  "asset_module": "asset.js",
+  "max_triangles": 2000,
+  "footprint": {
+    "type": "box",
+    "hw_param": "width",
+    "hw_factor": 0.5,
+    "hd_param": "depth",
+    "hd_factor": 0.5
+  },
+  "height": {
+    "param": "floors",
+    "factor": 3.2,
+    "offset": 0.5
+  },
+  "params_schema": {
+    "type": "object",
+    "required": ["floors"],
+    "properties": {
+      "floors": {
+        "type": "integer",
+        "min": 2,
+        "max": 8,
+        "default": 6,
+        "description": "storey count (floor_height is 3.2m, slab 0.25m)"
+      },
+      "width": {
+        "type": "number",
+        "min": 10,
+        "max": 16,
+        "default": 12,
+        "description": "tower width"
+      },
+      "depth": {
+        "type": "number",
+        "min": 10,
+        "max": 16,
+        "default": 12,
+        "description": "tower depth"
+      },
+      "glass_glow": {
+        "type": "number",
+        "min": 0.05,
+        "max": 1,
+        "default": 0.45,
+        "description": "curtain-wall brightness"
+      },
+      "accent_tint": {
+        "type": "number",
+        "min": -0.08,
+        "max": 0.08,
+        "default": 0,
+        "description": "concrete tone shift"
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "asset_id": "sun_lounger_v1",
+  "name": "Sun Lounger",
+  "category": "furniture",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "random",
+  "asset_module": "asset.js",
+  "max_triangles": 200,
+  "footprint": {
+    "type": "box",
+    "hw_param": "length",
+    "hw_factor": 0.5,
+    "hd_param": "width",
+    "hd_factor": 0.5
+  },
+  "height": {
+    "param": "length",
+    "factor": 0,
+    "offset": 0.72
+  },
+  "params_schema": {
+    "type": "object",
+    "required": ["length"],
+    "properties": {
+      "length": {
+        "type": "number",
+        "min": 1.6,
+        "max": 2.0,
+        "default": 1.8,
+        "description": "lounger length"
+      },
+      "width": {
+        "type": "number",
+        "min": 0.55,
+        "max": 0.7,
+        "default": 0.62,
+        "description": "lounger width"
+      },
+      "cushion_hue": {
+        "type": "number",
+        "min": 0,
+        "max": 1,
+        "default": 0.07,
+        "description": "cushion colour hue"
+      },
+      "frame_tint": {
+        "type": "number",
+        "min": -0.05,
+        "max": 0.05,
+        "default": 0,
+        "description": "frame tone shift"
+      }
+    }
+  }
+}

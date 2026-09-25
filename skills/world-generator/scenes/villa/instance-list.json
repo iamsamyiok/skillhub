@@ -1,0 +1,703 @@
+{
+  "scene": "Riverside Modern Villa (patched)",
+  "generated_at": "2026-09-25T03:40:00.503Z",
+  "instances": [
+    {
+      "instance_id": "inst_zone_driveway_car_sedan_v1_001",
+      "asset_id": "car_sedan_v1",
+      "zone_id": "zone_driveway",
+      "params": {
+        "body_hue": 0.05,
+        "body_light": 0.4170195375196636,
+        "half_length": 2.2,
+        "half_width": 0.98,
+        "_seed": 661157
+      },
+      "rotation_y": 1.5708
+    },
+    {
+      "instance_id": "inst_zone_driveway_car_sedan_v1_002",
+      "asset_id": "car_sedan_v1",
+      "zone_id": "zone_driveway",
+      "params": {
+        "body_hue": 0.58,
+        "body_light": 0.39827361221425234,
+        "half_length": 2.2,
+        "half_width": 0.98,
+        "_seed": 221844
+      },
+      "rotation_y": 1.5708
+    },
+    {
+      "instance_id": "inst_zone_villa_pad_villa_modern_v1_001",
+      "asset_id": "villa_modern_v1",
+      "zone_id": "zone_villa_pad",
+      "params": {
+        "width": 10.524289867375046,
+        "depth": 8.301408699015155,
+        "upper_scale": 0.6793468770105392,
+        "wall_tint": 0,
+        "glass_glow": 0.9,
+        "_seed": 66588
+      },
+      "rotation_y": 0,
+      "patched": true
+    },
+    {
+      "instance_id": "inst_zone_villa_pad_hedge_bush_v1_001",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_villa_pad",
+      "params": {
+        "radius": 0.6239161185454577,
+        "flower": 0,
+        "hue_shift": -0.004447560319676995,
+        "_seed": 114503
+      },
+      "rotation_y": 0.9977
+    },
+    {
+      "instance_id": "inst_zone_villa_pad_hedge_bush_v1_002",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_villa_pad",
+      "params": {
+        "radius": 0.5358988597989083,
+        "flower": 0,
+        "hue_shift": -0.006757578309625388,
+        "_seed": 406701
+      },
+      "rotation_y": 6.2832
+    },
+    {
+      "instance_id": "inst_zone_villa_pad_hedge_bush_v1_003",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_villa_pad",
+      "params": {
+        "radius": 0.6841732756234705,
+        "flower": 0,
+        "hue_shift": 0.0026024805195629594,
+        "_seed": 1732
+      },
+      "rotation_y": 2.62
+    },
+    {
+      "instance_id": "inst_zone_villa_pad_hedge_bush_v1_004",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_villa_pad",
+      "params": {
+        "radius": 0.540765764284879,
+        "flower": 0,
+        "hue_shift": -0.008956203209236265,
+        "_seed": 778053
+      },
+      "rotation_y": 5.214
+    },
+    {
+      "instance_id": "inst_zone_villa_pad_hedge_bush_v1_005",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_villa_pad",
+      "params": {
+        "radius": 0.6906808507163077,
+        "flower": 0,
+        "hue_shift": 0.0176881471183151,
+        "_seed": 765157
+      },
+      "rotation_y": 4.1085
+    },
+    {
+      "instance_id": "inst_zone_villa_pad_hedge_bush_v1_006",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_villa_pad",
+      "params": {
+        "radius": 0.5556989675853401,
+        "flower": 0,
+        "hue_shift": -0.009036169573664666,
+        "_seed": 414028
+      },
+      "rotation_y": 4.2524
+    },
+    {
+      "instance_id": "inst_zone_pool_pool_v1_001",
+      "asset_id": "pool_v1",
+      "zone_id": "zone_pool",
+      "params": {
+        "width": 6.643327998463064,
+        "depth": 4.131023231334985,
+        "water_hue": 0.5705470383120701,
+        "_seed": 301185
+      },
+      "rotation_y": 0
+    },
+    {
+      "instance_id": "inst_zone_pool_patio_umbrella_v1_001",
+      "asset_id": "patio_umbrella_v1",
+      "zone_id": "zone_pool",
+      "params": {
+        "canopy_radius": 1.2837283828295767,
+        "pole_height": 2.25,
+        "canopy_hue": 0.05,
+        "_seed": 40805
+      },
+      "rotation_y": 1.6885
+    },
+    {
+      "instance_id": "inst_zone_pool_patio_umbrella_v1_002",
+      "asset_id": "patio_umbrella_v1",
+      "zone_id": "zone_pool",
+      "params": {
+        "canopy_radius": 1.1670751236379147,
+        "pole_height": 2.25,
+        "canopy_hue": 0.08,
+        "_seed": 741954
+      },
+      "rotation_y": 1.9352,
+      "patched": true
+    },
+    {
+      "instance_id": "inst_zone_lawn_tree_round_v1_001",
+      "asset_id": "tree_round_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "total_height": 4.789814549963921,
+        "crown_radius": 2.077134986943565,
+        "hue_shift": 0.017646782984957102,
+        "irregularity": 0.14,
+        "_seed": 629186
+      },
+      "rotation_y": 4.7412
+    },
+    {
+      "instance_id": "inst_zone_lawn_tree_round_v1_002",
+      "asset_id": "tree_round_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "total_height": 4.730204086750746,
+        "crown_radius": 1.4217965338844805,
+        "hue_shift": 0.04929534257389605,
+        "irregularity": 0.14,
+        "_seed": 182314
+      },
+      "rotation_y": 6.1784
+    },
+    {
+      "instance_id": "inst_zone_lawn_tree_round_v1_003",
+      "asset_id": "tree_round_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "total_height": 5.933249330148101,
+        "crown_radius": 1.9816941188182682,
+        "hue_shift": -0.02256326312199235,
+        "irregularity": 0.14,
+        "_seed": 492672
+      },
+      "rotation_y": 2.2439
+    },
+    {
+      "instance_id": "inst_zone_lawn_tree_round_v1_004",
+      "asset_id": "tree_round_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "total_height": 4.3548391801305115,
+        "crown_radius": 2.0833852517418565,
+        "hue_shift": 0.01002117767930031,
+        "irregularity": 0.14,
+        "_seed": 869710
+      },
+      "rotation_y": 3.8694
+    },
+    {
+      "instance_id": "inst_zone_lawn_tree_round_v1_005",
+      "asset_id": "tree_round_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "total_height": 5.535415147431195,
+        "crown_radius": 1.8194860325194895,
+        "hue_shift": -0.0038232504855841426,
+        "irregularity": 0.14,
+        "_seed": 501884
+      },
+      "rotation_y": 1.1192
+    },
+    {
+      "instance_id": "inst_zone_lawn_tree_round_v1_006",
+      "asset_id": "tree_round_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "total_height": 5.578626195434481,
+        "crown_radius": 1.9374153167009354,
+        "hue_shift": 0.007620834023691715,
+        "irregularity": 0.14,
+        "_seed": 673249
+      },
+      "rotation_y": 3.1143
+    },
+    {
+      "instance_id": "inst_zone_lawn_tree_round_v1_007",
+      "asset_id": "tree_round_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "total_height": 5.936234879307449,
+        "crown_radius": 1.6613845554413273,
+        "hue_shift": -0.04868767056614161,
+        "irregularity": 0.14,
+        "_seed": 178633
+      },
+      "rotation_y": 1.405
+    },
+    {
+      "instance_id": "inst_zone_lawn_tree_round_v1_008",
+      "asset_id": "tree_round_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "total_height": 4.159835712052882,
+        "crown_radius": 2.0662075472995642,
+        "hue_shift": 0.04269280645530671,
+        "irregularity": 0.14,
+        "_seed": 173646
+      },
+      "rotation_y": 1.7886
+    },
+    {
+      "instance_id": "inst_zone_lawn_hedge_bush_v1_001",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "radius": 0.47555772580672057,
+        "flower": 0.7939924946986139,
+        "hue_shift": 0,
+        "_seed": 588765
+      },
+      "rotation_y": 2.2828
+    },
+    {
+      "instance_id": "inst_zone_lawn_hedge_bush_v1_002",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "radius": 0.49323237938806413,
+        "flower": 0.9792266892269254,
+        "hue_shift": 0,
+        "_seed": 899060
+      },
+      "rotation_y": 3.8078
+    },
+    {
+      "instance_id": "inst_zone_lawn_hedge_bush_v1_003",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "radius": 0.4523853561258875,
+        "flower": 0.987392717320472,
+        "hue_shift": 0,
+        "_seed": 619292
+      },
+      "rotation_y": 3.9142
+    },
+    {
+      "instance_id": "inst_zone_lawn_hedge_bush_v1_004",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "radius": 0.5827330758911557,
+        "flower": 0.6935802321881056,
+        "hue_shift": 0,
+        "_seed": 598176
+      },
+      "rotation_y": 2.768
+    },
+    {
+      "instance_id": "inst_zone_lawn_hedge_bush_v1_005",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "radius": 0.5327841218677349,
+        "flower": 0.6078230432234705,
+        "hue_shift": 0,
+        "_seed": 911049
+      },
+      "rotation_y": 5.3787
+    },
+    {
+      "instance_id": "inst_zone_lawn_hedge_bush_v1_006",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "radius": 0.5798541808035225,
+        "flower": 0.9854042138904333,
+        "hue_shift": 0,
+        "_seed": 791957
+      },
+      "rotation_y": 1.4418
+    },
+    {
+      "instance_id": "inst_zone_lawn_street_lamp_v1_001",
+      "asset_id": "street_lamp_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "pole_height": 2.820461720600724,
+        "lamp_radius": 0.24,
+        "glow": 0.95,
+        "_seed": 935886
+      },
+      "rotation_y": 0,
+      "patched": true
+    },
+    {
+      "instance_id": "inst_zone_lawn_street_lamp_v1_002",
+      "asset_id": "street_lamp_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "pole_height": 3.1805666757747533,
+        "lamp_radius": 0.24,
+        "glow": 0.95,
+        "_seed": 949
+      },
+      "rotation_y": 0,
+      "patched": true
+    },
+    {
+      "instance_id": "inst_zone_lawn_street_lamp_v1_003",
+      "asset_id": "street_lamp_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "pole_height": 2.9940886493772267,
+        "lamp_radius": 0.24,
+        "glow": 0.95,
+        "_seed": 915410
+      },
+      "rotation_y": 0,
+      "patched": true
+    },
+    {
+      "instance_id": "inst_zone_lawn_street_lamp_v1_004",
+      "asset_id": "street_lamp_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "pole_height": 3.2455242166295646,
+        "lamp_radius": 0.24,
+        "glow": 0.95,
+        "_seed": 97376
+      },
+      "rotation_y": 0,
+      "patched": true
+    },
+    {
+      "instance_id": "inst_zone_lawn_bench_v1_001",
+      "asset_id": "bench_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "length": 1.6987051459960638,
+        "wood_tint": 0,
+        "half_len": 0.85,
+        "half_wid": 0.33,
+        "_seed": 992957
+      },
+      "rotation_y": 1.4024
+    },
+    {
+      "instance_id": "inst_zone_lawn_bench_v1_002",
+      "asset_id": "bench_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "length": 1.8368669863790272,
+        "wood_tint": 0,
+        "half_len": 0.85,
+        "half_wid": 0.33,
+        "_seed": 224601
+      },
+      "rotation_y": 3.9097
+    },
+    {
+      "instance_id": "inst_zone_lawn_rock_boulder_v1_001",
+      "asset_id": "rock_boulder_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "radius": 0.3965186761692166,
+        "squash": 0.7277677850332112,
+        "irregularity": 0.27117914855480196,
+        "tint": 0,
+        "_seed": 194324
+      },
+      "rotation_y": 5.8876
+    },
+    {
+      "instance_id": "inst_zone_lawn_rock_boulder_v1_002",
+      "asset_id": "rock_boulder_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "radius": 0.4806576675502583,
+        "squash": 0.784257290896494,
+        "irregularity": 0.10979912234470249,
+        "tint": 0,
+        "_seed": 551837
+      },
+      "rotation_y": 2.2317
+    },
+    {
+      "instance_id": "inst_zone_lawn_rock_boulder_v1_003",
+      "asset_id": "rock_boulder_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "radius": 0.3392626515822485,
+        "squash": 0.7068636060110294,
+        "irregularity": 0.22101647239178418,
+        "tint": 0,
+        "_seed": 203391
+      },
+      "rotation_y": 1.0586
+    },
+    {
+      "instance_id": "inst_zone_lawn_rock_boulder_v1_004",
+      "asset_id": "rock_boulder_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "radius": 0.3684153031557798,
+        "squash": 0.6301219198037871,
+        "irregularity": 0.13258600649423896,
+        "tint": 0,
+        "_seed": 900865
+      },
+      "rotation_y": 0.116
+    },
+    {
+      "instance_id": "inst_zone_lawn_rock_boulder_v1_005",
+      "asset_id": "rock_boulder_v1",
+      "zone_id": "zone_lawn",
+      "params": {
+        "radius": 0.40969253126531835,
+        "squash": 0.5645927721750923,
+        "irregularity": 0.17983947065658867,
+        "tint": 0,
+        "_seed": 364325
+      },
+      "rotation_y": 2.553
+    },
+    {
+      "instance_id": "inst_zone_entry_court_hedge_bush_v1_001",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_entry_court",
+      "params": {
+        "radius": 0.5413056952413172,
+        "flower": 0.9674340967088938,
+        "hue_shift": 0,
+        "_seed": 639886
+      },
+      "rotation_y": 2.18
+    },
+    {
+      "instance_id": "inst_zone_entry_court_hedge_bush_v1_002",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_entry_court",
+      "params": {
+        "radius": 0.5249084641225636,
+        "flower": 0.8727606005035341,
+        "hue_shift": 0,
+        "_seed": 249065
+      },
+      "rotation_y": 3.8852
+    },
+    {
+      "instance_id": "inst_zone_path_main_street_lamp_v1_001",
+      "asset_id": "street_lamp_v1",
+      "zone_id": "zone_path_main",
+      "params": {
+        "pole_height": 2.2,
+        "lamp_radius": 0.24,
+        "glow": 0.6,
+        "_seed": 475210
+      },
+      "rotation_y": 0
+    },
+    {
+      "instance_id": "inst_zone_path_main_street_lamp_v1_002",
+      "asset_id": "street_lamp_v1",
+      "zone_id": "zone_path_main",
+      "params": {
+        "pole_height": 2.2,
+        "lamp_radius": 0.24,
+        "glow": 0.6,
+        "_seed": 228548
+      },
+      "rotation_y": 0
+    },
+    {
+      "instance_id": "inst_zone_path_main_street_lamp_v1_003",
+      "asset_id": "street_lamp_v1",
+      "zone_id": "zone_path_main",
+      "params": {
+        "pole_height": 2.2,
+        "lamp_radius": 0.24,
+        "glow": 0.6,
+        "_seed": 55123
+      },
+      "rotation_y": 0
+    },
+    {
+      "instance_id": "inst_zone_path_north_street_lamp_v1_001",
+      "asset_id": "street_lamp_v1",
+      "zone_id": "zone_path_north",
+      "params": {
+        "pole_height": 2.2,
+        "lamp_radius": 0.24,
+        "glow": 0.6,
+        "_seed": 103526
+      },
+      "rotation_y": 0
+    },
+    {
+      "instance_id": "inst_zone_pool_deck_sun_lounger_v1_001",
+      "asset_id": "sun_lounger_v1",
+      "zone_id": "zone_pool_deck",
+      "params": {
+        "length": 1.863840203359723,
+        "width": 0.62,
+        "cushion_hue": 0.05,
+        "frame_tint": 0,
+        "_seed": 696007
+      },
+      "rotation_y": 5.637
+    },
+    {
+      "instance_id": "inst_zone_pool_deck_sun_lounger_v1_002",
+      "asset_id": "sun_lounger_v1",
+      "zone_id": "zone_pool_deck",
+      "params": {
+        "length": 1.8728847344289534,
+        "width": 0.62,
+        "cushion_hue": 0.05,
+        "frame_tint": 0,
+        "_seed": 826108
+      },
+      "rotation_y": 5.668
+    },
+    {
+      "instance_id": "inst_zone_pool_deck_sun_lounger_v1_003",
+      "asset_id": "sun_lounger_v1",
+      "zone_id": "zone_pool_deck",
+      "params": {
+        "length": 1.9324722746154293,
+        "width": 0.62,
+        "cushion_hue": 0.55,
+        "frame_tint": 0,
+        "_seed": 55967
+      },
+      "rotation_y": 5.2782
+    },
+    {
+      "instance_id": "inst_zone_umbrella1_seats_chair_v1_001",
+      "asset_id": "chair_v1",
+      "zone_id": "zone_umbrella1_seats",
+      "params": {
+        "seat_hue": 0.09,
+        "wood_tint": 0,
+        "_seed": 180747
+      },
+      "rotation_y": 2.7353
+    },
+    {
+      "instance_id": "inst_zone_umbrella1_seats_chair_v1_002",
+      "asset_id": "chair_v1",
+      "zone_id": "zone_umbrella1_seats",
+      "params": {
+        "seat_hue": 0.09,
+        "wood_tint": 0,
+        "_seed": 909229
+      },
+      "rotation_y": 3.1373
+    },
+    {
+      "instance_id": "inst_zone_umbrella2_seats_chair_v1_001",
+      "asset_id": "chair_v1",
+      "zone_id": "zone_umbrella2_seats",
+      "params": {
+        "seat_hue": 0.09,
+        "wood_tint": 0,
+        "_seed": 583918
+      },
+      "rotation_y": 1.9339
+    },
+    {
+      "instance_id": "inst_zone_umbrella2_seats_chair_v1_002",
+      "asset_id": "chair_v1",
+      "zone_id": "zone_umbrella2_seats",
+      "params": {
+        "seat_hue": 0.09,
+        "wood_tint": 0,
+        "_seed": 495914
+      },
+      "rotation_y": 1.2228
+    },
+    {
+      "instance_id": "inst_zone_villa_entry_street_lamp_v1_001",
+      "asset_id": "street_lamp_v1",
+      "zone_id": "zone_villa_entry",
+      "params": {
+        "pole_height": 2.8,
+        "lamp_radius": 0.24,
+        "glow": 0.7,
+        "_seed": 689365
+      },
+      "rotation_y": 0
+    },
+    {
+      "instance_id": "inst_zone_villa_entry_street_lamp_v1_002",
+      "asset_id": "street_lamp_v1",
+      "zone_id": "zone_villa_entry",
+      "params": {
+        "pole_height": 2.8,
+        "lamp_radius": 0.24,
+        "glow": 0.7,
+        "_seed": 422111
+      },
+      "rotation_y": 0
+    },
+    {
+      "instance_id": "inst_zone_villa_entry_hedge_bush_v1_001",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_villa_entry",
+      "params": {
+        "radius": 0.45,
+        "flower": 1,
+        "hue_shift": 0,
+        "_seed": 53690
+      },
+      "rotation_y": 2.6849
+    },
+    {
+      "instance_id": "inst_zone_villa_entry_hedge_bush_v1_002",
+      "asset_id": "hedge_bush_v1",
+      "zone_id": "zone_villa_entry",
+      "params": {
+        "radius": 0.45,
+        "flower": 1,
+        "hue_shift": 0,
+        "_seed": 130294
+      },
+      "rotation_y": 5.7746
+    },
+    {
+      "instance_id": "inst_zone_villa_entry_bench_v1_001",
+      "asset_id": "bench_v1",
+      "zone_id": "zone_villa_entry",
+      "params": {
+        "length": 1.7,
+        "wood_tint": 0,
+        "half_len": 0.85,
+        "half_wid": 0.33,
+        "_seed": 74833
+      },
+      "rotation_y": 4.8697
+    },
+    {
+      "instance_id": "inst_zone_villa_bike_bicycle_v1_001",
+      "asset_id": "bicycle_v1",
+      "zone_id": "zone_villa_bike",
+      "params": {
+        "wheel_radius": 0.34,
+        "frame_hue": 0.07,
+        "frame_light": 0.52,
+        "_seed": 416584
+      },
+      "rotation_y": 0
+    }
+  ]
+}

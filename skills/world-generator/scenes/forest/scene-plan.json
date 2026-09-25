@@ -1,0 +1,206 @@
+{
+  "scene_meta": {
+    "name": "Highland Forest - 500 instance stress",
+    "seed": 7,
+    "global_safety_distance": 0.25,
+    "elevation": {
+      "type": "noise",
+      "amplitude": 2.8,
+      "frequency": 0.045,
+      "octaves": 3,
+      "base": 0.4,
+      "seed": 5
+    },
+    "world_bounds_hint": {
+      "width": 160,
+      "depth": 130
+    },
+    "time_of_day": 15.5
+  },
+  "zones": [
+    {
+      "zone_id": "zone_meadow",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          0,
+          -42
+        ],
+        "width": 120,
+        "depth": 30
+      },
+      "color": "#7d9455",
+      "placements": [
+        {
+          "asset_id": "tree_round_v1",
+          "count": 60,
+          "params": {
+            "total_height": {
+              "min": 3.8,
+              "max": 6.2
+            },
+            "crown_radius": {
+              "min": 1.3,
+              "max": 2.2
+            }
+          },
+          "constraints": [
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "max_elevation_diff": [
+                0.6
+              ]
+            }
+          ]
+        },
+        {
+          "asset_id": "hedge_bush_v1",
+          "count": 50,
+          "params": {
+            "radius": {
+              "min": 0.45,
+              "max": 0.75
+            },
+            "flower": {
+              "min": 0,
+              "max": 0.9
+            }
+          },
+          "constraints": [
+            "no_overlap",
+            {
+              "max_elevation_diff": [
+                0.5
+              ]
+            }
+          ]
+        },
+        {
+          "asset_id": "rock_boulder_v1",
+          "count": 25,
+          "params": {
+            "radius": {
+              "min": 0.3,
+              "max": 0.8
+            },
+            "squash": {
+              "min": 0.55,
+              "max": 0.85
+            }
+          },
+          "constraints": [
+            "no_overlap"
+          ]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_woods",
+      "boundary": {
+        "type": "rect",
+        "center": [
+          0,
+          18
+        ],
+        "width": 140,
+        "depth": 88
+      },
+      "color": "#57713f",
+      "placements": [
+        {
+          "asset_id": "tree_conifer_v1",
+          "count": 260,
+          "params": {
+            "total_height": {
+              "min": 4.5,
+              "max": 11
+            },
+            "crown_radius": {
+              "min": 1.0,
+              "max": 2.2
+            },
+            "tiers": {
+              "values": [
+                3,
+                4
+              ]
+            }
+          },
+          "constraints": [
+            "no_overlap",
+            "keep_inside_bounds",
+            {
+              "min_distance_to_asset_type": [
+                "tree_conifer_v1",
+                3.2
+              ]
+            },
+            {
+              "max_elevation_diff": [
+                0.8
+              ]
+            }
+          ]
+        },
+        {
+          "asset_id": "tree_round_v1",
+          "count": 70,
+          "params": {
+            "total_height": {
+              "min": 4,
+              "max": 6
+            },
+            "crown_radius": {
+              "min": 1.5,
+              "max": 2.3
+            }
+          },
+          "constraints": [
+            "no_overlap",
+            {
+              "min_distance_to_asset_type": [
+                "tree_conifer_v1",
+                2.6
+              ]
+            }
+          ]
+        },
+        {
+          "asset_id": "hedge_bush_v1",
+          "count": 30,
+          "params": {
+            "radius": {
+              "min": 0.4,
+              "max": 0.7
+            },
+            "flower": {
+              "min": 0.4,
+              "max": 1.0
+            }
+          },
+          "constraints": [
+            "no_overlap"
+          ]
+        },
+        {
+          "asset_id": "rock_boulder_v1",
+          "count": 35,
+          "params": {
+            "radius": {
+              "min": 0.4,
+              "max": 1.4
+            },
+            "squash": {
+              "min": 0.55,
+              "max": 0.9
+            }
+          },
+          "constraints": [
+            "no_overlap"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "asset_id": "tree_conifer_v1",
+  "name": "Conifer Tree",
+  "category": "vegetation",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "random",
+  "asset_module": "asset.js",
+  "max_triangles": 900,
+  "footprint": {
+    "type": "circle",
+    "radius_param": "crown_radius"
+  },
+  "height": {
+    "param": "total_height"
+  },
+  "params_schema": {
+    "type": "object",
+    "required": [
+      "total_height"
+    ],
+    "properties": {
+      "total_height": {
+        "type": "number",
+        "min": 4,
+        "max": 12,
+        "default": 7,
+        "description": "ground to tip"
+      },
+      "crown_radius": {
+        "type": "number",
+        "min": 0.8,
+        "max": 2.4,
+        "default": 1.5,
+        "description": "widest crown tier radius"
+      },
+      "trunk_ratio": {
+        "type": "number",
+        "min": 0.04,
+        "max": 0.09,
+        "default": 0.06,
+        "description": "trunk radius / crown radius"
+      },
+      "tiers": {
+        "type": "integer",
+        "min": 2,
+        "max": 4,
+        "default": 3,
+        "description": "cone tiers"
+      },
+      "hue_shift": {
+        "type": "number",
+        "min": -0.06,
+        "max": 0.06,
+        "default": 0,
+        "description": "foliage hue variation"
+      }
+    }
+  }
+}

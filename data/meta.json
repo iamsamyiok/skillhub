@@ -404,6 +404,21 @@
       "downloads": 0,
       "createdAt": "2026-09-21T00:00:00.000Z",
       "updatedAt": "2026-09-21T00:00:00.000Z"
+    },
+    "world-generator": {
+      "version": "1.0.0",
+      "category": "前端开发",
+      "tags": [
+        "3D",
+        "Three.js",
+        "程序化生成",
+        "场景生成",
+        "交互编辑",
+        "参数化"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-25T00:00:00.000Z",
+      "updatedAt": "2026-09-25T00:00:00.000Z"
     }
   }
 }

@@ -1,0 +1,50 @@
+{
+  "asset_id": "bicycle_v1",
+  "name": "City Bicycle",
+  "category": "vehicle",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "fixed",
+  "asset_module": "asset.js",
+  "max_triangles": 2500,
+  "footprint": {
+    "type": "box",
+    "hw_param": "wheel_radius",
+    "hw_factor": 2.7,
+    "half_depth": 0.3
+  },
+  "height": {
+    "param": "wheel_radius",
+    "factor": 3.2,
+    "offset": 0.1
+  },
+  "params_schema": {
+    "type": "object",
+    "required": [
+      "frame_hue"
+    ],
+    "properties": {
+      "wheel_radius": {
+        "type": "number",
+        "min": 0.28,
+        "max": 0.375,
+        "default": 0.34,
+        "description": "wheel radius, drives overall scale"
+      },
+      "frame_hue": {
+        "type": "number",
+        "min": 0,
+        "max": 1,
+        "default": 0.07,
+        "description": "frame paint hue"
+      },
+      "frame_light": {
+        "type": "number",
+        "min": 0.4,
+        "max": 0.62,
+        "default": 0.52,
+        "description": "frame paint lightness"
+      }
+    }
+  }
+}

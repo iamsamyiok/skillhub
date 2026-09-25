@@ -1,0 +1,48 @@
+{
+  "asset_id": "street_lamp_v1",
+  "name": "Path Lamp",
+  "category": "furniture",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "fixed",
+  "asset_module": "asset.js",
+  "max_triangles": 300,
+  "footprint": {
+    "type": "circle",
+    "radius": 0.25
+  },
+  "height": {
+    "param": "pole_height",
+    "factor": 1,
+    "offset": 0.5
+  },
+  "params_schema": {
+    "type": "object",
+    "required": [
+      "pole_height"
+    ],
+    "properties": {
+      "pole_height": {
+        "type": "number",
+        "min": 2.0,
+        "max": 5.5,
+        "default": 3.6,
+        "description": "pole height"
+      },
+      "lamp_radius": {
+        "type": "number",
+        "min": 0.16,
+        "max": 0.34,
+        "default": 0.24,
+        "description": "lamp head radius"
+      },
+      "glow": {
+        "type": "number",
+        "min": 0.0,
+        "max": 1.0,
+        "default": 0.55,
+        "description": "emissive intensity"
+      }
+    }
+  }
+}

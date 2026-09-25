@@ -1,0 +1,49 @@
+{
+  "asset_id": "table_desk_v1",
+  "name": "Desk",
+  "category": "furniture",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "random",
+  "asset_module": "asset.js",
+  "max_triangles": 200,
+  "footprint": {
+    "type": "box",
+    "hw_param": "width",
+    "hw_factor": 0.5,
+    "hd_param": "depth",
+    "hd_factor": 0.5
+  },
+  "height": {
+    "param": "width",
+    "factor": 0,
+    "offset": 0.78
+  },
+  "params_schema": {
+    "type": "object",
+    "required": ["width"],
+    "properties": {
+      "width": {
+        "type": "number",
+        "min": 1.4,
+        "max": 2.2,
+        "default": 1.8,
+        "description": "table width"
+      },
+      "depth": {
+        "type": "number",
+        "min": 0.7,
+        "max": 1.0,
+        "default": 0.8,
+        "description": "table depth"
+      },
+      "wood_tint": {
+        "type": "number",
+        "min": -0.05,
+        "max": 0.05,
+        "default": 0,
+        "description": "wood tone shift"
+      }
+    }
+  }
+}

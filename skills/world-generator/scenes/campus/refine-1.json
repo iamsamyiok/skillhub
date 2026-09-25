@@ -1,0 +1,75 @@
+{
+  "scene_meta": {
+    "name": "Tower A - per-floor landscaping",
+    "seed": 101,
+    "global_safety_distance": 0.2
+  },
+  "zones": [
+    {
+      "zone_id": "zone_ta_fl1",
+      "anchor": { "instance_id": "inst_zone_tower_a_building_tower_v1_001" },
+      "boundary": { "type": "rect", "center": [0, 0], "width": 9.5, "depth": 9.5 },
+      "elevation": { "type": "flat", "height": 3.45 },
+      "terrain": false,
+      "placements": [
+        { "asset_id": "hedge_bush_v1", "count": 2, "params": { "radius": 0.4 }, "constraints": ["no_overlap"] },
+        { "asset_id": "street_lamp_v1", "count": 1, "params": { "pole_height": 2.2, "lamp_radius": 0.18 }, "constraints": ["no_overlap"] }
+      ]
+    },
+    {
+      "zone_id": "zone_ta_fl2",
+      "anchor": { "instance_id": "inst_zone_tower_a_building_tower_v1_001" },
+      "boundary": { "type": "rect", "center": [0, 0], "width": 9.5, "depth": 9.5 },
+      "elevation": { "type": "flat", "height": 6.65 },
+      "terrain": false,
+      "placements": [
+        { "asset_id": "hedge_bush_v1", "count": 2, "params": { "radius": 0.4 }, "constraints": ["no_overlap"] },
+        { "asset_id": "street_lamp_v1", "count": 1, "params": { "pole_height": 2.2, "lamp_radius": 0.18 }, "constraints": ["no_overlap"] }
+      ]
+    },
+    {
+      "zone_id": "zone_ta_fl3",
+      "anchor": { "instance_id": "inst_zone_tower_a_building_tower_v1_001" },
+      "boundary": { "type": "rect", "center": [0, 0], "width": 9.5, "depth": 9.5 },
+      "elevation": { "type": "flat", "height": 9.85 },
+      "terrain": false,
+      "placements": [
+        { "asset_id": "hedge_bush_v1", "count": 2, "params": { "radius": 0.4 }, "constraints": ["no_overlap"] },
+        { "asset_id": "street_lamp_v1", "count": 1, "params": { "pole_height": 2.2, "lamp_radius": 0.18 }, "constraints": ["no_overlap"] }
+      ]
+    },
+    {
+      "zone_id": "zone_ta_fl4",
+      "anchor": { "instance_id": "inst_zone_tower_a_building_tower_v1_001" },
+      "boundary": { "type": "rect", "center": [0, 0], "width": 9.5, "depth": 9.5 },
+      "elevation": { "type": "flat", "height": 13.05 },
+      "terrain": false,
+      "placements": [
+        { "asset_id": "hedge_bush_v1", "count": 2, "params": { "radius": 0.4 }, "constraints": ["no_overlap"] },
+        { "asset_id": "street_lamp_v1", "count": 1, "params": { "pole_height": 2.2, "lamp_radius": 0.18 }, "constraints": ["no_overlap"] }
+      ]
+    },
+    {
+      "zone_id": "zone_ta_fl5",
+      "anchor": { "instance_id": "inst_zone_tower_a_building_tower_v1_001" },
+      "boundary": { "type": "rect", "center": [0, 0], "width": 9.5, "depth": 9.5 },
+      "elevation": { "type": "flat", "height": 16.25 },
+      "terrain": false,
+      "placements": [
+        { "asset_id": "hedge_bush_v1", "count": 2, "params": { "radius": 0.4 }, "constraints": ["no_overlap"] },
+        { "asset_id": "street_lamp_v1", "count": 1, "params": { "pole_height": 2.2, "lamp_radius": 0.18 }, "constraints": ["no_overlap"] }
+      ]
+    },
+    {
+      "zone_id": "zone_ta_roof",
+      "anchor": { "instance_id": "inst_zone_tower_a_building_tower_v1_001" },
+      "boundary": { "type": "rect", "center": [0, 3.2], "width": 8, "depth": 2.4 },
+      "elevation": { "type": "flat", "height": 19.45 },
+      "terrain": false,
+      "placements": [
+        { "asset_id": "hedge_bush_v1", "count": 3, "params": { "radius": 0.45 }, "constraints": ["no_overlap"] },
+        { "asset_id": "street_lamp_v1", "count": 1, "params": { "pole_height": 2.6, "lamp_radius": 0.2 }, "constraints": ["no_overlap"] }
+      ]
+    }
+  ]
+}

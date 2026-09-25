@@ -1,0 +1,112 @@
+{
+  "scene_meta": {
+    "name": "Tech Campus",
+    "seed": 42,
+    "global_safety_distance": 0.3,
+    "elevation": { "type": "flat", "height": 0 },
+    "world_bounds_hint": { "width": 90, "depth": 70 }
+  },
+  "zones": [
+    {
+      "zone_id": "zone_keepout",
+      "boundary": { "type": "rect", "center": [0, 0], "width": 6, "depth": 6 },
+      "terrain": false,
+      "constraints": ["no_placement"]
+    },
+    {
+      "zone_id": "zone_plaza",
+      "boundary": { "type": "rect", "center": [0, 0], "width": 26, "depth": 18 },
+      "color": "#c8c4bb",
+      "placements": [
+        {
+          "asset_id": "bench_v1",
+          "count": 4,
+          "constraints": ["no_overlap", "keep_inside_bounds"]
+        },
+        {
+          "asset_id": "street_lamp_v1",
+          "count": 4,
+          "constraints": ["no_overlap", "keep_inside_bounds", { "min_distance_to_asset_type": ["bench_v1", 2.0] }]
+        },
+        {
+          "asset_id": "tree_round_v1",
+          "count": 3,
+          "constraints": ["no_overlap", "keep_inside_bounds", { "min_distance_to_asset_type": ["bench_v1", 1.5] }]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_tower_a",
+      "boundary": { "type": "rect", "center": [-24, 0], "width": 16, "depth": 16 },
+      "color": "#b9c6b1",
+      "placements": [
+        {
+          "asset_id": "building_tower_v1",
+          "count": 1,
+          "params": { "floors": 6, "width": 12, "depth": 12, "glass_glow": 0.45 },
+          "constraints": ["no_overlap", "keep_inside_bounds"]
+        },
+        {
+          "asset_id": "hedge_bush_v1",
+          "count": 4,
+          "constraints": ["no_overlap", { "min_distance_to_asset_type": ["building_tower_v1", 7.0] }]
+        },
+        {
+          "asset_id": "tree_conifer_v1",
+          "count": 2,
+          "constraints": ["no_overlap", { "min_distance_to_asset_type": ["building_tower_v1", 8.0] }]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_tower_b",
+      "boundary": { "type": "rect", "center": [24, 0], "width": 16, "depth": 16 },
+      "color": "#b9c6b1",
+      "placements": [
+        {
+          "asset_id": "building_tower_v1",
+          "count": 1,
+          "params": { "floors": 4, "width": 13, "depth": 13, "glass_glow": 0.72 },
+          "constraints": ["no_overlap", "keep_inside_bounds"]
+        },
+        {
+          "asset_id": "street_lamp_v1",
+          "count": 2,
+          "constraints": ["no_overlap", { "min_distance_to_asset_type": ["building_tower_v1", 7.5] }]
+        },
+        {
+          "asset_id": "rock_boulder_v1",
+          "count": 2,
+          "constraints": ["no_overlap", { "min_distance_to_asset_type": ["building_tower_v1", 8.0] }]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_greenway",
+      "boundary": { "type": "rect", "center": [0, 26], "width": 50, "depth": 14 },
+      "color": "#a8bd96",
+      "placements": [
+        {
+          "asset_id": "tree_conifer_v1",
+          "count": 6,
+          "constraints": ["no_overlap", "keep_inside_bounds", { "min_distance_to_asset_type": ["tree_conifer_v1", 4.0] }]
+        },
+        {
+          "asset_id": "tree_round_v1",
+          "count": 5,
+          "constraints": ["no_overlap", "keep_inside_bounds"]
+        },
+        {
+          "asset_id": "rock_boulder_v1",
+          "count": 3,
+          "constraints": ["no_overlap"]
+        },
+        {
+          "asset_id": "hedge_bush_v1",
+          "count": 8,
+          "constraints": ["no_overlap"]
+        }
+      ]
+    }
+  ]
+}

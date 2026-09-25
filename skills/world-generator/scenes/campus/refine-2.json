@@ -1,0 +1,29 @@
+{
+  "scene_meta": {
+    "name": "Tower A fl5 - conference room",
+    "seed": 202,
+    "global_safety_distance": 0.15
+  },
+  "zones": [
+    {
+      "zone_id": "zone_ta_conf",
+      "anchor": { "instance_id": "inst_zone_tower_a_building_tower_v1_001" },
+      "boundary": { "type": "rect", "center": [0, 0], "width": 7, "depth": 5 },
+      "elevation": { "type": "flat", "height": 16.25 },
+      "terrain": false,
+      "placements": [
+        {
+          "asset_id": "table_desk_v1",
+          "count": 2,
+          "params": { "width": 1.8, "depth": 0.8 },
+          "constraints": ["no_overlap", { "min_distance_to_asset_type": ["table_desk_v1", 3.0] }]
+        },
+        {
+          "asset_id": "chair_v1",
+          "count": 6,
+          "constraints": ["no_overlap", { "min_distance_to_asset_type": ["chair_v1", 0.9] }]
+        }
+      ]
+    }
+  ]
+}

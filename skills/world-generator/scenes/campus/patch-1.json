@@ -1,0 +1,16 @@
+{
+  "description": "Campus tweaks: relocate a tree, brighten tower B glass, remove a boulder, add a plaza bench",
+  "patches": [
+    { "op": "move", "instance_id": "inst_zone_greenway_tree_conifer_v1_002", "offset": [2.5, 0, -1.5] },
+    { "op": "reparam", "instance_id": "inst_zone_tower_b_building_tower_v1_001", "params": { "glass_glow": 0.95 } },
+    { "op": "remove", "instance_id": "inst_zone_greenway_rock_boulder_v1_002" },
+    {
+      "op": "add",
+      "instance_id": "inst_zone_plaza_bench_v1_patch_001",
+      "asset_id": "bench_v1",
+      "zone_id": "zone_plaza",
+      "params": { "length": 2.0 },
+      "constraints": ["no_overlap", "keep_inside_bounds"]
+    }
+  ]
+}

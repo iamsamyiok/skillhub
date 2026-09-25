@@ -1,5 +1,5 @@
 {
-  "total": 31,
+  "total": 32,
   "categories": [
     "写作工具",
     "前端开发",
@@ -548,8 +548,8 @@
     {
       "id": "video-publish",
       "name": "video-publish",
-      "description": "为 Node.js Web 项目制作「真实录屏 + AI 中文配音 + 自动合成」的宣传视频并发布到 B 站：分镜表 → Playwright CDP 录屏（支持接入真实 LLM 内核录制真实执行画面）→ edge-tts 配音 → ffmpeg 合成烧录字幕 → biliup-rs 扫码登录投稿，全流程 Agent 自动完成。当用户想\"做功能演示视频/录屏宣传视频/发布B站投稿\"时使用。",
-      "version": "1.5.0",
+      "description": "为项目/产品制作宣传或解说视频并发布到 B 站，三种模式：①卡片模式（HTML卡片+配音+推镜，零录屏，最快）②录屏模式（Playwright CDP 真实录屏，支持真实 LLM 执行画面）③LLM 一键成稿（一句话主题→分镜表草稿）。TTS 供应商链（SiliconFlow CosyVoice2 自然女声→edge-tts→SAPI 兜底）按句生成保精确字幕，可选 BGM 闪避混音与 9:16 竖版裁切，biliup-rs 扫码登录投稿。当用户想\"做宣传视频/功能演示视频/榜单盘点视频/发布B站投稿\"时使用。",
+      "version": "2.1.0",
       "category": "视频创作",
       "tags": [
         "宣传视频",
@@ -582,6 +582,26 @@
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/vision-for-dev.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/vision-for-dev.zip",
       "tgz": "https://iamsamyiok.github.io/skillhub/downloads/vision-for-dev.tar.gz"
+    },
+    {
+      "id": "world-generator",
+      "name": "world-generator",
+      "description": "通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（内嵌 Three.js 零外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。",
+      "version": "1.0.0",
+      "category": "前端开发",
+      "tags": [
+        "3D",
+        "Three.js",
+        "程序化生成",
+        "场景生成",
+        "交互编辑",
+        "参数化"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-25T00:00:00.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/world-generator.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/world-generator.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/world-generator.tar.gz"
     },
     {
       "id": "xlsx",

@@ -1,0 +1,111 @@
+{
+  "scene_meta": {
+    "name": "Villa polish - pool deck, entry, patio seats",
+    "seed": 77,
+    "global_safety_distance": 0.2
+  },
+  "zones": [
+    {
+      "zone_id": "zone_pool_deck",
+      "anchor": { "instance_id": "inst_zone_pool_pool_v1_001" },
+      "boundary": { "type": "rect", "center": [0, -4.2], "width": 10, "depth": 2.4 },
+      "elevation": { "type": "flat", "height": 0 },
+      "terrain": false,
+      "placements": [
+        {
+          "asset_id": "sun_lounger_v1",
+          "count": 3,
+          "params": {
+            "length": { "min": 1.8, "max": 1.95 },
+            "width": 0.62,
+            "cushion_hue": { "values": [0.05, 0.12, 0.55] }
+          },
+          "constraints": [
+            "no_overlap",
+            { "min_distance_to_asset_type": ["sun_lounger_v1", 1.4] }
+          ]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_umbrella1_seats",
+      "anchor": { "instance_id": "inst_zone_pool_patio_umbrella_v1_001" },
+      "boundary": { "type": "circle", "center": [0, 0], "radius": 0.9 },
+      "elevation": { "type": "flat", "height": 0 },
+      "terrain": false,
+      "placements": [
+        {
+          "asset_id": "chair_v1",
+          "count": 2,
+          "params": { "seat_hue": 0.09 },
+          "constraints": [
+            "no_overlap",
+            { "min_distance_to_asset_type": ["chair_v1", 0.7] }
+          ]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_umbrella2_seats",
+      "anchor": { "instance_id": "inst_zone_pool_patio_umbrella_v1_002" },
+      "boundary": { "type": "circle", "center": [0, 0], "radius": 0.9 },
+      "elevation": { "type": "flat", "height": 0 },
+      "terrain": false,
+      "placements": [
+        {
+          "asset_id": "chair_v1",
+          "count": 2,
+          "params": { "seat_hue": 0.09 },
+          "constraints": [
+            "no_overlap",
+            { "min_distance_to_asset_type": ["chair_v1", 0.7] }
+          ]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_villa_entry",
+      "anchor": { "instance_id": "inst_zone_villa_pad_villa_modern_v1_001" },
+      "boundary": { "type": "rect", "center": [1.5, 6.0], "width": 5, "depth": 3 },
+      "elevation": { "type": "flat", "height": 0 },
+      "terrain": false,
+      "placements": [
+        {
+          "asset_id": "street_lamp_v1",
+          "count": 2,
+          "params": { "pole_height": 2.8, "glow": 0.7 },
+          "constraints": [
+            "no_overlap",
+            { "min_distance_to_asset_type": ["street_lamp_v1", 2.5] }
+          ]
+        },
+        {
+          "asset_id": "hedge_bush_v1",
+          "count": 2,
+          "params": { "radius": 0.45, "flower": 1.0 },
+          "constraints": ["no_overlap"]
+        },
+        {
+          "asset_id": "bench_v1",
+          "count": 1,
+          "params": { "length": 1.7 },
+          "constraints": ["no_overlap"]
+        }
+      ]
+    },
+    {
+      "zone_id": "zone_villa_bike",
+      "anchor": { "instance_id": "inst_zone_villa_pad_villa_modern_v1_001" },
+      "boundary": { "type": "rect", "center": [-6.0, -0.5], "width": 1.8, "depth": 1.8 },
+      "elevation": { "type": "flat", "height": 0 },
+      "terrain": false,
+      "placements": [
+        {
+          "asset_id": "bicycle_v1",
+          "count": 1,
+          "constraints": ["no_overlap"]
+        }
+      ]
+    }
+  ]
+}

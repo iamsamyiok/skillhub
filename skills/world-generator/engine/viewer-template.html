@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Universal 3D World</title>
+<style>
+  html, body { margin: 0; padding: 0; overflow: hidden; height: 100%; background: #0e1420; font-family: ui-monospace, Menlo, Consolas, monospace; }
+  #app { width: 100%; height: 100%; }
+  canvas { display: block; }
+  .hud { position: absolute; color: #cfe3ff; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,.8); }
+  #hud-top { top: 12px; left: 14px; font-size: 13px; line-height: 1.6; }
+  #hud-top .title { font-size: 15px; font-weight: bold; color: #ffffff; }
+  #hud-help { bottom: 10px; left: 14px; font-size: 11px; opacity: .75; }
+  #panel { position: absolute; top: 12px; right: 14px; width: 280px; max-height: 70vh; overflow: auto;
+           background: rgba(10, 18, 32, .85); border: 1px solid rgba(120,170,255,.25); border-radius: 8px;
+           padding: 10px 12px; font-size: 12px; color: #cfe3ff; display: none; pointer-events: auto; }
+  #panel h3 { margin: 0 0 6px 0; font-size: 13px; color: #fff; }
+  #panel .row { margin: 2px 0; }
+  #panel .k { color: #7fb0ff; }
+  #panel .close { float: right; cursor: pointer; color: #89a; }
+  #panel pre { margin: 4px 0; white-space: pre-wrap; font-size: 11px; color: #9fd0a0; }
+  #stats { position: absolute; bottom: 10px; right: 14px; font-size: 11px; opacity: .8; }
+  #views { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+           display: flex; gap: 8px; pointer-events: auto; }
+  #views button { background: rgba(10, 18, 32, .8); color: #cfe3ff; border: 1px solid rgba(120,170,255,.35);
+           border-radius: 6px; padding: 5px 12px; font: inherit; font-size: 12px; cursor: pointer; }
+ #views button:hover { background: rgba(50, 80, 130, .8); color: #fff; }
+ #views button.active { background: rgba(70, 120, 200, .9); color: #fff; }
+ #editbar { display: none; position: fixed; left: 50%; transform: translateX(-50%); bottom: 56px; width: min(680px, 92vw);
+           background: rgba(10, 18, 32, .92); border: 1px solid rgba(120,170,255,.35); border-radius: 10px;
+           padding: 10px 12px; color: #cfe3ff; font-size: 12px; z-index: 30; }
+ #editbar .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; max-height: 72px; overflow: auto; }
+ #editbar .chip { background: rgba(70, 120, 200, .35); border: 1px solid rgba(120,170,255,.4); border-radius: 4px;
+                 padding: 1px 6px; cursor: pointer; }
+ #editbar .chip:hover { background: rgba(180, 60, 60, .5); }
+ #editbar textarea { width: 100%; height: 54px; background: rgba(20,30,48,.9); color: #e8f1ff;
+                    border: 1px solid rgba(120,170,255,.35); border-radius: 6px; padding: 6px; font: inherit; resize: vertical; }
+ #editbar .row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+ #editbar button { background: rgba(70, 120, 200, .9); color: #fff; border: 0; border-radius: 6px; padding: 5px 14px; cursor: pointer; }
+ #editbar button.sec { background: rgba(60, 70, 90, .9); }
+ #editbar .status { margin-left: auto; opacity: .85; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud" id="hud-top"><div class="title"></div><div class="sub"></div></div>
+<div class="hud" id="hud-help">drag: orbit &nbsp;|&nbsp; wheel: zoom &nbsp;|&nbsp; right-drag: pan &nbsp;|&nbsp; click: inspect instance</div>
+<div class="hud" id="stats"></div>
+<div id="views">
+  <button data-v="bird">鸟瞰</button>
+  <button data-v="street">街景</button>
+  <button data-v="spin">环绕</button>
+  <button id="btn-time">时间</button>
+  <button id="btn-glb">导出 GLB</button>
+  <button id="btn-edit">编辑</button>
+</div>
+<div id="panel"><span class="close" id="panel-close">[x]</span><h3 id="panel-title"></h3><div id="panel-body"></div></div>
+<div id="editbar">
+  <div style="margin-bottom:6px"><b>编辑模式</b> — 左键点选/再点取消（可多选），提交改进意图给 Agent</div>
+  <div class="chips" id="edit-chips"></div>
+  <textarea id="edit-intent" placeholder="例如：把这盏灯换成暖光并移到路径东侧；删除选中的两块岩石；给泳池加一圈护栏"></textarea>
+  <div class="row">
+    <button id="edit-submit">提交给 Agent</button>
+    <button id="edit-clear" class="sec">清除选择</button>
+    <span class="status" id="edit-status"></span>
+  </div>
+</div>
+
+<script type="module">
+/*__THREE_MODULE__*/
+</script>
+
+<script type="module">
+/*__ADDONS_MODULE__*/
+</script>
+
+<script type="module">
+"use strict";
+const THREE = window.THREE;
+const makeElevationField = eval('(' + "__ELEV_FN__" + ')');
+const ASSET_SOURCES = "__ASSET_SOURCES__";
+const WORLD = "__WORLD_DATA__";
+
+// ---------- self-contained orbit controls (no example deps) ----------
+class Orbit {
+  constructor(camera, dom) {
+    this.camera = camera; this.dom = dom;
+    this.target = new THREE.Vector3();
+    this.sph = new THREE.Spherical(60, Math.PI / 3, Math.PI / 4);
+    this.damping = 0.12;
+    this.vel = { theta: 0, phi: 0, radius: 0 };
+    this.state = 0; // 0 idle, 1 rotate, 2 pan
+    const el = dom;
+    el.addEventListener('pointerdown', e => { this.state = e.button === 2 ? 2 : 1; this.px = e.clientX; this.py = e.clientY; el.setPointerCapture(e.pointerId); });
+    el.addEventListener('pointerup', e => { this.state = 0; });
+    el.addEventListener('pointermove', e => {
+      if (!this.state) return;
+      const dx = e.clientX - this.px, dy = e.clientY - this.py;
+      this.px = e.clientX; this.py = e.clientY;
+      if (this.state === 1) {
+        this.vel.theta -= dx * 0.0035;
+        this.vel.phi -= dy * 0.0035;
+      } else {
+        const panScale = this.sph.radius * 0.0011;
+        const t = this.target;
+        const off = new THREE.Vector3().setFromSpherical(this.sph);
+        const fwd = new THREE.Vector3(-off.x, 0, -off.z).normalize();
+        const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0)).negate();
+        t.addScaledVector(right, dx * panScale);
+        t.addScaledVector(new THREE.Vector3(0, 1, 0), -dy * panScale);
+      }
+      this.updateNow = true;
+    });
+    el.addEventListener('wheel', e => {
+      e.preventDefault();
+      this.vel.radius = this.vel.radius || 0;
+      this.vel.radius += e.deltaY * 0.0018 * this.sph.radius * 0.08;
+      this.updateNow = true;
+    }, { passive: false });
+    el.addEventListener('contextmenu', e => e.preventDefault());
+  }
+  update() {
+    const k = this.damping;
+    this.sph.theta += this.vel.theta * k;
+    this.sph.phi += this.vel.phi * k;
+    this.sph.radius *= (1 + this.vel.radius * k);
+    this.vel.theta *= (1 - k); this.vel.phi *= (1 - k); this.vel.radius *= (1 - k);
+    this.sph.phi = Math.max(0.08, Math.min(Math.PI / 2 - 0.02, this.sph.phi));
+    this.sph.radius = Math.max(4, Math.min(900, this.sph.radius));
+    const p = new THREE.Vector3().setFromSpherical(this.sph).add(this.target);
+    this.camera.position.copy(p);
+    this.camera.lookAt(this.target);
+  }
+  fitTo(box) {
+    const size = new THREE.Vector3(); box.getSize(size);
+    const center = new THREE.Vector3(); box.getCenter(center);
+    const radius = Math.max(size.x, size.z) * 0.5;
+    this.target.copy(center).setY(box.min.y + size.y * 0.25);
+    this.sph.radius = Math.max(3, radius / Math.tan((this.camera.fov * Math.PI / 360)) * 1.15);
+    this.sph.phi = Math.PI / 3.2;
+    this.update();
+  }
+}
+
+// ---------- scene setup ----------
+const app = document.getElementById('app');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.12;
+app.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const skyColor = new THREE.Color(0x87b5e5);
+scene.background = skyColor;
+scene.fog = new THREE.Fog(0x87b5e5, 120, 520);
+
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 2000);
+const orbit = new Orbit(camera, renderer.domElement);
+
+const hemi = new THREE.HemisphereLight(0xbdd7ff, 0x3a3126, 0.85);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff2d8, 1.6);
+sun.position.set(60, 90, 40);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near = 10;
+sun.shadow.camera.far = 400;
+scene.add(sun);
+
+// ---------- unified terrain: one shared-vertex lattice, ramp-blended layers ----------
+const elevFactory = makeElevationField;
+
+// hash value-noise for ground mottling (self-contained, deterministic, world-space)
+function hash2(x, z) {
+  const s = Math.sin(x * 127.1 + z * 311.7) * 43758.5453;
+  return s - Math.floor(s);
+}
+function vnoise(x, z) {
+  const xi = Math.floor(x), zi = Math.floor(z);
+  const xf = x - xi, zf = z - zi;
+  const sm = t => t * t * (3 - 2 * t);
+  const u = sm(xf), v = sm(zf);
+  const a = hash2(xi, zi), b = hash2(xi + 1, zi), c = hash2(xi, zi + 1), d = hash2(xi + 1, zi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+const C_DIRT = new THREE.Color(0x8a7550);
+
+function inPoly(x, z, pts) {
+  let inside = false;
+  const n = pts.length;
+  for (let i = 0, j = n - 1; i < n; j = i++) {
+    const xi = pts[i][0], zi = pts[i][1], xj = pts[j][0], zj = pts[j][1];
+    if (zi > z !== zj > z && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function distToPoly(x, z, pts) {
+  let d = Infinity;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const ax = pts[j][0], az = pts[j][1], bx = pts[i][0], bz = pts[i][1];
+    const dx = bx - ax, dz = bz - az;
+    const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz)));
+    d = Math.min(d, Math.hypot(x - (ax + dx * t), z - (az + dz * t)));
+  }
+  return d;
+}
+
+const RAMP = 1.4; // transition band width for height + color blending
+const ZONE_COLORS = [0x5f7d4f, 0x7c8a5a, 0x8a7d5f, 0x5f6d7d, 0x6d5f7d, 0x5f7d76];
+const zoneGroup = new THREE.Group();
+scene.add(zoneGroup);
+const pickables = [];
+const debugMode = location.hash === '#debug';
+
+// layers: noise bases first, flat platforms blended on top afterwards (stable: plan order kept)
+const terrainLayers = [];
+for (let zi = 0; zi < WORLD.zones.length; zi++) {
+  const z = WORLD.zones[zi];
+  if (z.terrain === false) continue;
+  terrainLayers.push({
+    pts: z.boundary_points,
+    elev: elevFactory(z.elevation),
+    color: new THREE.Color(z.color || ZONE_COLORS[zi % ZONE_COLORS.length]),
+    flat: (z.elevation || {}).type === 'flat'
+  });
+}
+terrainLayers.sort((a, b) => (a.flat ? 1 : 0) - (b.flat ? 1 : 0));
+const firstNoise = terrainLayers.find(l => !l.flat) || null;
+const defaultElev = elevFactory(WORLD.meta.elevation);
+const defaultColor = firstNoise ? firstNoise.color.clone() : new THREE.Color(0x5f7d4f);
+
+function layerWeight(x, z, pts) {
+  if (inPoly(x, z, pts)) return 1;
+  const d = distToPoly(x, z, pts);
+  if (d >= RAMP) return 0;
+  const t = d / RAMP;
+  return 1 - t * t * (3 - 2 * t);
+}
+function mottleAt(base, x, z) {
+  const m = vnoise(x * 0.35, z * 0.35) * 0.7 + vnoise(x * 1.3, z * 1.3) * 0.3;
+  return base.clone().multiplyScalar(0.88 + m * 0.26);
+}
+// composed height / color at any world point
+function terrainSample(x, z) {
+  let h = null;
+  let c = null;
+  for (const L of terrainLayers) {
+    const w = layerWeight(x, z, L.pts);
+    if (w <= 0) continue;
+    if (h === null) {
+      h = L.elev(x, z);
+      c = mottleAt(L.color, x, z);
+    } else {
+      const target = L.elev(x, z);
+      h += (target - h) * w;
+      c.lerp(mottleAt(L.color, x, z), w);
+    }
+  }
+  if (h === null) {
+    h = defaultElev(x, z);
+    c = mottleAt(defaultColor, x, z);
+  }
+  return { h, c };
+}
+function hAt(x, z) { return terrainSample(x, z).h; }
+
+// lattice bounds = union of terrain zone AABBs + margin so ramps fade out softly
+let gMinX = Infinity, gMaxX = -Infinity, gMinZ = Infinity, gMaxZ = -Infinity;
+for (const L of terrainLayers) {
+  for (const [px, pz] of L.pts) {
+    gMinX = Math.min(gMinX, px); gMaxX = Math.max(gMaxX, px);
+    gMinZ = Math.min(gMinZ, pz); gMaxZ = Math.max(gMaxZ, pz);
+  }
+}
+const MARGIN = 2.5, cell = 1.0;
+gMinX -= MARGIN; gMaxX += MARGIN; gMinZ -= MARGIN; gMaxZ += MARGIN;
+const nx = Math.max(2, Math.ceil((gMaxX - gMinX) / cell));
+const nz = Math.max(2, Math.ceil((gMaxZ - gMinZ) / cell));
+
+const positions = [], colors = [], indices = [];
+const vIndex = new Map();
+function vert(i, j) {
+  const k = i + ',' + j;
+  if (vIndex.has(k)) return vIndex.get(k);
+  const x = gMinX + i * cell, zz = gMinZ + j * cell;
+  const s = terrainSample(x, zz);
+  // steep composed faces blend toward bare dirt (natural path/plateau rims)
+  const e = Math.max(0.3, cell * 0.5);
+  const gx = (hAt(x + e, zz) - hAt(x - e, zz)) / (2 * e);
+  const gz = (hAt(x, zz + e) - hAt(x, zz - e)) / (2 * e);
+  const steep = Math.min(1, Math.hypot(gx, gz) * 0.85);
+  s.c.lerp(C_DIRT, steep * 0.55);
+  const idx = positions.length / 3;
+  positions.push(x, s.h, zz);
+  colors.push(Math.min(1, s.c.r), Math.min(1, s.c.g), Math.min(1, s.c.b));
+  vIndex.set(k, idx);
+  return idx;
+}
+for (let i = 0; i < nx; i++) {
+  for (let j = 0; j < nz; j++) {
+    const a = vert(i, j), b = vert(i + 1, j + 1), c2 = vert(i + 1, j), d = vert(i, j + 1);
+    // counter-clockwise seen from +Y so normals face up
+    indices.push(a, b, c2);
+    indices.push(a, d, b);
+  }
+}
+const terrainGeo = new THREE.BufferGeometry();
+terrainGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+terrainGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+terrainGeo.setIndex(indices);
+terrainGeo.computeVertexNormals();
+const terrainMesh = new THREE.Mesh(terrainGeo, new THREE.MeshLambertMaterial({ vertexColors: true }));
+terrainMesh.receiveShadow = true;
+zoneGroup.add(terrainMesh);
+const worldBox = new THREE.Box3().setFromObject(terrainMesh);
+
+// boundary lines (debug only)
+if (debugMode) {
+  for (const z of WORLD.zones) {
+    if (z.terrain === false) continue;
+    const bpts = z.boundary_points.map(([x, zz]) => new THREE.Vector3(x, hAt(x, zz) + 0.06, zz));
+    const line = new THREE.LineLoop(
+      new THREE.BufferGeometry().setFromPoints(bpts),
+      new THREE.LineBasicMaterial({ color: 0x9fc7ff, transparent: true, opacity: 0.35 })
+    );
+    scene.add(line);
+  }
+}
+
+// ---------- instances ----------
+const ASSET_FACTORIES = {};
+for (const [id, src] of Object.entries(ASSET_SOURCES)) {
+  try {
+    ASSET_FACTORIES[id] = new Function('THREE', src + '\n;return createAsset;')(THREE);
+  } catch (err) {
+    console.error('asset factory failed:', id, err);
+  }
+}
+
+const instanceRoot = new THREE.Group();
+scene.add(instanceRoot);
+const instanceById = new Map();
+let built = 0;
+
+for (const inst of WORLD.instances) {
+  const factory = ASSET_FACTORIES[inst.asset_id];
+  if (!factory) continue;
+  let obj;
+  try { obj = factory(Object.assign({}, inst.params)); } catch (err) { console.error('build failed', inst.instance_id, err); continue; }
+  obj.position.set(inst.position[0], inst.position[1], inst.position[2]);
+  obj.rotation.y = inst.rotation_y || 0;
+  obj.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; o.userData.instanceRef = inst; pickables.push(o); } });
+  inst._object = obj;
+  instanceRoot.add(obj);
+  instanceById.set(inst.instance_id, inst);
+  built++;
+  const p = new THREE.Vector3(inst.position[0], inst.position[1], inst.position[2]);
+  worldBox.expandByPoint(p);
+}
+
+// ---------- water upgrade (meshes tagged by assets: userData.water) ----------
+const waterMats = [];
+instanceRoot.traverse(o => {
+  if (!o.isMesh || !o.userData.water) return;
+  const old = o.material;
+  const m = new THREE.MeshPhongMaterial({
+    color: old.color ? old.color.clone() : new THREE.Color(0x3f7f9f),
+    emissive: old.emissive ? old.emissive.clone() : new THREE.Color(0x0a2a3a),
+    transparent: true,
+    opacity: 0.86,
+    shininess: 140,
+    specular: new THREE.Color(0x9fd4e8)
+  });
+  m.userData.waterUpgraded = true;
+  m.userData.uTime = { value: 0 };
+  m.onBeforeCompile = shader => {
+    shader.uniforms.uTime = m.userData.uTime;
+    shader.vertexShader = 'uniform float uTime;\n' + shader.vertexShader.replace(
+      '#include <begin_vertex>',
+      `#include <begin_vertex>
+       float _wv = sin(uTime * 1.4 + transformed.x * 2.1) * cos(uTime * 0.9 + transformed.z * 1.7);
+       transformed.y += _wv * 0.035;`
+    );
+  };
+  o.material = m;
+  waterMats.push(m);
+});
+
+// ---------- material dedup (perf: one material per distinct look) ----------
+(function dedupMaterials() {
+  const cache = new Map();
+  let merged = 0;
+  instanceRoot.traverse(o => {
+    if (!o.isMesh || !o.material || o.material.userData.waterUpgraded) return;
+    const m = o.material;
+    const key = [m.type,
+      m.color ? m.color.getHexString() : '',
+      m.emissive ? m.emissive.getHexString() : '',
+      typeof m.emissiveIntensity === 'number' ? m.emissiveIntensity.toFixed(2) : '',
+      m.transparent, m.opacity, m.vertexColors, m.flatShading, m.side].join('|');
+    const hit = cache.get(key);
+    if (hit) { merged++; o.material = hit; }
+    else cache.set(key, m);
+  });
+  window.__MAT_DEDUP__ = { unique: cache.size, merged };
+})();
+
+// shadow frustum fits the world
+const wbSize = new THREE.Vector3(); worldBox.getSize(wbSize);
+const wbCenter = new THREE.Vector3(); worldBox.getCenter(wbCenter);
+const sunDist = Math.max(wbSize.x, wbSize.z) * 1.1 + 60;
+sun.target.position.copy(wbCenter);
+scene.add(sun.target);
+const sc = sun.shadow.camera;
+const ext = Math.max(wbSize.x, wbSize.z) * 0.75;
+sc.left = -ext; sc.right = ext; sc.top = ext; sc.bottom = -ext;
+sc.updateProjectionMatrix();
+
+// ground-void backdrop disc so the world does not float in empty space
+const groundDisc = new THREE.Mesh(
+  new THREE.CircleGeometry(Math.max(wbSize.x, wbSize.z) * 1.8, 48),
+  new THREE.MeshLambertMaterial({ color: 0x4a5f42 })
+);
+groundDisc.rotation.x = -Math.PI / 2;
+groundDisc.position.set(wbCenter.x, worldBox.min.y - 0.35, wbCenter.z);
+groundDisc.receiveShadow = true;
+scene.add(groundDisc);
+
+// ---------- post-processing: RenderPass -> UnrealBloom -> OutputPass ----------
+let composer = null, bloomPass = null;
+if (window.THREE_ADDONS && window.THREE_ADDONS.EffectComposer) {
+  const { EffectComposer, RenderPass, UnrealBloomPass, OutputPass } = window.THREE_ADDONS;
+  composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.32, 0.45, 0.82);
+  composer.addPass(bloomPass);
+  composer.addPass(new OutputPass());
+}
+
+// ---------- time of day ----------
+const C_DAY = new THREE.Color(0x87b5e5), C_GOLD = new THREE.Color(0xe8a25e),
+      C_NIGHT = new THREE.Color(0x0b1120), C_SUN_NOON = new THREE.Color(0xfff4e0),
+      C_SUN_LOW = new THREE.Color(0xffc27a), C_MOON = new THREE.Color(0x9db8e8);
+const timeState = { time: 14 };
+const statsParts = { time: null, fps: null, tris: null, mats: null };
+function renderStats() {
+  const parts = [`seed ${WORLD.meta.seed}`];
+  if (statsParts.time !== null) parts.push(statsParts.time);
+  if (statsParts.fps !== null) parts.push(statsParts.fps + ' fps');
+  if (statsParts.tris !== null) parts.push(statsParts.tris + 'k tris');
+  if (statsParts.mats !== null) parts.push(statsParts.mats + ' mats');
+  document.getElementById('stats').textContent = parts.join(' · ');
+}
+
+function applyTimeOfDay(t) {
+  timeState.time = t;
+  const dayFrac = (t - 6) / 12;               // 0 at 06:00, 1 at 18:00
+  const elev = Math.sin(dayFrac * Math.PI);   // sun elevation factor, <0 at night
+  const maxElev = THREE.MathUtils.degToRad(62);
+  const elevAngle = elev * maxElev;
+  const azim = dayFrac * Math.PI;             // east -> west
+
+  // sun / moon direction + light
+  if (elev > -0.06) {
+    const dir = new THREE.Vector3(Math.cos(azim), Math.max(0.06, Math.sin(elevAngle)), 0.38).normalize();
+    sun.position.copy(wbCenter).addScaledVector(dir, sunDist);
+    sun.color.copy(C_SUN_LOW).lerp(C_SUN_NOON, Math.min(1, elev * 1.4));
+    sun.intensity = 0.55 + Math.max(0, elev) * 1.75;
+  } else {
+    const dir = new THREE.Vector3(-0.5, 0.7, -0.4).normalize();
+    sun.position.copy(wbCenter).addScaledVector(dir, sunDist);
+    sun.color.copy(C_MOON);
+    sun.intensity = 0.22;
+  }
+
+  // sky blend: night -> golden twilight -> day
+  const dayW = THREE.MathUtils.clamp((elev - 0.02) / 0.28, 0, 1);
+  const goldW = THREE.MathUtils.clamp(1 - Math.abs(elev - 0.05) / 0.22, 0, 1);
+  skyColor.copy(C_NIGHT).lerp(C_DAY, dayW).lerp(C_GOLD, goldW * 0.75);
+  scene.fog.color.copy(skyColor);
+  scene.background = skyColor;
+  hemi.intensity = 0.32 + Math.max(0, elev) * 0.68;
+  hemi.color.copy(C_NIGHT).lerp(new THREE.Color(0xbdd7ff), Math.max(0.15, dayW));
+  if (bloomPass) bloomPass.strength = 0.28 + (1 - Math.max(0, elev)) * 0.3;
+  statsParts.time = String(Math.floor(t)).padStart(2, '0') + ':' + String(Math.round((t % 1) * 60)).padStart(2, '0');
+  renderStats();
+}
+
+// ---------- view presets + auto spin ----------
+let autoSpin = false;
+const viewBtns = document.querySelectorAll('#views button[data-v]');
+function setActive(btn) { viewBtns.forEach(b => b.classList.toggle('active', b === btn)); }
+viewBtns.forEach(btn => btn.addEventListener('click', () => {
+  const v = btn.dataset.v;
+  if (v === 'bird') {
+    autoSpin = false; setActive(btn);
+    orbit.fitTo(worldBox);
+    orbit.sph.phi = 0.38;
+    orbit.sph.radius *= 1.25;
+    orbit.update();
+  } else if (v === 'street') {
+    autoSpin = false; setActive(btn);
+    const size = new THREE.Vector3(); worldBox.getSize(size);
+    const center = new THREE.Vector3(); worldBox.getCenter(center);
+    orbit.target.set(center.x, worldBox.min.y + 1.7, center.z);
+    orbit.sph.radius = Math.max(8, Math.max(size.x, size.z) * 0.16);
+    orbit.sph.phi = Math.PI / 2 - 0.06;
+    orbit.update();
+  } else if (v === 'spin') {
+    autoSpin = !autoSpin;
+    setActive(autoSpin ? btn : null);
+  }
+}));
+
+// ---------- time slider ----------
+document.getElementById('btn-time').addEventListener('click', () => {
+  const panel = document.getElementById('panel');
+  document.getElementById('panel-title').textContent = 'time of day';
+  document.getElementById('panel-body').innerHTML =
+    `<div class="row"><span class="k">hour</span>: <span id="tval"></span></div>
+     <input type="range" min="0" max="24" step="0.25" id="tslider" style="width:100%">`;
+  panel.style.display = 'block';
+  const slider = document.getElementById('tslider');
+  slider.value = timeState.time;
+  const tval = document.getElementById('tval');
+  tval.textContent = String(Math.floor(timeState.time)).padStart(2, '0') + ':' +
+    String(Math.round((timeState.time % 1) * 60)).padStart(2, '0');
+  slider.addEventListener('input', () => {
+    applyTimeOfDay(parseFloat(slider.value));
+    tval.textContent = String(Math.floor(timeState.time)).padStart(2, '0') + ':' +
+      String(Math.round((timeState.time % 1) * 60)).padStart(2, '0');
+  });
+});
+
+// ---------- GLB export ----------
+document.getElementById('btn-glb').addEventListener('click', () => {
+  const exporterNS = window.THREE_ADDONS;
+  if (!exporterNS || !exporterNS.GLTFExporter) { console.error('GLTFExporter not bundled'); return; }
+  const exportRoot = new THREE.Group();
+  exportRoot.name = WORLD.meta.name || 'world';
+  const terr = zoneGroup.clone(true);
+  const inst = instanceRoot.clone(true);
+  // strip per-instance helpers from export clones
+  [terr, inst].forEach(g => g.traverse(o => {
+    if (o.isMesh) { o.castShadow = false; o.receiveShadow = false; }
+  }));
+  exportRoot.add(terr, inst);
+  new exporterNS.GLTFExporter().parse(exportRoot, buf => {
+    const blob = new Blob([buf], { type: 'model/gltf-binary' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (WORLD.meta.name || 'world').replace(/[^\w-]+/g, '_') + '.glb';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, err => console.error('GLB export failed', err), { binary: true });
+});
+
+// ---------- picking + panel ----------
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let selected = null;
+const panel = document.getElementById('panel');
+
+function highlight(inst, on) {
+  inst._object.traverse(o => {
+    if (!o.isMesh) return;
+    if (!o.userData._origMat) o.userData._origMat = o.material;
+    if (on) {
+      o.material = o.userData._origMat.clone();
+      if (o.material.emissive) o.material.emissive.setHex(0x3355ff);
+      o.material.emissiveIntensity = 0.9;
+    } else {
+      o.material = o.userData._origMat;
+    }
+  });
+}
+
+// click vs drag guard so orbiting never changes selection
+let downPos = null;
+renderer.domElement.addEventListener('pointerdown', e => {
+  if (e.button !== 0) return;
+  downPos = [e.clientX, e.clientY];
+});
+renderer.domElement.addEventListener('pointerup', e => {
+  if (e.button !== 0 || !downPos) return;
+  const moved = Math.hypot(e.clientX - downPos[0], e.clientY - downPos[1]);
+  downPos = null;
+  if (moved > 6) return; // was a drag
+  pointer.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(pickables, false);
+  const inst = hits.length ? hits[0].object.userData.instanceRef : null;
+
+  if (editMode) {
+    if (!inst) return;
+    if (editSel.has(inst)) { highlight(inst, false); editSel.delete(inst); }
+    else { highlight(inst, true); editSel.add(inst); }
+    renderEditChips();
+    return;
+  }
+
+  if (selected) highlight(selected, false);
+  selected = null;
+  panel.style.display = 'none';
+  if (inst) {
+    selected = inst;
+    highlight(inst, true);
+    document.getElementById('panel-title').textContent = inst.instance_id;
+    const params = Object.assign({}, inst.params); delete params._seed;
+    document.getElementById('panel-body').innerHTML =
+      `<div class="row"><span class="k">asset_id</span>: ${inst.asset_id}</div>` +
+      `<div class="row"><span class="k">zone_id</span>: ${inst.zone_id}</div>` +
+      `<div class="row"><span class="k">position</span>: [${inst.position.map(v => v.toFixed(2)).join(', ')}]</div>` +
+      `<div class="row"><span class="k">rotation_y</span>: ${((inst.rotation_y || 0) * 180 / Math.PI).toFixed(1)}°</div>` +
+      `<pre>${JSON.stringify(params, null, 1)}</pre>`;
+    panel.style.display = 'block';
+  }
+});
+document.getElementById('panel-close').onclick = () => {
+  if (selected) highlight(selected, false);
+  selected = null; panel.style.display = 'none';
+};
+
+// ---------- edit mode: button-gated, mutually exclusive with other controls ----------
+let editMode = false;
+const editSel = new Set();
+const editbar = document.getElementById('editbar');
+const btnEdit = document.getElementById('btn-edit');
+const otherBtns = [...document.querySelectorAll('#views button:not(#btn-edit)')];
+const helpDefault = document.getElementById('hud-help').textContent;
+
+function enterEdit() {
+  editMode = true;
+  otherBtns.forEach(b => b.style.display = 'none');
+  btnEdit.textContent = '退出编辑';
+  btnEdit.classList.add('active');
+  document.getElementById('hud-help').textContent =
+    '编辑模式：click 多选对象（再点取消，Esc 清空）| 选好后底部输入意图提交';
+}
+function exitEdit() {
+  editMode = false;
+  clearEditSel();
+  otherBtns.forEach(b => b.style.display = '');
+  btnEdit.textContent = '编辑';
+  btnEdit.classList.remove('active');
+  panel.style.display = 'none';
+  document.getElementById('hud-help').textContent = helpDefault;
+}
+btnEdit.onclick = () => (editMode ? exitEdit() : enterEdit());
+// deep link from the skill side: land directly in edit state
+if (location.hash.includes('edit')) enterEdit();
+
+function renderEditChips() {
+  const box = document.getElementById('edit-chips');
+  box.innerHTML = '';
+  for (const inst of editSel) {
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.textContent = inst.instance_id.replace(/^inst_/, '');
+    chip.title = '点击取消选择';
+    chip.onclick = () => { highlight(inst, false); editSel.delete(inst); renderEditChips(); };
+    box.appendChild(chip);
+  }
+  document.getElementById('edit-status').textContent = editSel.size ? `已选 ${editSel.size} 个` : '';
+  editbar.style.display = editSel.size ? 'block' : 'none';
+}
+function clearEditSel() {
+  for (const inst of editSel) highlight(inst, false);
+  editSel.clear();
+  renderEditChips();
+}
+document.getElementById('edit-clear').onclick = clearEditSel;
+window.addEventListener('keydown', e => { if (e.key === 'Escape' && editMode) clearEditSel(); });
+
+document.getElementById('edit-submit').onclick = async () => {
+  const status = document.getElementById('edit-status');
+  const intent = document.getElementById('edit-intent').value.trim();
+  if (!editSel.size) { status.textContent = '请先点选对象'; return; }
+  if (!intent) { status.textContent = '请描述改进意图'; return; }
+  const payload = {
+    scene_page: location.pathname,
+    instance_ids: [...editSel].map(i => i.instance_id),
+    asset_ids: [...new Set([...editSel].map(i => i.asset_id))],
+    intent,
+    submitted_at: new Date().toISOString()
+  };
+  status.textContent = '提交中…';
+  try {
+    const res = await fetch('/edit-request', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('bad status ' + res.status);
+    document.getElementById('edit-intent').value = '';
+    clearEditSel();
+    status.textContent = '已提交，等待 Agent 处理（页面将自动刷新）…';
+  } catch (err) {
+    // static hosting fallback: copyable request for pasting into chat
+    const txt = JSON.stringify({ edit_request: payload }, null, 2);
+    if (navigator.clipboard) { try { await navigator.clipboard.writeText(txt); } catch (e) {} }
+    status.textContent = '无编辑服务：请求已复制到剪贴板，直接粘贴给 Agent 即可';
+    console.log('EDIT REQUEST (paste to agent):\n' + txt);
+  }
+};
+
+// auto-reload after the agent rebuilds world.html (active while editing)
+{
+  let lm = null;
+  setInterval(async () => {
+    if (!editMode) { lm = null; return; }
+    try {
+      const r = await fetch(location.pathname, { method: 'HEAD', cache: 'no-store' });
+      const cur = r.headers.get('last-modified');
+      if (lm === null) lm = cur;
+      else if (cur && cur !== lm) location.reload();
+    } catch (e) { /* ignore */ }
+  }, 2000);
+}
+
+// ---------- HUD + loop ----------
+document.querySelector('#hud-top .title').textContent = WORLD.meta.name;
+document.querySelector('#hud-top .sub').textContent =
+  `${WORLD.zones.length} zones · ${built}/${WORLD.instances.length} instances solved`;
+
+// default camera: overall bird's-eye view of the whole world
+orbit.fitTo(worldBox);
+orbit.sph.phi = 0.38;
+orbit.sph.radius *= 1.25;
+orbit.update();
+applyTimeOfDay(WORLD.meta.time_of_day ?? 14);
+
+let frames = 0, lastT = performance.now(), fps = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  if (autoSpin) orbit.vel.theta += 0.0016;
+  orbit.update();
+  const t = performance.now() / 1000;
+  for (const m of waterMats) m.userData.uTime.value = t;
+  if (composer) composer.render();
+  else renderer.render(scene, camera);
+  frames++;
+  const now = performance.now();
+  if (now - lastT > 1000) {
+    fps = frames; frames = 0; lastT = now;
+    statsParts.fps = fps;
+    statsParts.tris = (renderer.info.render.triangles / 1000).toFixed(0);
+    if (window.__MAT_DEDUP__) statsParts.mats = window.__MAT_DEDUP__.unique;
+    renderStats();
+  }
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  if (composer) composer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// debug / tooling handle
+window.__WORLD__ = {
+  orbit, camera, scene, renderer, composer,
+  instances: instanceById, worldBox,
+  setTimeOfDay: applyTimeOfDay, timeState
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "asset_id": "patio_umbrella_v1",
+  "name": "Patio Umbrella",
+  "category": "furniture",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "random",
+  "asset_module": "asset.js",
+  "max_triangles": 200,
+  "footprint": {
+    "type": "circle",
+    "radius_param": "canopy_radius"
+  },
+  "height": {
+    "param": "pole_height",
+    "factor": 1,
+    "offset": 0.15
+  },
+  "params_schema": {
+    "type": "object",
+    "required": [
+      "canopy_radius"
+    ],
+    "properties": {
+      "canopy_radius": {
+        "type": "number",
+        "min": 1.0,
+        "max": 1.7,
+        "default": 1.35,
+        "description": "canopy radius"
+      },
+      "pole_height": {
+        "type": "number",
+        "min": 1.9,
+        "max": 2.6,
+        "default": 2.25,
+        "description": "pole height"
+      },
+      "canopy_hue": {
+        "type": "number",
+        "min": 0.0,
+        "max": 1.0,
+        "default": 0.05,
+        "description": "canopy hue"
+      }
+    }
+  }
+}

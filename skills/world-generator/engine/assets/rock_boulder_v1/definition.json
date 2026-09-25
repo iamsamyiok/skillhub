@@ -1,0 +1,54 @@
+{
+  "asset_id": "rock_boulder_v1",
+  "name": "Boulder",
+  "category": "terrain_detail",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "random",
+  "asset_module": "asset.js",
+  "max_triangles": 500,
+  "footprint": {
+    "type": "circle",
+    "radius_param": "radius"
+  },
+  "height": {
+    "param": "radius",
+    "factor": 2
+  },
+  "params_schema": {
+    "type": "object",
+    "required": [
+      "radius"
+    ],
+    "properties": {
+      "radius": {
+        "type": "number",
+        "min": 0.3,
+        "max": 2.0,
+        "default": 0.9,
+        "description": "mean radius"
+      },
+      "squash": {
+        "type": "number",
+        "min": 0.55,
+        "max": 1.0,
+        "default": 0.75,
+        "description": "y scale factor"
+      },
+      "irregularity": {
+        "type": "number",
+        "min": 0.0,
+        "max": 0.35,
+        "default": 0.18,
+        "description": "vertex displacement amount"
+      },
+      "tint": {
+        "type": "number",
+        "min": -0.08,
+        "max": 0.08,
+        "default": 0,
+        "description": "gray tint shift"
+      }
+    }
+  }
+}

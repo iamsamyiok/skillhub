@@ -1,0 +1,40 @@
+{
+  "asset_id": "chair_v1",
+  "name": "Chair",
+  "category": "furniture",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "random",
+  "asset_module": "asset.js",
+  "max_triangles": 200,
+  "footprint": {
+    "type": "box",
+    "half_width": 0.27,
+    "half_depth": 0.27
+  },
+  "height": {
+    "param": "seat_hue",
+    "factor": 0,
+    "offset": 0.95
+  },
+  "params_schema": {
+    "type": "object",
+    "required": [],
+    "properties": {
+      "seat_hue": {
+        "type": "number",
+        "min": 0,
+        "max": 1,
+        "default": 0.58,
+        "description": "seat colour hue"
+      },
+      "wood_tint": {
+        "type": "number",
+        "min": -0.05,
+        "max": 0.05,
+        "default": 0,
+        "description": "frame tone shift"
+      }
+    }
+  }
+}
