@@ -551,8 +551,10 @@ def cmd_hub_publish(a):
     for f in sorted(src.rglob("*")):
         if f.is_file():
             rel = f.relative_to(src).as_posix()
-            if rel.startswith(".skillhub") or "__pycache__" in rel or rel.endswith(".pyc"):
+            if rel.startswith(".skillhub") or "__pycache__" in rel:
                 continue
+            if rel.endswith((".pyc", ".exe", ".dll", ".bin", ".zip", ".7z")):
+                continue                                   # 二进制/产物不进技能仓库
             files.append((rel, f))
     print("[hub-publish] 来源 %s, %d 个文件" % (src, len(files)))
     if a.dry_run:
