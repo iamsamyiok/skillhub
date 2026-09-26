@@ -1,26 +1,23 @@
 #!/usr/bin/env node
 'use strict';
 
-// cards.mjs — 卡片模式合成器 v2(HyperFrames 理念轻量化落地)
-//  v1: 静态卡片截图 + ffmpeg zoompan 假推镜 + 硬切拼接
-//  v2 新增(借鉴 HyperFrames 框架,零新依赖):
-//    1. 确定性入场动画:每张卡片的元素错峰淡入+滑入(纯 CSS animation + WAAPI currentTime 逐帧seek,
-//       不用 GSAP;同款效果,截图完全可复现——确定性逐帧渲染是 HyperFrames 的核心纪律)
-//    2. 交叉溶解转场:卡片之间 xfade 0.4s(替代硬切;HF 规则「场景间必须有转场,禁跳切」)
-//    3. 溢出自检:截图前扫描元素包围盒,超出视口即告警(HF inspect 的轻量版)
-//    4. 对比度审计:主题色 vs 背景的 WCAG 对比度检查(HF validate 的轻量版)
-//
-// 契约不变:env STORYBOARD/OUT_DIR;配音来自 tts.mjs(OUT/tts/{id}.mp3)
-// 产物:OUT/cards/、OUT/final-cards.mp4
-//
-// 运行: NODE_PATH=$(npm root -g) node cards.mjs
-// 环境变量: NO_ANIMATE=1 关闭入场动画(退回 v1 静态模式) | XFADE=0.4 转场时长 | TTS_DIR 覆盖配音目录
+// cards.mjs — 卡片模式合成器 v2.2(LaunchVideo 启示升级)
+//  v2.0: 静态卡片截图 + ffmpeg zoompan 假推镜 + 硬切拼接
+//  v2.1: 确定性入场动画(WAAPI 逐帧 seek) + xfade 转场 + 溢出/对比度审计
+//  v2.2(借鉴 LaunchVideo/shipvideo 的 check_scene 思路):
+//    1. 统一子树时间轴寻址: getAnimations 覆盖全部后代+伪元素, CSS 类动画与内联动画同样可 seek
+//    2. 元素级动效: 数字滚动计数(data-count 确定性 __seek)、进度条生长、下划线扫过、网格微漂移
+//    3. check_scene 式质检: 缺元素/不可见/溢出/页面错误/定格帧体积, 不合格自动修复重试一次
+//    4. render_report.json: 每卡质检结果 + 终片抽帧 QA, 全程留痕
+//  契约不变: env STORYBOARD/OUT_DIR;配音来自 tts.mjs(OUT/tts/{id}.mp3)
+//  运行: NODE_PATH=$(npm root -g) node cards.mjs
+//  环境变量: NO_ANIMATE=1 关闭动画 | XFADE=秒
 
 import fs from 'fs';
 import path from 'path';
 import { execFileSync } from 'child_process';
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url); // NODE_PATH 指向全局 node_modules 时可解析全局 playwright
+const require = createRequire(import.meta.url);
 
 const ROOT = import.meta.dirname;
 const OUT_DIR = process.env.OUT_DIR || path.join(ROOT, 'out');
@@ -39,7 +36,7 @@ const BG = '#0d0a14', FG = '#e6edf3';
 const shots = (BOARD.shots || []).filter((s) => s.card);
 if (shots.length === 0) { console.error('分镜表里没有任何 card 字段的分镜'); process.exit(1); }
 
-// ---------- 对比度审计(WCAG,借鉴 HF validate) ----------
+// ---------- 对比度审计(WCAG) ----------
 function luma(hex) {
   const c = hex.replace('#', '');
   const f = (i) => {
@@ -59,28 +56,66 @@ for (const [name, fg, bg, large] of [['正文', FG, BG, false], ['主题色', A,
   else console.log(`对比度 ✓ ${name} ${r.toFixed(2)}:1`);
 }
 
-// ---------- 渲染 HTML(带入场动画) ----------
+// ---------- 渲染 HTML(入场动画 + 元素级时间轴动效) ----------
 const animCss = ANIMATE ? `
-/* 确定性入场:CSS animation + play-state paused,WAAPI 逐帧 seek currentTime */
+/* 确定性入场:CSS animation + play-state paused,渲染时逐帧 seek currentTime */
 .slide [data-anim] { animation: enter 0.6s cubic-bezier(0.22,1,0.36,1) both paused; }
 @keyframes enter { from { opacity: 0; transform: translateY(42px); } to { opacity: 1; transform: none; } }
+/* v2.2 元素级动效(全部走 CSS 动画 → 统一 seek,确定性成立) */
+.kicker { position: relative; }
+.kicker::after { content: ""; position: absolute; left: 0; bottom: -14px; height: 6px; width: 100%;
+  background: ${A}; transform-origin: left; animation: swipe 0.5s 0.4s cubic-bezier(.22,1,.36,1) both paused; }
+@keyframes swipe { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.hook { position: relative; }
+.hook::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+  background: ${A2}; transform-origin: top; animation: swipeV 0.45s 0.55s cubic-bezier(.22,1,.36,1) both paused; }
+@keyframes swipeV { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.slide::after { content: ""; position: absolute; inset: -2px 0 0 -96px; pointer-events: none;
+  background: repeating-linear-gradient(90deg, ${A}07 0 1px, transparent 1px 96px);
+  animation: gridDrift 16s linear both paused; }
+@keyframes gridDrift { from { transform: translateX(0); } to { transform: translateX(-96px); } }
+.pbar-wrap { position: absolute; left: 0; bottom: 0; height: 10px; background: ${A}22; overflow: hidden; }
+.pbar { height: 100%; background: linear-gradient(90deg, ${A}, ${A2});
+  transform-origin: left; animation: pbarFill 0.9s 0.25s cubic-bezier(.22,1,.36,1) both paused; }
+@keyframes pbarFill { from { transform: scaleX(0.02); } to { transform: scaleX(1); } }
+.num { font-variant-numeric: tabular-nums; color: ${A2}; font-weight: 900; }
 ` : '';
+
+// 数字滚动: 长数字(非年份)包成 data-count 元素,页面 __seek 驱动 0→目标值
+const numify = (txt) => esc(txt).replace(/(\d{1,3}(?:,\d{3})+|\d{3,})/g, (m) => {
+  const raw = m.replace(/,/g, '');
+  if (/^(19|20)\d{2}$/.test(raw)) return m;                 // 年份不做计数
+  return `<span class="num" data-count="${raw}">${m}</span>`;
+});
 
 function slideHtml(s, idx) {
   const title = esc(s.card.title).replace(/(SkillHub|AI)/g, `<span class="hl">$1</span>`);
   let k = 0;
   const el = (tag, cls, inner) => `<${tag} class="${cls}" ${ANIMATE ? `data-anim style="animation-delay:${(k++) * 0.15}s"` : ''}>${inner}</${tag}>`;
+  const pct = ((idx + 1) / shots.length * 100).toFixed(1);
   return `<section class="slide" id="s${s.id}">
     <div class="ai-badge" ${ANIMATE ? `data-anim style="animation-delay:0s"` : ''}>AI 生成</div>
     ${el('div', 'kicker', esc(s.card.kicker))}
     ${el('h1', '', title)}
-    ${s.card.sub ? el('div', 'sub', esc(s.card.sub)) : ''}
-    ${s.card.hook ? el('div', 'hook', esc(s.card.hook)) : ''}
-    ${(s.card.brands || []).length ? el('div', 'brands', s.card.brands.map((b) => `<span class="brand">${esc(b)}</span>`).join('')) : ''}
+    ${s.card.sub ? el('div', 'sub', numify(esc(s.card.sub))) : ''}
+    ${s.card.hook ? el('div', 'hook', numify(esc(s.card.hook))) : ''}
+    ${(s.card.brands || []).length ? el('div', 'brands', s.card.brands.map((b) => `<span class="brand">${numify(esc(b))}</span>`).join('')) : ''}
     ${s.card.decl ? el('div', 'decl', '⚠ ' + esc(s.card.decl)) : ''}
     ${s.card.note ? el('div', 'note', esc(s.card.note)) : ''}
+    <div class="pbar-wrap" style="width:${pct}%"><div class="pbar"></div></div>
   </section>`;
 }
+
+// 页面内确定性计数钩子: 渲染循环每帧调用 __seek(t)
+const seekJs = `
+window.__seek = (t) => {
+  document.querySelectorAll('[data-count]').forEach((el) => {
+    const target = parseFloat(el.dataset.count);
+    const p = Math.min(1, Math.max(0, (t - 500) / 900));
+    const e = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(target * e).toLocaleString('en-US');
+  });
+};`;
 
 fs.mkdirSync(OUT, { recursive: true });
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
@@ -106,11 +141,11 @@ h1 .hl{color:${A}}
 .decl{display:inline-block;margin-top:40px;padding:16px 34px;border-radius:16px;
   background:${A}24;border:2px solid ${A};font-size:44px;font-weight:900;color:${A}}
 ${animCss}
-</style></head><body>${shots.map(slideHtml).join('\n')}</body></html>`;
+</style></head><body><script>${seekJs}</script>${shots.map(slideHtml).join('\n')}</body></html>`;
 fs.writeFileSync(path.join(OUT_DIR, 'cards.html'), html);
 console.log(`cards.html 已生成(${shots.length} 张卡片, 动画=${ANIMATE})`);
 
-// ---------- Playwright 截图(入场逐帧 + 定格) ----------
+// ---------- Playwright 截图(入场逐帧 + 定格 + check_scene 质检) ----------
 let chromium = null;
 for (const m of ['@playwright/test', 'playwright']) {
   try { chromium = require(m).chromium; break; } catch { /* 下一个 */ }
@@ -121,14 +156,32 @@ const width = BOARD.meta?.resolution?.[0] ?? 1920;
 const height = BOARD.meta?.resolution?.[1] ?? 1080;
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width, height } });
+const pageErrors = [];
+page.on('pageerror', (e) => pageErrors.push(String(e)));
+page.on('console', (m) => { if (m.type() === 'error') pageErrors.push('console: ' + m.text()); });
 await page.goto('file://' + path.join(OUT_DIR, 'cards.html').replace(/\\/g, '/'));
 await page.waitForTimeout(600);
 
+// 统一子树时间轴寻址: 后代全部元素 + 本身伪元素, delay 取自计算时序(CSS 类动画同样适用)
+const SEEK_JS = (node, time) => {
+  const targets = [node, ...node.querySelectorAll('*')];
+  for (const n of targets) {
+    for (const a of n.getAnimations()) {
+      const d = (a.effect && a.effect.getComputedTiming) ? (a.effect.getComputedTiming().delay || 0) : 0;
+      a.pause();
+      a.currentTime = Math.max(0, time - d);
+    }
+  }
+  if (window.__seek) window.__seek(time);
+};
+
 const entranceFrames = ANIMATE ? Math.round(ENTRANCE * FPS) : 1;
 const warnings = [];
+const cardReport = [];
 for (let i = 0; i < shots.length; i++) {
   const el = page.locator(`#s${shots[i].id}`);
-  // 溢出自检(HF inspect 轻量版):相对卡片自身 1920x1080 舞台判断,页面级坐标会误报非首卡
+  const issues = [];
+  // 溢出自检(HF inspect 轻量版):相对卡片自身 1920x1080 舞台判断
   const overflow = await el.evaluate((node) => {
     const bad = [];
     const stage = node.getBoundingClientRect();
@@ -140,30 +193,60 @@ for (let i = 0; i < shots.length; i++) {
     }
     return bad;
   });
-  overflow.forEach((o) => warnings.push(`[${shots[i].id}] 溢出: ${o}`));
+  overflow.forEach((o) => issues.push('溢出: ' + o));
 
   if (ANIMATE) {
-    // 确定性逐帧:WAAPI seek(pause 后设 currentTime;delay 已含在动画相位里,逐帧归一化)
+    // 确定性逐帧:统一 seek(WAAPI/CSS 动画 + __seek 计数)
     const frameDir = path.join(OUT, `frames-${shots[i].id}`);
     fs.mkdirSync(frameDir, { recursive: true });
     for (let f = 0; f < entranceFrames; f++) {
       const t = (f / FPS) * 1000;
-      await el.evaluate((node, time) => {
-        node.querySelectorAll('[data-anim]').forEach((n) => {
-          const delay = parseFloat(n.style.animationDelay) * 1000 || 0;
-          n.getAnimations().forEach((a) => { a.pause(); a.currentTime = Math.max(0, time - delay); });
-        });
-      }, t);
+      await el.evaluate(SEEK_JS, t);
       await page.locator(`#s${shots[i].id}`).screenshot({ path: path.join(frameDir, `e${String(f).padStart(3, '0')}.png`) });
     }
     // 全入场状态定格帧(v2 保留 slide-XX.png 供 zoompan/封面复用)
-    await el.evaluate((node) => {
-      node.querySelectorAll('[data-anim]').forEach((n) => n.getAnimations().forEach((a) => { a.pause(); a.currentTime = 5000; }));
-    });
-    await page.locator(`#s${shots[i].id}`).screenshot({ path: path.join(OUT, `slide-${String(i).padStart(2, '0')}.png`) });
+    await el.evaluate(SEEK_JS, 60000);
   } else {
-    await page.locator(`#s${shots[i].id}`).screenshot({ path: path.join(OUT, `slide-${String(i).padStart(2, '0')}.png`) });
+    await el.evaluate((node) => { if (window.__seek) window.__seek(60000); });
   }
+  await page.locator(`#s${shots[i].id}`).screenshot({ path: path.join(OUT, `slide-${String(i).padStart(2, '0')}.png`) });
+
+  // ---- check_scene 式质检(不合格自动修复重试一次) ----
+  const shotPath = path.join(OUT, `slide-${String(i).padStart(2, '0')}.png`);
+  const qa = await el.evaluate((node) => {
+    const out = { missing: [], invisible: [] };
+    for (const sel of ['.kicker', 'h1']) {
+      const n = node.querySelector(sel);
+      if (!n || !n.textContent.trim()) out.missing.push(sel);
+    }
+    for (const n of node.querySelectorAll('[data-anim]')) {
+      const cs = getComputedStyle(n);
+      if (n.textContent.trim() && parseFloat(cs.opacity) < 0.95) out.invisible.push('opacity:' + (n.className || n.tagName));
+    }
+    return out;
+  });
+  qa.missing.forEach((m) => issues.push('缺元素: ' + m));
+  qa.invisible.forEach((m) => issues.push('不可见: ' + m));
+  if (fs.existsSync(shotPath) && fs.statSync(shotPath).size < 15000) issues.push('定格帧过小(疑似空白)');
+
+  if (issues.length) {
+    // 修复重试: 强制末态 + 重截 + 复检
+    await el.evaluate((node) => {
+      const targets = [node, ...node.querySelectorAll('*')];
+      for (const n of targets) for (const a of n.getAnimations()) { a.pause(); a.currentTime = 60000; }
+      if (window.__seek) window.__seek(60000);
+    });
+    await page.locator(`#s${shots[i].id}`).screenshot({ path: shotPath });
+    const retry = fs.existsSync(shotPath) && fs.statSync(shotPath).size >= 15000;
+    if (retry) issues.splice(issues.findIndex((x) => x.includes('定格帧')), 1);
+    cardReport.push({ id: shots[i].id, ok: issues.length === 0, issues });
+    if (issues.length === 0) console.log(`card ${shots[i].id} ⚠ 质检发现 ${issues.length + 1} 项 → 修复重试后通过`);
+    else console.error(`card ${shots[i].id} ✗ 质检未过: ${issues.join('; ')}`);
+  } else {
+    cardReport.push({ id: shots[i].id, ok: true, issues: [] });
+  }
+
+  issues.forEach((o) => warnings.push(`[${shots[i].id}] ${o}`));
   console.log(`card ${shots[i].id} ✓ (${ANIMATE ? entranceFrames + ' 帧入场 + ' : ''}定格)`);
 }
 warnings.forEach((w) => console.error('⚠ ' + w));
@@ -241,4 +324,24 @@ if (segs.length === 1 || XFADE <= 0) {
 }
 const size = (fs.statSync(final).size / 1048576).toFixed(1);
 const total = parseFloat(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', final], { encoding: 'utf8' }).trim());
+
+// ---------- 终片抽帧 QA + 渲染报告(LaunchVideo check_scene 的成片版) ----------
+const qaDir = path.join(OUT, 'qa');
+fs.mkdirSync(qaDir, { recursive: true });
+let qaBad = 0;
+[0.2, 0.5, 0.8].forEach((p, k) => {
+  const f = path.join(qaDir, `q${k}.png`);
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', String(Math.round(total * p)), '-i', final, '-frames:v', '1', f]);
+  if (fs.statSync(f).size < 15000) qaBad++;
+});
+const report = {
+  ok: qaBad === 0 && cardReport.every((c) => c.ok) && pageErrors.length === 0,
+  cards: cardReport,
+  pageErrors,
+  finalFrameQA: { sampled: 3, bad: qaBad },
+  durationSec: total,
+  sizeMB: Number(size),
+};
+fs.writeFileSync(path.join(OUT_DIR, 'render_report.json'), JSON.stringify(report, null, 1));
+console.log(`质检: 卡片 ${cardReport.filter((c) => c.ok).length}/${cardReport.length} 通过, 终片抽帧异常 ${qaBad}, 页面错误 ${pageErrors.length} → render_report.json`);
 console.log(`成片完成 → ${final} (${size}MB, ${total.toFixed(1)}s, ${segs.length} 段, 转场=${XFADE}s, 动画=${ANIMATE})`);
