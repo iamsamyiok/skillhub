@@ -16,6 +16,7 @@ function createAsset(params) {
     new THREE_.BoxGeometry(w * 0.18, h * 0.62, 0.06),
     new THREE_.MeshLambertMaterial({ color: 0x4a3220 })
   );
+  door.userData.surface = 'wood';
   door.position.set(0, h * 0.31, hz + 0.02);
   group.add(door);
 

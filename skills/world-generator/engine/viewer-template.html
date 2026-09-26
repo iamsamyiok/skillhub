@@ -308,6 +308,7 @@ const SURFACE_DEFS = {
 const TYPE_SURFACES = [
   [/^rock|^boulder/, 'rock'],
   [/^bench|^table|^chair/, 'wood'],
+  [/^boat/, 'wood'],
   [/^street_lamp|^lamp|^patio_umbrella/, 'metal'],
   [/^car/, 'metal'],
   [/^pool/, 'concrete'],
@@ -330,9 +331,14 @@ function surfaceFor(o) {
   return null;
 }
 // brown-ish material color -> bark (tree trunks; canopies stay procedural)
+// thresholds are tuned for sRGB values; ColorManagement stores linear
+// working-space components, so convert before comparing
+const _surfC = new THREE.Color();
 function trunkish(m) {
   const c = m.color;
-  return c && c.r > c.g && c.g > c.b && c.r < 0.62 && c.g > 0.18 && c.b < 0.32;
+  if (!c) return false;
+  _surfC.copy(c).convertLinearToSRGB();
+  return _surfC.r > _surfC.g && _surfC.g > _surfC.b && _surfC.r < 0.62 && _surfC.g > 0.18 && _surfC.b < 0.32;
 }
 // planar XZ fallback for hand-built geometries without a uv attribute
 function ensureUV(o) {
@@ -624,7 +630,11 @@ window.__applyMaterialOverrides();
   leafTex.wrapS = leafTex.wrapT = THREE.RepeatWrapping;
   leafTex.repeat.set(3, 3);
 
-  const isCanopy = m => m.color && m.color.g >= m.color.r && m.color.g > m.color.b && m.color.g > 0.28;
+  const isCanopy = m => {
+    if (!m.color) return false;
+    _surfC.copy(m.color).convertLinearToSRGB();
+    return _surfC.g > _surfC.r * 1.12 && _surfC.g > _surfC.b && _surfC.g > 0.28;
+  };
 
   instanceRoot.traverse(o => {
     if (!o.isMesh || !o.geometry || !o.material) return;
@@ -770,7 +780,11 @@ scene.add(groundDisc);
   const bindMat = (m, slot, worldSize) => {
     const p = packs[slot];
     if (!p || m.userData.waterUpgraded || m.userData._photoBound) return m;
-    if (m.emissive && m.emissiveIntensity > 0.25) return m; // glass / lights
+    // skip only materials with a real visible glow: PBR conversion gives
+    // every material a black emissive Color (truthy) at intensity 1, so the
+    // presence check alone would reject the entire library
+    if (m.emissive && m.emissiveIntensity > 0.25 &&
+        (m.emissive.r + m.emissive.g + m.emissive.b) > 0.09) return m; // glass / lights
     const r = Math.max(1, Math.round(worldSize / p.size));
     const key = m.uuid + '|' + slot + '|' + r;
     if (matCache.has(key)) return matCache.get(key);
@@ -832,21 +846,49 @@ scene.add(groundDisc);
   // HDRI image-based lighting replaces the synthetic room (kept as fallback)
   if (TEXDB.hdri && window.THREE_ADDONS && window.THREE_ADDONS.RGBELoader) {
     try {
-      const bin = atob(TEXDB.hdri.split(',')[1]);
-      const buf = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
-      // r160 RGBELoader.parse returns raw texData, not a texture
-      const td = new window.THREE_ADDONS.RGBELoader().parse(buf.buffer);
-      if (td && td.width && td.data) {
+      const loader = new window.THREE_ADDONS.RGBELoader();
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      const pmremFromDataUri = (uri) => {
+        const bin = atob(uri.split(',')[1]);
+        const buf = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+        // r160 RGBELoader.parse returns raw texData, not a texture
+        const td = loader.parse(buf.buffer);
+        if (!(td && td.width && td.data)) return null;
         const eq = new THREE.DataTexture(td.data, td.width, td.height, td.format, td.type);
         eq.mapping = THREE.EquirectangularReflectionMapping;
         eq.magFilter = THREE.LinearFilter; eq.minFilter = THREE.LinearFilter;
         eq.needsUpdate = true;
-        const pmrem = new THREE.PMREMGenerator(renderer);
-        scene.environment = pmrem.fromEquirectangular(eq).texture;
-        pmrem.dispose();
+        const env = pmrem.fromEquirectangular(eq).texture;
         eq.dispose();
+        return env;
+      };
+      // time-banded HDRIs (manifest __hdri__.bands): dusk sky takes over in
+      // the evening; applyTimeOfDay swaps the environment at the band edge
+      const envByBand = {};
+      const bandSources = TEXDB.hdris || (TEXDB.hdri ? { day: TEXDB.hdri } : {});
+      for (const [band, uri] of Object.entries(bandSources)) {
+        const env = pmremFromDataUri(uri);
+        if (env) envByBand[band] = env;
+      }
+      pmrem.dispose();
+      window.__ENV_BANDS__ = envByBand;
+      const pickEnv = (t) => (t >= 16.5 && envByBand.dusk) ? envByBand.dusk : (envByBand.day || null);
+      const chosen = pickEnv(timeState.time);
+      if (chosen) {
+        scene.environment = chosen;
         window.__IBL__ = 'hdri';
+        window.__ENV_BAND_PICK__ = (t) => {
+          const env = pickEnv(t);
+          if (env && env !== scene.environment) {
+            // soften the pop: dip ambient reflections for a few frames
+            scene.environment = env;
+            const dip = 0.25;
+            pbrMats.forEach(m => { if (m.envMapIntensity !== undefined) m.envMapIntensity = (m.userData.envBase || 1) * dip; });
+            setTimeout(() => applyTimeOfDay(timeState.time), 90);
+          }
+          return env;
+        };
       }
     } catch (e) { console.warn('HDRI IBL failed, procedural IBL kept', e); }
   }
@@ -1034,6 +1076,8 @@ function renderStats() {
 
 function applyTimeOfDay(t) {
   timeState.time = t;
+  // time-banded HDRI swap (dusk sky in the evening) before light modulation
+  if (window.__ENV_BAND_PICK__) window.__ENV_BAND_PICK__(t);
   const dayFrac = (t - 6) / 12;               // 0 at 06:00, 1 at 18:00
   const elev = Math.sin(dayFrac * Math.PI);   // sun elevation factor, <0 at night
   const maxElev = THREE.MathUtils.degToRad(62);

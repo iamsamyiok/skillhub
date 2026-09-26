@@ -1,9 +1,9 @@
 ---
 name: world-generator
-version: 1.4.0
+version: 1.5.0
 category: 前端开发
 tags: [3D, Three.js, 程序化生成, 场景生成, 交互编辑, 参数化]
-description: 通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL、SSAO/SMAA 影视级后处理、圆角建筑与叶噪树冠，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch（布局 + 实例属性：旋转/缩放/材质/显隐/自定义元数据，配属性值指导库 props-library）与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。
+description: 通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL、SSAO/SMAA 影视级后处理、圆角建筑与叶噪树冠，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch（布局 + 实例属性：旋转/缩放/材质/显隐/自定义元数据，配属性值指导库 props-library）、分时段双 HDRI（白天/黄昏）与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。
 license: MIT
 ---
 规则机器固定，语义无限扩展；程序管几何，AI 管设计。
@@ -145,9 +145,10 @@ node engine/index.mjs --scene scenes/<name> --patch patch-1.json
 ### 阶段 6：视觉与运行时能力（viewer 内建，无需额外操作）
 
 - **渲染**（照片级质感已全量内建）：ACES tone mapping + 线性光工作流；Poly Haven HDRI 实景 IBL（PMREM，1k equirect 内嵌 base64；无 HDRI 时回退 RoomEnvironment）；Lambert 资产 API → 引擎端统一升级 MeshStandardMaterial；UnrealBloom 泛光（灯头 emissive、太阳盘 HDR 自动发光）；SSAO 环境光遮蔽（角落/缝隙接地感；GL 栈渲染异常时自动回退 RenderPass 并告警）；SMAA 抗锯齿（EffectComposer 关闭 MSAA 后的边缘修复）；FogExp2 大气。后处理链顺序：SSAO → Bloom → Output → 调色 → SMAA
+- **分时段双 HDRI**：`assets-bin/manifest.json` 的 `__hdri__.bands`（day=白天 / dusk=黄昏）按 `time_of_day` 切换环境（≥16.5 取 dusk），切换瞬间环境反射短暂压暗过渡；滑动时间滑杆实时换天空
 - **几何真实感**：标记为墙面/楼板/屋顶的建筑 mesh 自动圆角化（RoundedBoxGeometry）；绿色树冠叠加双倍频叶噪色图（高频两色叶纹一次性烘焙）；地形确定性草丛散布（仅绿系采样点，按噪声聚簇，种子可复现）
 - **CC0 PBR 贴图库**（照片级核心，12 槽位内嵌）：grass/dirt/rock/concrete/asphalt/stucco/brick/wood/rooftile/metal/bark/gravel，每槽 albedo(sRGB)+normalGL+roughness(linar) 1K JPG，来源 ambientCG 与 Poly Haven（全 CC0），构建脚本 `engine/tools/build-texture-packs.py` 可重建；绑定按 mesh 世界尺寸自动换算平铺密度，anisotropy 全开
-- **surface 槽位系统**：mesh 级 `userData.surface = '<slot>'` 显式标签（建筑资产首选）优先；资产类型默认映射（rock→rock、bench/table/chair→wood、lamp/umbrella/car→metal、pool→concrete、tree→树干棕色调启发式→bark）；emissive/玻璃/水面材质自动跳过；手写 BufferGeometry 无 uv 时按 XZ 平面投影兜底生成
+- **surface 槽位系统**：mesh 级 `userData.surface = '<slot>'` 显式标签（建筑资产首选）优先；资产类型默认映射（rock→rock、bench/table/chair→wood、boat→wood、lamp/umbrella/car→metal、pool→concrete、tree→树干棕色调启发式→bark）；仅真实发光材质（emissive 亮度+强度双条件）与水面跳过绑定；手写 BufferGeometry 无 uv 时按 XZ 平面投影兜底生成；颜色启发式（trunkish/isCanopy）先做 linear→sRGB 换算再比较阈值
 - **程序化天穹 + 程序化噪变兜底**：渐变穹顶 + HDR 日/月盘 + 程序化星场；无贴图槽位命中的材质保留多倍频值噪声 roughnessMap/bumpMap；贴图解码异步完成前先渲染程序化外观，就绪后原位升级（`__WORLD__.texturesReady.done`）
 - **时间系统**：`scene_meta.time_of_day`（0-24，默认 14）驱动太阳方位/颜色、天穹、雾、半球光、IBL、夜间泛光增强；viewer「时间」按钮可实时拖动预览
 - **水面动画**：资产给水面 mesh 设 `mesh.userData.water = true`，viewer 自动升级为低粗糙度 Standard 波动材质（HDRI 反射 + 顶点波，见 pool_v1）

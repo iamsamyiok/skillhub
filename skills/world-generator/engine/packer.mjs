@@ -115,13 +115,24 @@ function buildTextureDB() {
     if (files.color) slots[slot] = { files, source: entry.source };
   }
   let hdri = '';
-  const hdriFiles = manifest.__hdri__ && manifest.__hdri__.files;
-  if (hdriFiles) {
-    const name = Object.keys(hdriFiles)[0];
-    const raw = fs.readFileSync(path.join(binDir, 'hdri', name));
-    hdri = 'data:application/octet-stream;base64,' + raw.toString('base64');
+  const hdris = {};
+  const hdriBands = manifest.__hdri__ && manifest.__hdri__.bands;
+  if (hdriBands) {
+    for (const [band, info] of Object.entries(hdriBands)) {
+      const raw = fs.readFileSync(path.join(binDir, 'hdri', info.file));
+      hdris[band] = 'data:application/octet-stream;base64,' + raw.toString('base64');
+    }
+    if (hdris.day) hdri = hdris.day; // compat: single-hdri viewers keep working
+  } else {
+    const hdriFiles = manifest.__hdri__ && manifest.__hdri__.files;
+    if (hdriFiles) {
+      const name = Object.keys(hdriFiles)[0];
+      const raw = fs.readFileSync(path.join(binDir, 'hdri', name));
+      hdri = 'data:application/octet-stream;base64,' + raw.toString('base64');
+      hdris.day = hdri;
+    }
   }
-  const json = JSON.stringify({ slots, hdri }).replace(/</g, '\\u003c');
+  const json = JSON.stringify({ slots, hdri, hdris }).replace(/</g, '\\u003c');
   return 'window.__TEXDB__ = ' + json + ';';
 }
 

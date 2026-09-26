@@ -348,8 +348,15 @@
     }
   },
   "__hdri__": {
-    "files": {
-      "day_partly_cloudy_1k.hdr": 1637206
+    "bands": {
+      "day": {
+        "file": "day_partly_cloudy_1k.hdr",
+        "source": "polyhaven.com/day_partly_cloudy"
+      },
+      "dusk": {
+        "file": "evening_meadow_1k.hdr",
+        "source": "polyhaven.com/evening_meadow"
+      }
     }
   }
 }
