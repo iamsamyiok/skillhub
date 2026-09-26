@@ -58,7 +58,7 @@ node engine/edit-server.mjs --port 8770 --root .
 
 - 鸟瞰/街景/环绕预设，默认整体鸟瞰机位
 - 时间系统（0-24h，太阳方位/色温、天穹、雾、IBL 昼夜调制、暮光下限保护）
-- 渲染栈：ACES tone mapping + 线性光工作流 + RoomEnvironment IBL（PMREM 程序化环境光）+ Lambert→MeshStandardMaterial 引擎端升级 + 程序化噪变 roughness/bump + UnrealBloom + FogExp2
+- 渲染栈：ACES tone mapping + 线性光工作流 + Poly Haven HDRI 实景 IBL（内嵌 base64，回退 RoomEnvironment）+ CC0 PBR 贴图（12 槽位内嵌）+ Lambert→MeshStandardMaterial 引擎端升级 + 程序化噪变 roughness/bump + SSAO 环境光遮蔽 + UnrealBloom + SMAA 抗锯齿（链路：SSAO → Bloom → Output → Grade → SMAA，GL 栈不支持时自动回退）+ FogExp2；几何侧建筑圆角化、叶噪树冠与确定性草丛散布
 - 程序化天穹：渐变穹顶 + HDR 日/月盘 + 程序化星场（无任何外部纹理/HDRI）
 - 单张统一晶格地形：noise 基底 + flat 平台 1.4m 高度/颜色过渡带，无拼接缝
 - GLB 一键导出（运行时 userData 循环引用已剥离）；`#debug` 显示分区边界；`#edit` 启用编辑模式

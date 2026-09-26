@@ -586,8 +586,8 @@
     {
       "id": "world-generator",
       "name": "world-generator",
-      "description": "通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。",
-      "version": "1.2.0",
+      "description": "通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL、SSAO/SMAA 影视级后处理、圆角建筑与叶噪树冠，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。",
+      "version": "1.3.0",
       "category": "前端开发",
       "tags": [
         "3D",

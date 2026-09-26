@@ -1,15 +1,15 @@
-# Validation Report — scenes/villa (base)
-- time: 2026-09-26T03:31:50.962Z
+# Validation Report — scenes/villa (patch)
+- time: 2026-09-26T07:46:49.913Z
 - world: scenes/villa/world.html
 
 ## Errors
 - none
 
 ## Warnings
-- none
+- [PATCH] moved 'inst_zone_villa_pad_villa_modern_v1_001' now overlaps 'inst_zone_villa_bike_bicycle_v1_001' (accepted, explicit user move)
 
-## solve
-- solved: 43, failed: 0, attempts: 129
+## patch
+- solved: -, failed: -, attempts: -
 
 ## Asset Validation
 | asset | status | max tris | issues |

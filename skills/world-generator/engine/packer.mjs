@@ -35,17 +35,23 @@ const ADDON_FILES = [
   'shaders/CopyShader.js',
   'shaders/LuminosityHighPassShader.js',
   'shaders/OutputShader.js',
+  'shaders/SSAOShader.js',
+  'shaders/SMAAShader.js',
+  'math/SimplexNoise.js',
   'postprocessing/MaskPass.js',
   'postprocessing/ShaderPass.js',
   'postprocessing/RenderPass.js',
   'postprocessing/EffectComposer.js',
   'postprocessing/UnrealBloomPass.js',
   'postprocessing/OutputPass.js',
+  'postprocessing/SSAOPass.js',
+  'postprocessing/SMAAPass.js',
+  'geometries/RoundedBoxGeometry.js',
   'environments/RoomEnvironment.js',
   'loaders/RGBELoader.js',
   'exporters/GLTFExporter.js'
 ];
-const ADDON_EXPORTS = ['EffectComposer', 'RenderPass', 'ShaderPass', 'UnrealBloomPass', 'OutputPass', 'RoomEnvironment', 'RGBELoader', 'GLTFExporter'];
+const ADDON_EXPORTS = ['EffectComposer', 'RenderPass', 'ShaderPass', 'UnrealBloomPass', 'OutputPass', 'SSAOPass', 'SMAAPass', 'RoundedBoxGeometry', 'RoomEnvironment', 'RGBELoader', 'GLTFExporter'];
 
 // resolve a file inside the installed three package, walking up from the
 // engine dir so the skill works from a bare repo (npm install at any level)

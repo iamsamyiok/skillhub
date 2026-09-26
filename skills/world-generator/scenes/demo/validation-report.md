@@ -1,5 +1,5 @@
 # Validation Report — scenes/demo (repack)
-- time: 2026-09-26T03:27:04.232Z
+- time: 2026-09-26T07:39:53.501Z
 - world: scenes/demo/world.html
 
 ## Errors

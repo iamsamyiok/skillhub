@@ -44,6 +44,16 @@ const hud = await page.evaluate(() => ({
   title: document.querySelector('#hud-top .title')?.textContent,
   sub: document.querySelector('#hud-top .sub')?.textContent
 }));
-await page.screenshot({ path: outPath });
+// Render and grab the canvas in the same JS task: with the postprocessing
+// chain the compositor may see an empty buffer under swiftshader, so
+// page.screenshot() can come out black. toDataURL() right after render() is
+// reliable regardless of preserveDrawingBuffer.
+const dataUrl = await page.evaluate(() => {
+  const w = window.__WORLD__;
+  if (w.composer) w.composer.render(); else w.renderer.render(w.scene, w.camera);
+  return w.renderer.domElement.toDataURL('image/png');
+});
+import { writeFileSync } from 'node:fs';
+writeFileSync(outPath, Buffer.from(dataUrl.split(',')[1], 'base64'));
 console.log(JSON.stringify({ view, hud, consoleErrors: errors }, null, 2));
 await browser.close();
