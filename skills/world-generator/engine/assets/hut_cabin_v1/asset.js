@@ -9,6 +9,7 @@ function createAsset(params) {
   const wallMat = new THREE_.MeshLambertMaterial({ color: new THREE_.Color().setHSL(0.07, 0.35, 0.38 + tint) });
   const body = new THREE_.Mesh(new THREE_.BoxGeometry(w, h, d), wallMat);
   body.position.y = h / 2;
+  body.userData.surface = 'wood';
   group.add(body);
 
   const door = new THREE_.Mesh(
@@ -36,6 +37,7 @@ function createAsset(params) {
     new THREE_.MeshLambertMaterial({ color: new THREE_.Color().setHSL(0.03, 0.45, 0.30 + tint), side: THREE_.DoubleSide })
   );
   roof.position.y = h;
+  roof.userData.surface = 'rooftile';
   group.add(roof);
 
   const chimney = new THREE_.Mesh(
@@ -43,6 +45,7 @@ function createAsset(params) {
     new THREE_.MeshLambertMaterial({ color: 0x7a7a78 })
   );
   chimney.position.set(hx * 0.45, h + ridgeH * 0.72, 0);
+  chimney.userData.surface = 'concrete';
   group.add(chimney);
 
   return group;

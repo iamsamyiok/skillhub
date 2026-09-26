@@ -21,7 +21,7 @@ page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
 
 // 1) normal mode: edit button visible, editbar hidden
 await page.goto(`${BASE}/scenes/${SCENE}/world.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-await page.waitForFunction('!!window.__WORLD__', null, { timeout: 60000 });
+await page.waitForFunction('!!window.__WORLD__ && window.__WORLD__.texturesReady && window.__WORLD__.texturesReady.done', null, { timeout: 90000 });
 const btnVisible = await page.isVisible('#btn-edit');
 const barHidden = !(await page.isVisible('#editbar'));
 console.log('edit button visible:', btnVisible, '| editbar hidden:', barHidden);
@@ -77,7 +77,7 @@ console.log('exit edit: buttons restored:', restored, '| bar hidden:', barHidden
 // 6) #edit deep link lands directly in edit state
 await page.goto('about:blank');
 await page.goto(`${BASE}/scenes/${SCENE}/world.html#edit`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-await page.waitForFunction('!!window.__WORLD__', null, { timeout: 60000 });
+await page.waitForFunction('!!window.__WORLD__ && window.__WORLD__.texturesReady && window.__WORLD__.texturesReady.done', null, { timeout: 90000 });
 const deepActive = await page.evaluate(() =>
   document.getElementById('btn-edit').classList.contains('active') &&
   document.getElementById('btn-edit').textContent === '退出编辑');

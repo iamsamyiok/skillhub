@@ -39,9 +39,19 @@ const consoleErrors = [];
 page.on('pageerror', e => consoleErrors.push(String(e)));
 page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text()); });
 
-await page.goto('file://' + path.resolve(htmlPath), { waitUntil: 'networkidle', timeout: 60000 });
-await page.waitForFunction(() => window.__WORLD__ && window.__WORLD__.renderer, null, { timeout: 30000 });
+await page.goto('file://' + path.resolve(htmlPath), { waitUntil: 'networkidle', timeout: 90000 });
+// renderer init (slow under swiftshader, esp. from file://) + async photo
+// texture decode both need to settle before pixels are final
+await page.waitForFunction(() => window.__WORLD__ && window.__WORLD__.renderer
+  && window.__WORLD__.texturesReady && window.__WORLD__.texturesReady.done, null, { timeout: 150000 });
 await page.waitForTimeout(300);
+
+// time-aware brightness floors: golden-hour and night scenes legitimately
+// render darker than the daytime baseline
+const tod = await page.evaluate(() => window.__WORLD__ && window.__WORLD__.timeState ? window.__WORLD__.timeState.time : 14);
+const goldenHour = (tod >= 16.5 && tod <= 19) || (tod >= 5 && tod < 7);
+const night = tod >= 19.5 || tod < 5;
+const minLum = night ? 4 : (goldenHour ? 10 : THRESHOLDS.minCenterLum);
 
 const results = [];
 for (const [name, v] of Object.entries(VIEWS)) {
@@ -82,7 +92,7 @@ await browser.close();
 const issues = [];
 if (consoleErrors.length) issues.push(`console errors: ${consoleErrors.length}`);
 for (const r of results) {
-  if (r.avgLum < THRESHOLDS.minCenterLum) issues.push(`${r.view}: black frame (avgLum ${r.avgLum})`);
+  if (r.avgLum < minLum) issues.push(`${r.view}: black frame (avgLum ${r.avgLum})`);
   if (r.avgLum > THRESHOLDS.maxCenterLum) issues.push(`${r.view}: blown out (avgLum ${r.avgLum})`);
   if (r.uniqColors < THRESHOLDS.minUniqColors) issues.push(`${r.view}: too few colors (${r.uniqColors}) - scene may be empty`);
 }

@@ -81,6 +81,8 @@ const THREE = window.THREE;
 const makeElevationField = eval('(' + "__ELEV_FN__" + ')');
 const ASSET_SOURCES = "__ASSET_SOURCES__";
 const WORLD = "__WORLD_DATA__";
+/*__TEXDB__*/
+const TEXDB = window.__TEXDB__ || { slots: {}, hdri: "" };
 
 // ---------- self-contained orbit controls (no example deps) ----------
 class Orbit {
@@ -287,6 +289,62 @@ function makeGrungeTexture(freq, seed) {
 const grungeAsset = makeGrungeTexture(0.09, 3);
 grungeAsset.repeat.set(2, 2);                 // fine micro grain on assets
 const grungeTerrain = makeGrungeTexture(0.045, 11); // terrain uv unit = 8 m
+
+// ---------- photo-real surface library (embedded CC0 PBR packs) ----------
+// Slots carry real-world material scales (metres per tile). Meshes opt in via
+// userData.surface (explicit, highest priority) or the asset-type defaults
+// below. Binding is asynchronous (base64 image decode): the world renders in
+// its procedural look first, then upgrades in place once textures are ready.
+const SURFACE_DEFS = {
+  grass: { size: 1.7 }, dirt: { size: 2.4 }, rock: { size: 2.8 },
+  concrete: { size: 3.4 }, asphalt: { size: 4.2 }, stucco: { size: 3.0 },
+  brick: { size: 2.4 }, wood: { size: 2.0 }, rooftile: { size: 1.5 },
+  metal: { size: 1.3 }, bark: { size: 1.7 }, gravel: { size: 1.7 }
+};
+const TYPE_SURFACES = [
+  [/^rock|^boulder/, 'rock'],
+  [/^bench|^table|^chair/, 'wood'],
+  [/^street_lamp|^lamp|^patio_umbrella/, 'metal'],
+  [/^car/, 'metal'],
+  [/^pool/, 'concrete'],
+  [/^tree|^pine|^oak|^birch/, '__tree__'] // trunk gets bark via color heuristic
+];
+const texReady = { done: false };
+function decodeImg(uri) {
+  return new Promise((res, rej) => {
+    const im = new Image();
+    im.onload = () => res(im);
+    im.onerror = () => rej(new Error('decode failed'));
+    im.src = uri;
+  });
+}
+function surfaceFor(o) {
+  if (o.userData && o.userData.surface) return o.userData.surface;
+  const ref = o.userData && o.userData.instanceRef;
+  const aid = (ref && ref.asset_id) || '';
+  for (const [re, slot] of TYPE_SURFACES) if (re.test(aid)) return slot;
+  return null;
+}
+// brown-ish material color -> bark (tree trunks; canopies stay procedural)
+function trunkish(m) {
+  const c = m.color;
+  return c && c.r > c.g && c.g > c.b && c.r < 0.62 && c.g > 0.18 && c.b < 0.32;
+}
+// planar XZ fallback for hand-built geometries without a uv attribute
+function ensureUV(o) {
+  if (o.geometry.attributes.uv) return true;
+  if (!o.geometry.attributes.position) return false;
+  o.geometry.computeBoundingBox();
+  const bb = o.geometry.boundingBox, pos = o.geometry.attributes.position;
+  const sx = Math.max(1e-6, bb.max.x - bb.min.x), sz = Math.max(1e-6, bb.max.z - bb.min.z);
+  const uv = new Float32Array(pos.count * 2);
+  for (let i = 0; i < pos.count; i++) {
+    uv[i * 2] = (pos.getX(i) - bb.min.x) / sx;
+    uv[i * 2 + 1] = (pos.getZ(i) - bb.min.z) / sz;
+  }
+  o.geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  return true;
+}
 // composed height / color at any world point
 function terrainSample(x, z) {
   let h = null;
@@ -486,7 +544,7 @@ instanceRoot.traverse(o => {
       bumpScale: 0.035
     });
     if (m.map) s.map = m.map;
-    s.envMapIntensity = s.userData.envBase = 0.5;
+    s.envMapIntensity = s.userData.envBase = 0.65;
     pbrMats.push(s);
     cache.set(m, s);
     return s;
@@ -586,6 +644,127 @@ groundDisc.position.set(wbCenter.x, worldBox.min.y - 0.35, wbCenter.z);
 groundDisc.receiveShadow = true;
 scene.add(groundDisc);
 
+// ---------- photo-texture application (async upgrade over the procedural look) ----------
+(async function applyPhotoTextures() {
+  const entries = Object.entries(TEXDB.slots || {});
+  if (!entries.length) { texReady.done = true; return; }
+  const maxAniso = renderer.capabilities.getMaxAnisotropy();
+  const packs = {};
+  await Promise.all(entries.map(async ([slot, def]) => {
+    try {
+      const imgs = await Promise.all([
+        decodeImg(def.files.color),
+        def.files.normalGL ? decodeImg(def.files.normalGL) : Promise.resolve(null),
+        def.files.roughness ? decodeImg(def.files.roughness) : Promise.resolve(null)
+      ]);
+      const tColor = new THREE.Texture(imgs[0]);
+      tColor.colorSpace = THREE.SRGBColorSpace;
+      packs[slot] = {
+        color: tColor,
+        normalGL: imgs[1] ? new THREE.Texture(imgs[1]) : null,
+        roughness: imgs[2] ? new THREE.Texture(imgs[2]) : null,
+        size: (SURFACE_DEFS[slot] && SURFACE_DEFS[slot].size) || 2
+      };
+    } catch (e) { console.warn('texture decode failed:', slot, e); }
+  }));
+  if (!Object.keys(packs).length) { texReady.done = true; return; }
+  for (const p of Object.values(packs)) {
+    for (const t of [p.color, p.normalGL, p.roughness]) {
+      if (!t) continue;
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.anisotropy = maxAniso;
+      t.needsUpdate = true;
+    }
+  }
+  // independent repeat per binding; clones share the GPU upload (same Source)
+  const withRepeat = (t, r) => { const c = t.clone(); c.repeat.set(r, r); return c; };
+  const matCache = new Map();
+  const bindMat = (m, slot, worldSize) => {
+    const p = packs[slot];
+    if (!p || m.userData.waterUpgraded || m.userData._photoBound) return m;
+    if (m.emissive && m.emissiveIntensity > 0.25) return m; // glass / lights
+    const r = Math.max(1, Math.round(worldSize / p.size));
+    const key = m.uuid + '|' + slot + '|' + r;
+    if (matCache.has(key)) return matCache.get(key);
+    const s = m.clone();
+    s.userData = Object.assign({}, m.userData, { _photoBound: true, envBase: m.userData.envBase || 0.5 });
+    s.color.set(0xffffff); // albedo carries the color now; vertexColors stay
+    s.map = withRepeat(p.color, r);
+    if (p.normalGL) { s.normalMap = withRepeat(p.normalGL, r); s.normalScale.set(1, 1); }
+    if (p.roughness) s.roughnessMap = withRepeat(p.roughness, r);
+    s.bumpMap = null;
+    s.roughness = 1.0;
+    s.metalness = slot === 'metal' ? 0.85 : 0.02;
+    s.needsUpdate = true;
+    matCache.set(key, s);
+    return s;
+  };
+  const tmpBox = new THREE.Box3(), tmpSize = new THREE.Vector3();
+  const worldSizeOf = o => { tmpBox.setFromObject(o); tmpBox.getSize(tmpSize); return Math.max(tmpSize.x, tmpSize.y, tmpSize.z); };
+  let boundCount = 0;
+  instanceRoot.traverse(o => {
+    if (!o.isMesh || !o.material || !o.material.isMeshStandardMaterial) return;
+    let slot = surfaceFor(o);
+    if (slot === '__tree__') slot = trunkish(o.material) ? 'bark' : null;
+    if (!slot || !packs[slot]) return;
+    if (!ensureUV(o)) return;
+    o.material = bindMat(o.material, slot, worldSizeOf(o));
+    boundCount++;
+  });
+  window.__PHOTO_BOUND__ = boundCount;
+
+  // terrain + backdrop: real grass over the vertex-colored lattice
+  if (packs.grass) {
+    const r = 8 / packs.grass.size; // terrain uv unit = 8 m
+    terrainMat.map = withRepeat(packs.grass.color, r);
+    if (packs.grass.normalGL) terrainMat.normalMap = withRepeat(packs.grass.normalGL, r);
+    if (packs.grass.roughness) terrainMat.roughnessMap = withRepeat(packs.grass.roughness, r);
+    terrainMat.bumpMap = null;
+    terrainMat.color.set(0xffffff);
+    // lift vertex colors toward white: they now tint photo albedo instead of
+    // carrying the full grass hue (avoids double-green darkening)
+    const colAttr = terrainGeo.attributes.color;
+    if (colAttr) {
+      for (let i = 0; i < colAttr.count * 3; i++) colAttr.array[i] += (1 - colAttr.array[i]) * 0.62;
+      colAttr.needsUpdate = true;
+    }
+    terrainMat.needsUpdate = true;
+
+    const d = groundDisc.geometry.parameters.radius * 2;
+    const rg = Math.max(2, Math.round(d / packs.grass.size));
+    groundMat.map = withRepeat(packs.grass.color, rg);
+    if (packs.grass.normalGL) groundMat.normalMap = withRepeat(packs.grass.normalGL, rg);
+    if (packs.grass.roughness) groundMat.roughnessMap = withRepeat(packs.grass.roughness, rg);
+    groundMat.bumpMap = null;
+    groundMat.color.set(0xffffff);
+    groundMat.needsUpdate = true;
+  }
+
+  // HDRI image-based lighting replaces the synthetic room (kept as fallback)
+  if (TEXDB.hdri && window.THREE_ADDONS && window.THREE_ADDONS.RGBELoader) {
+    try {
+      const bin = atob(TEXDB.hdri.split(',')[1]);
+      const buf = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      // r160 RGBELoader.parse returns raw texData, not a texture
+      const td = new window.THREE_ADDONS.RGBELoader().parse(buf.buffer);
+      if (td && td.width && td.data) {
+        const eq = new THREE.DataTexture(td.data, td.width, td.height, td.format, td.type);
+        eq.mapping = THREE.EquirectangularReflectionMapping;
+        eq.magFilter = THREE.LinearFilter; eq.minFilter = THREE.LinearFilter;
+        eq.needsUpdate = true;
+        const pmrem = new THREE.PMREMGenerator(renderer);
+        scene.environment = pmrem.fromEquirectangular(eq).texture;
+        pmrem.dispose();
+        eq.dispose();
+        window.__IBL__ = 'hdri';
+      }
+    } catch (e) { console.warn('HDRI IBL failed, procedural IBL kept', e); }
+  }
+  texReady.done = true;
+  applyTimeOfDay(timeState.time); // re-modulate env intensities after swap
+})();
+
 // ---------- post-processing: RenderPass -> UnrealBloom -> OutputPass ----------
 let composer = null, bloomPass = null;
 if (window.THREE_ADDONS && window.THREE_ADDONS.EffectComposer) {
@@ -650,7 +829,7 @@ function applyTimeOfDay(t) {
     skyUniforms.uSunColor.value.copy(sun.color);
     skyUniforms.uNight.value = THREE.MathUtils.clamp((0.04 - elev) * 7, 0, 1);
   }
-  hemi.intensity = 0.15 + Math.max(0, elev) * 0.45; // IBL carries ambient now
+  hemi.intensity = 0.26 + Math.max(0, elev) * 0.5; // IBL carries ambient, hemi lifts shadow faces
   hemi.color.copy(C_NIGHT).lerp(new THREE.Color(0xbdd7ff), Math.max(0.15, dayW));
   // IBL follows the sun: bright soft reflections at noon, faint at midnight
   const envW = 0.22 + 0.78 * dayW;
@@ -942,7 +1121,8 @@ window.addEventListener('resize', () => {
 window.__WORLD__ = {
   orbit, camera, scene, renderer, composer,
   instances: instanceById, worldBox,
-  setTimeOfDay: applyTimeOfDay, timeState
+  setTimeOfDay: applyTimeOfDay, timeState,
+  texturesReady: texReady
 };
 </script>
 </body>

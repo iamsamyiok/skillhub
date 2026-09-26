@@ -42,9 +42,10 @@ const ADDON_FILES = [
   'postprocessing/UnrealBloomPass.js',
   'postprocessing/OutputPass.js',
   'environments/RoomEnvironment.js',
+  'loaders/RGBELoader.js',
   'exporters/GLTFExporter.js'
 ];
-const ADDON_EXPORTS = ['EffectComposer', 'RenderPass', 'ShaderPass', 'UnrealBloomPass', 'OutputPass', 'RoomEnvironment', 'GLTFExporter'];
+const ADDON_EXPORTS = ['EffectComposer', 'RenderPass', 'ShaderPass', 'UnrealBloomPass', 'OutputPass', 'RoomEnvironment', 'RGBELoader', 'GLTFExporter'];
 
 // resolve a file inside the installed three package, walking up from the
 // engine dir so the skill works from a bare repo (npm install at any level)
@@ -87,6 +88,37 @@ function bundleAddons() {
   return code.replace(/<\/script/gi, '<\\/script');
 }
 
+// Embed the CC0 PBR texture library (assets-bin/) as base64 data URIs.
+// Emits a JS statement assigning window.__TEXDB__; empty DB when the library
+// is absent (viewer falls back to the procedural grunge look).
+function buildTextureDB() {
+  const binDir = path.join(__dirname, 'assets-bin');
+  const manifestPath = path.join(binDir, 'manifest.json');
+  if (!fs.existsSync(manifestPath)) return 'window.__TEXDB__ = { slots: {}, hdri: "" };';
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const slots = {};
+  for (const [slot, entry] of Object.entries(manifest)) {
+    if (slot === '__hdri__' || !entry.maps) continue;
+    const files = {};
+    for (const mapName of ['color', 'normalGL', 'roughness']) {
+      const info = entry.maps[mapName];
+      if (!info) continue;
+      const raw = fs.readFileSync(path.join(binDir, 'packs', slot, info.file));
+      files[mapName] = 'data:image/jpeg;base64,' + raw.toString('base64');
+    }
+    if (files.color) slots[slot] = { files, source: entry.source };
+  }
+  let hdri = '';
+  const hdriFiles = manifest.__hdri__ && manifest.__hdri__.files;
+  if (hdriFiles) {
+    const name = Object.keys(hdriFiles)[0];
+    const raw = fs.readFileSync(path.join(binDir, 'hdri', name));
+    hdri = 'data:application/octet-stream;base64,' + raw.toString('base64');
+  }
+  const json = JSON.stringify({ slots, hdri }).replace(/</g, '\\u003c');
+  return 'window.__TEXDB__ = ' + json + ';';
+}
+
 export function packWorld({ scenePlan, zonesOut, instancesOut, registry, outDir }) {
   const template = fs.readFileSync(path.join(__dirname, 'viewer-template.html'), 'utf8');
   const threeSource = fs.readFileSync(threePath('build/three.module.js'), 'utf8');
@@ -127,6 +159,7 @@ export function packWorld({ scenePlan, zonesOut, instancesOut, registry, outDir 
   const html = template
     .replace('/*__THREE_MODULE__*/', () => moduleCode)
     .replace('/*__ADDONS_MODULE__*/', () => bundleAddons())
+    .replace('/*__TEXDB__*/', () => buildTextureDB())
     .replace('"__ELEV_FN__"', () => jsonForHtml(elevSource))
     .replace('"__ASSET_SOURCES__"', () => jsonForHtml(assetSources))
     .replace('"__WORLD_DATA__"', () => jsonForHtml(payload));

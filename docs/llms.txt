@@ -64,7 +64,7 @@
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/video-publish.zip
 - [vision-for-dev](https://iamsamyiok.github.io/skillhub/skills-md/vision-for-dev.md): 视觉辅助开发技能：用「识图模型审查 + 像素级测量 + 源码交叉验证」三轨闭环排障 GUI 程序界面问题（豆腐块乱码、按钮重叠、布局错位、黑边阴影、字体渲染等），覆盖交叉编译 + Wine/Xvfb 虚拟显示运行 + 自动化交互截图 + 网页交付的全流程。当用户想"界面显示不对/截图看看效果/识图检查界面/修复显示问题
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/vision-for-dev.zip
-- [world-generator](https://iamsamyiok.github.io/skillhub/skills-md/world-generator.md): 通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（内嵌 Three.js 零外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使
+- [world-generator](https://iamsamyiok.github.io/skillhub/skills-md/world-generator.md): 通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/world-generator.zip
 - [xlsx](https://iamsamyiok.github.io/skillhub/skills-md/xlsx.md): 电子表格处理技能：凡以表格文件为主要输入或输出的任务即触发——打开、读取、编辑、修复现有 .xlsx/.xlsm/.xltx/.csv/.tsv（加列、算公式、排版、做图、清洗脏数据），从零或从其他数据源新建表格，表格格式互转，以及把混乱的表格数据整理成规范表格。当用户按名字或路径提到某个表格文件（如「我下载夹里的 x
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/xlsx.zip

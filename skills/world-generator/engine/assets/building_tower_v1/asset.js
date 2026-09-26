@@ -33,6 +33,7 @@ function createAsset(params) {
     for (const sz of [-cz, cz]) {
       const col = new THREE_.Mesh(new THREE_.BoxGeometry(0.55, topY, 0.55), concrete);
       col.position.set(sx, topY / 2, sz);
+      col.userData.surface = 'concrete';
       group.add(col);
     }
   }
@@ -41,6 +42,7 @@ function createAsset(params) {
   for (let k = 0; k <= F; k++) {
     const slab = new THREE_.Mesh(new THREE_.BoxGeometry(W, ST, D), k === F ? dark : concrete);
     slab.position.set(0, k * FH + ST / 2, 0);
+    slab.userData.surface = 'concrete';
     group.add(slab);
   }
 

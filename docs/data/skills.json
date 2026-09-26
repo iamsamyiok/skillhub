@@ -2539,8 +2539,8 @@
     {
       "id": "world-generator",
       "name": "world-generator",
-      "description": "通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（内嵌 Three.js 零外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。",
-      "version": "1.1.0",
+      "description": "通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。",
+      "version": "1.2.0",
       "category": "前端开发",
       "tags": [
         "3D",
@@ -2567,7 +2567,7 @@
         },
         {
           "path": "SKILL.md",
-          "size": 18313
+          "size": 21034
         },
         {
           "path": "engine/assets/bench_v1/asset.js",
@@ -2587,7 +2587,7 @@
         },
         {
           "path": "engine/assets/building_tower_v1/asset.js",
-          "size": 2462
+          "size": 2543
         },
         {
           "path": "engine/assets/building_tower_v1/definition.json",
@@ -2619,7 +2619,7 @@
         },
         {
           "path": "engine/assets/hut_cabin_v1/asset.js",
-          "size": 1697
+          "size": 1810
         },
         {
           "path": "engine/assets/hut_cabin_v1/definition.json",
@@ -2691,11 +2691,163 @@
         },
         {
           "path": "engine/assets/villa_modern_v1/asset.js",
-          "size": 2803
+          "size": 3102
         },
         {
           "path": "engine/assets/villa_modern_v1/definition.json",
           "size": 1386
+        },
+        {
+          "path": "engine/assets-bin/hdri/day_partly_cloudy_1k.hdr",
+          "size": 1637206
+        },
+        {
+          "path": "engine/assets-bin/manifest.json",
+          "size": 6202
+        },
+        {
+          "path": "engine/assets-bin/packs/asphalt/color.jpg",
+          "size": 193430
+        },
+        {
+          "path": "engine/assets-bin/packs/asphalt/normalGL.jpg",
+          "size": 375417
+        },
+        {
+          "path": "engine/assets-bin/packs/asphalt/roughness.jpg",
+          "size": 223857
+        },
+        {
+          "path": "engine/assets-bin/packs/bark/color.jpg",
+          "size": 336021
+        },
+        {
+          "path": "engine/assets-bin/packs/bark/normalGL.jpg",
+          "size": 542622
+        },
+        {
+          "path": "engine/assets-bin/packs/bark/roughness.jpg",
+          "size": 222041
+        },
+        {
+          "path": "engine/assets-bin/packs/brick/color.jpg",
+          "size": 206551
+        },
+        {
+          "path": "engine/assets-bin/packs/brick/normalGL.jpg",
+          "size": 304492
+        },
+        {
+          "path": "engine/assets-bin/packs/brick/roughness.jpg",
+          "size": 84634
+        },
+        {
+          "path": "engine/assets-bin/packs/concrete/color.jpg",
+          "size": 49879
+        },
+        {
+          "path": "engine/assets-bin/packs/concrete/normalGL.jpg",
+          "size": 107166
+        },
+        {
+          "path": "engine/assets-bin/packs/concrete/roughness.jpg",
+          "size": 40712
+        },
+        {
+          "path": "engine/assets-bin/packs/dirt/color.jpg",
+          "size": 319680
+        },
+        {
+          "path": "engine/assets-bin/packs/dirt/normalGL.jpg",
+          "size": 485188
+        },
+        {
+          "path": "engine/assets-bin/packs/dirt/roughness.jpg",
+          "size": 138317
+        },
+        {
+          "path": "engine/assets-bin/packs/grass/color.jpg",
+          "size": 225269
+        },
+        {
+          "path": "engine/assets-bin/packs/grass/normalGL.jpg",
+          "size": 491221
+        },
+        {
+          "path": "engine/assets-bin/packs/grass/roughness.jpg",
+          "size": 294350
+        },
+        {
+          "path": "engine/assets-bin/packs/gravel/color.jpg",
+          "size": 240978
+        },
+        {
+          "path": "engine/assets-bin/packs/gravel/normalGL.jpg",
+          "size": 583051
+        },
+        {
+          "path": "engine/assets-bin/packs/gravel/roughness.jpg",
+          "size": 191352
+        },
+        {
+          "path": "engine/assets-bin/packs/metal/color.jpg",
+          "size": 14303
+        },
+        {
+          "path": "engine/assets-bin/packs/metal/normalGL.jpg",
+          "size": 6740
+        },
+        {
+          "path": "engine/assets-bin/packs/metal/roughness.jpg",
+          "size": 17847
+        },
+        {
+          "path": "engine/assets-bin/packs/rock/color.jpg",
+          "size": 281143
+        },
+        {
+          "path": "engine/assets-bin/packs/rock/normalGL.jpg",
+          "size": 604328
+        },
+        {
+          "path": "engine/assets-bin/packs/rock/roughness.jpg",
+          "size": 224718
+        },
+        {
+          "path": "engine/assets-bin/packs/rooftile/color.jpg",
+          "size": 168248
+        },
+        {
+          "path": "engine/assets-bin/packs/rooftile/normalGL.jpg",
+          "size": 333208
+        },
+        {
+          "path": "engine/assets-bin/packs/rooftile/roughness.jpg",
+          "size": 258690
+        },
+        {
+          "path": "engine/assets-bin/packs/stucco/color.jpg",
+          "size": 96790
+        },
+        {
+          "path": "engine/assets-bin/packs/stucco/normalGL.jpg",
+          "size": 352136
+        },
+        {
+          "path": "engine/assets-bin/packs/stucco/roughness.jpg",
+          "size": 57795
+        },
+        {
+          "path": "engine/assets-bin/packs/wood/color.jpg",
+          "size": 131885
+        },
+        {
+          "path": "engine/assets-bin/packs/wood/normalGL.jpg",
+          "size": 145758
+        },
+        {
+          "path": "engine/assets-bin/packs/wood/roughness.jpg",
+          "size": 100934
         },
         {
           "path": "engine/edit-server.mjs",
@@ -2742,24 +2894,32 @@
           "size": 4293
         },
         {
+          "path": "engine/night-glb-probe.mjs",
+          "size": 2249
+        },
+        {
           "path": "engine/packer.mjs",
-          "size": 6202
+          "size": 7743
         },
         {
           "path": "engine/screenshot.mjs",
-          "size": 1908
+          "size": 1984
         },
         {
           "path": "engine/test-edit-flow.mjs",
-          "size": 5532
+          "size": 5678
+        },
+        {
+          "path": "engine/tools/build-texture-packs.py",
+          "size": 6060
         },
         {
           "path": "engine/viewer-template.html",
-          "size": 39789
+          "size": 47888
         },
         {
           "path": "engine/visual-check.mjs",
-          "size": 4069
+          "size": 4692
         },
         {
           "path": "package.json",

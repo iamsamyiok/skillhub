@@ -19,8 +19,9 @@ const errors = [];
 page.on('pageerror', e => errors.push(String(e)));
 page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
 
-await page.goto('file://' + absPath, { waitUntil: 'networkidle', timeout: 60000 });
-await page.waitForFunction(() => window.__WORLD__ && window.__WORLD__.renderer, null, { timeout: 30000 });
+await page.goto('file://' + absPath, { waitUntil: 'networkidle', timeout: 90000 });
+await page.waitForFunction(() => window.__WORLD__ && window.__WORLD__.renderer
+  && window.__WORLD__.texturesReady && window.__WORLD__.texturesReady.done, null, { timeout: 150000 });
 await page.waitForTimeout(300);
 
 const views = {

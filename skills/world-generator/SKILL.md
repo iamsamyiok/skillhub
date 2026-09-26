@@ -1,15 +1,11 @@
 ---
 name: world-generator
-version: 1.1.0
+version: 1.2.0
 category: 前端开发
 tags: [3D, Three.js, 程序化生成, 场景生成, 交互编辑, 参数化]
-description: 通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（内嵌 Three.js 零外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。
+description: 通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。
 license: MIT
 ---
-
-
-# World Generator Skill
-
 规则机器固定，语义无限扩展；程序管几何，AI 管设计。
 
 ## 触发条件
@@ -61,6 +57,7 @@ ls node_modules/three >/dev/null 2>&1 || npm install
 7. 仅用原生 Three.js 基础几何体；Lambert 材质；注明 `max_triangles` 预算（默认 5000）
 8. 顶点扰动类几何（岩石/树冠）扰动后必须 `computeVertexNormals()` 且 bbox 归零
 9. 可入内的建筑类资产用框架式设计（角柱+楼板+半透明幕墙），保证内部 refine 的实例肉眼可见
+10. **照片级贴图槽位**：需要真实材质观感的 mesh 设 `mesh.userData.surface = '<slot>'`（可选：grass/dirt/rock/concrete/asphalt/stucco/brick/wood/rooftile/metal/bark/gravel）；建筑资产按部件细分（墙 stucco、楼板 concrete、门 wood、金属件 metal），见 villa_modern_v1；未打标的 mesh 走资产类型默认映射或程序化噪变兜底
 
 ### 阶段 3b：总图与地形拼接规范（masterplan & terrain continuity，硬性）
 
@@ -132,13 +129,15 @@ node engine/index.mjs --scene scenes/<name> --patch patch-1.json
 
 ### 阶段 6：视觉与运行时能力（viewer 内建，无需额外操作）
 
-- **渲染**（Opus 级质感四件套已全量内建）：ACES tone mapping + 线性光工作流；RoomEnvironment IBL（PMREM 程序化环境光，无外部 HDRI）；Lambert 资产 API → 引擎端统一升级 MeshStandardMaterial + 程序化噪变（多倍频值噪声 CanvasTexture 作 roughnessMap/bumpMap，打破平色塑料感）；UnrealBloom 泛光（灯头 emissive、太阳盘 HDR 自动发光）；FogExp2 大气
-- **程序化天穹**：渐变穹顶 + HDR 日/月盘（同一形体昼夜换位换色）+ 程序化星场，随 time_of_day 联动；IBL 强度随昼夜调制（正午亮反射、午夜微光）
+- **渲染**（照片级质感已全量内建）：ACES tone mapping + 线性光工作流；Poly Haven HDRI 实景 IBL（PMREM，1k equirect 内嵌 base64；无 HDRI 时回退 RoomEnvironment）；Lambert 资产 API → 引擎端统一升级 MeshStandardMaterial；UnrealBloom 泛光（灯头 emissive、太阳盘 HDR 自动发光）；FogExp2 大气
+- **CC0 PBR 贴图库**（照片级核心，12 槽位内嵌）：grass/dirt/rock/concrete/asphalt/stucco/brick/wood/rooftile/metal/bark/gravel，每槽 albedo(sRGB)+normalGL+roughness(linar) 1K JPG，来源 ambientCG 与 Poly Haven（全 CC0），构建脚本 `engine/tools/build-texture-packs.py` 可重建；绑定按 mesh 世界尺寸自动换算平铺密度，anisotropy 全开
+- **surface 槽位系统**：mesh 级 `userData.surface = '<slot>'` 显式标签（建筑资产首选）优先；资产类型默认映射（rock→rock、bench/table/chair→wood、lamp/umbrella/car→metal、pool→concrete、tree→树干棕色调启发式→bark）；emissive/玻璃/水面材质自动跳过；手写 BufferGeometry 无 uv 时按 XZ 平面投影兜底生成
+- **程序化天穹 + 程序化噪变兜底**：渐变穹顶 + HDR 日/月盘 + 程序化星场；无贴图槽位命中的材质保留多倍频值噪声 roughnessMap/bumpMap；贴图解码异步完成前先渲染程序化外观，就绪后原位升级（`__WORLD__.texturesReady.done`）
 - **时间系统**：`scene_meta.time_of_day`（0-24，默认 14）驱动太阳方位/颜色、天穹、雾、半球光、IBL、夜间泛光增强；viewer「时间」按钮可实时拖动预览
-- **水面动画**：资产给水面 mesh 设 `mesh.userData.water = true`，viewer 自动升级为低粗糙度 Standard 波动材质（IBL 反射 + 顶点波，见 pool_v1）
+- **水面动画**：资产给水面 mesh 设 `mesh.userData.water = true`，viewer 自动升级为低粗糙度 Standard 波动材质（HDRI 反射 + 顶点波，见 pool_v1）
 - **视角预设**：鸟瞰 / 街景 / 环绕（自动旋转）按钮
-- **GLB 导出**：viewer「导出 GLB」按钮，输出含地形+实例的 .glb，可进 Blender / three.js editor
-- **材质去重**：构建后按外观键合并材质（500 实例压到 ~33 材质）；发光/水面材质不参与合并
+- **GLB 导出**：viewer「导出 GLB」按钮，输出含地形+实例+全部贴图的 .glb（照片级场景 ~16MB），可进 Blender / three.js editor
+- **材质去重**：构建后按外观键合并材质；贴图绑定按 (材质, 槽位, 平铺密度) 二次共享，发光/水面材质不参与
 
 ### 阶段 6b：交互编辑闭环（用户指令含"编辑"时触发）
 
@@ -204,6 +203,12 @@ node engine/visual-check.mjs scenes/<name>/world.html
 | GLB 导出点击即报 `Converting circular structure to JSON` | three r160 `Mesh.copy` 用 `JSON.parse(JSON.stringify(userData))` 深拷贝，运行时 `instanceRef→_object→userData` 循环引用必炸 | 导出前 stash 清空 userData，clone 后恢复（viewer-template 已修） |
 | 想全局调 IBL 强度找不到 `scene.environmentIntensity` | r160 尚无该属性 | 逐材质 `envMapIntensity`（viewer 已按 `userData.envBase` 昼夜调制） |
 | 改了 viewer 模板后想重新打包又怕求解结果漂移 | 重跑 base 会重置 solved-instances.json | 用 `--repack` 模式，只重打包 |
+| HDRI 内嵌后报 `Cannot read properties of undefined (reading 'width')` | r160 `RGBELoader.parse(buffer)` 返回 texData 而非 texture | 用 texData 手动构造 `DataTexture` 再进 PMREM（viewer 已修） |
+| 贴图版 visual-check/screenshot 拍到无贴图帧 | base64 贴图异步解码，`__WORLD__` 就绪早于贴图就绪 | 等待条件加 `texturesReady.done`（工具已改） |
+| 贴图 albedo 上去后地形双绿发暗 | 顶点色（程序化绿）× 贴图 albedo（照片绿）相乘 | 绑 map 时把顶点色向白色提亮 0.62（只作色偏调制） |
+| golden hour 场景 close 视角误报黑帧 | 阈值按正午校准，17-19 点阴影面物理上就暗 | visual-check 按时段分档：夜 4 / 暮光 10 / 日间 15 |
+| ambientCG 部分 ID 猜错下载 404 | 材质命名不规律（Dirt/Brick 系列多次换 ID） | 用 zip 签名探测候选链；Poly Haven API（`api.polyhaven.com/files/<slug>`）做备用源 |
+| 贴图版 world.html 14MB+ 加载慢 | 13.5MB base64 贴图 + swiftshader 冷启动 | 正常预期（用户已接受 10-20MB 档）；工具超时已放宽至 150s |
 
 ## 引擎固定层（禁止修改）
 
@@ -213,14 +218,17 @@ node engine/visual-check.mjs scenes/<name>/world.html
 
 ```
 SKILL.md                  本文档（Agent 工作流）
-engine/index.mjs          CLI：--scene / --refine / --patch 三模式管线
-engine/packer.mjs         world.html 打包（内嵌 three + addons + viewer）
-engine/viewer-template.html  查看器：统一地形、时间系统、GLB 导出、#edit 编辑模式、#debug
+engine/index.mjs          CLI：--scene / --refine / --patch / --repack 四模式管线
+engine/packer.mjs         world.html 打包（内嵌 three + addons + 贴图库 + viewer）
+engine/viewer-template.html  查看器：统一地形、照片级贴图、HDRI IBL、时间系统、GLB 导出、#edit 编辑模式、#debug
+engine/assets-bin/        CC0 PBR 贴图库（12 槽 + HDRI，manifest.json 索引）
+engine/tools/build-texture-packs.py  贴图库构建脚本（ambientCG + Poly Haven 下载/提取/重压缩）
 engine/edit-server.mjs    编辑桥服务：静态托管 + POST /edit-request 落盘
 engine/test-edit-flow.mjs 编辑闭环 e2e 回归（playwright）
 engine/screenshot.mjs     截图（--view top/close/side）
-engine/visual-check.mjs   像素统计视觉校验
+engine/visual-check.mjs   像素统计视觉校验（时段分档阈值）
+engine/night-glb-probe.mjs  夜景像素 + GLB 导出探针
 engine/lib/               schema/expand/solve/geom/elevation/rng/registry/validate-assets/plan-lint
-engine/assets/<id>/       16 个参数化资产（definition.json + asset.js）
+engine/assets/<id>/       16 个参数化资产（definition.json + asset.js，建筑件带 userData.surface）
 scenes/                   5 个回归场景（villa/campus 含 refine+patch 链）
 ```

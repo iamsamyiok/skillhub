@@ -1,0 +1,355 @@
+{
+  "grass": {
+    "source": "ambientcg.com/Grass001",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 225269,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 491221,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 294350,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "dirt": {
+    "source": "polyhaven.com/forest_ground_04",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 319680,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 485188,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 138317,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "rock": {
+    "source": "ambientcg.com/Rock034",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 281143,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 604328,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 224718,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "concrete": {
+    "source": "ambientcg.com/Concrete034",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 49879,
+        "size": [
+          1024,
+          512
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 107166,
+        "size": [
+          1024,
+          512
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 40712,
+        "size": [
+          1024,
+          512
+        ]
+      }
+    }
+  },
+  "asphalt": {
+    "source": "ambientcg.com/Asphalt013",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 193430,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 375417,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 223857,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "stucco": {
+    "source": "ambientcg.com/Plaster001",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 96790,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 352136,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 57795,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "brick": {
+    "source": "polyhaven.com/brick_wall_001",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 206551,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 304492,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 84634,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "wood": {
+    "source": "ambientcg.com/Wood026",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 131885,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 145758,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 100934,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "rooftile": {
+    "source": "ambientcg.com/RoofingTiles002",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 168248,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 333208,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 258690,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "metal": {
+    "source": "ambientcg.com/Metal031",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 14303,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 6740,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 17847,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "bark": {
+    "source": "ambientcg.com/Bark012",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 336021,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 542622,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 222041,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "gravel": {
+    "source": "ambientcg.com/Gravel012",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 240978,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 583051,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 191352,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "__hdri__": {
+    "files": {
+      "day_partly_cloudy_1k.hdr": 1637206
+    }
+  }
+}

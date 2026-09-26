@@ -9,19 +9,23 @@ function createAsset(params) {
   const wallMat = new THREE_.MeshLambertMaterial({ color: new THREE_.Color().setHSL(0.09, 0.18, 0.78 + tint) });
   const lower = new THREE_.Mesh(new THREE_.BoxGeometry(w, 3.1, d), wallMat);
   lower.position.y = 3.1 / 2;
+  lower.userData.surface = 'stucco';
   group.add(lower);
 
   const upper = new THREE_.Mesh(new THREE_.BoxGeometry(w * us, 2.7, d * us), wallMat);
   upper.position.set(-w * (1 - us) * 0.25, 3.1 + 2.7 / 2, -d * (1 - us) * 0.22);
+  upper.userData.surface = 'stucco';
   group.add(upper);
 
   // flat roof slabs with overhang
   const slabMat = new THREE_.MeshLambertMaterial({ color: 0xd9d4c8 });
   const slab1 = new THREE_.Mesh(new THREE_.BoxGeometry(w + 0.7, 0.16, d + 0.7), slabMat);
   slab1.position.y = 3.1 + 0.08;
+  slab1.userData.surface = 'concrete';
   group.add(slab1);
   const slab2 = new THREE_.Mesh(new THREE_.BoxGeometry(w * us + 0.6, 0.16, d * us + 0.6), slabMat);
   slab2.position.set(upper.position.x, 3.1 + 2.7 + 0.08, upper.position.z);
+  slab2.userData.surface = 'concrete';
   group.add(slab2);
 
   // glass band on lower south face
@@ -45,20 +49,24 @@ function createAsset(params) {
     new THREE_.MeshLambertMaterial({ color: 0x5a4030 })
   );
   door.position.set(-w * 0.28, 1.05, d / 2 + 0.04);
+  door.userData.surface = 'wood';
   group.add(door);
 
   // side garage wing
   const garage = new THREE_.Mesh(new THREE_.BoxGeometry(3.4, 2.6, d * 0.62), wallMat);
   garage.position.set(w / 2 + 1.5, 1.3, d * 0.16);
+  garage.userData.surface = 'stucco';
   group.add(garage);
   const gSlab = new THREE_.Mesh(new THREE_.BoxGeometry(3.9, 0.14, d * 0.62 + 0.5), slabMat);
   gSlab.position.set(w / 2 + 1.5, 2.67, d * 0.16);
+  gSlab.userData.surface = 'concrete';
   group.add(gSlab);
   const gDoor = new THREE_.Mesh(
     new THREE_.BoxGeometry(2.6, 1.9, 0.08),
     new THREE_.MeshLambertMaterial({ color: 0xb8bdc4 })
   );
   gDoor.position.set(w / 2 + 1.5, 0.98, d * 0.16 + (d * 0.62) / 2 + 0.03);
+  gDoor.userData.surface = 'metal';
   group.add(gDoor);
 
   // origin normalization: recentre children so bbox centre xz sits at (0,0)
