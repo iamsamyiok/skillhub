@@ -1,0 +1,8 @@
+node_modules/
+scenes/*/world.html
+scenes/*/world-meta.json
+scenes/*/solved-instances.json
+scenes/*/validation-report.json
+scenes/*/edit-requests/
+scenes/*/screenshot*.png
+*.log

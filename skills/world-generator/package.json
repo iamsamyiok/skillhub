@@ -1,6 +1,6 @@
 {
   "name": "world-generator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Universal parameterized 3D world generator: AI plans semantics, engine solves geometry, single-file world.html output with interactive edit loop",
   "type": "module",
   "scripts": {

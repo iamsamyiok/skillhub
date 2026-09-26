@@ -37,6 +37,7 @@ function arg(name, fallback) {
 const sceneDir = arg('--scene', 'scenes/demo');
 const refineFile = arg('--refine', null);
 const patchFile = arg('--patch', null);
+const repackOnly = process.argv.includes('--repack');
 const editSave = process.argv.includes('--edit-save');
 const newSession = process.argv.includes('--new-session');
 if (!fs.existsSync(sceneDir)) {
@@ -46,7 +47,7 @@ if (!fs.existsSync(sceneDir)) {
 
 const report = {
   scene: sceneDir,
-  mode: patchFile ? 'patch' : (refineFile ? 'refine' : 'base'),
+  mode: patchFile ? 'patch' : (refineFile ? 'refine' : (repackOnly ? 'repack' : 'base')),
   timestamp: new Date().toISOString(),
   stages: {},
   errors: [],
@@ -179,6 +180,26 @@ function checkZonePolicy(zones, instances) {
 
 let worldFile = null;
 let solveSummary = { failures: [] };
+
+// ================================================================ REPACK
+// Rebuild world.html from the solved state already on disk. Use this when only
+// the viewer template / packer changed: zero solver involvement, so placed
+// instances stay byte-identical to the last solve/refine/patch run.
+if (report.mode === 'repack') {
+  const plan = stage('LOAD SCENE PLAN', () => {
+    const doc = JSON.parse(fs.readFileSync(path.join(sceneDir, 'scene-plan.json'), 'utf8'));
+    console.log(`plan OK: ${doc.scene_meta.name}, ${doc.zones.length} zones`);
+    return doc;
+  });
+  const solved = stage('LOAD SOLVED INSTANCES', () => {
+    const list = loadSolved();
+    console.log(`solved instances on disk: ${list.length}`);
+    return list;
+  });
+  if (plan && solved) {
+    worldFile = stage('REPACK WORLD.HTML', () => packScene(plan, solved));
+  }
+}
 
 // ================================================================ BASE
 if (report.mode === 'base') {

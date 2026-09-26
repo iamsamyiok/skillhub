@@ -1,15 +1,12 @@
-# Validation Report — scenes/villa (base)
-- time: 2026-09-26T03:31:50.962Z
-- world: scenes/villa/world.html
+# Validation Report — scenes/bicycle (repack)
+- time: 2026-09-26T03:27:04.454Z
+- world: scenes/bicycle/world.html
 
 ## Errors
 - none
 
 ## Warnings
 - none
-
-## solve
-- solved: 43, failed: 0, attempts: 129
 
 ## Asset Validation
 | asset | status | max tris | issues |

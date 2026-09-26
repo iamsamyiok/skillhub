@@ -1,11 +1,12 @@
 ---
 name: world-generator
-version: 1.0.0
+version: 1.1.0
 category: 前端开发
 tags: [3D, Three.js, 程序化生成, 场景生成, 交互编辑, 参数化]
 description: 通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（内嵌 Three.js 零外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。
 license: MIT
 ---
+
 
 # World Generator Skill
 
@@ -75,7 +76,10 @@ viewer 已内置统一地形机制：全场合并为**单张共享顶点晶格**
 ### 阶段 4：运行流水线
 
 ```bash
+# base：全量求解 + 打包
 node engine/index.mjs --scene scenes/<name>
+# repack：只改了 viewer 模板/打包器时用，从磁盘 solved 状态直接重打包（实例坐标零变动）
+node engine/index.mjs --scene scenes/<name> --repack
 ```
 ### 阶段 5：按报告路由定向修复（最多 3 轮）
 
@@ -128,9 +132,10 @@ node engine/index.mjs --scene scenes/<name> --patch patch-1.json
 
 ### 阶段 6：视觉与运行时能力（viewer 内建，无需额外操作）
 
-- **渲染**：ACES tone mapping + UnrealBloom 泛光（灯头 emissive、玻璃高光自动发光）+ OutputPass
-- **时间系统**：`scene_meta.time_of_day`（0-24，默认 14）驱动太阳方位/颜色、天空、雾、半球光、夜间泛光增强；viewer「时间」按钮可实时拖动预览
-- **水面动画**：资产给水面 mesh 设 `mesh.userData.water = true`，viewer 自动升级为波动 Phong 材质（见 pool_v1）
+- **渲染**（Opus 级质感四件套已全量内建）：ACES tone mapping + 线性光工作流；RoomEnvironment IBL（PMREM 程序化环境光，无外部 HDRI）；Lambert 资产 API → 引擎端统一升级 MeshStandardMaterial + 程序化噪变（多倍频值噪声 CanvasTexture 作 roughnessMap/bumpMap，打破平色塑料感）；UnrealBloom 泛光（灯头 emissive、太阳盘 HDR 自动发光）；FogExp2 大气
+- **程序化天穹**：渐变穹顶 + HDR 日/月盘（同一形体昼夜换位换色）+ 程序化星场，随 time_of_day 联动；IBL 强度随昼夜调制（正午亮反射、午夜微光）
+- **时间系统**：`scene_meta.time_of_day`（0-24，默认 14）驱动太阳方位/颜色、天穹、雾、半球光、IBL、夜间泛光增强；viewer「时间」按钮可实时拖动预览
+- **水面动画**：资产给水面 mesh 设 `mesh.userData.water = true`，viewer 自动升级为低粗糙度 Standard 波动材质（IBL 反射 + 顶点波，见 pool_v1）
 - **视角预设**：鸟瞰 / 街景 / 环绕（自动旋转）按钮
 - **GLB 导出**：viewer「导出 GLB」按钮，输出含地形+实例的 .glb，可进 Blender / three.js editor
 - **材质去重**：构建后按外观键合并材质（500 实例压到 ~33 材质）；发光/水面材质不参与合并
@@ -196,6 +201,9 @@ node engine/visual-check.mjs scenes/<name>/world.html
 | 编辑模式下点不到对象 | 编辑栏常驻展开，遮挡屏幕下方，点击落在栏上 | 输入框改为"选中后才出现"且上移至按钮行上方（bottom 56px）；编辑态下其余按钮隐藏 |
 | 编辑按钮点不动 | 收起态提示条盖住底部按钮行 | 收起态整条隐藏（提示走 hud-help），不再拦截指针 |
 | 提交后状态栏闪一下就空 | `clearEditSel()` 在设置状态文字之前执行，把文字清掉 | 先 clear 再写状态（viewer-template 已修） |
+| GLB 导出点击即报 `Converting circular structure to JSON` | three r160 `Mesh.copy` 用 `JSON.parse(JSON.stringify(userData))` 深拷贝，运行时 `instanceRef→_object→userData` 循环引用必炸 | 导出前 stash 清空 userData，clone 后恢复（viewer-template 已修） |
+| 想全局调 IBL 强度找不到 `scene.environmentIntensity` | r160 尚无该属性 | 逐材质 `envMapIntensity`（viewer 已按 `userData.envBase` 昼夜调制） |
+| 改了 viewer 模板后想重新打包又怕求解结果漂移 | 重跑 base 会重置 solved-instances.json | 用 `--repack` 模式，只重打包 |
 
 ## 引擎固定层（禁止修改）
 

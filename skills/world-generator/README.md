@@ -28,6 +28,9 @@ node engine/index.mjs --scene scenes/villa --refine refine-1.json
 # 局部补丁（move / reparam / delete / add，可改 time_of_day）
 node engine/index.mjs --scene scenes/villa --patch patch-1.json
 
+# 只改了 viewer 模板/打包器时：从既有 solved 状态直接重打包（实例坐标零变动）
+node engine/index.mjs --scene scenes/villa --repack
+
 # 浏览器打开
 open scenes/villa/world.html
 ```
@@ -54,10 +57,11 @@ node engine/edit-server.mjs --port 8770 --root .
 ## 查看器功能
 
 - 鸟瞰/街景/环绕预设，默认整体鸟瞰机位
-- 时间系统（0-24h，太阳方位/色温、天空、雾、暮光下限保护）
-- ACES tone mapping + UnrealBloom 后处理
+- 时间系统（0-24h，太阳方位/色温、天穹、雾、IBL 昼夜调制、暮光下限保护）
+- 渲染栈：ACES tone mapping + 线性光工作流 + RoomEnvironment IBL（PMREM 程序化环境光）+ Lambert→MeshStandardMaterial 引擎端升级 + 程序化噪变 roughness/bump + UnrealBloom + FogExp2
+- 程序化天穹：渐变穹顶 + HDR 日/月盘 + 程序化星场（无任何外部纹理/HDRI）
 - 单张统一晶格地形：noise 基底 + flat 平台 1.4m 高度/颜色过渡带，无拼接缝
-- GLB 一键导出；`#debug` 显示分区边界；`#edit` 启用编辑模式
+- GLB 一键导出（运行时 userData 循环引用已剥离）；`#debug` 显示分区边界；`#edit` 启用编辑模式
 
 ## 质量管线
 

@@ -157,7 +157,7 @@ app.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 const skyColor = new THREE.Color(0x87b5e5);
 scene.background = skyColor;
-scene.fog = new THREE.Fog(0x87b5e5, 120, 520);
+scene.fog = new THREE.FogExp2(0x87b5e5, 0.0022);
 
 const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 2000);
 const orbit = new Orbit(camera, renderer.domElement);
@@ -171,6 +171,21 @@ sun.shadow.mapSize.set(2048, 2048);
 sun.shadow.camera.near = 10;
 sun.shadow.camera.far = 400;
 scene.add(sun);
+
+// ---------- image-based lighting: procedural RoomEnvironment via PMREM ----------
+// No external HDRI: a synthetic room is rendered once into a cubemap and every
+// PBR material picks up soft ambient + reflections from it.
+try {
+  if (THREE.PMREMGenerator && window.THREE_ADDONS && window.THREE_ADDONS.RoomEnvironment) {
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new window.THREE_ADDONS.RoomEnvironment(renderer), 0.04).texture;
+    pmrem.dispose();
+  } else {
+    console.warn('IBL unavailable (lights-only fallback)');
+  }
+} catch (err) { console.warn('IBL failed, lights-only fallback', err); }
+// every upgraded PBR material lands here for time-of-day env modulation
+const pbrMats = [];
 
 // ---------- unified terrain: one shared-vertex lattice, ramp-blended layers ----------
 const elevFactory = makeElevationField;
@@ -245,6 +260,33 @@ function mottleAt(base, x, z) {
   const m = vnoise(x * 0.35, z * 0.35) * 0.7 + vnoise(x * 1.3, z * 1.3) * 0.3;
   return base.clone().multiplyScalar(0.88 + m * 0.26);
 }
+// procedural grunge (multi-octave value noise baked once into a CanvasTexture):
+// reused as roughnessMap + bumpMap so flat primitive colors break up into
+// believable surfaces. Zero external assets, deterministic per seed.
+function makeGrungeTexture(freq, seed) {
+  const S = 256, cv = document.createElement('canvas');
+  cv.width = cv.height = S;
+  const ctx = cv.getContext('2d');
+  const img = ctx.createImageData(S, S);
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      const n = vnoise(x * freq + seed * 13.7, y * freq + seed * 7.3) * 0.6
+              + vnoise(x * freq * 3.4 + 9.2, y * freq * 3.4 + 4.1) * 0.28
+              + vnoise(x * freq * 12.0 + 1.7, y * freq * 12.0 + 8.9) * 0.12;
+      const v = Math.round(110 + Math.pow(n, 1.5) * 145); // roughness range ~0.43..1.0
+      const i = (y * S + x) * 4;
+      img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+      img.data[i + 3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  return tex;
+}
+const grungeAsset = makeGrungeTexture(0.09, 3);
+grungeAsset.repeat.set(2, 2);                 // fine micro grain on assets
+const grungeTerrain = makeGrungeTexture(0.045, 11); // terrain uv unit = 8 m
 // composed height / color at any world point
 function terrainSample(x, z) {
   let h = null;
@@ -282,7 +324,7 @@ gMinX -= MARGIN; gMaxX += MARGIN; gMinZ -= MARGIN; gMaxZ += MARGIN;
 const nx = Math.max(2, Math.ceil((gMaxX - gMinX) / cell));
 const nz = Math.max(2, Math.ceil((gMaxZ - gMinZ) / cell));
 
-const positions = [], colors = [], indices = [];
+const positions = [], colors = [], uvs = [], indices = [];
 const vIndex = new Map();
 function vert(i, j) {
   const k = i + ',' + j;
@@ -298,6 +340,7 @@ function vert(i, j) {
   const idx = positions.length / 3;
   positions.push(x, s.h, zz);
   colors.push(Math.min(1, s.c.r), Math.min(1, s.c.g), Math.min(1, s.c.b));
+  uvs.push((x - gMinX) / 8, (zz - gMinZ) / 8); // 1 uv unit = 8 m of world
   vIndex.set(k, idx);
   return idx;
 }
@@ -312,9 +355,16 @@ for (let i = 0; i < nx; i++) {
 const terrainGeo = new THREE.BufferGeometry();
 terrainGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 terrainGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+terrainGeo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
 terrainGeo.setIndex(indices);
 terrainGeo.computeVertexNormals();
-const terrainMesh = new THREE.Mesh(terrainGeo, new THREE.MeshLambertMaterial({ vertexColors: true }));
+const terrainMat = new THREE.MeshStandardMaterial({
+  vertexColors: true, roughness: 1.0, metalness: 0.0,
+  roughnessMap: grungeTerrain, bumpMap: grungeTerrain, bumpScale: 0.06
+});
+terrainMat.envMapIntensity = terrainMat.userData.envBase = 0.4;
+pbrMats.push(terrainMat);
+const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
 terrainMesh.receiveShadow = true;
 zoneGroup.add(terrainMesh);
 const worldBox = new THREE.Box3().setFromObject(terrainMesh);
@@ -368,14 +418,16 @@ const waterMats = [];
 instanceRoot.traverse(o => {
   if (!o.isMesh || !o.userData.water) return;
   const old = o.material;
-  const m = new THREE.MeshPhongMaterial({
+  const m = new THREE.MeshStandardMaterial({
     color: old.color ? old.color.clone() : new THREE.Color(0x3f7f9f),
     emissive: old.emissive ? old.emissive.clone() : new THREE.Color(0x0a2a3a),
     transparent: true,
     opacity: 0.86,
-    shininess: 140,
-    specular: new THREE.Color(0x9fd4e8)
+    roughness: 0.10,
+    metalness: 0.24
   });
+  m.envMapIntensity = m.userData.envBase = 1.25;
+  pbrMats.push(m);
   m.userData.waterUpgraded = true;
   m.userData.uTime = { value: 0 };
   m.onBeforeCompile = shader => {
@@ -410,6 +462,44 @@ instanceRoot.traverse(o => {
   window.__MAT_DEDUP__ = { unique: cache.size, merged };
 })();
 
+// ---------- PBR upgrade: Lambert/Phong -> MeshStandardMaterial + grunge ----------
+// Assets keep their simple Lambert authoring API; the engine owns the final
+// look. color/emissive/opacity carry over, roughness comes from the grunge
+// canvas, IBL intensity is modulated by time of day in applyTimeOfDay().
+(function upgradeToPBR() {
+  const cache = new Map();
+  const convert = m => {
+    const hit = cache.get(m);
+    if (hit) return hit;
+    const s = new THREE.MeshStandardMaterial({
+      color: m.color ? m.color.clone() : new THREE.Color(0xffffff),
+      emissive: m.emissive ? m.emissive.clone() : new THREE.Color(0x000000),
+      transparent: m.transparent,
+      opacity: m.opacity,
+      vertexColors: m.vertexColors,
+      flatShading: m.flatShading,
+      side: m.side,
+      roughness: 0.9,
+      metalness: 0.02,
+      roughnessMap: grungeAsset,
+      bumpMap: grungeAsset,
+      bumpScale: 0.035
+    });
+    if (m.map) s.map = m.map;
+    s.envMapIntensity = s.userData.envBase = 0.5;
+    pbrMats.push(s);
+    cache.set(m, s);
+    return s;
+  };
+  instanceRoot.traverse(o => {
+    if (!o.isMesh || !o.material) return;
+    const m = o.material;
+    if (m.userData.waterUpgraded) return; // water is already PBR
+    if (m.isMeshLambertMaterial || m.isMeshPhongMaterial) o.material = convert(m);
+    else if (m.isMeshStandardMaterial && !pbrMats.includes(m)) pbrMats.push(m);
+  });
+})();
+
 // shadow frustum fits the world
 const wbSize = new THREE.Vector3(); worldBox.getSize(wbSize);
 const wbCenter = new THREE.Vector3(); worldBox.getCenter(wbCenter);
@@ -421,10 +511,75 @@ const ext = Math.max(wbSize.x, wbSize.z) * 0.75;
 sc.left = -ext; sc.right = ext; sc.top = ext; sc.bottom = -ext;
 sc.updateProjectionMatrix();
 
+// ---------- procedural sky dome: gradient + HDR sun/moon disc + stars ----------
+// Replaces the flat background. The celestial disc is authored > 1.0 (HDR) so
+// ACES rolls it off and the bloom pass picks it up naturally. One body serves
+// as sun by day and moon by night (position/color switch in applyTimeOfDay).
+const skyUniforms = {
+  uTop: { value: new THREE.Color(0x87b5e5) },
+  uHorizon: { value: new THREE.Color(0xbfd7ee) },
+  uSunDir: { value: new THREE.Vector3(0.3, 0.8, 0.4).normalize() },
+  uSunColor: { value: new THREE.Color(0xfff4e0) },
+  uNight: { value: 0 }
+};
+let skyDome = null;
+try {
+  skyDome = new THREE.Mesh(
+    new THREE.SphereGeometry(1200, 48, 24),
+    new THREE.ShaderMaterial({
+      uniforms: skyUniforms,
+      side: THREE.BackSide,
+      depthWrite: false,
+      fog: false,
+      vertexShader: `
+        varying vec3 vDir;
+        void main() {
+          vDir = normalize((modelMatrix * vec4(position, 1.0)).xyz - cameraPosition);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }`,
+      fragmentShader: `
+        uniform vec3 uTop, uHorizon, uSunColor, uSunDir;
+        uniform float uNight;
+        varying vec3 vDir;
+        float hash13(vec3 p) {
+          p = fract(p * 443.8975);
+          p += dot(p, p.yzx + 19.19);
+          return fract((p.x + p.y) * p.z);
+        }
+        void main() {
+          vec3 d = normalize(vDir);
+          vec3 col = mix(uHorizon, uTop, smoothstep(-0.06, 0.42, d.y));
+          // celestial disc: HDR core + two-lobe halo
+          float s = max(dot(d, uSunDir), 0.0);
+          col += uSunColor * (smoothstep(0.99935, 0.99965, s) * 6.0
+                            + pow(s, 220.0) * 0.55
+                            + pow(s, 9.0) * 0.10);
+          // procedural stars, faded near the horizon, night only
+          float star = step(0.9975, hash13(floor(d * 160.0))) * smoothstep(0.08, 0.35, d.y);
+          col += vec3(0.9, 0.95, 1.0) * star * uNight * 0.85;
+          gl_FragColor = vec4(col, 1.0);
+        }`
+    })
+  );
+  skyDome.position.set(wbCenter.x, 0, wbCenter.z);
+  skyDome.renderOrder = -1;
+  scene.add(skyDome);
+  scene.background = null; // the dome covers every view ray
+} catch (err) {
+  console.warn('sky dome unavailable, flat background fallback', err);
+  skyDome = null;
+}
+
 // ground-void backdrop disc so the world does not float in empty space
+const groundMat = new THREE.MeshStandardMaterial({
+  color: 0x4a5f42, roughness: 1.0, metalness: 0.0,
+  roughnessMap: grungeTerrain, bumpMap: grungeTerrain, bumpScale: 0.05
+});
+groundMat.envMapIntensity = groundMat.userData.envBase = 0.35;
+pbrMats.push(groundMat);
 const groundDisc = new THREE.Mesh(
   new THREE.CircleGeometry(Math.max(wbSize.x, wbSize.z) * 1.8, 48),
-  new THREE.MeshLambertMaterial({ color: 0x4a5f42 })
+  groundMat
 );
 groundDisc.rotation.x = -Math.PI / 2;
 groundDisc.position.set(wbCenter.x, worldBox.min.y - 0.35, wbCenter.z);
@@ -466,13 +621,14 @@ function applyTimeOfDay(t) {
   const azim = dayFrac * Math.PI;             // east -> west
 
   // sun / moon direction + light
+  let dir;
   if (elev > -0.06) {
-    const dir = new THREE.Vector3(Math.cos(azim), Math.max(0.06, Math.sin(elevAngle)), 0.38).normalize();
+    dir = new THREE.Vector3(Math.cos(azim), Math.max(0.06, Math.sin(elevAngle)), 0.38).normalize();
     sun.position.copy(wbCenter).addScaledVector(dir, sunDist);
     sun.color.copy(C_SUN_LOW).lerp(C_SUN_NOON, Math.min(1, elev * 1.4));
     sun.intensity = 0.55 + Math.max(0, elev) * 1.75;
   } else {
-    const dir = new THREE.Vector3(-0.5, 0.7, -0.4).normalize();
+    dir = new THREE.Vector3(-0.5, 0.7, -0.4).normalize();
     sun.position.copy(wbCenter).addScaledVector(dir, sunDist);
     sun.color.copy(C_MOON);
     sun.intensity = 0.22;
@@ -483,9 +639,22 @@ function applyTimeOfDay(t) {
   const goldW = THREE.MathUtils.clamp(1 - Math.abs(elev - 0.05) / 0.22, 0, 1);
   skyColor.copy(C_NIGHT).lerp(C_DAY, dayW).lerp(C_GOLD, goldW * 0.75);
   scene.fog.color.copy(skyColor);
-  scene.background = skyColor;
-  hemi.intensity = 0.32 + Math.max(0, elev) * 0.68;
+  if (!skyDome) scene.background = skyColor;
+  if (skyDome) {
+    skyUniforms.uHorizon.value.copy(skyColor);
+    // deepen the zenith: toward dark navy at night, toward saturated blue at day
+    const topTint = new THREE.Color(0x0a1226).lerp(new THREE.Color(0x3c6fb0), dayW);
+    skyUniforms.uTop.value.copy(skyColor).lerp(topTint, 0.45);
+    // one celestial body: sun by day, moon by night (position + color swap)
+    skyUniforms.uSunDir.value.copy(dir);
+    skyUniforms.uSunColor.value.copy(sun.color);
+    skyUniforms.uNight.value = THREE.MathUtils.clamp((0.04 - elev) * 7, 0, 1);
+  }
+  hemi.intensity = 0.15 + Math.max(0, elev) * 0.45; // IBL carries ambient now
   hemi.color.copy(C_NIGHT).lerp(new THREE.Color(0xbdd7ff), Math.max(0.15, dayW));
+  // IBL follows the sun: bright soft reflections at noon, faint at midnight
+  const envW = 0.22 + 0.78 * dayW;
+  for (const m of pbrMats) m.envMapIntensity = m.userData.envBase * envW;
   if (bloomPass) bloomPass.strength = 0.28 + (1 - Math.max(0, elev)) * 0.3;
   statsParts.time = String(Math.floor(t)).padStart(2, '0') + ':' + String(Math.round((t % 1) * 60)).padStart(2, '0');
   renderStats();
@@ -543,8 +712,16 @@ document.getElementById('btn-glb').addEventListener('click', () => {
   if (!exporterNS || !exporterNS.GLTFExporter) { console.error('GLTFExporter not bundled'); return; }
   const exportRoot = new THREE.Group();
   exportRoot.name = WORLD.meta.name || 'world';
+  // three r160 Mesh.copy deep-clones userData via JSON: the runtime-only
+  // instanceRef/_object pointers are circular and would throw. Stash userData
+  // around the clone, then restore - the export copy ships clean.
+  const stash = new Map();
+  [zoneGroup, instanceRoot].forEach(g => g.traverse(o => {
+    if (Object.keys(o.userData).length) { stash.set(o, o.userData); o.userData = {}; }
+  }));
   const terr = zoneGroup.clone(true);
   const inst = instanceRoot.clone(true);
+  stash.forEach((ud, o) => { o.userData = ud; });
   // strip per-instance helpers from export clones
   [terr, inst].forEach(g => g.traverse(o => {
     if (o.isMesh) { o.castShadow = false; o.receiveShadow = false; }

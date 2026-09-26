@@ -41,9 +41,10 @@ const ADDON_FILES = [
   'postprocessing/EffectComposer.js',
   'postprocessing/UnrealBloomPass.js',
   'postprocessing/OutputPass.js',
+  'environments/RoomEnvironment.js',
   'exporters/GLTFExporter.js'
 ];
-const ADDON_EXPORTS = ['EffectComposer', 'RenderPass', 'ShaderPass', 'UnrealBloomPass', 'OutputPass', 'GLTFExporter'];
+const ADDON_EXPORTS = ['EffectComposer', 'RenderPass', 'ShaderPass', 'UnrealBloomPass', 'OutputPass', 'RoomEnvironment', 'GLTFExporter'];
 
 // resolve a file inside the installed three package, walking up from the
 // engine dir so the skill works from a bare repo (npm install at any level)
