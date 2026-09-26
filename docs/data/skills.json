@@ -1,5 +1,5 @@
 {
-  "total": 32,
+  "total": 33,
   "categories": [
     "写作工具",
     "前端开发",
@@ -631,6 +631,28 @@
         {
           "path": "SKILL.md",
           "size": 2685
+        }
+      ]
+    },
+    {
+      "id": "localtunnel-preview",
+      "name": "localtunnel-preview",
+      "description": "通过 localtunnel 将本地 Web 服务暴露为临时公网 URL，5 分钟后自动清理。提供安全防御：端口范围限制、进程隔离、自动回收。适用于需要分享本地项目给他人预览的场景。",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "预览",
+        "临时链接",
+        "localtunnel",
+        "tunnel",
+        "开发"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-26T15:04:23.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 5673
         }
       ]
     },
@@ -2540,7 +2562,7 @@
       "id": "world-generator",
       "name": "world-generator",
       "description": "通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL、SSAO/SMAA 影视级后处理、圆角建筑与叶噪树冠，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch（布局 + 实例属性：旋转/缩放/材质/显隐/自定义元数据，配属性值指导库 props-library）、分时段双 HDRI（白天/黄昏）与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。",
-      "version": "1.5.0",
+      "version": "1.6.0",
       "category": "前端开发",
       "tags": [
         "3D",
@@ -2567,7 +2589,7 @@
         },
         {
           "path": "SKILL.md",
-          "size": 24492
+          "size": 26664
         },
         {
           "path": "engine/assets/bench_v1/asset.js",
@@ -2632,6 +2654,14 @@
         {
           "path": "engine/assets/patio_umbrella_v1/definition.json",
           "size": 981
+        },
+        {
+          "path": "engine/assets/pier_v1/asset.js",
+          "size": 5061747
+        },
+        {
+          "path": "engine/assets/pier_v1/definition.json",
+          "size": 510
         },
         {
           "path": "engine/assets/pool_v1/asset.js",
@@ -2707,7 +2737,7 @@
         },
         {
           "path": "engine/assets-bin/manifest.json",
-          "size": 6394
+          "size": 7744
         },
         {
           "path": "engine/assets-bin/packs/asphalt/color.jpg",
@@ -2806,6 +2836,18 @@
           "size": 17847
         },
         {
+          "path": "engine/assets-bin/packs/paving/color.jpg",
+          "size": 105284
+        },
+        {
+          "path": "engine/assets-bin/packs/paving/normalGL.jpg",
+          "size": 124599
+        },
+        {
+          "path": "engine/assets-bin/packs/paving/roughness.jpg",
+          "size": 54517
+        },
+        {
           "path": "engine/assets-bin/packs/rock/color.jpg",
           "size": 281143
         },
@@ -2828,6 +2870,30 @@
         {
           "path": "engine/assets-bin/packs/rooftile/roughness.jpg",
           "size": 258690
+        },
+        {
+          "path": "engine/assets-bin/packs/sand/color.jpg",
+          "size": 250081
+        },
+        {
+          "path": "engine/assets-bin/packs/sand/normalGL.jpg",
+          "size": 375207
+        },
+        {
+          "path": "engine/assets-bin/packs/sand/roughness.jpg",
+          "size": 46369
+        },
+        {
+          "path": "engine/assets-bin/packs/stonewall/color.jpg",
+          "size": 192053
+        },
+        {
+          "path": "engine/assets-bin/packs/stonewall/normalGL.jpg",
+          "size": 327624
+        },
+        {
+          "path": "engine/assets-bin/packs/stonewall/roughness.jpg",
+          "size": 65893
         },
         {
           "path": "engine/assets-bin/packs/stucco/color.jpg",
@@ -2926,8 +2992,12 @@
           "size": 6060
         },
         {
+          "path": "engine/tools/glb-to-asset.py",
+          "size": 20354
+        },
+        {
           "path": "engine/viewer-template.html",
-          "size": 61748
+          "size": 61957
         },
         {
           "path": "engine/visual-check.mjs",
