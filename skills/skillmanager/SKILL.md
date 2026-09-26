@@ -72,3 +72,21 @@ python "<脚本绝对路径>" run "<技能名>" -- <该技能的实际执行命�
 | `hub-publish <名称> [--dry-run]` | 发布本地技能到 skillhub(自动处理已存在文件的 sha 覆盖) |
 
 已知坑:本机代理偶发返回 rc=0 空响应 — _hub_tree 已带 3 次重试;描述扫描每请求间隔 0.5s 防 GitHub 二级限流。
+
+
+## Agent 工作流:用户要求查找/安装 skillhub 技能时 (v1.2)
+
+当用户说"帮我找一个 XX 技能"、"skillhub 上有没有 YY"、"安装 ZZ 技能"时,按以下流程执行:
+
+1. **搜索**: `python <本技能>/scripts/skillmanager.py hub-search <关键词>`
+   - 返回名称命中与描述命中两个维度,逐条列给用户
+2. **给结果**: 把命中列表整理成表格(技能名 + 推断用途)呈现给用户
+3. **安装**: 用户确认(或明确要求"直接装")后执行
+   `python <本技能>/scripts/skillmanager.py hub-install <名称>`
+   安装到 `~/.agents/skills/<名称>/`,ZCode 重启后自动进技能列表
+4. **确认**: `hub-outdated` 检查安装结果,向用户报告安装路径与用法入口(SKILL.md)
+
+示例对话:
+- 用户:"skillhub 上有没有能生成图表的技能?"
+- → `hub-search 图表` / `hub-search chart` / `hub-search d2` → 命中 d2-chart、text-to-d2 →
+  呈现给用户 → 用户说"装 d2-chart" → `hub-install d2-chart` → 完成
