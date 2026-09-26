@@ -466,6 +466,9 @@ for (const inst of WORLD.instances) {
   try { obj = factory(Object.assign({}, inst.params)); } catch (err) { console.error('build failed', inst.instance_id, err); continue; }
   obj.position.set(inst.position[0], inst.position[1], inst.position[2]);
   obj.rotation.y = inst.rotation_y || 0;
+  if (inst.scale) obj.scale.set(inst.scale[0], inst.scale[1], inst.scale[2]);
+  if (inst.visible === false) obj.visible = false;
+  if (inst.user_data) obj.userData.user = inst.user_data;
   obj.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; o.userData.instanceRef = inst; pickables.push(o); } });
   inst._object = obj;
   instanceRoot.add(obj);
@@ -561,6 +564,40 @@ instanceRoot.traverse(o => {
     else if (m.isMeshStandardMaterial && !pbrMats.includes(m)) pbrMats.push(m);
   });
 })();
+
+// ---------- instance material overrides (patch op: set_material) ----------
+// Applied twice: once on the procedural look, once more after photo-texture
+// binding, so explicit patch values always win the final appearance.
+// Water meshes are tuned in place (never cloned) to keep their wave shader.
+window.__applyMaterialOverrides = function () {
+  let touched = 0;
+  for (const inst of WORLD.instances) {
+    if (!inst.material || !inst._object) continue;
+    const slots = inst.material;
+    inst._object.traverse(o => {
+      if (!o.isMesh || !o.material) return;
+      const isWater = !!o.material.userData.waterUpgraded;
+      const surf = o.userData && o.userData.surface;
+      let m = null;
+      if (slots.all) m = Object.assign({}, slots.all);
+      if (surf && slots[surf]) m = Object.assign(m || {}, slots[surf]);
+      if (isWater && slots.water) m = Object.assign(m || {}, slots.water);
+      if (!m) return;
+      if (!isWater) o.material = o.material.clone(); // shared/deduped mats stay intact
+      const mat = o.material;
+      if (m.color) mat.color.set(m.color);
+      if (m.emissive) mat.emissive.set(m.emissive);
+      if (m.metalness !== undefined) mat.metalness = m.metalness;
+      if (m.roughness !== undefined) mat.roughness = m.roughness;
+      if (m.emissive_intensity !== undefined) mat.emissiveIntensity = m.emissive_intensity;
+      if (m.opacity !== undefined) { mat.opacity = m.opacity; mat.transparent = m.opacity < 1; }
+      mat.needsUpdate = true;
+      touched++;
+    });
+  }
+  window.__MAT_OVERRIDES__ = touched;
+};
+window.__applyMaterialOverrides();
 
 // ---------- geometry realism upgrades: rounded building edges, leafy canopies ----------
 // Runs before photo-texture binding so upgraded geometry gets the same
@@ -763,6 +800,7 @@ scene.add(groundDisc);
     boundCount++;
   });
   window.__PHOTO_BOUND__ = boundCount;
+  if (window.__applyMaterialOverrides) window.__applyMaterialOverrides();
 
   // terrain + backdrop: real grass over the vertex-colored lattice
   if (packs.grass) {
@@ -1099,7 +1137,12 @@ document.getElementById('btn-glb').addEventListener('click', () => {
   // around the clone, then restore - the export copy ships clean.
   const stash = new Map();
   [zoneGroup, instanceRoot].forEach(g => g.traverse(o => {
-    if (Object.keys(o.userData).length) { stash.set(o, o.userData); o.userData = {}; }
+    if (Object.keys(o.userData).length) {
+      stash.set(o, o.userData);
+      // plain user_data (patch op: set_userdata) ships with the export
+      o.userData = (o.userData.user && typeof o.userData.user === 'object')
+        ? JSON.parse(JSON.stringify(o.userData.user)) : {};
+    }
   }));
   const terr = zoneGroup.clone(true);
   const inst = instanceRoot.clone(true);
@@ -1176,7 +1219,11 @@ renderer.domElement.addEventListener('pointerup', e => {
       `<div class="row"><span class="k">zone_id</span>: ${inst.zone_id}</div>` +
       `<div class="row"><span class="k">position</span>: [${inst.position.map(v => v.toFixed(2)).join(', ')}]</div>` +
       `<div class="row"><span class="k">rotation_y</span>: ${((inst.rotation_y || 0) * 180 / Math.PI).toFixed(1)}°</div>` +
-      `<pre>${JSON.stringify(params, null, 1)}</pre>`;
+      (inst.scale ? `<div class="row"><span class="k">scale</span>: [${inst.scale.map(v => v.toFixed(2)).join(', ')}]</div>` : '') +
+      (inst.visible === false ? `<div class="row"><span class="k">visible</span>: hidden</div>` : '') +
+      (inst.material ? `<div class="row"><span class="k">material</span>:</div><pre>${JSON.stringify(inst.material, null, 1)}</pre>` : '') +
+      `<pre>${JSON.stringify(params, null, 1)}</pre>` +
+      (inst.user_data ? `<div class="row"><span class="k">user_data</span>:</div><pre>${JSON.stringify(inst.user_data, null, 1)}</pre>` : '');
     panel.style.display = 'block';
   }
 });

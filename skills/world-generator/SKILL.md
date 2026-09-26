@@ -1,9 +1,9 @@
 ---
 name: world-generator
-version: 1.3.0
+version: 1.4.0
 category: 前端开发
 tags: [3D, Three.js, 程序化生成, 场景生成, 交互编辑, 参数化]
-description: 通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL、SSAO/SMAA 影视级后处理、圆角建筑与叶噪树冠，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch 与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。
+description: 通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL、SSAO/SMAA 影视级后处理、圆角建筑与叶噪树冠，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch（布局 + 实例属性：旋转/缩放/材质/显隐/自定义元数据，配属性值指导库 props-library）与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。
 license: MIT
 ---
 规则机器固定，语义无限扩展；程序管几何，AI 管设计。
@@ -113,18 +113,33 @@ node engine/index.mjs --scene scenes/<name> --refine refine-1.json
 node engine/index.mjs --scene scenes/<name> --patch patch-1.json
 ```
 
-四种 op（`patches` 数组按序执行）：
+九种 op（`patches` 数组按序执行）。前四种操作实例布局，后五种操作实例属性——属性值选型前必读 `engine/props-library.json`（范围、预设、语义配色库）：
 
 ```json
 { "op": "move",   "instance_id": "...", "offset": [dx, dy, dz] }
 { "op": "reparam", "instance_id": "...", "params": { "glass_glow": 0.95 } }
 { "op": "remove", "instance_id": "..." }
-{ "op": "add", "instance_id": "新ID", "asset_id": "bench_v1", "zone_id": "zone_plaza", "params": {}, "constraints": ["no_overlap"] }
+{ "op": "add", "instance_id": "新ID", "asset_id": "bench_v1", "zone_id": "zone_plaza", "params": {}, "constraints": ["no_overlap"], "rotation_y": 90 }
+{ "op": "rotate", "instance_id": "...", "rotation_y": 45 }
+{ "op": "scale", "instance_id": "...", "scale": 1.4 }
+{ "op": "scale", "instance_id": "...", "scale": [1.0, 1.6, 0.8] }
+{ "op": "set_material", "instance_id": "...", "target": "stucco", "color": "#b0604a", "roughness": 0.85 }
+{ "op": "set_material", "instance_id": "...", "color": "#c8ccd0", "metalness": 0.95, "roughness": 0.15 }
+{ "op": "set_material", "instance_id": "...", "target": "water", "opacity": 0.7 }
+{ "op": "set_visible", "instance_id": "...", "visible": false }
+{ "op": "set_userdata", "instance_id": "...", "data": { "component_id": "CMP-0007", "component_type": "building", "note": "主楼样板" } }
 ```
 
 - `reparam` 参数会做范围校验（越界报 `[PATCH]` 错误）
 - `add` 走单实例增量求解（避开现有世界）
 - `move` 产生的重叠只告警不拒绝（用户显式移动优先）
+- patch 输入的 `rotation_y` 一律是**角度**（0-360）；引擎内部落盘为弧度
+- `scale` 夹紧到 [0.25, 4.0]；缩放属视觉层——碰撞足迹仍按参数化尺寸，>1.5 或 <0.6 需说明理由并自查穿模
+- `set_material` 字段：`color`/`emissive`（#rrggbb）、`metalness`/`roughness`（0-1）、`opacity`（0.05-1，<1 自动开透明）、`emissive_intensity`（0-5）；`target` 选材质槽位：`all`（默认）/ 资产 surface 标签（`stucco`/`glass`/`metal`/`wood`…）/ `water`（水面在原材质上原地调，保留波纹着色器）
+- `set_material` 在程序化外观与照片贴图绑定后各执行一次，显式值最终生效（对贴图材质表现为着色）
+- `set_visible: false` 隐藏但保留实例与碰撞（方案对比用），可随时恢复
+- `set_userdata` 值限 string/number/boolean、单次 ≤8 键、序列化 ≤2KB；元数据进 instance-list.json 与 GLB 导出的 `userData.user`，供下游系统读取
+- 属性补丁运行时验证：`node engine/probe-props.mjs <world.html>`（输出各实例 scale/visible/material/user_data 的运行态 JSON，无页面错误即通过）
 - patch 文件可带顶层 `time_of_day`（0-24）：写入 `world-meta.json`，打包时叠加到场景元数据（viewer 实时重算太阳/天空/雾/泛光）
 
 ### 阶段 6：视觉与运行时能力（viewer 内建，无需额外操作）
@@ -151,7 +166,7 @@ node engine/index.mjs --scene scenes/<name> --patch patch-1.json
 2. **给用户编辑链接**：`http://<host>:8000/scenes/<name>/world.html#edit`（`#edit` 直达编辑态；页面内也可点"编辑"按钮进入/退出）
 3. **页面内交互**（互斥设计）：进入编辑态后其余按钮（鸟瞰/街景/环绕/时间/GLB）自动隐藏；左键点选/再点取消（可多选，Esc 清空）；选中后底部展开输入框写改进意图 → "提交给 Agent"；点"退出编辑"恢复原界面
 4. **接收请求**：提交落盘 `scenes/<name>/edit-requests/ed-NNN.json`（`{instance_ids, asset_ids, intent}`），服务终端同步打印；无后端托管时页面降级为剪贴板 JSON
-5. **转换为补丁**：按意图把 `instance_ids` 映射为 `--patch` 操作（`reparam`/`move`/`delete`；新增走 `add`，需给 zone_id + 合法 params）。语义拿不准先反问；参数必须在资产 `params_schema` 范围内
+5. **转换为补丁**：按意图把 `instance_ids` 映射为 `--patch` 操作（布局：`move`/`reparam`/`remove`，新增走 `add`；外观/状态/元数据：`rotate`/`scale`/`set_material`/`set_visible`/`set_userdata`，值选型查 `engine/props-library.json`）。语义拿不准先反问；参数必须在资产 `params_schema` 范围内
 6. **版本另存 + 重建**：
    ```bash
    # 同一轮编辑的首次保存加 --new-session，本轮后续保存省略
@@ -227,6 +242,8 @@ engine/tools/build-texture-packs.py  贴图库构建脚本（ambientCG + Poly Ha
 engine/edit-server.mjs    编辑桥服务：静态托管 + POST /edit-request 落盘
 engine/test-edit-flow.mjs 编辑闭环 e2e 回归（playwright）
 engine/screenshot.mjs     截图（--view top/close/side）
+engine/props-library.json 实例属性指导库：patch 属性值的范围/预设/语义配色（Agent 选值前必读）
+engine/probe-props.mjs    属性补丁运行时探针（验证 scale/visible/material/user_data 生效态）
 engine/visual-check.mjs   像素统计视觉校验（时段分档阈值）
 engine/night-glb-probe.mjs  夜景像素 + GLB 导出探针
 engine/lib/               schema/expand/solve/geom/elevation/rng/registry/validate-assets/plan-lint

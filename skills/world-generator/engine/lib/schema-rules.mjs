@@ -193,13 +193,24 @@ export const patchFileSchema = {
         type: 'object',
         required: ['op', 'instance_id'],
         properties: {
-          op: { enum: ['move', 'reparam', 'remove', 'add'] },
+          op: { enum: ['move', 'reparam', 'remove', 'add', 'rotate', 'scale', 'set_material', 'set_visible', 'set_userdata'] },
           instance_id: { type: 'string', description: 'for op=add this is the new id' },
           offset: { type: 'array', minItems: 3, maxItems: 3, items: { type: 'number' } },
           params: { type: 'object' },
           asset_id: { type: 'string' },
           zone_id: { type: 'string' },
-          constraints: { type: 'array' }
+          constraints: { type: 'array' },
+          rotation_y: { type: 'number', description: 'degrees 0-360; radians internally' },
+          scale: { anyOf: [{ type: 'number' }, { type: 'array', minItems: 3, maxItems: 3, items: { type: 'number' } }], description: 'uniform ratio or [sx,sy,sz], clamped to [0.25, 4.0]' },
+          target: { type: 'string', description: 'set_material surface slot: all | stucco | glass | metal | wood | water | ...' },
+          color: { type: 'string', pattern: '^#[0-9a-fA-F]{6}$' },
+          emissive: { type: 'string', pattern: '^#[0-9a-fA-F]{6}$' },
+          metalness: { type: 'number', minimum: 0, maximum: 1 },
+          roughness: { type: 'number', minimum: 0, maximum: 1 },
+          opacity: { type: 'number', minimum: 0.05, maximum: 1 },
+          emissive_intensity: { type: 'number', minimum: 0, maximum: 5 },
+          visible: { type: 'boolean' },
+          data: { type: 'object', description: 'set_userdata: flat string/number/boolean map' }
         }
       }
     }

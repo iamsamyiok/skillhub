@@ -83,9 +83,13 @@ function writeInstanceList(planName, solved) {
   const out = {
     scene: planName,
     generated_at: report.timestamp,
-    instances: solved.map(({ instance_id, asset_id, zone_id, params, rotation_y, patched }) => {
+    instances: solved.map(({ instance_id, asset_id, zone_id, params, rotation_y, scale, material, visible, user_data, patched }) => {
       const o = { instance_id, asset_id, zone_id, params };
       if (rotation_y !== undefined) o.rotation_y = rotation_y;
+      if (scale !== undefined) o.scale = scale;
+      if (material !== undefined) o.material = material;
+      if (visible !== undefined) o.visible = visible;
+      if (user_data !== undefined) o.user_data = user_data;
       if (patched) o.patched = true;
       return o;
     })
@@ -385,6 +389,82 @@ if (report.mode === 'patch') {
         patchIds.push(p.instance_id);
         continue;
       }
+      if (p.op === 'rotate') {
+        const s = byId.get(p.instance_id);
+        if (!s) { failures.push({ instance_id: p.instance_id, reason: 'patch_rotate_unknown' }); continue; }
+        if (typeof p.rotation_y !== 'number') { failures.push({ instance_id: p.instance_id, reason: 'patch_rotate_missing_rotation_y' }); continue; }
+        // library input is degrees [0, 360]; solver convention stores radians
+        s.rotation_y = +((((p.rotation_y % 360) + 360) % 360) * Math.PI / 180).toFixed(5);
+        s.patched = true;
+        patchIds.push(p.instance_id);
+        continue;
+      }
+      if (p.op === 'scale') {
+        const s = byId.get(p.instance_id);
+        if (!s) { failures.push({ instance_id: p.instance_id, reason: 'patch_scale_unknown' }); continue; }
+        const raw = typeof p.scale === 'number' ? [p.scale, p.scale, p.scale] : p.scale;
+        if (!Array.isArray(raw) || raw.length !== 3 || !raw.every(v => typeof v === 'number' && isFinite(v))) {
+          failures.push({ instance_id: p.instance_id, reason: 'patch_scale_invalid' }); continue;
+        }
+        const clamped = raw.map(v => Math.min(4, Math.max(0.25, +v.toFixed(3))));
+        if (clamped.some((v, i) => Math.abs(v - raw[i]) > 1e-3)) report.warnings.push(`[PATCH] '${p.instance_id}': scale clamped to library range [0.25, 4.0]`);
+        s.scale = clamped;
+        s.patched = true;
+        patchIds.push(p.instance_id);
+        report.warnings.push(`[PATCH] scaled '${p.instance_id}' (visual layer: collision footprint keeps parametric size)`);
+        continue;
+      }
+      if (p.op === 'set_material') {
+        const s = byId.get(p.instance_id);
+        if (!s) { failures.push({ instance_id: p.instance_id, reason: 'patch_material_unknown' }); continue; }
+        const HEX = /^#[0-9a-fA-F]{6}$/;
+        const NUM01 = v => typeof v === 'number' && isFinite(v) && v >= 0 && v <= 1;
+        const bad = [];
+        const m = {};
+        if (p.color !== undefined) { HEX.test(p.color) ? m.color = p.color.toLowerCase() : bad.push('color'); }
+        if (p.emissive !== undefined) { HEX.test(p.emissive) ? m.emissive = p.emissive.toLowerCase() : bad.push('emissive'); }
+        if (p.metalness !== undefined) { NUM01(p.metalness) ? m.metalness = +p.metalness.toFixed(3) : bad.push('metalness'); }
+        if (p.roughness !== undefined) { NUM01(p.roughness) ? m.roughness = +p.roughness.toFixed(3) : bad.push('roughness'); }
+        if (p.opacity !== undefined) { (typeof p.opacity === 'number' && p.opacity >= 0.05 && p.opacity <= 1) ? m.opacity = +p.opacity.toFixed(3) : bad.push('opacity'); }
+        if (p.emissive_intensity !== undefined) { (typeof p.emissive_intensity === 'number' && p.emissive_intensity >= 0 && p.emissive_intensity <= 5) ? m.emissive_intensity = +p.emissive_intensity.toFixed(3) : bad.push('emissive_intensity'); }
+        if (bad.length || !Object.keys(m).length) {
+          failures.push({ instance_id: p.instance_id, reason: `patch_material_invalid_fields:${bad.join(',') || 'none'}` });
+          report.errors.push(`[PATCH] '${p.instance_id}': set_material rejected (bad fields: ${bad.join(', ') || 'no valid field'}; see props-library.json)`);
+          continue;
+        }
+        if (p.target !== undefined && (typeof p.target !== 'string' || !p.target.length || p.target.length > 32)) {
+          failures.push({ instance_id: p.instance_id, reason: 'patch_material_bad_target' }); continue;
+        }
+        const slot = p.target || 'all';
+        s.material = s.material || {};
+        s.material[slot] = { ...(s.material[slot] || {}), ...m };
+        s.patched = true;
+        patchIds.push(p.instance_id);
+        continue;
+      }
+      if (p.op === 'set_visible') {
+        const s = byId.get(p.instance_id);
+        if (!s) { failures.push({ instance_id: p.instance_id, reason: 'patch_visible_unknown' }); continue; }
+        if (typeof p.visible !== 'boolean') { failures.push({ instance_id: p.instance_id, reason: 'patch_visible_not_bool' }); continue; }
+        s.visible = p.visible;
+        s.patched = true;
+        patchIds.push(p.instance_id);
+        continue;
+      }
+      if (p.op === 'set_userdata') {
+        const s = byId.get(p.instance_id);
+        if (!s) { failures.push({ instance_id: p.instance_id, reason: 'patch_userdata_unknown' }); continue; }
+        if (!p.data || typeof p.data !== 'object' || Array.isArray(p.data)) { failures.push({ instance_id: p.instance_id, reason: 'patch_userdata_bad_data' }); continue; }
+        const keys = Object.keys(p.data);
+        if (!keys.length || keys.length > 8 || keys.some(k => k.length > 32)) { failures.push({ instance_id: p.instance_id, reason: 'patch_userdata_key_limits' }); continue; }
+        if (keys.some(k => !['string', 'number', 'boolean'].includes(typeof p.data[k]))) { failures.push({ instance_id: p.instance_id, reason: 'patch_userdata_value_type' }); continue; }
+        const merged = { ...(s.user_data || {}), ...p.data };
+        if (JSON.stringify(merged).length > 2048) { failures.push({ instance_id: p.instance_id, reason: 'patch_userdata_too_large' }); continue; }
+        s.user_data = merged;
+        s.patched = true;
+        patchIds.push(p.instance_id);
+        continue;
+      }
       if (p.op === 'reparam') {
         const s = byId.get(p.instance_id);
         if (!s) { failures.push({ instance_id: p.instance_id, reason: 'patch_reparam_unknown' }); continue; }
@@ -418,7 +498,11 @@ if (report.mode === 'patch') {
           params,
           constraints: (p.constraints || []).map(normalizeConstraint),
           orientation: def.orientation || 'random',
-          rotation_hint: typeof p.rotation_y === 'number' ? p.rotation_y : null,
+          // patch vocabulary: rotation_y in degrees (see props-library.json);
+          // solver consumes radians
+          rotation_hint: typeof p.rotation_y === 'number'
+            ? +((((p.rotation_y % 360) + 360) % 360) * Math.PI / 180).toFixed(5)
+            : null,
           _def: def
         };
         const others = solved.filter(s => s.instance_id !== p.instance_id);

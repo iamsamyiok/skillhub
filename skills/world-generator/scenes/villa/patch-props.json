@@ -1,0 +1,72 @@
+{
+  "patches": [
+    {
+      "op": "rotate",
+      "instance_id": "inst_zone_lawn_tree_round_v1_001",
+      "rotation_y": 45
+    },
+    {
+      "op": "scale",
+      "instance_id": "inst_zone_lawn_tree_round_v1_002",
+      "scale": 1.4
+    },
+    {
+      "op": "scale",
+      "instance_id": "inst_zone_villa_pad_hedge_bush_v1_001",
+      "scale": [
+        1.0,
+        1.6,
+        0.8
+      ]
+    },
+    {
+      "op": "set_material",
+      "instance_id": "inst_zone_villa_pad_villa_modern_v1_001",
+      "target": "stucco",
+      "color": "#b0604a",
+      "roughness": 0.85
+    },
+    {
+      "op": "set_material",
+      "instance_id": "inst_zone_lawn_street_lamp_v1_001",
+      "color": "#9fd8ff",
+      "emissive": "#9fd8ff",
+      "emissive_intensity": 2.5
+    },
+    {
+      "op": "set_material",
+      "instance_id": "inst_zone_pool_pool_v1_001",
+      "target": "water",
+      "opacity": 0.7
+    },
+    {
+      "op": "set_material",
+      "instance_id": "inst_zone_driveway_car_sedan_v1_001",
+      "metalness": 0.95,
+      "roughness": 0.15,
+      "color": "#c8ccd0"
+    },
+    {
+      "op": "set_material",
+      "instance_id": "inst_zone_lawn_tree_round_v1_004",
+      "opacity": 0.5
+    },
+    {
+      "op": "set_visible",
+      "instance_id": "inst_zone_lawn_hedge_bush_v1_001",
+      "visible": false
+    },
+    {
+      "op": "set_userdata",
+      "instance_id": "inst_zone_villa_pad_villa_modern_v1_001",
+      "data": {
+        "component_id": "CMP-0007",
+        "component_type": "building",
+        "note": "主楼-陶土红样板",
+        "phase": "phase-1"
+      }
+    }
+  ],
+  "time_of_day": 17.5,
+  "description": "属性级补丁示例：rotate/scale/set_material/set_visible/set_userdata（正向用例，值选自 engine/props-library.json）"
+}

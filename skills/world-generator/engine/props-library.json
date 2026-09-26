@@ -1,0 +1,166 @@
+{
+  "version": "1.0.0",
+  "description": "实例属性修改指导库：Agent 在生成 patch 前必须查阅本库选择属性值。所有值均为绝对值（非增量），patch 重建后持久生效。",
+  "usage": [
+    "1. 用 instance-list.json 确认目标实例的 asset_id / params / 现有覆盖值",
+    "2. 按本库的 range 与 presets 选值；越界值会被引擎拒绝或夹紧",
+    "3. 颜色优先从 color_palettes 按语义类别选取，避免随意取色",
+    "4. scale 与旋转不参与碰撞重算（视觉层），改动后自查画面是否穿模"
+  ],
+  "properties": {
+    "rotation_y": {
+      "op": "rotate",
+      "desc": "绕 Y 轴朝向角，绝对值",
+      "unit": "degrees",
+      "range": [0, 360],
+      "presets": {
+        "沿路排列": 0,
+        "垂直路面": 90,
+        "对角朝向": 45,
+        "背对场地": 180
+      },
+      "guidance": "建筑主朝向宜与最近道路平行或垂直（0/90/180）；景观类（树、椅）可任意角度增加自然感；带 rotation_hint 的资产保持求解值附近 ±30° 以内最稳。"
+    },
+    "scale": {
+      "op": "scale",
+      "desc": "三轴缩放，number 为等比，[sx,sy,sz] 为分轴",
+      "unit": "ratio",
+      "range": [0.25, 4.0],
+      "presets": {
+        "微调放大": 1.15,
+        "主景强调": 1.5,
+        "背景弱化": 0.8,
+        "地标夸张": 2.0
+      },
+      "guidance": "碰撞体按参数化 footprint 计算，缩放属视觉层：等比 0.8~1.3 内基本安全；分轴拉伸仅建议用于贴合墙体/绿篱等薄体；>1.5 或 <0.6 时在 patch 说明中注明理由，并自查相邻实例是否穿模。"
+    },
+    "material.color": {
+      "op": "set_material",
+      "desc": "材质基色，hex 字符串",
+      "format": "#rrggbb",
+      "range": null,
+      "guidance": "按目标语义从 color_palettes 对应类别选取；同一场景主色不超过 3 个色系；改色前先看资产是否已暴露 hue/tint 参数（reparam 优先，改色其次）。"
+    },
+    "material.metalness": {
+      "op": "set_material",
+      "desc": "金属度",
+      "unit": "0-1",
+      "range": [0, 1],
+      "presets": {
+        "混凝土/木材/涂料": 0.0,
+        "石材/陶瓷": 0.05,
+        "旧金属/栏杆": 0.6,
+        "不锈钢/铝板": 0.9,
+        "镜面金属": 1.0
+      },
+      "guidance": "建筑立面保持 0~0.1；金属构件 0.8~1.0 需配合低 roughness 才有金属感；非金属设 >0.2 会发黑。"
+    },
+    "material.roughness": {
+      "op": "set_material",
+      "desc": "粗糙度",
+      "unit": "0-1",
+      "range": [0, 1],
+      "presets": {
+        "抛光玻璃/镜面": 0.05,
+        "金属板": 0.3,
+        "涂料墙面": 0.7,
+        "混凝土/木材": 0.85,
+        "卵石/树皮": 0.95
+      },
+      "guidance": "与 metalness 联动：金属+低粗糙=反光，非金属+高粗糙=哑光；大面积低粗糙会产生明显环境反射，夜景会更亮。"
+    },
+    "material.opacity": {
+      "op": "set_material",
+      "desc": "不透明度，<1 自动开启透明通道",
+      "unit": "0-1",
+      "range": [0.05, 1],
+      "presets": {
+        "清玻璃": 0.25,
+        "磨砂玻璃": 0.45,
+        "纱帘/隔断": 0.6,
+        "水体": 0.86
+      },
+      "guidance": "透明材质在视觉层级中可能产生排序瑕疵，同屏透明面不宜多；做玻璃效果优先改资产 glass 参数，整体改 opacity 用于展示剖切/概念态。水面材质由引擎管理，target 需指定 'water' 才生效。"
+    },
+    "material.emissive": {
+      "op": "set_material",
+      "desc": "自发光颜色，hex 字符串",
+      "format": "#rrggbb",
+      "range": null,
+      "presets": {
+        "暖光窗": "#ffb35c",
+        "冷光灯带": "#9fd8ff",
+        "警示标识": "#ff6a4d"
+      },
+      "guidance": "配合 emissive_intensity 使用；夜景想点亮窗户优先用资产 glass_glow 参数；emissive 用于强调单体（门牌、灯柱、logo 墙）。"
+    },
+    "material.emissive_intensity": {
+      "op": "set_material",
+      "desc": "自发光强度",
+      "unit": "multiplier",
+      "range": [0, 5],
+      "presets": { "含蓄点缀": 0.6, "常规夜景": 1.2, "强强调": 2.5 }
+    },
+    "visible": {
+      "op": "set_visible",
+      "desc": "显示/隐藏（保留实例与碰撞，仅视觉隐藏）",
+      "type": "boolean",
+      "guidance": "用于方案对比（隐藏/显示某栋建筑）或临时腾出视野检查地面；隐藏的实例仍在 instance-list.json 中，可随时 set_visible:true 恢复；正式交付前确认没有遗留隐藏项。"
+    },
+    "user_data": {
+      "op": "set_userdata",
+      "desc": "自定义元数据，键值合并写入",
+      "type": "object",
+      "value_types": ["string", "number", "boolean"],
+      "constraints": { "key_max_len": 32, "max_keys_per_op": 8, "serialized_max_bytes": 2048 },
+      "suggested_keys": {
+        "component_id": "外部系统组件编号，如 CMP-0007",
+        "component_type": "语义类型：building/structure/furniture/lighting/vegetation",
+        "note": "人工备注，一句话以内",
+        "phase": "分期标记：phase-1 / phase-2",
+        "supplier": "供应商或来源标识"
+      },
+      "guidance": "值仅限 string/number/boolean（嵌套对象会被拒绝）；元数据会写进 instance-list.json 与 GLB 导出的 userData.user，供下游系统读取；不要用它存几何或材质信息（已有专门字段）。"
+    }
+  },
+  "color_palettes": {
+    "architecture": {
+      "暖白涂料": "#e8e2d6",
+      "米灰砂浆": "#d9d2c5",
+      "深灰金属板": "#5a6068",
+      "炭黑立面": "#2e3238",
+      "陶土红砖": "#b0604a",
+      "清水混凝土": "#b8b4ac"
+    },
+    "metal": {
+      "不锈钢": "#c8ccd0",
+      "古铜": "#8a6a48",
+      "耐候钢": "#7a4f3a",
+      "阳极氧化铝": "#aeb6bd"
+    },
+    "wood": {
+      "浅木": "#c9a878",
+      "柚木": "#8f6a44",
+      "深胡桃": "#5c4430",
+      "灰化木": "#8c857a"
+    },
+    "foliage": {
+      "草坪绿": "#6a8f4f",
+      "乔木深绿": "#4a7040",
+      "黄叶乔木": "#b09340",
+      "红叶灌木": "#8f5a3e",
+      "干草": "#b3a06a"
+    },
+    "glass": {
+      "清玻璃": "#bcd2da",
+      "蓝灰玻璃": "#8fb2c4",
+      "茶色玻璃": "#b09878"
+    },
+    "accent": {
+      "信号橙": "#e07b39",
+      "品牌蓝": "#3f6fa8",
+      "警示黄": "#d9b13b",
+      "安全绿": "#4f8f6a"
+    }
+  }
+}

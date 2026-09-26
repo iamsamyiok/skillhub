@@ -1,6 +1,6 @@
 # world-generator
 
-通用参数化 3D 世界生成器 —— AI 负责语义规划，程序负责几何求解。从一份 JSON 场景计划出发，一键生成可在浏览器直接打开的单文件 `world.html`（内嵌 Three.js，零外部依赖），并支持渐进细化、局部补丁与可视化交互编辑闭环。
+通用参数化 3D 世界生成器 —— AI 负责语义规划，程序负责几何求解。从一份 JSON 场景计划出发，一键生成可在浏览器直接打开的单文件 `world.html`（内嵌 Three.js，零外部依赖），并支持渐进细化、局部补丁（布局与实例属性两级，属性值选型有指导库）与可视化交互编辑闭环。
 
 ## 核心理念
 
@@ -25,8 +25,11 @@ node engine/index.mjs --scene scenes/villa
 # 渐进细化（锚定 zone，如在泳池边加躺椅）
 node engine/index.mjs --scene scenes/villa --refine refine-1.json
 
-# 局部补丁（move / reparam / delete / add，可改 time_of_day）
+# 局部补丁（move / reparam / remove / add + 属性级 rotate / scale / set_material / set_visible / set_userdata，可改 time_of_day）
 node engine/index.mjs --scene scenes/villa --patch patch-1.json
+
+# 属性级补丁示例（值选型参考 engine/props-library.json 指导库）
+node engine/index.mjs --scene scenes/villa --patch patch-props.json
 
 # 只改了 viewer 模板/打包器时：从既有 solved 状态直接重打包（实例坐标零变动）
 node engine/index.mjs --scene scenes/villa --repack
