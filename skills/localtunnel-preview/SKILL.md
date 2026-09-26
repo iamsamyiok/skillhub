@@ -1,6 +1,6 @@
 ---
 name: localtunnel-preview
-version: 2.0.0
+version: 2.1.0
 category: 开发工具
 tags: [预览, 临时链接, 内网穿透, 隧道, 发布, 国内可用]
 description: 把本地网页发布为可公开访问的链接。v2.0 多策略国内可用版:方案A 部署到自有服务器(最快最稳,不过期,推荐) → 方案B Cloudflare 临时隧道 → 方案C localtunnel(仅海外),自动回退+每步外网验证+运营商拦截识别。适用:分享本地项目预览、临时演示页、快速给用户一个可点开的链接。
@@ -29,10 +29,18 @@ python <本技能>/scripts/preview.py <含index.html的目录> [--port 8899] [--
 ```
 之后每次发布 = 逐文件 scp + 外网验证,秒级完成,**不过期**。适合少儿网页这类需要稳定访问的站点。
 
-## 方案B/C 临时隧道(海外或特定网络用)
+## 方案B bore 自建隧道(动态服务穿透;需服务器控制端口 7835 可达)
+
+服务器: `bore server`(systemd 常驻 bore-server.service,数据端口 10000-19999,控制端口固定 7835)。
+本机: `bore local <本地端口> --to 服务器 --port <远端端口>` → 流量实时从本机转发,适合 Flask/Node 调试服务。
+**硬约束: 云服务器安全组必须放行 TCP 7835(控制)+ 10000-19999(数据)**,不放行则 bore 方案自动跳过并如实报告。
+(本 skill 部署测试机: 腾讯云安全组仅放行 15375-15377,故 bore 可用性取决于安全组放行 7835。)
+
+## 方案C/D 临时隧道(海外或特定网络用)
 
 - cloudflared:自动下载二进制 → trycloudflare.com 随机子域(进程存活期间有效)
 - localtunnel:loca.lt 随机子域(同上)。**国内运营商对这两类域名普遍 SNI 拦截**,验证失败会如实报告并建议方案A
+- bore CLI 自动下载(本机需可直连 GitHub;否则手动放 bin/bore.exe)
 
 ## 质量约定
 
