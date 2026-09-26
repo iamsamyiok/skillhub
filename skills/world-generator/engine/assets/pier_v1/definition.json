@@ -1,0 +1,26 @@
+{
+  "asset_id": "pier_v1",
+  "name": "Wooden Pier",
+  "category": "structure",
+  "version": 1,
+  "origin": "base_center",
+  "orientation": "fixed",
+  "asset_module": "asset.js",
+  "source": "modular_wooden_pier (Poly Haven, CC0)",
+  "license": "CC0",
+  "max_triangles": 100000,
+  "footprint": {
+    "type": "box",
+    "half_width": 1.55,
+    "half_depth": 9.5
+  },
+  "height": {
+    "factor": 0,
+    "offset": 7.52
+  },
+  "params_schema": {
+    "type": "object",
+    "required": [],
+    "properties": {}
+  }
+}

@@ -1,8 +1,8 @@
 ---
 name: world-generator
-version: 1.5.0
+version: 1.6.0
 category: 前端开发
-tags: [3D, Three.js, 程序化生成, 场景生成, 交互编辑, 参数化]
+tags: [3D, Three.js, 程序化生成, 场景生成, 交互编辑, 参数化, GLB导入]
 description: 通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL、SSAO/SMAA 影视级后处理、圆角建筑与叶噪树冠，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch（布局 + 实例属性：旋转/缩放/材质/显隐/自定义元数据，配属性值指导库 props-library）、分时段双 HDRI（白天/黄昏）与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。
 license: MIT
 ---
@@ -36,7 +36,7 @@ ls node_modules/three >/dev/null 2>&1 || npm install
 
 ### 阶段 2：资产判断
 
-`engine/assets/` 下已有 15 个资产（树×2、岩、屋、别墅、泳池、伞、灌木、车、长椅、灯、自行车、塔楼、桌、椅）。缺什么才生成什么。
+`engine/assets/` 下已有 16 个参数化资产（树×2、岩、屋、别墅、泳池、伞、灌木、车、长椅、灯、自行车、塔楼、桌、椅）+ 1 个 GLB 导入资产 pier_v1。缺什么才生成什么。GLB 导入走 `engine/tools/glb-to-asset.py`（构建时转译，不依赖 GLTFLoader），输出 `asset.js + definition.json` 后入库。
 
 ### 阶段 3：新资产生成（每资产两个文件）
 
@@ -57,7 +57,7 @@ ls node_modules/three >/dev/null 2>&1 || npm install
 7. 仅用原生 Three.js 基础几何体；Lambert 材质；注明 `max_triangles` 预算（默认 5000）
 8. 顶点扰动类几何（岩石/树冠）扰动后必须 `computeVertexNormals()` 且 bbox 归零
 9. 可入内的建筑类资产用框架式设计（角柱+楼板+半透明幕墙），保证内部 refine 的实例肉眼可见
-10. **照片级贴图槽位**：需要真实材质观感的 mesh 设 `mesh.userData.surface = '<slot>'`（可选：grass/dirt/rock/concrete/asphalt/stucco/brick/wood/rooftile/metal/bark/gravel）；建筑资产按部件细分（墙 stucco、楼板 concrete、门 wood、金属件 metal），见 villa_modern_v1；未打标的 mesh 走资产类型默认映射或程序化噪变兜底
+10. **照片级贴图槽位**：需要真实材质观感的 mesh 设 `mesh.userData.surface = '<slot>'`（可选：grass/dirt/rock/concrete/asphalt/stucco/brick/wood/rooftile/metal/bark/gravel/sand/stonewall/paving）；建筑资产按部件细分（墙 stucco、楼板 concrete、门 wood、金属件 metal），见 villa_modern_v1；未打标的 mesh 走资产类型默认映射或程序化噪变兜底
 
 ### 阶段 3b：总图与地形拼接规范（masterplan & terrain continuity，硬性）
 
@@ -227,6 +227,34 @@ node engine/visual-check.mjs scenes/<name>/world.html
 | ambientCG 部分 ID 猜错下载 404 | 材质命名不规律（Dirt/Brick 系列多次换 ID） | 用 zip 签名探测候选链；Poly Haven API（`api.polyhaven.com/files/<slug>`）做备用源 |
 | 贴图版 world.html 14MB+ 加载慢 | 13.5MB base64 贴图 + swiftshader 冷启动 | 正常预期（用户已接受 10-20MB 档）；工具超时已放宽至 150s |
 
+## GLB/GLTF 导入管线
+
+把 CC0 模型的 .gltf（或 .glb）连同其 companion .bin + `textures/*` 放到一个目录，用构建时转译器生成 `asset.js + definition.json`：
+
+```bash
+# glTF（外部 .bin + textures/ 目录）
+python3 engine/tools/glb-to-asset.py input.gltf pier_v1 engine/assets/pier_v1 \
+  --name "Wooden Pier" --normal-flip-y --max-tri 100000 \
+  --max-tex-size 512 --tex-quality 72
+
+# GLB（单文件内嵌一切）
+python3 engine/tools/glb-to-asset.py input.glb foo_v1 engine/assets/foo_v1 \
+  --name "Foo Model" --max-tri 5000
+```
+
+参数说明：
+- `--normal-flip-y`：Poly Haven 的 _nor_dx 贴图是 DirectX 法线，glTF 规范期望 OpenGL；开启后生成 `normalScale(1,-1)`
+- `--max-tex-size`：打包前把贴图缩到 ≤N px（默认 512）；避免 asset.js 体积失控
+- `--tex-quality`：重压缩 JPEG 质量（默认 72）
+- `--max-tri`：definition.json 中 max_triangles 预算，默认按实际三角形数 × 1.5 自算
+
+生成的 `asset.js` 是一个 `createAsset(params)` 工厂，全部几何与贴图以 base64 内嵌，**零运行时网络依赖**。validate-assets 会校验原点契约（bbox.min.y≈0, center xz≈0）、法线存在、三角形预算。定义文件里的 `footprint` 与 `height` 必须覆盖求解器所需的碰撞/高程计算；无参数的静态资产用 `"height": {"factor":0,"offset":<实际高度>}`。
+
+来源推荐：
+- **Poly Haven** (`api.polyhaven.com/assets?t=models&types=gltf`)：CC0 高质量模型，文件 API 返回精确下载 URL；注意模型走 glTF 分发而非 glb，normal map 用 `_nor_dx` 后缀需 `--normal-flip-y`
+- **ambientCG**（贴图为主）、**Kenney**（低多边形，slug 需手动确认）
+- Quaternius（CC0，但站点链接 JS 驱动无直接下载 URL，建议人工确认）
+
 ## 引擎固定层（禁止修改）
 
 坐标系（Y 向上、地面 Y=0）、双 ID 体系、词表、`createAsset` 签名、求解/碰撞/打包逻辑、refine 的局部→世界变换与 Y 分离规则、addons 内嵌打包器均属程序固定层。发现引擎缺陷按"科学完善"原则最小化修改并回归五个场景（`scenes/demo`、`scenes/villa`、`scenes/bicycle`、`scenes/campus`、`scenes/forest`——campus 覆盖 base→refine→refine→patch 全链路，forest 为 530 实例压测）。
@@ -238,8 +266,9 @@ SKILL.md                  本文档（Agent 工作流）
 engine/index.mjs          CLI：--scene / --refine / --patch / --repack 四模式管线
 engine/packer.mjs         world.html 打包（内嵌 three + addons + 贴图库 + viewer）
 engine/viewer-template.html  查看器：统一地形、照片级贴图、HDRI IBL、时间系统、GLB 导出、#edit 编辑模式、#debug
-engine/assets-bin/        CC0 PBR 贴图库（12 槽 + HDRI，manifest.json 索引）
+engine/assets-bin/        CC0 PBR 贴图库（15 槽 + HDRI，manifest.json 索引）
 engine/tools/build-texture-packs.py  贴图库构建脚本（ambientCG + Poly Haven 下载/提取/重压缩）
+engine/tools/glb-to-asset.py         GLB/GLTF 构建时转译器（base64 嵌入几何+贴图，产出 createAsset 工厂）
 engine/edit-server.mjs    编辑桥服务：静态托管 + POST /edit-request 落盘
 engine/test-edit-flow.mjs 编辑闭环 e2e 回归（playwright）
 engine/screenshot.mjs     截图（--view top/close/side）
@@ -248,6 +277,6 @@ engine/probe-props.mjs    属性补丁运行时探针（验证 scale/visible/mat
 engine/visual-check.mjs   像素统计视觉校验（时段分档阈值）
 engine/night-glb-probe.mjs  夜景像素 + GLB 导出探针
 engine/lib/               schema/expand/solve/geom/elevation/rng/registry/validate-assets/plan-lint
-engine/assets/<id>/       16 个参数化资产（definition.json + asset.js，建筑件带 userData.surface）
+engine/assets/<id>/       17 个资产（16 参数化 + pier_v1 GLB导入，definition.json + asset.js，建筑件带 userData.surface）
 scenes/                   5 个回归场景（villa/campus 含 refine+patch 链）
 ```

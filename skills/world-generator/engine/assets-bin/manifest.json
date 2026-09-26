@@ -347,16 +347,96 @@
       }
     }
   },
-  "__hdri__": {
-    "bands": {
-      "day": {
-        "file": "day_partly_cloudy_1k.hdr",
-        "source": "polyhaven.com/day_partly_cloudy"
+  "sand": {
+    "source": "polyhaven.com/coast_sand_01",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 250081,
+        "size": [
+          1024,
+          1024
+        ]
       },
-      "dusk": {
-        "file": "evening_meadow_1k.hdr",
-        "source": "polyhaven.com/evening_meadow"
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 375207,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 46369,
+        "size": [
+          1024,
+          1024
+        ]
       }
+    }
+  },
+  "stonewall": {
+    "source": "polyhaven.com/cliff_side",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 192053,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 327624,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 65893,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "paving": {
+    "source": "polyhaven.com/rectangular_paving",
+    "maps": {
+      "color": {
+        "file": "color.jpg",
+        "bytes": 105284,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "normalGL": {
+        "file": "normalGL.jpg",
+        "bytes": 124599,
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "roughness": {
+        "file": "roughness.jpg",
+        "bytes": 54517,
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "__hdri__": {
+    "files": {
+      "day_partly_cloudy_1k.hdr": 1637206
     }
   }
 }

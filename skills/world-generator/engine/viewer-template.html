@@ -303,15 +303,20 @@ const SURFACE_DEFS = {
   grass: { size: 1.7 }, dirt: { size: 2.4 }, rock: { size: 2.8 },
   concrete: { size: 3.4 }, asphalt: { size: 4.2 }, stucco: { size: 3.0 },
   brick: { size: 2.4 }, wood: { size: 2.0 }, rooftile: { size: 1.5 },
-  metal: { size: 1.3 }, bark: { size: 1.7 }, gravel: { size: 1.7 }
+  metal: { size: 1.3 }, bark: { size: 1.7 }, gravel: { size: 1.7 },
+  sand: { size: 3.0 }, stonewall: { size: 2.6 }, paving: { size: 2.2 }
 };
 const TYPE_SURFACES = [
   [/^rock|^boulder/, 'rock'],
   [/^bench|^table|^chair/, 'wood'],
   [/^boat/, 'wood'],
+  [/^pier/, 'wood'],
   [/^street_lamp|^lamp|^patio_umbrella/, 'metal'],
   [/^car/, 'metal'],
   [/^pool/, 'concrete'],
+  [/^sand|^beach|^dune/, 'sand'],
+  [/^wall|^castle|^ruin/, 'stonewall'],
+  [/^paving|^path|^road_tile/, 'paving'],
   [/^tree|^pine|^oak|^birch/, '__tree__'] // trunk gets bark via color heuristic
 ];
 const texReady = { done: false };
