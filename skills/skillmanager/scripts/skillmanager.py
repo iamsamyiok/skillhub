@@ -551,8 +551,10 @@ def cmd_hub_publish(a):
     for f in sorted(src.rglob("*")):
         if f.is_file():
             rel = f.relative_to(src).as_posix()
-            if rel.startswith(".skillhub") or "__pycache__" in rel or rel.endswith(".pyc"):
+            if rel.startswith(".skillhub") or "__pycache__" in rel:
                 continue
+            if rel.endswith((".pyc", ".exe", ".dll", ".bin", ".zip", ".7z")):
+                continue                                   # 二进制/产物不进技能仓库
             files.append((rel, f))
     print("[hub-publish] 来源 %s, %d 个文件" % (src, len(files)))
     if a.dry_run:
@@ -577,6 +579,21 @@ def cmd_hub_publish(a):
             ok += 1; print("↑", rel)
         else:
             print("✗", rel, (rr.stderr or "")[:150])
+    # 发布后写/更新本地标记: 让 hub-outdated 能追踪该技能(与 hub-install 行为一致)
+    if ok:
+        try:
+            tree = _hub_tree()
+            shas = {x["path"].replace("skills/%s/" % name, ""): x.get("sha")
+                    for x in tree
+                    if x["path"].startswith("skills/%s/" % name) and x.get("type") == "blob"}
+            commit = _gh_json("repos/%s/commits/main" % HUB_REPO)["sha"]
+            (src / ".skillhub.json").write_text(json.dumps(
+                {"name": name, "commit": commit, "installed": now_str(),
+                 "files": shas, "published": now_str()}, ensure_ascii=False, indent=1),
+                encoding="utf-8")
+            print("已写发布标记 → .skillhub.json")
+        except Exception as e:
+            print("(发布标记写入失败,不影响发布)", e)
     print("发布完成 %d/%d → github.com/%s/tree/main/skills/%s" % (ok, len(files), HUB_REPO, name))
 
 
