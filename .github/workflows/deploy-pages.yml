@@ -30,7 +30,7 @@ jobs:
           # 白名单外的静态页(auto-code 生成的新页面等)原样带上
           for f in public/*.html; do
             base=$(basename "$f")
-            case " index.html skill.html ai.html setup.html " in *" $base "*) continue ;; esac
+            case " index.html skill.html ai.html setup.html mcps.html " in *" $base "*) continue ;; esac
             cp "$f" docs/
             echo "extra page: $base"
           done
