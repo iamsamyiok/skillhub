@@ -1,9 +1,9 @@
 ---
 name: coding-principles
-version: 2.0.0
+version: 2.1.0
 category: 工程规范
 tags: [Coding Principle, MCP, Skill, Agent友好, 人类友好, 双通道, 插件化, 模块化, 原子化, 层级化, 接口标准化, 变化隔离, 可观测性, 容错降级, Next.js, Python, Rust]
-description: 生成 Agent 与人类同时好用的程序——面向 MCP/Skill 类双受众工程的核心规范（七条铁律，每条 = Agent 可执行硬规则 + 紧随的人类自然语言说明）：接口双通道输出 Schema+人类备注、日志双通道输出 JSON+纯文本摘要、扩展强制走插拔式标准接口禁改核心宿主、仅允许一次性临时 MCP 极简豁免埋点（无白名单）。适配 Next.js / Python / Rust。
+description: 生成 Agent 与人类同时好用的程序——面向 MCP/Skill 类双受众工程的核心规范（七条铁律，每条 = Agent 可执行硬规则 + 紧随的人类自然语言说明）：接口双通道输出 Schema+人类备注、日志双通道输出 JSON+纯文本摘要、扩展强制走插拔式标准接口禁改核心宿主、仅允许一次性临时 MCP 极简豁免埋点（无白名单）。适配 Next.js / Python / Rust。附 Agent Skill 典型范例与 DeepSeek-Harness 风格宿主程序示例（examples/）。
 ---
 
 # Coding Principles — Agent 与人类同时好用的程序（七条铁律）
@@ -115,6 +115,10 @@ MUST: 关键路径提供静态兜底：某工具 offline 时，Agent 收到的�
 > 🧑 **人话**：一个员工晕倒，公司照常营业。坏工具会被自动"停职"（degraded），反复出错就"离职"（offline），但宿主活得好好的一切照旧——而且会明明白白告诉你"这个工具坏了，你可以先用那个替代"。停职的员工连续体检合格还能复职。
 
 ## 2. MCP 插件最小示例（Agent 生成，人类 3 分钟看懂）
+
+> **配套范例库 `examples/`**（同样遵循本 skill，可直接抄骨架）：
+> ① [`examples/agent-skill-md-catalog.md`](examples/agent-skill-md-catalog.md) — **Agent Skill 典型范例**：SKILL.md+manifest+实现+测试 四件套，示范"Skill 形态"的双通道写法（frontmatter=Agent 契约，正文=人类说明），含幂等与失败路径测试。
+> ② [`examples/deepseek-harness-example.md`](examples/deepseek-harness-example.md) — **DeepSeek-Harness 风格程序示例**：约 130 行生产级调度核（健康状态机/声明式重试/事件回放/human 渲染器注入），示范"宿主冻结、能力外挂"的完整形态。
 
 > 完整可运行。Python 官方 MCP SDK；每个文件都体现"双通道"。`Honey` 命名致意 DeepSeek-Honey 风格——插件是甜头，宿主保持干净。
 
