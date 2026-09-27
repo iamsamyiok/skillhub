@@ -8,12 +8,13 @@
 |---|---|
 | 站点 | https://iamsamyiok.github.io/skillhub（GitHub Pages，由 **docs/** 目录部署，分支 main） |
 | 技能源 | `skills/{id}/`，一个技能一个目录，**必须含 SKILL.md**，可附带 LICENSE/脚本/资源（会被打包进 zip/tar.gz） |
+| MCP 源 | `mcps/{id}/`，一个 MCP 一个目录，**必须含 README.md**，可附带 scripts/package.json（会被打包进 zip/tar.gz） |
 | 元数据 | `data/meta.json` 的 `skills.{id}` 条目（category/tags/downloads/createdAt/updatedAt/version） |
 | 构建 | `node export-static.js --site-url https://iamsamyiok.github.io/skillhub --repo-url https://github.com/iamsamyiok/skillhub` → **清空重建 docs/** |
 | 测试 | `npm test`（= test/health.test.js + test/validate_skill.test.js） |
 | 关键实现 | `server.js`（parseFrontmatter / skillDetail / allSkillIds）、`export-static.js`、`seeds.js` |
 
-构建产出的 docs/ 内容包括：`skills-md/{id}.md`（SKILL.md 原文）、`downloads/{id}.zip` 与 `.tar.gz`、`skills.json`、`data/skills.json`、`llms.txt`、`skills.txt`、`index.html`（内联技能清单 + skills-data JSON）、`AGENTS.md`（安装说明）。
+构建产出的 docs/ 内容包括：`skills-md/{id}.md`（SKILL.md 原文）、`mcps-md/{id}.md`（MCP README）、`downloads/{id}.zip` 与 `.tar.gz`、`skills.json`、`data/skills.json`、`data/mcps.json`、`llms.txt`、`skills.txt`、`index.html`（内联技能清单 + skills-data JSON）、`mcps.html`（MCP 列表页）、`AGENTS.md`（安装说明）。
 
 ## 二、上架新技能：必做清单（按序执行，缺一不可）
 
