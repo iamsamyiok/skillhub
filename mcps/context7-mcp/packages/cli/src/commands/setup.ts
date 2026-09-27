@@ -1,0 +1,638 @@
+import { Command } from "commander";
+import pc from "picocolors";
+import ora from "ora";
+import { password, select } from "@inquirer/prompts";
+import { mkdir, readFile, writeFile } from "fs/promises";
+import { dirname, join } from "path";
+
+import { log } from "../utils/logger.js";
+import { checkboxWithHover } from "../utils/prompts.js";
+import { trackEvent } from "../utils/tracking.js";
+import { downloadSkill } from "../utils/api.js";
+import { installSkillFiles } from "../utils/installer.js";
+import { performLogin } from "./auth.js";
+import { saveTokens, getValidAccessToken } from "../utils/auth.js";
+import type { SkillFile } from "../types.js";
+import { resolveSetupApiKey } from "../setup/auth.js";
+import {
+  type SetupAgent,
+  type AuthOptions,
+  type Transport,
+  AUTH_MODE_LABELS,
+  ALL_AGENT_NAMES,
+  getAgent,
+  detectAgents,
+} from "../setup/agents.js";
+import {
+  customizeSkillFilesForAgent,
+  getBundledMcpSkillFiles,
+  getBundledRuleContent,
+  getRuleContent,
+} from "../setup/templates.js";
+import {
+  getMcpUrl,
+  getOnPremMcpAuthStatus,
+  resolveSetupDeployment,
+  type CustomSetupDeployment,
+  type SetupDeployment,
+} from "../setup/deployment.js";
+import {
+  readJsonConfig,
+  mergeServerEntry,
+  writeJsonConfig,
+  resolveMcpPath,
+  appendTomlServer,
+  patchTomlStdioApiKey,
+  isStdioContext7Entry,
+  patchStdioApiKey,
+  getJsonServerEntry,
+} from "../setup/mcp-writer.js";
+
+type Scope = "global" | "project";
+type SetupMode = "mcp" | "cli";
+interface McpSkillPayload {
+  files: SkillFile[];
+  status: "installed" | "installed (bundled)" | "installed (bundled fallback)";
+}
+
+type SetupOptions = Partial<Record<SetupAgent, boolean>> & {
+  project?: boolean;
+  yes?: boolean;
+  apiKey?: string;
+  oauth?: boolean;
+  cli?: boolean;
+  mcp?: boolean;
+  stdio?: boolean;
+  baseUrl?: string;
+};
+
+function resolveTransport(options: SetupOptions): Transport {
+  return options.stdio ? "stdio" : "http";
+}
+
+const CHECKBOX_THEME = {
+  style: {
+    highlight: (text: string) => pc.green(text),
+    disabledChoice: (text: string) => ` ${pc.dim("◯")} ${pc.dim(text)}`,
+  },
+};
+
+function getSelectedAgents(options: SetupOptions): SetupAgent[] {
+  return ALL_AGENT_NAMES.filter((name) => options[name]);
+}
+
+export function registerSetupCommand(program: Command): void {
+  const command = program.command("setup").description("Set up Context7 for your AI coding agent");
+
+  for (const name of ALL_AGENT_NAMES) {
+    const agent = getAgent(name);
+    command.option(`--${name}`, agent.setupDescription ?? `Set up for ${agent.displayName}`);
+  }
+
+  command
+    .option("--mcp", "Set up MCP server mode")
+    .option("--cli", "Set up CLI + Skills mode (no MCP server)")
+    .option("-p, --project", "Configure for current project instead of globally")
+    .option("-y, --yes", "Skip confirmation prompts")
+    .option("--api-key <key>", "Use API key authentication")
+    .option("--oauth", "Use OAuth endpoint (IDE handles auth flow)")
+    .option("--stdio", "Configure the MCP server as a local stdio process (default: HTTP)")
+    // The root option handles shared API configuration; this local declaration also
+    // lets Commander accept --base-url after `setup`.
+    .option("--base-url <url>", "Use a custom Context7 deployment (for example, on-premise)")
+    .action(async (_options: SetupOptions, command: Command) => {
+      await setupCommand(command.optsWithGlobals<SetupOptions>());
+    });
+}
+
+async function promptForOnPremApiKey(deployment: CustomSetupDeployment): Promise<string | null> {
+  try {
+    return await password({
+      message: `Personal API key (create one at ${deployment.baseUrl}/account)`,
+      mask: true,
+      validate: (value) => value.trim().length > 0 || "API key is required",
+    }).then((value) => value.trim());
+  } catch {
+    log.error("Setup cancelled before a personal API key was entered.");
+    return null;
+  }
+}
+
+async function resolveAuth(
+  options: SetupOptions,
+  deployment: SetupDeployment
+): Promise<AuthOptions | null> {
+  const explicitApiKey = options.apiKey?.trim();
+
+  if (deployment.kind === "custom") {
+    try {
+      if (!(await getOnPremMcpAuthStatus(deployment))) return { mode: "none" };
+    } catch (err) {
+      log.error(
+        `Could not check MCP authentication at ${deployment.baseUrl}: ${err instanceof Error ? err.message : String(err)}`
+      );
+      process.exitCode = 1;
+      return null;
+    }
+
+    const apiKey = explicitApiKey || process.env.CONTEXT7_API_KEY?.trim();
+    if (apiKey) return { mode: "api-key", apiKey };
+
+    if (!options.yes) {
+      const promptedApiKey = await promptForOnPremApiKey(deployment);
+      return promptedApiKey ? { mode: "api-key", apiKey: promptedApiKey } : null;
+    }
+
+    log.error(
+      `MCP authentication is enabled at ${deployment.baseUrl}. Pass --api-key, set CONTEXT7_API_KEY, or rerun without --yes to enter a personal API key securely.`
+    );
+    process.exitCode = 1;
+    return null;
+  }
+
+  if (explicitApiKey) return { mode: "api-key", apiKey: explicitApiKey };
+  if (options.oauth) return { mode: "oauth" };
+
+  const resolvedApiKey = await resolveSetupApiKey();
+  if (!resolvedApiKey) return null;
+  return { mode: "api-key", apiKey: resolvedApiKey };
+}
+
+function getSetupValidationError(
+  mode: SetupMode,
+  options: SetupOptions,
+  deployment: SetupDeployment
+): string | null {
+  if (deployment.kind === "custom") {
+    if (mode === "cli") {
+      return "--base-url currently supports MCP setup only. Use --mcp with an on-premise deployment.";
+    }
+    if (options.stdio) {
+      return "--stdio is not supported with --base-url. On-premise setup uses the HTTP /mcp endpoint.";
+    }
+    if (options.oauth) {
+      return "--oauth is only supported by hosted Context7. Use a personal on-premise API key.";
+    }
+  }
+
+  if (mode === "mcp" && options.stdio && options.oauth) {
+    return "--stdio is incompatible with --oauth (OAuth uses the hosted HTTP endpoint).";
+  }
+  return null;
+}
+
+async function resolveMode(options: SetupOptions): Promise<SetupMode> {
+  if (options.cli) return "cli";
+  if (options.baseUrl || options.mcp || options.yes || options.oauth || options.stdio) return "mcp";
+
+  return select<SetupMode>({
+    message: "How should your agent access Context7?",
+    choices: [
+      {
+        name: `MCP server\n    ${pc.dim("Agent calls Context7 tools via MCP protocol to retrieve up-to-date library docs")}`,
+        value: "mcp" as SetupMode,
+      },
+      {
+        name: `CLI + Skills\n    ${pc.dim("Installs a find-docs skill that guides your agent to fetch up-to-date library docs using ")}${pc.dim(pc.bold("ctx7"))}${pc.dim(" CLI commands")}`,
+        value: "cli" as SetupMode,
+      },
+    ],
+    theme: {
+      style: {
+        highlight: (text: string) => pc.green(text),
+        answer: (text: string) => pc.green(text.split("\n")[0].trim()),
+      },
+    },
+  });
+}
+
+async function resolveCliAuth(apiKey?: string): Promise<void> {
+  if (apiKey) {
+    saveTokens({ access_token: apiKey, token_type: "bearer" });
+    log.blank();
+    log.plain(`${pc.green("✔")} Authenticated`);
+    return;
+  }
+
+  const validToken = await getValidAccessToken();
+  if (validToken) {
+    log.blank();
+    log.plain(`${pc.green("✔")} Authenticated`);
+    return;
+  }
+
+  await performLogin();
+}
+
+async function promptAgents(): Promise<SetupAgent[] | null> {
+  const choices = ALL_AGENT_NAMES.map((name) => ({
+    name: getAgent(name).displayName,
+    value: name,
+  }));
+
+  const message = "Which agents do you want to set up?";
+
+  try {
+    return await checkboxWithHover(
+      {
+        message,
+        choices,
+        loop: false,
+        theme: CHECKBOX_THEME,
+      },
+      { getName: (a: SetupAgent) => getAgent(a).displayName }
+    );
+  } catch {
+    return null;
+  }
+}
+
+async function resolveAgents(options: SetupOptions, scope: Scope): Promise<SetupAgent[]> {
+  const explicit = getSelectedAgents(options);
+  if (explicit.length > 0) return explicit;
+
+  const detected = await detectAgents(scope);
+
+  if (detected.length > 0 && options.yes) return detected;
+
+  log.blank();
+  const selected = await promptAgents();
+  if (!selected) {
+    log.warn("Setup cancelled");
+    return [];
+  }
+  return selected;
+}
+
+/** Install a rule for an agent, handling both "file" (standalone) and "append" (AGENTS.md) types. */
+async function installRule(
+  agentName: SetupAgent,
+  scope: Scope,
+  content: string
+): Promise<{ status: string; path: string }> {
+  const agent = getAgent(agentName);
+  const rule = agent.rule;
+
+  if (rule.kind === "file") {
+    const ruleContent = `${rule.contentPrefix ?? ""}${content}`;
+    const ruleDir =
+      scope === "global" ? rule.dir("global") : join(process.cwd(), rule.dir("project"));
+    const rulePath = join(ruleDir, rule.filename);
+    await mkdir(dirname(rulePath), { recursive: true });
+    await writeFile(rulePath, ruleContent, "utf-8");
+    return { status: "installed", path: rulePath };
+  }
+
+  const filePath =
+    scope === "global" ? rule.file("global") : join(process.cwd(), rule.file("project"));
+  const escapedMarker = rule.sectionMarker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const section = `${rule.sectionMarker}\n${content}${rule.sectionMarker}`;
+
+  let existing = "";
+  try {
+    existing = await readFile(filePath, "utf-8");
+  } catch {
+    // File doesn't exist yet
+  }
+
+  if (existing.includes(rule.sectionMarker)) {
+    const regex = new RegExp(`${escapedMarker}\\n[\\s\\S]*?${escapedMarker}`);
+    const updated = existing.replace(regex, section);
+    await writeFile(filePath, updated, "utf-8");
+    return { status: "updated", path: filePath };
+  }
+
+  const separator =
+    existing.length > 0 && !existing.endsWith("\n") ? "\n\n" : existing.length > 0 ? "\n" : "";
+  await mkdir(dirname(filePath), { recursive: true });
+  await writeFile(filePath, existing + separator + section + "\n", "utf-8");
+  return { status: "installed", path: filePath };
+}
+
+async function loadMcpSkillPayload(deployment: SetupDeployment): Promise<McpSkillPayload> {
+  const bundled = getBundledMcpSkillFiles();
+  if (deployment.kind === "custom") {
+    return { files: bundled, status: "installed (bundled)" };
+  }
+
+  try {
+    const downloadData = await downloadSkill("/upstash/context7", "context7-mcp");
+    if (downloadData.error || downloadData.files.length === 0) {
+      throw new Error(downloadData.error || "no files");
+    }
+    return { files: downloadData.files, status: "installed" };
+  } catch {
+    return { files: bundled, status: "installed (bundled fallback)" };
+  }
+}
+
+/**
+ * For stdio transport, preserve an existing `@upstash/context7-mcp` invocation
+ * (e.g., `@upstash/context7-mcp@latest` or a user-pinned version) and only
+ * swap the `--api-key` value. Falls back to the agent's canonical shape when
+ * no existing stdio entry is detected. HTTP transport always uses the
+ * canonical shape.
+ */
+function resolveEntryToWrite(
+  agent: ReturnType<typeof getAgent>,
+  auth: AuthOptions,
+  transport: Transport,
+  existingEntry: Record<string, unknown> | undefined,
+  mcpUrl: string
+): Record<string, unknown> {
+  if (transport === "stdio" && existingEntry && isStdioContext7Entry(existingEntry)) {
+    const apiKey = auth.mode === "api-key" ? auth.apiKey : undefined;
+    return patchStdioApiKey(existingEntry, apiKey);
+  }
+  return agent.mcp.buildEntry(auth, transport, mcpUrl);
+}
+
+async function setupAgent(
+  agentName: SetupAgent,
+  auth: AuthOptions,
+  transport: Transport,
+  scope: Scope,
+  deployment: SetupDeployment,
+  mcpUrl: string,
+  skillPayload: McpSkillPayload
+): Promise<{
+  agent: string;
+  mcpStatus: string;
+  mcpPath: string;
+  ruleStatus: string;
+  rulePath: string;
+  skillStatus: string;
+  skillPath: string;
+}> {
+  const agent = getAgent(agentName);
+
+  const mcpCandidates =
+    scope === "global" || agent.mcp.projectPaths.length === 0
+      ? agent.mcp.globalPaths
+      : agent.mcp.projectPaths.map((p) => join(process.cwd(), p));
+  const mcpPath = await resolveMcpPath(mcpCandidates);
+
+  let mcpStatus: string;
+  try {
+    if (mcpPath.endsWith(".toml")) {
+      const apiKey = auth.mode === "api-key" ? auth.apiKey : undefined;
+      const patched =
+        transport === "stdio" ? await patchTomlStdioApiKey(mcpPath, "context7", apiKey) : false;
+      const { alreadyExists } = patched
+        ? { alreadyExists: true }
+        : await appendTomlServer(
+            mcpPath,
+            "context7",
+            resolveEntryToWrite(agent, auth, transport, undefined, mcpUrl)
+          );
+      mcpStatus = alreadyExists
+        ? `reconfigured with ${AUTH_MODE_LABELS[auth.mode]}`
+        : `configured with ${AUTH_MODE_LABELS[auth.mode]}`;
+    } else {
+      const existing = await readJsonConfig(mcpPath);
+      const existingJsonEntry =
+        transport === "stdio"
+          ? getJsonServerEntry(existing, agent.mcp.configKey, "context7")
+          : undefined;
+      const entry = resolveEntryToWrite(agent, auth, transport, existingJsonEntry, mcpUrl);
+      const { config, alreadyExists } = mergeServerEntry(
+        existing,
+        agent.mcp.configKey,
+        "context7",
+        entry
+      );
+      mcpStatus = alreadyExists
+        ? `reconfigured with ${AUTH_MODE_LABELS[auth.mode]}`
+        : `configured with ${AUTH_MODE_LABELS[auth.mode]}`;
+      await writeJsonConfig(mcpPath, config);
+    }
+  } catch (err) {
+    mcpStatus = `failed: ${err instanceof Error ? err.message : String(err)}`;
+  }
+
+  let ruleStatus: string;
+  let rulePath: string;
+  try {
+    const ruleContent =
+      deployment.kind === "custom"
+        ? getBundledRuleContent("mcp", agentName)
+        : await getRuleContent("mcp", agentName);
+    const result = await installRule(agentName, scope, ruleContent);
+    ruleStatus = result.status;
+    rulePath = result.path;
+  } catch (err) {
+    ruleStatus = `failed: ${err instanceof Error ? err.message : String(err)}`;
+    rulePath = "";
+  }
+
+  const skillDir =
+    scope === "global"
+      ? agent.skill.dir("global")
+      : join(process.cwd(), agent.skill.dir("project"));
+  const skillPath = join(skillDir, agent.skill.name, "SKILL.md");
+
+  let skillStatus: string;
+  try {
+    await installSkillFiles(agent.skill.name, skillPayload.files, skillDir);
+    skillStatus = skillPayload.status;
+  } catch (err) {
+    skillStatus = `failed: ${err instanceof Error ? err.message : String(err)}`;
+  }
+
+  return {
+    agent: agent.displayName,
+    mcpStatus,
+    mcpPath,
+    ruleStatus,
+    rulePath,
+    skillStatus,
+    skillPath,
+  };
+}
+
+function logSkillStatus(skillStatus: string, skillPath: string): void {
+  const skillFailed = skillStatus.startsWith("failed:");
+  const skillIcon = skillStatus.startsWith("installed")
+    ? pc.green("+")
+    : skillFailed
+      ? pc.red("✖")
+      : pc.dim("~");
+  log.plain(`    ${skillIcon} Skill ${skillFailed ? "failed" : skillStatus}`);
+  log.plain(`      ${pc.dim(skillPath)}`);
+  if (skillFailed) {
+    log.plain(`      ${pc.red(skillStatus.slice("failed: ".length))}`);
+    if (skillStatus.includes("EACCES")) {
+      log.plain(
+        `      ${pc.yellow("tip:")} fix permissions with: ${pc.cyan(`sudo chown -R $(whoami) ${dirname(dirname(skillPath))}`)}`
+      );
+    }
+  }
+}
+
+async function setupMcp(
+  agents: SetupAgent[],
+  options: SetupOptions,
+  scope: Scope,
+  deployment: SetupDeployment
+): Promise<void> {
+  const transport = resolveTransport(options);
+  const auth = await resolveAuth(options, deployment);
+  if (!auth) {
+    log.warn("Setup cancelled");
+    return;
+  }
+
+  log.blank();
+  const spinner = ora("Setting up Context7...").start();
+  const mcpUrl = getMcpUrl(deployment, auth);
+  const skillPayload = await loadMcpSkillPayload(deployment);
+
+  const results = [];
+  for (const agentName of agents) {
+    spinner.text = `Setting up ${getAgent(agentName).displayName}...`;
+    results.push(
+      await setupAgent(agentName, auth, transport, scope, deployment, mcpUrl, skillPayload)
+    );
+  }
+
+  spinner.succeed("Context7 setup complete");
+
+  log.blank();
+  for (const r of results) {
+    log.plain(`  ${pc.bold(r.agent)}`);
+    const mcpIcon =
+      r.mcpStatus.startsWith("configured") || r.mcpStatus.startsWith("reconfigured")
+        ? pc.green("+")
+        : pc.dim("~");
+    log.plain(`    ${mcpIcon} MCP server ${r.mcpStatus}`);
+    log.plain(`      ${pc.dim(r.mcpPath)}`);
+    const ruleIcon = r.ruleStatus === "installed" ? pc.green("+") : pc.dim("~");
+    log.plain(`    ${ruleIcon} Rule ${r.ruleStatus}`);
+    log.plain(`      ${pc.dim(r.rulePath)}`);
+    logSkillStatus(r.skillStatus, r.skillPath);
+  }
+  log.blank();
+
+  trackEvent("setup", { agents, scope, authMode: auth.mode });
+  trackEvent("install", { skills: ["/upstash/context7/context7-mcp"], ides: agents });
+}
+
+async function setupCliAgent(
+  agentName: SetupAgent,
+  scope: Scope,
+  downloadData: { files: Array<{ path: string; content: string }> }
+): Promise<{ skillPath: string; skillStatus: string; rulePath: string; ruleStatus: string }> {
+  const agent = getAgent(agentName);
+
+  const skillDir =
+    scope === "global"
+      ? agent.skill.dir("global")
+      : join(process.cwd(), agent.skill.dir("project"));
+  let skillStatus: string;
+  try {
+    const files = customizeSkillFilesForAgent(agentName, "find-docs", downloadData.files);
+    await installSkillFiles("find-docs", files, skillDir);
+    skillStatus = "installed";
+  } catch (err) {
+    skillStatus = `failed: ${err instanceof Error ? err.message : String(err)}`;
+  }
+  const skillPath = join(skillDir, "find-docs");
+
+  let ruleStatus: string;
+  let rulePath: string;
+  try {
+    const result = await installRule(agentName, scope, await getRuleContent("cli", agentName));
+    ruleStatus = result.status;
+    rulePath = result.path;
+  } catch (err) {
+    ruleStatus = `failed: ${err instanceof Error ? err.message : String(err)}`;
+    rulePath = "";
+  }
+
+  return { skillPath, skillStatus, rulePath, ruleStatus };
+}
+
+async function setupCli(options: SetupOptions): Promise<void> {
+  await resolveCliAuth(options.apiKey);
+
+  const scope: Scope = options.project ? "project" : "global";
+  const agents = await resolveAgents(options, scope);
+  if (agents.length === 0) return;
+
+  log.blank();
+  const spinner = ora("Downloading find-docs skill...").start();
+
+  const downloadData = await downloadSkill("/upstash/context7", "find-docs");
+  if (downloadData.error || downloadData.files.length === 0) {
+    spinner.fail(`Failed to download find-docs skill: ${downloadData.error || "no files"}`);
+    return;
+  }
+
+  spinner.succeed("Downloaded find-docs skill");
+
+  const installSpinner = ora("Installing...").start();
+  const results: Array<{
+    agent: string;
+    skillPath: string;
+    skillStatus: string;
+    rulePath: string;
+    ruleStatus: string;
+  }> = [];
+
+  for (const agentName of agents) {
+    const agentDef = getAgent(agentName);
+    installSpinner.text = `Setting up ${agentDef.displayName}...`;
+    const r = await setupCliAgent(agentName, scope, downloadData);
+    results.push({ agent: agentDef.displayName, ...r });
+  }
+
+  installSpinner.succeed("Context7 CLI setup complete");
+
+  log.blank();
+  for (const r of results) {
+    log.plain(`  ${pc.bold(r.agent)}`);
+    logSkillStatus(r.skillStatus, r.skillPath);
+    const ruleIcon =
+      r.ruleStatus === "installed" || r.ruleStatus === "updated" ? pc.green("+") : pc.dim("~");
+    log.plain(`    ${ruleIcon} Rule ${r.ruleStatus}`);
+    log.plain(`      ${pc.dim(r.rulePath)}`);
+  }
+  log.blank();
+
+  trackEvent("setup", { mode: "cli" });
+  trackEvent("install", { skills: ["/upstash/context7/find-docs"], ides: agents });
+}
+
+async function setupCommand(options: SetupOptions): Promise<void> {
+  try {
+    let deployment: SetupDeployment;
+    try {
+      deployment = resolveSetupDeployment(options.baseUrl);
+    } catch (err) {
+      log.error(err instanceof Error ? err.message : String(err));
+      process.exitCode = 1;
+      return;
+    }
+
+    const mode = await resolveMode(options);
+    const validationError = getSetupValidationError(mode, options, deployment);
+    if (validationError) {
+      log.error(validationError);
+      process.exitCode = 1;
+      return;
+    }
+    trackEvent("command", { name: "setup" });
+
+    if (mode === "mcp") {
+      const scope: Scope = options.project ? "project" : "global";
+      const agents = await resolveAgents(options, scope);
+      if (agents.length === 0) return;
+      await setupMcp(agents, options, scope, deployment);
+    } else {
+      await setupCli(options);
+    }
+  } catch (err) {
+    if (err instanceof Error && err.name === "ExitPromptError") process.exit(0);
+    throw err;
+  }
+}

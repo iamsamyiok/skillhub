@@ -1,0 +1,134 @@
+import * as z from "zod/v4";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { Registry } from "../registry/index.js";
+import type { HarnessClient } from "../client/harness-client.js";
+import type { Config } from "../config.js";
+import { jsonResult, errorResult } from "../utils/response-formatter.js";
+import { isUserError, isUserFixableApiError, toMcpError } from "../utils/errors.js";
+import { confirmViaElicitation, describeElicitationFailure, describeBlockedAudit } from "../utils/elicitation.js";
+import { applyUrlDefaults } from "../utils/url-parser.js";
+import { asString, isRecord, coerceRecord } from "../utils/type-guards.js";
+import { formatBodyPreview } from "../utils/body-preview.js";
+import { orgIdField, projectIdField, resourceScopeSchema, resourceTypeSchema } from "./input-schemas.js";
+import { updateOutputSchema } from "./output-schemas.js";
+
+export function registerUpdateTool(server: McpServer, registry: Registry, client: HarnessClient, config: Config): void {
+  const updatableTypes = registry.getTypesForOperation("update");
+
+  server.registerTool(
+    "harness_update",
+    {
+      description: "Update an existing Harness resource. For pipelines/input sets: pass body as a YAML string directly (recommended for complex definitions), or use body.yamlPipeline/body.pipeline. You can pass a Harness URL to auto-extract identifiers. Response includes openInHarness link to the updated resource when applicable.",
+      inputSchema: {
+        resource_type: resourceTypeSchema(updatableTypes).describe("The type of resource to update"),
+        resource_id: z.string().optional().describe("The identifier of the resource to update. Optional when url contains the resource ID."),
+        url: z.string().optional().describe("A Harness UI URL — org, project, resource type, ID, and supported resource_scope are extracted automatically"),
+        resource_scope: resourceScopeSchema,
+        body: z.union([
+          z.record(z.string(), z.unknown()),
+          z.string(),
+        ]).describe("The updated resource definition body. For pipelines: pass a YAML string directly, or an object with yamlPipeline (YAML string) or pipeline (JSON object)"),
+        org_id: orgIdField(registry.orgId),
+        project_id: projectIdField(registry.projectId),
+        confirm: z.boolean().optional().describe("Set to true to confirm the operation. Only required when the operation risk is medium_write or above AND the client cannot surface a confirmation prompt — e.g. managed MCP that does not advertise elicitation, or an elicitation that fails at runtime. Has no effect for low-risk updates. Does NOT override an explicit decline from a client that completed an elicitation prompt — a user's decline is authoritative."),
+        params: z.record(z.string(), z.unknown()).optional().describe("Additional identifiers (e.g. pipeline_id for triggers/input sets, version_label for templates)."),
+      },
+      outputSchema: updateOutputSchema,
+      annotations: {
+        title: "Update Harness Resource",
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async (args) => {
+      try {
+        // Validate resource_type and operation before asking user to confirm
+        const def = registry.getResource(args.resource_type);
+        if (!def.operations.update) {
+          return errorResult(`Resource "${args.resource_type}" does not support "update". Supported: ${Object.keys(def.operations).join(", ")}`);
+        }
+
+        const { params, body, confirm: _confirm, ...rest } = args;
+        const coercedBody = typeof body === "string" ? (coerceRecord(body) ?? body) : body;
+        const coercedParams = coerceRecord(params);
+        // Merge params in before URL defaults so explicit identifiers (e.g. FME's
+        // workspace_id, passed via params) are visible to applyUrlDefaults's
+        // legacy-vs-URL-scope precedence check, not just top-level named args.
+        const argsForUrlDefaults = { ...rest, ...coercedParams, body: coercedBody };
+        const input = applyUrlDefaults(argsForUrlDefaults as Record<string, unknown>, args.url, { includeResourceScope: true });
+        if (coercedParams) Object.assign(input, coercedParams);
+        const identFields = def.identifierFields;
+        const primaryField = identFields.length > 1
+          ? identFields[identFields.length - 1]!
+          : identFields[0];
+        const fromResourceId = asString(input.resource_id);
+        const fromPrimaryField = primaryField ? asString(input[primaryField]) : undefined;
+        if (fromResourceId && fromPrimaryField && fromResourceId !== fromPrimaryField) {
+          return errorResult(
+            `Conflicting identifiers: resource_id/url gives "${fromResourceId}" but params.${primaryField} gives "${fromPrimaryField}". Provide one or ensure they match.`,
+          );
+        }
+        const resolvedResourceId = fromResourceId ?? fromPrimaryField;
+        if (!resolvedResourceId) {
+          return errorResult("resource_id is required for harness_update unless url contains the resource ID or params includes the resource-specific ID field.");
+        }
+        // Populate the primary identifier on the input map BEFORE any
+        // pre-dispatch audit emission so pathBuilder-backed updates resolve
+        // a stable http_path on blocked-attempt audit rows.
+        if (primaryField) {
+          input[primaryField] = resolvedResourceId;
+        }
+
+        const risk = def.operations.update!.operationPolicy.risk;
+        // Fail fast on HARNESS_READ_ONLY before elicitation — see
+        // harness_create.ts for the rationale. Mirrors registry.dispatch().
+        if (config.HARNESS_READ_ONLY) {
+          const reason = `Read-only mode is enabled (HARNESS_READ_ONLY=true). "update" operations are not allowed.`;
+          registry.auditBlockedAttempt(
+            args.resource_type,
+            "update",
+            input,
+            { tool: "harness_update", confirmation: "blocked", resource_id: resolvedResourceId },
+            reason,
+          );
+          return errorResult(reason);
+        }
+        const bodyPreview = formatBodyPreview(args.body);
+        const elicit = await confirmViaElicitation({
+          server,
+          toolName: "harness_update",
+          message: `Update ${args.resource_type} "${resolvedResourceId}"?\n\n${bodyPreview}`,
+          risk,
+          autoApproveRisk: config.HARNESS_AUTO_APPROVE_RISK,
+          callerConfirmed: args.confirm === true,
+        });
+        if (!elicit.proceed) {
+          registry.auditBlockedAttempt(
+            args.resource_type,
+            "update",
+            input,
+            { tool: "harness_update", confirmation: elicit.method, resource_id: resolvedResourceId },
+            describeBlockedAudit(elicit),
+          );
+          return errorResult(describeElicitationFailure(elicit));
+        }
+        // Lift version_label from body when callers put it there instead of params.
+        // Do not invent a default — template update requires an explicit version_label
+        // (see paramsSchema / harness_describe); a silent "v1" default masked omissions.
+        const versionLabel = asString(input.version_label);
+        if (!versionLabel && isRecord(args.body) && "version_label" in args.body) {
+          input.version_label = args.body.version_label;
+        }
+
+        const result = await registry.dispatch(client, args.resource_type, "update", input, { tool: "harness_update", confirmation: elicit.method, resource_id: resolvedResourceId });
+        return jsonResult(result);
+      } catch (err) {
+        if (isUserError(err)) return errorResult(err.message);
+        if (isUserFixableApiError(err)) return errorResult(err.message);
+        throw toMcpError(err);
+      }
+    },
+  );
+}

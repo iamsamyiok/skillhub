@@ -1,0 +1,250 @@
+import type { ParamsSchema, ToolsetDefinition } from "../types.js";
+import { buildBodyNormalized } from "../../utils/body-normalizer.js";
+import { ngExtract, pageExtract } from "../extractors.js";
+import { isRecord } from "../../utils/type-guards.js";
+
+/** Copy environmentRef onto environmentIdentifier so the deep-link template can resolve {environmentIdentifier}. */
+function aliasEnvironmentIdentifier(record: Record<string, unknown>): void {
+  if (typeof record.environmentIdentifier === "string" && record.environmentIdentifier) return;
+  const nested = isRecord(record.infrastructure) ? record.infrastructure : undefined;
+  const ref = record.environmentRef ?? nested?.environmentRef;
+  if (typeof ref === "string" && ref) {
+    record.environmentIdentifier = ref;
+  }
+}
+
+const infrastructureExtract = (raw: unknown): unknown => {
+  const data = ngExtract(raw);
+  if (isRecord(data)) aliasEnvironmentIdentifier(data);
+  return data;
+};
+
+const infrastructurePageExtract = (raw: unknown): { items: unknown[]; total: number } => {
+  const page = pageExtract(raw);
+  for (const item of page.items) {
+    if (isRecord(item)) aliasEnvironmentIdentifier(item);
+  }
+  return page;
+};
+
+/**
+ * Infra create/update body shaping (same unwrap/strip pattern as service/env), plus
+ * ``ensureYamlWrapper`` — NG requires non-empty ``yaml`` and will not synthesize it
+ * (QA: flat JSON → ``yaml: must not be empty``; service/env succeed without yaml).
+ *
+ * Inject org/project from tool-level ``org_id``/``project_id`` *before* yaml synthesis
+ * so the generated ``body.yaml`` includes scope fields. Registry also injects those
+ * into the JSON body later; without this, yaml would lag behind the outer body.
+ */
+const infrastructureScopeFields = [
+  { from: "org_id", to: "orgIdentifier", onlyIfMissing: true },
+  { from: "project_id", to: "projectIdentifier", onlyIfMissing: true },
+] as const;
+
+const infrastructureBodyBuilder = buildBodyNormalized({
+  unwrapKey: "infrastructureDefinition",
+  ensureYamlWrapper: "infrastructureDefinition",
+  injectFields: [...infrastructureScopeFields],
+});
+
+const infrastructureUpdateBodyBuilder = buildBodyNormalized({
+  unwrapKey: "infrastructureDefinition",
+  ensureYamlWrapper: "infrastructureDefinition",
+  injectIdentifier: { inputField: "infrastructure_id", bodyField: "identifier" },
+  injectFields: [...infrastructureScopeFields],
+});
+
+const ENVIRONMENT_ID_PARAM = {
+  name: "environment_id",
+  required: true,
+  description: "Environment identifier. Infrastructure is always scoped to an environment.",
+} as const;
+
+const infrastructureEnvironmentParams: ParamsSchema = {
+  fields: [{ ...ENVIRONMENT_ID_PARAM }],
+};
+
+const infrastructureMoveConfigsParams: ParamsSchema = {
+  fields: [
+    { ...ENVIRONMENT_ID_PARAM },
+    {
+      name: "move_config_type",
+      required: true,
+      description: "INLINE_TO_REMOTE or REMOTE_TO_INLINE. Pass via params.",
+    },
+  ],
+};
+
+const MOVE_CONFIG_PARAM_KEYS = [
+  "environment_id",
+  "move_config_type",
+  "connector_ref",
+  "repo_name",
+  "branch",
+  "file_path",
+  "commit_msg",
+  "is_new_branch",
+  "base_branch",
+  "is_harness_code_repo",
+] as const;
+
+/** Copy body fields onto input so queryParams can bind them (same pattern as pipeline interrupt/import). */
+function hoistInfrastructureMoveConfigParams(input: Record<string, unknown>): Record<string, unknown> {
+  const body = isRecord(input.body) ? input.body : undefined;
+  if (body) {
+    for (const key of MOVE_CONFIG_PARAM_KEYS) {
+      if ((input[key] === undefined || input[key] === "") && body[key] !== undefined && body[key] !== "") {
+        input[key] = body[key];
+      }
+    }
+  }
+  return {};
+}
+
+export const infrastructureToolset: ToolsetDefinition = {
+  name: "infrastructure",
+  displayName: "Infrastructure",
+  description: "Infrastructure definitions for deployment targets",
+  resources: [
+    {
+      resourceType: "infrastructure",
+      displayName: "Infrastructure Definition",
+      description: "Infrastructure definition within an environment. Supports full CRUD. Default list/get scope is project — pass org_id and project_id (or a project URL) on the first call. Use resource_scope='account' only when the user asked for account-level infrastructure definitions.",
+      toolset: "infrastructure",
+      scope: "project",
+      supportedScopes: ["account", "org", "project"],
+      identifierFields: ["infrastructure_id"],
+      executeHint:
+        "Move config with harness_execute(resource_type='infrastructure', action='move_configs', resource_id='<infrastructure_id>', params={ environment_id, move_config_type: 'INLINE_TO_REMOTE' | 'REMOTE_TO_INLINE' }). Optional Git fields (connector_ref, repo_name, branch, file_path, commit_msg) are also params.",
+      listFilterFields: [
+        { name: "environment_id", description: "Environment identifier. Infrastructure is always scoped to an environment.", required: true },
+        { name: "search_term", description: "Search term to filter infrastructure definitions" },
+        { name: "deployment_type", description: "Filter by deployment type (e.g. Kubernetes, ECS)" },
+        { name: "sort", description: "Field to sort by (e.g. name, identifier)" },
+        { name: "order", description: "Sort order", enum: ["asc", "desc"] },
+      ],
+      deepLinkTemplate: "/ng/account/{accountId}/all/orgs/{orgIdentifier}/projects/{projectIdentifier}/settings/environments/{environmentIdentifier}/details?sectionId=INFRASTRUCTURE",
+      operations: {
+        list: {
+          method: "GET",
+          path: "/ng/api/infrastructures",
+          operationPolicy: { risk: "read", retryPolicy: "safe" },
+          queryParams: {
+            environment_id: "environmentIdentifier",
+            search_term: "searchTerm",
+            deployment_type: "deploymentType",
+            sort: "sort",
+            order: "order",
+            page: "page",
+            size: "size",
+          },
+          responseExtractor: infrastructurePageExtract,
+          description: "List infrastructure definitions",
+        },
+        get: {
+          method: "GET",
+          path: "/ng/api/infrastructures/{infraIdentifier}",
+          operationPolicy: { risk: "read", retryPolicy: "safe" },
+          pathParams: { infrastructure_id: "infraIdentifier" },
+          queryParams: { environment_id: "environmentIdentifier" },
+          paramsSchema: infrastructureEnvironmentParams,
+          responseExtractor: infrastructureExtract,
+          description: "Get infrastructure definition details",
+        },
+        create: {
+          method: "POST",
+          path: "/ng/api/infrastructures",
+          operationPolicy: { risk: "low_write", retryPolicy: "do_not_retry" },
+          bodyBuilder: infrastructureBodyBuilder,
+          bodySchema: {
+            description:
+              "Infrastructure definition. NG requires body.yaml (infrastructureDefinition: ...). " +
+              "Prefer body: { identifier, name, type, environmentRef, deploymentType?, yaml }. " +
+              "If yaml is omitted, the server synthesizes it from the flat fields.",
+            fields: [
+              { name: "identifier", type: "string", required: true, description: "Unique identifier" },
+              { name: "name", type: "string", required: true, description: "Display name" },
+              { name: "type", type: "string", required: true, description: "Infrastructure type (e.g. KubernetesDirect, KubernetesGcp)" },
+              { name: "environmentRef", type: "string", required: true, description: "Environment reference identifier" },
+              { name: "deploymentType", type: "string", required: false, description: "Deployment type (e.g. Kubernetes)" },
+              {
+                name: "yaml",
+                type: "yaml",
+                required: true,
+                description:
+                  "Full infrastructure YAML under infrastructureDefinition:. Auto-synthesized from flat fields when omitted.",
+              },
+            ],
+          },
+          responseExtractor: infrastructureExtract,
+          description: "Create infrastructure definition",
+        },
+        update: {
+          method: "PUT",
+          path: "/ng/api/infrastructures",
+          operationPolicy: { risk: "low_write", retryPolicy: "safe" },
+          bodyBuilder: infrastructureUpdateBodyBuilder,
+          bodySchema: {
+            description:
+              "Infrastructure definition update. NG requires body.yaml; auto-synthesized from flat fields when omitted.",
+            fields: [
+              { name: "identifier", type: "string", required: true, description: "Infrastructure identifier" },
+              { name: "name", type: "string", required: true, description: "Display name" },
+              { name: "type", type: "string", required: true, description: "Infrastructure type" },
+              { name: "environmentRef", type: "string", required: true, description: "Environment reference identifier" },
+              {
+                name: "yaml",
+                type: "yaml",
+                required: true,
+                description:
+                  "Full infrastructure YAML under infrastructureDefinition:. Auto-synthesized from flat fields when omitted.",
+              },
+            ],
+          },
+          responseExtractor: infrastructureExtract,
+          description: "Update infrastructure definition",
+        },
+        delete: {
+          method: "DELETE",
+          path: "/ng/api/infrastructures/{infraIdentifier}",
+          operationPolicy: { risk: "destructive", retryPolicy: "do_not_retry" },
+          pathParams: { infrastructure_id: "infraIdentifier" },
+          queryParams: { environment_id: "environmentIdentifier" },
+          paramsSchema: infrastructureEnvironmentParams,
+          responseExtractor: ngExtract,
+          description: "Delete infrastructure definition",
+        },
+      },
+      executeActions: {
+        move_configs: {
+          method: "POST",
+          path: "/ng/api/infrastructures/move-config/{infraIdentifier}",
+          operationPolicy: { risk: "low_write", retryPolicy: "do_not_retry" },
+          pathParams: { infrastructure_id: "infraIdentifier" },
+          queryParams: {
+            environment_id: "environmentIdentifier",
+            connector_ref: "connectorRef",
+            repo_name: "repoName",
+            branch: "branch",
+            file_path: "filePath",
+            commit_msg: "commitMsg",
+            is_new_branch: "isNewBranch",
+            base_branch: "baseBranch",
+            is_harness_code_repo: "isHarnessCodeRepo",
+            move_config_type: "moveConfigType",
+          },
+          paramsSchema: infrastructureMoveConfigsParams,
+          skipScopeBodyInjection: true,
+          bodyBuilder: hoistInfrastructureMoveConfigParams,
+          bodySchema: {
+            description:
+              "No JSON body is sent. Pass environment_id, move_config_type, and optional Git fields via params. Values supplied in body are copied onto params.",
+            fields: [],
+          },
+          responseExtractor: ngExtract,
+          actionDescription: "Move infrastructure configuration (e.g., move inline config to remote or vice versa)",
+        },
+      },
+    },
+  ],
+};

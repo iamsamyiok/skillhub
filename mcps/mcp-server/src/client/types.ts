@@ -1,0 +1,79 @@
+/**
+ * Harness API response envelope types.
+ */
+
+/** Standard Harness NG API response wrapper */
+export interface HarnessResponse<T> {
+  status: "SUCCESS" | "ERROR" | "FAILURE";
+  data?: T;
+  message?: string;
+  code?: string;
+  correlationId?: string;
+  metadata?: unknown;
+}
+
+/** Paginated content wrapper (used by some endpoints) */
+export interface HarnessPageResponse<T> {
+  status: "SUCCESS" | "ERROR" | "FAILURE";
+  data?: {
+    content?: T[];
+    totalElements?: number;
+    totalPages?: number;
+    pageIndex?: number;
+    pageSize?: number;
+    empty?: boolean;
+  };
+  message?: string;
+  code?: string;
+  correlationId?: string;
+}
+
+/** V1 beta list response format */
+export interface HarnessV1ListResponse<T> {
+  items?: T[];
+  page?: number;
+  limit?: number;
+  totalItems?: number;
+  totalPages?: number;
+}
+
+/** Endpoint-owned limits for a finite batch of JSON SSE data events. */
+export interface JsonEventStreamLimits {
+  maxEvents: number;
+  durationMs: number;
+  maxBytes: number;
+}
+
+export interface RequestOptions {
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  path: string;
+  /** Scalar or string[] (repeated query keys, e.g. `inputSetIdentifiers=a&inputSetIdentifiers=b`). */
+  params?: Record<string, string | number | boolean | string[] | undefined>;
+  body?: unknown;
+  headers?: Record<string, string>;
+  /** Override base URL for this request (e.g. FME/Split.io uses https://api.split.io) */
+  baseUrl?: string;
+  /** Override base path prefix (e.g. "/pipeline/api" vs "/ng/api") */
+  rawPath?: boolean;
+  /** External abort signal (e.g. from MCP client disconnect). Merged with timeout. */
+  signal?: AbortSignal;
+  /** Override default timeout for this request (milliseconds). */
+  timeoutMs?: number;
+  /** JSON, binary download, or a bounded batch of JSON SSE data events. */
+  responseType?: "json" | "buffer" | "sse";
+  /** Required for responseType=sse. The caller owns the batch policy. */
+  sseLimits?: JsonEventStreamLimits;
+  /** Product backend — when "fme", skips Harness-specific auth/headers/params. */
+  product?: "harness" | "fme";
+  /** When true, omit the automatic `accountIdentifier` query param.
+   *  Some APIs (e.g. SEI) use only the `Harness-Account` header for account scoping. */
+  headerBasedScoping?: boolean;
+  /** Retry policy from OperationPolicy. When "do_not_retry", transient errors
+   *  (5xx, timeouts) throw immediately instead of retrying. */
+  retryPolicy?: "safe" | "idempotency_key_required" | "do_not_retry";
+  /** Internal tracing metadata. Never serialized into HTTP headers/query/body. */
+  tracing?: {
+    /** API name that produced this concrete request path. */
+    route?: string;
+  };
+}

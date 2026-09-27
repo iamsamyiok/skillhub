@@ -1,0 +1,682 @@
+import * as z from "zod/v4";
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { Registry } from "../registry/index.js";
+import type { HarnessClient } from "../client/harness-client.js";
+import type { Config } from "../config.js";
+import { jsonResult, errorResult } from "../utils/response-formatter.js";
+import { isUserError, isUserFixableApiError, toMcpError } from "../utils/errors.js";
+import { confirmViaElicitation, describeElicitationFailure, describeBlockedAudit } from "../utils/elicitation.js";
+import { createLogger } from "../utils/logger.js";
+import { applyUrlDefaults } from "../utils/url-parser.js";
+import { asRecord, asString, coerceRecord } from "../utils/type-guards.js";
+import { isFlatKeyValueInputs, isResolvableInputs, flattenInputs, resolveRuntimeInputs, resolveRuntimeInputsWithBaseYaml, type ResolutionResult } from "../utils/runtime-input-resolver.js";
+import { applyInputExpansions } from "../utils/input-expander.js";
+import { materializeInputSetsToRuntimeYaml, mergeRuntimePipelineFragments } from "../utils/materialize-input-sets.js";
+import { normalizeV1PipelineRunInputs } from "../utils/pipeline-v1-runtime-inputs.js";
+import { orgIdField, projectIdField, resourceScopeSchema, resourceTypeSchema } from "./input-schemas.js";
+import { pollExecutionToTerminal, FAILURE_STATUSES, AbortError } from "../utils/poll-execution.js";
+import { sendProgress } from "../utils/progress.js";
+import { executeOutputSchema } from "./output-schemas.js";
+
+const log = createLogger("execute");
+
+const DEFAULT_WAIT_TIMEOUT_SECONDS = 600;
+const DEFAULT_WAIT_POLL_INTERVAL_SECONDS = 3;
+const MAX_WAIT_INTERVAL_MS = 30_000;
+
+function hasNoInlineRuntimeInputs(inputs: unknown): boolean {
+  if (inputs === undefined) return true;
+  const record = asRecord(inputs);
+  return !!record && Object.keys(record).length === 0;
+}
+
+/**
+ * True when `inputs` is a full pipeline document (`{ pipeline: ... }`) rather
+ * than a flat key/value override map. These are merged fragment-wise with a
+ * materialized input set (see the pipeline run path) instead of being resolved
+ * against the runtime input template.
+ */
+function isFullPipelineInputs(inputs: unknown): inputs is Record<string, unknown> {
+  const record = asRecord(inputs);
+  return !!record && "pipeline" in record;
+}
+
+/**
+ * Extract the inner `pipeline` fragment from a pipeline-execute runtime
+ * document, accepting either a YAML string or an already-parsed object. The
+ * top-level `pipeline` key is unwrapped when present; otherwise the whole
+ * document is treated as the fragment. Used to merge a caller-supplied full
+ * pipeline YAML with a materialized input set.
+ */
+function extractPipelineFragment(yamlOrObj: unknown): Record<string, unknown> {
+  const doc = typeof yamlOrObj === "string" ? parseYaml(yamlOrObj) : yamlOrObj;
+  const root = asRecord(doc);
+  if (!root) return {};
+  return asRecord(root.pipeline) ?? root;
+}
+
+/**
+ * Map `resource_id` onto the execute action's target identifier field, in
+ * place. Mirrors the remap performed inline in the dispatch path so that
+ * pre-dispatch consumers (e.g. blocked-attempt audit emission, where the
+ * action's `pathBuilder` reads identifier fields off the input map) see
+ * the same shape the registry would dispatch with.
+ *
+ * Most resources use `identifierFields[0]`, but some execute endpoints
+ * omit the parent identifier used by get/update/delete and target a child
+ * path field directly (e.g. `security_exemption.approve` writes to
+ * `exemption_id`, not the resource's primary id).
+ *
+ * Returns the same `input` reference for chaining; idempotent (safe to
+ * call when `resourceId` is undefined or the action has no pathParams).
+ */
+function applyExecuteActionTargetRemap(
+  input: Record<string, unknown>,
+  def: { identifierFields: readonly string[]; product?: string },
+  actionSpec: { pathParams?: Record<string, string> } | undefined,
+  resourceId: string | undefined,
+): Record<string, unknown> {
+  const primaryField = def.identifierFields[0];
+  if (!primaryField || !resourceId) return input;
+  const actionPathFields = new Set(Object.keys(actionSpec?.pathParams ?? {}));
+  // FME dual-mode resources declare `workspace_id` as identifierFields[0], but it's
+  // a legacy *scope* selector (alternative to org_id+project_id), not the resource's
+  // identity — unlike every other multi-field resource (e.g. gitops_application's
+  // agent_id), where identifierFields[0] genuinely is what resource_id should fill.
+  // Legacy path templates still reference workspace_id in pathParams, so when the
+  // caller omits it (Harness-native mode), the target search below must not treat
+  // it as "used by this action" or resource_id silently overwrites the scope field
+  // instead of the real identifier (e.g. feature_flag_name).
+  const primaryIsFmeLegacyScope = def.product === "fme" && primaryField === "workspace_id" && input.workspace_id === undefined;
+  const primaryUsedByAction = !primaryIsFmeLegacyScope && actionPathFields.has(primaryField);
+  const actionTargetField = primaryUsedByAction
+    ? undefined
+    : [...def.identifierFields].reverse().find((field) => actionPathFields.has(field));
+
+  if (actionTargetField) {
+    input[actionTargetField] = resourceId;
+  } else {
+    const existing = input[primaryField];
+    const primaryAlreadySet = existing !== undefined && existing !== "" && existing !== resourceId;
+    if (primaryAlreadySet && def.identifierFields.length > 1) {
+      const childField = def.identifierFields[def.identifierFields.length - 1]!;
+      input[childField] = resourceId;
+    } else {
+      input[primaryField] = resourceId;
+    }
+  }
+  return input;
+}
+
+/**
+ * Extract the execution ID from a `harness_execute` run/retry response.
+ * Verified shapes:
+ *  - v0 pipeline run (ngExtract): `{ planExecution: { uuid, metadata: { executionUuid, ... } }, ... }`
+ *  - v0 pipeline retry: usually returns `{ planExecutionId, ... }` directly
+ *  - v1 pipeline run (passthrough): `{ execution_details: { execution_id } }` or
+ *    `{ execution_id }` / `{ executionId }` depending on endpoint version
+ */
+function extractExecutionId(result: unknown, resourceType: string): string | undefined {
+  const rec = asRecord(result);
+  if (!rec) return undefined;
+  if (resourceType === "pipeline_v1") {
+    const details = asRecord(rec.execution_details);
+    return asString(details?.execution_id)
+      ?? asString(rec.execution_id)
+      ?? asString(rec.executionId);
+  }
+  const planExec = asRecord(rec.planExecution);
+  return asString(rec.planExecutionId)
+    ?? asString(planExec?.uuid)
+    ?? asString(asRecord(planExec?.metadata)?.executionUuid)
+    ?? asString(rec.executionId);
+}
+
+export function registerExecuteTool(server: McpServer, registry: Registry, client: HarnessClient, config: Config): void {
+  const executableTypes = registry.getTypesWithExecuteActions();
+
+  server.registerTool(
+    "harness_execute",
+    {
+      description: "Execute an action on a Harness resource: run/retry/interrupt pipelines, kill/restore FME feature flags, test connectors, sync GitOps apps, run chaos experiments. You can pass a Harness URL to auto-extract identifiers. Pass `wait: true` for pipeline run/retry to block until the execution reaches a terminal status — single tool call instead of an LLM polling loop. For HQL batch operations pass `queries` with resource_type='hql_query' and action='validate' or 'run'.",
+      inputSchema: {
+        // .describe() must be the LAST call in every chain — Zod 4's
+        // .optional() / .default() / .min() / .max() each return a fresh
+        // wrapper schema whose `.description` getter does NOT walk into the
+        // inner schema (verified on @modelcontextprotocol/sdk via
+        // getSchemaDescription). A description set before any of those
+        // would be invisible to MCP clients listing this tool.
+        resource_type: resourceTypeSchema(executableTypes).optional().describe("Resource type with executable actions. Auto-detected from url."),
+        url: z.string().optional().describe("Harness UI URL — auto-extracts org, project, type, and ID"),
+        action: z.string().describe("Action to execute (e.g. run, retry, interrupt, toggle, test_connection, sync)"),
+        resource_id: z.string().optional().describe("Primary resource identifier"),
+        org_id: orgIdField(registry.orgId),
+        project_id: projectIdField(registry.projectId),
+        resource_scope: resourceScopeSchema,
+        inputs: z.union([z.string(), z.record(z.string(), z.unknown())]).optional().describe("Pipeline runtime inputs. For v0 pipeline, check runtime_input_template and pass key-value pairs or full overlay YAML. For pipeline_v1, check runtime_input_template_v1 and pass named values; the server sends them as an inputs: YAML document."),
+        input_set_ids: z.array(z.string()).optional().describe("Input set IDs for complex pipelines. List available: harness_list(resource_type='input_set', filters={pipeline_id: '...'})."),
+        body: z.record(z.string(), z.unknown()).optional().describe("Additional body payload for the action"),
+        params: z.record(z.string(), z.unknown()).optional().describe("Action-specific parameters. Call harness_describe for available fields per resource_type."),
+        confirm: z.boolean().optional().describe("Set to true to confirm the operation. Only required when the action's risk is medium_write or above (e.g. pipeline.run is high_write; hql_query.run/validate are read and need no confirmation) AND the client cannot surface a confirmation prompt — e.g. managed MCP that does not advertise elicitation, or an elicitation that fails at runtime. Has no effect for low-risk actions. Does NOT override an explicit decline from a client that completed an elicitation prompt — a user's decline is authoritative."),
+        wait: z.boolean().optional().describe("For pipeline run/retry actions: block until the execution reaches a terminal status (Success/Failed/Aborted/Errored/Expired). Server-side polling — a single tool call gives the agent the final outcome instead of an LLM polling loop. Ignored for other actions."),
+        wait_timeout_seconds: z.number().min(10).max(7200).optional().describe("Max seconds to wait when wait=true. Default 600 (10 min). Max 7200 (2 h). When the timeout fires, returns execution_timed_out=true with the last observed status."),
+        wait_poll_interval_seconds: z.number().min(2).max(60).optional().describe("Initial poll interval when wait=true (seconds). Default 3. Backoff multiplier 1.5x, capped at 30s."),
+        queries: z.array(
+          z.object({
+            query_string: z.string().describe("HQL query string"),
+            timeout_ms: z.number().optional().describe("Per-query timeout in milliseconds"),
+            max_results: z.number().optional().describe("Maximum rows to return"),
+          })
+        ).max(20).optional().describe("Batch HQL queries — use with resource_type='hql_query' and action='validate' or 'run'. Fans out in parallel, returns per-query results."),
+      },
+      outputSchema: executeOutputSchema,
+      annotations: {
+        title: "Execute Harness Action",
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+        openWorldHint: true,
+      },
+    },
+    async (args, extra) => {
+      try {
+        const { params, wait, wait_timeout_seconds, wait_poll_interval_seconds, confirm: _confirm, queries: batchQueries, ...rest } = args;
+        const coercedParams = coerceRecord(params);
+        // Merge params in before URL defaults so explicit identifiers (e.g. FME's
+        // workspace_id, passed via params) are visible to applyUrlDefaults's
+        // legacy-vs-URL-scope precedence check, not just top-level named args.
+        const argsForUrlDefaults = coercedParams ? { ...rest, ...coercedParams } : rest;
+        const input = applyUrlDefaults(argsForUrlDefaults as Record<string, unknown>, args.url, { includeResourceScope: true });
+        if (coercedParams) Object.assign(input, coercedParams);
+        log.debug("Execute input after params merge", { input: JSON.stringify(input), params: JSON.stringify(params) });
+        let resourceType = asString(input.resource_type);
+        if (!resourceType) {
+          return errorResult("resource_type is required. Provide it explicitly or via a Harness URL.");
+        }
+        // Interrupt is registered on resource_type=execution; accept pipeline as an alias.
+        if (resourceType === "pipeline" && args.action === "interrupt") {
+          resourceType = "execution";
+          input.resource_type = "execution";
+        }
+        const resourceId = asString(input.resource_id);
+        if (resourceType === "pipeline" && args.action === "retry" && !asString(input.execution_id) && resourceId) {
+          input.execution_id = resourceId;
+        }
+
+        // Validate resource_type and action before asking user to confirm
+        const def = registry.getResource(resourceType);
+        if (!def.executeActions?.[args.action]) {
+          const available = def.executeActions ? Object.keys(def.executeActions).join(", ") : "none";
+          return errorResult(`Resource "${resourceType}" has no execute action "${args.action}". Available: ${available}`);
+        }
+
+        const actionSpec = def.executeActions?.[args.action];
+        if (resourceType === "pipeline_v1" && args.action === "run") {
+          const normalizationError = normalizeV1PipelineRunInputs(input);
+          if (normalizationError) return errorResult(normalizationError);
+        }
+        const risk = actionSpec?.operationPolicy.risk ?? "low_write";
+
+        // Resolve the execute action's path identifier BEFORE any
+        // pre-dispatch audit emission. Without this, blocked rows for
+        // pathBuilder-backed actions (e.g. security_exemption.approve
+        // reading `input.exemption_id`) record an http_path with empty
+        // placeholders ("/sto/api/v2/exemptions//approve").
+        applyExecuteActionTargetRemap(input, def, actionSpec, resourceId);
+        if (
+          resourceType === "pipeline" &&
+          args.action === "retry" &&
+          asString(input.pipeline_id) &&
+          asString(input.execution_id) &&
+          input.pipeline_id === input.execution_id
+        ) {
+          delete input.pipeline_id;
+        }
+
+        // Fail fast on HARNESS_READ_ONLY before elicitation. Mirrors
+        // registry.dispatchExecute()'s gate (risk !== "read"): read-safe
+        // actions like hql_query.run/validate stay allowed in read-only
+        // mode. For everything else we don't ask the user to approve a
+        // write that can never run, AND we capture the rejection as a
+        // pre-dispatch "blocked" audit row.
+        if (config.HARNESS_READ_ONLY && risk !== "read") {
+          const reason = `Read-only mode is enabled (HARNESS_READ_ONLY=true). Execute action "${args.action}" is not allowed.`;
+          registry.auditBlockedAttempt(
+            resourceType,
+            "execute",
+            input,
+            { tool: "harness_execute", confirmation: "blocked", resource_id: resourceId, action: args.action },
+            reason,
+          );
+          return errorResult(reason);
+        }
+
+        const elicit = await confirmViaElicitation({
+          server,
+          toolName: "harness_execute",
+          message: `Execute "${args.action}" on ${resourceType}${resourceId ? ` "${resourceId}"` : ""}?`,
+          risk,
+          autoApproveRisk: config.HARNESS_AUTO_APPROVE_RISK,
+          callerConfirmed: args.confirm === true,
+        });
+        if (!elicit.proceed) {
+          registry.auditBlockedAttempt(
+            resourceType,
+            "execute",
+            input,
+            { tool: "harness_execute", confirmation: elicit.method, resource_id: resourceId, action: args.action },
+            describeBlockedAudit(elicit),
+          );
+          return errorResult(describeElicitationFailure(elicit));
+        }
+
+        // Batch HQL path — fan out queries in parallel through the registry
+        if (batchQueries && batchQueries.length > 0) {
+          if (resourceType !== "hql_query") {
+            return errorResult(`queries batch parameter is only supported for resource_type='hql_query'. Got: ${resourceType}`);
+          }
+
+          // Fail fast on policy errors before fan-out — mirrors registry.dispatchExecute()
+          // risk-based enforcement: read-safe actions (e.g. hql validate/run) are allowed in
+          // read-only mode; write actions are blocked before any query is dispatched.
+          if (config.HARNESS_READ_ONLY && risk !== "read") {
+            return errorResult(`Read-only mode is enabled (HARNESS_READ_ONLY=true). Execute action "${args.action}" is not allowed.`);
+          }
+
+          const auditCtxBatch = { tool: "harness_execute" as const, confirmation: elicit.method, action: args.action };
+
+          try {
+            const allResults = await Promise.allSettled(
+              batchQueries.map((q) =>
+                registry.dispatchExecute(client, "hql_query", args.action, { body: { query_string: q.query_string, ...(q.timeout_ms != null ? { timeout_ms: q.timeout_ms } : {}), ...(q.max_results != null ? { max_results: q.max_results } : {}) } }, auditCtxBatch, extra.signal),
+              ),
+            );
+
+            const results = allResults.map((r, i) => {
+              const query_string = batchQueries[i]!.query_string;
+              if (r.status === "fulfilled") return { query_string, success: true, ...((r.value as Record<string, unknown>) ?? {}) };
+              return { query_string, success: false, error: r.reason instanceof Error ? r.reason.message : String(r.reason) };
+            });
+            const succeeded = results.filter((r) => r.success).length;
+            return jsonResult({ results, summary: { total: results.length, succeeded, failed: results.length - succeeded } });
+          } catch (err) {
+            if (isUserError(err) || isUserFixableApiError(err)) return errorResult((err as Error).message);
+            throw toMcpError(err);
+          }
+        }
+
+        // Pass input_set_ids as string[] so HarnessClient emits repeated `inputSetIdentifiers=` query keys
+        // (grpc-gateway array style). Comma-joined single param is ignored by pipeline execute.
+        if (args.input_set_ids && args.input_set_ids.length > 0) {
+          input.input_set_ids = [...args.input_set_ids];
+        }
+
+        if (resourceType === "pipeline" && args.action === "run") {
+          normalizeRemotePipelineRunParams(input);
+        }
+
+        const inputSetIds = args.input_set_ids ?? [];
+        const hasInputSets = inputSetIds.length > 0;
+        let materializedInputSets = false;
+        let materializedInputSetYaml: string | undefined;
+
+        // When only input_set_ids are effectively provided, fetch each input set and build runtime YAML.
+        // Harness execute often does not apply `inputSetIdentifiers` from the query string alone;
+        // sending the merged `pipeline` fragment as the YAML body matches the working UI path.
+        if (
+          resourceType === "pipeline" &&
+          args.action === "run" &&
+          hasInputSets &&
+          (hasNoInlineRuntimeInputs(args.inputs) ||
+            isResolvableInputs(args.inputs) ||
+            isFullPipelineInputs(args.inputs) ||
+            typeof args.inputs === "string")
+        ) {
+          const pipelineId = asString(input.pipeline_id) ?? resourceId;
+          const orgId = asString(input.org_id) || registry.orgId;
+          const projectId = asString(input.project_id) || registry.projectId;
+          if (!pipelineId) {
+            return errorResult(
+              "pipeline_id is required when using input_set_ids without inputs. Provide resource_id or params.pipeline_id.",
+            );
+          }
+          if (!orgId) {
+            return errorResult(
+              "org_id is required when using input_set_ids. Pass org_id or set HARNESS_ORG.",
+            );
+          }
+          if (!projectId) {
+            return errorResult(
+              "project_id is required when using input_set_ids. Pass project_id or set HARNESS_PROJECT.",
+            );
+          }
+          try {
+            // Forward git context so remote / Git-stored input sets resolve
+            // from the correct branch/repo instead of silently defaulting to
+            // the repo's default branch. `normalizeRemotePipelineRunParams`
+            // (called above) has already populated these on `input`.
+            const gitContext = {
+              branch: asString(input.pipeline_branch) ?? asString(input.branch),
+              repoName: asString(input.repo_name),
+              connectorRef: asString(input.connector_ref),
+              storeType: asString(input.store_type),
+            };
+            materializedInputSetYaml = await materializeInputSetsToRuntimeYaml(client, {
+              pipelineId,
+              orgId,
+              projectId,
+              inputSetIds,
+              gitContext,
+            });
+            if (materializedInputSetYaml && hasNoInlineRuntimeInputs(args.inputs)) {
+              input.inputs = materializedInputSetYaml;
+              delete input.input_set_ids;
+              materializedInputSets = true;
+            } else if (
+              materializedInputSetYaml &&
+              (isFullPipelineInputs(args.inputs) || typeof args.inputs === "string")
+            ) {
+              // Caller supplied a full pipeline document (YAML string or object)
+              // alongside input_set_ids. Merge the input set as the base and the
+              // caller's document as the override (caller wins per variable /
+              // stage). Without this the input set would be dropped to the
+              // `inputSetIdentifiers` query param, which pipeline execute ignores.
+              const base = extractPipelineFragment(materializedInputSetYaml);
+              const override = extractPipelineFragment(args.inputs);
+              const merged = mergeRuntimePipelineFragments(base, override);
+              input.inputs = stringifyYaml({ pipeline: merged });
+              delete input.input_set_ids;
+              materializedInputSets = true;
+            }
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            return errorResult(`Could not load input set(s) for execution: ${msg}`);
+          }
+        }
+
+        // Auto-resolve flat key-value runtime inputs for pipeline run
+        let resolved: ResolutionResult | undefined;
+
+        if (
+          resourceType === "pipeline" &&
+          args.action === "run" &&
+          !materializedInputSets &&
+          isResolvableInputs(args.inputs)
+        ) {
+          // Apply declarative input expansions (e.g. {branch: "main"} -> full build structure)
+          const actionSpec = registry.getExecuteActions(resourceType)?.[args.action];
+          if (actionSpec?.inputExpansions?.length) {
+            args.inputs = applyInputExpansions(
+              args.inputs as Record<string, unknown>,
+              actionSpec.inputExpansions,
+            );
+          }
+
+          const pipelineId = asString(input.pipeline_id);
+          if (!pipelineId) {
+            return errorResult("pipeline_id is required to auto-resolve runtime inputs. Provide it via resource_id, params.pipeline_id, or a Harness URL.");
+          }
+          try {
+            // Flatten nested inputs (e.g. codebase build objects) into dot-path keys
+            // for template matching. Flat inputs pass through unchanged.
+            const inputsToResolve = isFlatKeyValueInputs(args.inputs)
+              ? args.inputs
+              : flattenInputs(args.inputs);
+            const resolveOptions = {
+              pipelineId,
+              orgId: asString(input.org_id) || registry.orgId,
+              projectId: asString(input.project_id) || registry.projectId,
+              branch: asString(input.pipeline_branch) ?? asString(input.branch),
+            };
+            resolved = materializedInputSetYaml
+              ? await resolveRuntimeInputsWithBaseYaml(client, inputsToResolve, resolveOptions, materializedInputSetYaml)
+              : await resolveRuntimeInputs(client, inputsToResolve, resolveOptions);
+
+            // Smart pre-flight: block when required fields remain uncovered after
+            // applying any input-set base and inline overrides.
+            if (resolved.unmatchedRequired.length > 0) {
+              const parts: string[] = [];
+              if (resolved.matched.length > 0) {
+                parts.push(`Matched ${resolved.matched.length} input(s): ${resolved.matched.join(", ")}.`);
+              }
+
+              const structuralFields = resolved.unmatchedRequired.filter(f => isStructuralField(f));
+              const simpleFields = resolved.unmatchedRequired.filter(f => !isStructuralField(f));
+
+              parts.push(`${resolved.unmatchedRequired.length} required field(s) still need values: ${resolved.unmatchedRequired.join(", ")}.`);
+
+              if (structuralFields.length > 0) {
+                parts.push(`Fields [${structuralFields.join(", ")}] likely need complex objects (not simple strings). Use an input set or provide full YAML.`);
+              }
+
+              if (resolved.unmatchedOptional.length > 0) {
+                parts.push(`${resolved.unmatchedOptional.length} optional field(s) have defaults and can be omitted: ${resolved.unmatchedOptional.join(", ")}.`);
+              }
+
+              // Fetch available input sets to suggest them
+              const inputSetHint = await fetchInputSetHint(client, pipelineId, input, registry);
+              if (inputSetHint) parts.push(inputSetHint);
+
+              parts.push(`Expected keys: [${resolved.expectedKeys.join(", ")}]. You provided: [${Object.keys(args.inputs).join(", ")}].`);
+              parts.push(`Tip: use harness_get(resource_type="runtime_input_template", resource_id="${pipelineId}") to see the full template.`);
+
+              return errorResult(parts.join("\n\n"));
+            }
+
+            input.inputs = resolved.yaml;
+            if (materializedInputSetYaml) {
+              delete input.input_set_ids;
+              materializedInputSets = true;
+            }
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            log.warn("Failed to auto-resolve runtime inputs", { error: msg });
+            return errorResult(
+              `Could not auto-resolve runtime inputs for pipeline execution: ${msg}. ` +
+              "Pass full runtime YAML in inputs, use input_set_ids, or retry after checking runtime_input_template.",
+            );
+          }
+        }
+
+        const auditCtx = { tool: "harness_execute" as const, confirmation: elicit.method, resource_id: resourceId, action: args.action };
+
+        let result: unknown;
+        // Tracks supplementary fields to merge into the final response envelope
+        // (input resolution hints, wait results).
+        const envelope: Record<string, unknown> = {};
+
+        result = await registry.dispatchExecute(client, resourceType, args.action, input, auditCtx);
+
+        if (resolved) {
+          envelope._inputResolution = {
+            mode: hasInputSets ? "input_set_with_overrides" : "auto_resolved",
+            matched: resolved.matched,
+            ...(resolved.unmatchedOptional.length > 0 ? { defaulted: resolved.unmatchedOptional } : {}),
+          };
+        }
+
+        // Opt-in server-side wait for pipeline run/retry. Avoids the LLM
+        // burning tokens on a polling loop — a single tool call returns the
+        // terminal status.
+        const isWaitable =
+          wait === true &&
+          (resourceType === "pipeline" || resourceType === "pipeline_v1") &&
+          (args.action === "run" || args.action === "retry");
+
+        if (isWaitable) {
+          const executionId = extractExecutionId(result, resourceType);
+          if (!executionId) {
+            envelope._wait = {
+              skipped: true,
+              reason: "Could not locate execution_id in the trigger response — wait skipped. Inspect the response shape and report so we can extend extractExecutionId.",
+            };
+          } else {
+            envelope.execution_id = executionId;
+            const timeoutMs = (wait_timeout_seconds ?? DEFAULT_WAIT_TIMEOUT_SECONDS) * 1000;
+            const initialIntervalMs = (wait_poll_interval_seconds ?? DEFAULT_WAIT_POLL_INTERVAL_SECONDS) * 1000;
+            const orgId = asString(input.org_id) || registry.orgId;
+            const projectId = asString(input.project_id) || registry.projectId;
+
+            log.info("Waiting for execution to reach terminal status", {
+              executionId,
+              resourceType,
+              timeoutMs,
+              initialIntervalMs,
+            });
+
+            try {
+              const pollResult = await pollExecutionToTerminal(registry, client, {
+                executionId,
+                orgId,
+                projectId,
+                timeoutMs,
+                initialIntervalMs,
+                maxIntervalMs: MAX_WAIT_INTERVAL_MS,
+                signal: extra.signal,
+                onPoll: async (status, elapsedMs, pollCount) => {
+                  await sendProgress(
+                    extra,
+                    elapsedMs,
+                    timeoutMs,
+                    `Polling execution (${status}, poll #${pollCount})`,
+                  );
+                },
+              });
+
+              envelope.execution_status = pollResult.status;
+              envelope.execution_terminal = pollResult.is_terminal;
+              envelope.execution_timed_out = pollResult.timed_out;
+              envelope.execution_elapsed_ms = pollResult.elapsed_ms;
+              envelope.execution_poll_count = pollResult.poll_count;
+              if (pollResult.started_at) envelope.started_at = pollResult.started_at;
+              if (pollResult.ended_at) envelope.ended_at = pollResult.ended_at;
+              if (pollResult.openInHarness) envelope.openInHarness = pollResult.openInHarness;
+
+              if (pollResult.timed_out) {
+                envelope._wait = {
+                  hint: `Execution still running after ${pollResult.elapsed_ms}ms (last status: ${pollResult.status}). Recheck with harness_get(resource_type='execution', execution_id='${executionId}') and wait for a terminal status before diagnosing it.`,
+                };
+              } else if (FAILURE_STATUSES.has(pollResult.status)) {
+                envelope._diagnose_hint = `Execution ${pollResult.status}. Call harness_diagnose(resource_type='execution', options={execution_id: '${executionId}'}) for the failed step, error message, and log snippet.`;
+              }
+            } catch (err) {
+              if (err instanceof AbortError) {
+                envelope._wait = {
+                  hint: `Wait cancelled by client. Execution may still be running. Recheck with harness_get(resource_type='execution', execution_id='${executionId}').`,
+                  cancelled: true,
+                };
+              } else {
+                log.warn("Wait failed", { executionId, error: String(err) });
+                envelope._wait = {
+                  hint: `Wait failed: ${String(err)}. The trigger succeeded — the execution may still be running. Recheck with harness_get(resource_type='execution', execution_id='${executionId}').`,
+                  error: String(err),
+                };
+              }
+            }
+          }
+        }
+
+        if (Object.keys(envelope).length === 0) {
+          return jsonResult(result);
+        }
+        return jsonResult({ ...(asRecord(result) ?? {}), ...envelope });
+      } catch (err) {
+        if (isUserError(err)) return errorResult(err.message);
+        if (isUserFixableApiError(err)) return errorResult(err.message);
+        throw toMcpError(err);
+      }
+    },
+  );
+}
+
+function normalizeRemotePipelineRunParams(input: Record<string, unknown>): void {
+  input.store_type ??= input.storeType;
+  input.connector_ref ??= input.connectorRef;
+  input.repo_name ??= input.repoName;
+
+  const runtimeCodebase = extractRuntimeYamlCodebase(input.inputs);
+  if (runtimeCodebase?.repoName && input.repo_name === undefined) {
+    input.repo_name = runtimeCodebase.repoName;
+  }
+  // Keep definition reads and execution on the same branch. Explicit selectors
+  // win over the legacy fallback inferred from the CI codebase runtime YAML.
+  const definitionBranch = asString(input.pipeline_branch) || asString(input.branch) || runtimeCodebase?.branch;
+  if (definitionBranch) {
+    input.branch = definitionBranch;
+    input.pipeline_branch = definitionBranch;
+  }
+  if (
+    input.store_type === undefined &&
+    (runtimeCodebase?.branch !== undefined || runtimeCodebase?.repoName !== undefined)
+  ) {
+    input.store_type = "REMOTE";
+  }
+}
+
+function extractRuntimeYamlCodebase(inputs: unknown): { branch?: string; repoName?: string } | undefined {
+  if (typeof inputs !== "string" || inputs.trim().length === 0) {
+    return undefined;
+  }
+
+  try {
+    const root = asRecord(parseYaml(inputs));
+    const pipeline = asRecord(root?.pipeline);
+    const properties = asRecord(pipeline?.properties);
+    const ci = asRecord(properties?.ci);
+    const codebase = asRecord(ci?.codebase);
+    if (!codebase) return undefined;
+
+    const build = asRecord(codebase.build);
+    const spec = asRecord(build?.spec);
+    const branch = asString(spec?.branch);
+    const repoName = asString(codebase.repoName);
+
+    if (!branch && !repoName) return undefined;
+    return { branch, repoName };
+  } catch {
+    return undefined;
+  }
+}
+
+const STRUCTURAL_FIELDS = new Set([
+  "infrastructure", "execution", "spec", "template",
+  "templateinputs", "servicedefinition", "artifacts", "manifests",
+]);
+
+function isStructuralField(fieldName: string): boolean {
+  return STRUCTURAL_FIELDS.has(fieldName.toLowerCase());
+}
+
+async function fetchInputSetHint(
+  client: HarnessClient,
+  pipelineId: string,
+  input: Record<string, unknown>,
+  registry: Registry,
+): Promise<string | null> {
+  try {
+    const raw = await client.request<unknown>({
+      method: "GET",
+      path: "/pipeline/api/inputSets",
+      params: {
+        pipelineIdentifier: pipelineId,
+        orgIdentifier: String(input.org_id || registry.orgId),
+        projectIdentifier: String(input.project_id || registry.projectId),
+        size: "5",
+      },
+    });
+    const data = asRecord(asRecord(raw)?.data);
+    const content = data?.content;
+    if (!Array.isArray(content) || content.length === 0) return null;
+
+    const ids = content
+      .map((item: unknown) => asString(asRecord(item)?.identifier))
+      .filter(Boolean);
+    if (ids.length === 0) return null;
+
+    const total = typeof data?.totalElements === "number" ? data.totalElements : ids.length;
+    return `Available input sets for this pipeline (${total} total): [${ids.join(", ")}]. Use input_set_ids=["<id>"] to apply one.`;
+  } catch {
+    return null;
+  }
+}

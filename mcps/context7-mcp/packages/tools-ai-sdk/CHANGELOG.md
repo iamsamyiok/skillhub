@@ -1,0 +1,80 @@
+# @upstash/context7-tools-ai-sdk
+
+## 1.0.2
+
+### Patch Changes
+
+- Confirm compatibility with `@upstash/context7-sdk@0.5.0`. The tools package API is unchanged.
+
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [5a7039b]
+  - @upstash/context7-sdk@0.4.1
+
+## 1.0.0
+
+### Patch Changes
+
+- Updated dependencies [4eff2b9]
+  - @upstash/context7-sdk@0.4.0
+
+## 0.2.5
+
+### Patch Changes
+
+- 1c081df: Improve query prompts so agents request relevant library documentation instead of passing the task to complete.
+
+## 0.2.4
+
+### Patch Changes
+
+- 33229cb: Clarify the `query-docs` query description so it asks for a single concept per query. When a question spans multiple distinct topics, callers are now told to make a separate query per concept instead of combining them (unless the question is about how the concepts interact), which avoids diluted, shallow results. Applied consistently across the MCP server, CLI, pi, and AI SDK tools.
+
+## 0.2.3
+
+### Patch Changes
+
+- 8322879: Improve resolve libryar id tool prompt to provide the libraryName query with proper format
+
+## 0.2.2
+
+### Patch Changes
+
+- 02148ff: Bump zod from 3.x to 4.x
+
+## 0.2.1
+
+### Patch Changes
+
+- 07a53dc: Upgrade ai peer dependency to >=6.0.0 for AI SDK v6 compatibility
+
+## 0.2.0
+
+### Minor Changes
+
+- 9412e62: feat: Change SDK default response type from "txt" to "json" for both searchLibrary and getContext methods. AI SDK tools now explicitly use type: "txt" for LLM-friendly text responses.
+
+### Patch Changes
+
+- Updated dependencies [9412e62]
+  - @upstash/context7-sdk@0.3.0
+
+## 0.1.0
+
+### Minor Changes
+
+- b3cd38a: feat: Rename tools to match MCP naming conventions
+  - Rename `resolveLibrary` to `resolveLibraryId` with new `query` parameter
+  - Rename `getLibraryDocs` to `queryDocs` with new `query` parameter (replaces `topic`)
+  - Rename `RESOLVE_LIBRARY_DESCRIPTION` to `RESOLVE_LIBRARY_ID_DESCRIPTION`
+  - Rename `GET_LIBRARY_DOCS_DESCRIPTION` to `QUERY_DOCS_DESCRIPTION`
+  - Update type re-exports to match new SDK types (Library, Documentation, GetContextOptions)
+  - Remove deprecated `defaultMaxResults` option from Context7ToolsConfig and Context7AgentConfig
+  - Add rate limiting guidance to tool descriptions
+
+### Patch Changes
+
+- Updated dependencies [b3cd38a]
+  - @upstash/context7-sdk@0.2.0

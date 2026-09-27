@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.Python
+.venv/
+venv/
+dist/
+build/
+*.log
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+node_modules/
+npm-debug.log*
+coverage/
+/.idea/
+.DS_Store
+*.swp
+*.bak
+Thumbs.db
+
+# Keep compiled TS artifacts (ts_dist) since they ship with the package
+!latex_mcp_server/ts_dist/

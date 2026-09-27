@@ -1,0 +1,156 @@
+---
+title: "Docker Deployment"
+sidebarTitle: "Docker"
+description: "Deploy Context7 On-Premise with Docker Compose"
+---
+
+Deploy Context7 On-Premise with Docker Compose. This guide assumes you have completed the [On-Premise setup](/enterprise/on-premise) and have a valid license key.
+
+## Prerequisites
+
+- Docker and Docker Compose installed
+- Context7 license key
+
+## Registry Authentication
+
+Context7 Enterprise images are hosted on `ghcr.io` and require authentication. Log in using your license key:
+
+```bash
+LICENSE_KEY="<your-license-key>"
+
+TOKEN=$(curl -s -H "Authorization: Bearer $LICENSE_KEY" \
+  https://context7.com/api/v1/license/registry-token | jq -r '.token')
+
+docker login ghcr.io -u x-access-token -p $TOKEN
+```
+
+Docker stores these credentials locally. `docker compose` will use them automatically when pulling the image. You can also pull manually:
+
+```bash
+docker pull ghcr.io/context7/enterprise:latest
+```
+
+## Docker Compose
+
+Create a `docker-compose.yml`:
+
+```yaml
+services:
+  context7:
+    image: ghcr.io/context7/enterprise:latest
+    container_name: context7
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - context7-data:/data
+    environment:
+      - LICENSE_KEY=${LICENSE_KEY}
+
+volumes:
+  context7-data:
+    driver: local
+```
+
+<Warning>
+The `context7-data` volume is critical. It stores your SQLite database (configuration, credentials, indexed libraries) and all vector embeddings. Without a persistent volume, all data is lost when the container restarts or is recreated. Never run without a volume mount in production.
+</Warning>
+
+Create a `.env` file in the same directory:
+
+```bash
+LICENSE_KEY=ctx7sk-...
+```
+
+Start the service:
+
+```bash
+docker compose up -d
+```
+
+Once the container is running, open `http://localhost:3000` in your browser to complete the setup wizard.
+
+## Operations
+
+### Updating
+
+If your registry login has expired, re-authenticate first:
+
+```bash
+LICENSE_KEY="<your-license-key>"
+
+TOKEN=$(curl -s -H "Authorization: Bearer $LICENSE_KEY" \
+  https://context7.com/api/v1/license/registry-token | jq -r '.token')
+
+docker login ghcr.io -u x-access-token -p $TOKEN
+```
+
+Then pull the latest image and restart the container:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Data persists in the named Docker volume across updates.
+
+### Health Check
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+Example response:
+
+```json
+{
+  "status": "healthy",
+  "version": "1.0.0",
+  "setup": "complete",
+  "license": "configured",
+  "licenseInfo": {
+    "valid": true,
+    "teamSize": 10,
+    "expiresAt": "2026-06-01T00:00:00.000Z"
+  },
+  "repos_parsed": 5,
+  "uptime": 3600,
+  "connectivity": {
+    "llm": "configured",
+    "llm_provider": "openai",
+    "embedding": "configured",
+    "embedding_provider": "openai",
+    "github": "configured",
+    "gitlab": "not configured"
+  }
+}
+```
+
+## Running as non-root
+
+The container runs as root by default. To run it unprivileged, chown the volume to the UID you want and pass `--user`:
+
+```bash
+docker run --rm -v context7-data:/data alpine chown -R 10001:10001 /data
+
+docker run -d --name context7 \
+  --user 10001:10001 \
+  -v context7-data:/data \
+  -e LICENSE_KEY="$LICENSE_KEY" \
+  -p 3000:3000 \
+  ghcr.io/context7/enterprise:latest
+```
+
+Any UID works. Everything Context7 writes lives under `/data`, including source clones (`/data/repos`) and documentation-agent state (`/data/home`). The only other path it writes is `/tmp`.
+
+Skip the `chown` and the server exits at startup with the path it could not write. This requires image 1.3.2 or later. On Kubernetes, use `fsGroup` instead and the kubelet handles the ownership: see [Kubernetes](/enterprise/deployment/kubernetes#running-as-non-root).
+
+## Scaling
+
+The setup above runs a single container with a local volume, which suits most deployments. To run multiple replicas behind a load balancer, move state to an external PostgreSQL (embeddings included, via the `pgvector` extension), so every replica is stateless and interchangeable. A turnkey multi-replica Compose file (app replicas + Nginx load balancer) ships in the deployment bundle.
+
+See [Scaling](/enterprise/deployment/scaling) for the full setup, which also covers migrating an existing single-container deployment.
+
+## Connecting AI Clients
+
+Once deployed, point your MCP clients to your deployment URL. See [Connecting Your AI Client](/enterprise/on-premise#connecting-your-ai-client) for client-specific instructions.

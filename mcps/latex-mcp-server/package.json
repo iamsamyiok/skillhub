@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@sylphlab/pdf-reader-mcp": "^0.3.23",
+    "canvas": "^3.1.2",
+    "path2d-polyfill": "^3.2.1"
+  }
+}

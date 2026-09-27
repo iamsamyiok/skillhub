@@ -1,0 +1,34 @@
+node_modules/
+.pnpm-store/
+.npm-shrinkwrap-staging/
+build/
+dist/
+.env
+*.tgz
+*.mcpb
+.DS_Store
+
+.worktrees/
+worktrees/
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.serena/
+
+# Python
+__pycache__/
+.venv-stub/
+
+# Generated pipeline files
+pipelines/
+
+# Log files
+*.log
+
+# Reference OpenAPI specs (too large for repo)
+index (1).json
+index (2).yaml
+harness-mcp-v2-quality-review.md.pdf

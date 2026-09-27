@@ -1,0 +1,2377 @@
+## Harness MCP Server 2.0
+
+[![MCP Toplist](https://mcptoplist.com/badge/glama%2Fharness%2Fmcp-server.svg)](https://mcptoplist.com/server/glama%2Fharness%2Fmcp-server)
+
+An MCP (Model Context Protocol) server that gives AI agents full access to the Harness.io platform through 11 consolidated tools and 255 resource types.
+
+## Why Use This MCP Server
+
+Most MCP servers map one tool per API endpoint. For a platform as broad as Harness, that means 240+ tools — and LLMs get worse at tool selection as the count grows. Context windows fill up with schemas, and every new endpoint means new code.
+
+This server is built differently:
+
+- **11 tools, 255 resource types.** A registry-based dispatch system routes `harness_list`, `harness_get`, `harness_create`, etc. to any Harness resource — pipelines, services, environments, orgs, projects, feature flags, cost data, and more. The LLM picks from 11 tools instead of hundreds.
+- **Full platform coverage.** 41 default toolsets spanning CI/CD, GitOps, Feature Flags, Cloud Cost Management, Security Testing, Chaos Engineering, Database DevOps, Internal Developer Portal, Software Supply Chain, Infrastructure as Code Management, Release Management, Governance, Service Overrides, Knowledge Graph, and more. Opt-in Ansible and observability-evaluation coverage is available when needed.
+- **Multi-project workflows out of the box.** Agents discover organizations and projects dynamically — no hardcoded env vars needed. Ask "show failed executions across all projects" and the agent can navigate the full account hierarchy.
+- **35 prompt templates.** Pre-built prompts for common workflows: build & deploy apps end-to-end, debug failed pipelines, review DORA metrics, triage vulnerabilities, optimize cloud costs, audit access control, plan feature flag rollouts, review pull requests, approve pending pipelines, and more.
+- **Works everywhere.** Stdio transport for local clients (Claude Desktop, Cursor, Devin Desktop), HTTP transport for remote/shared deployments, Docker and Kubernetes ready.
+- **Zero-config start.** Just provide a Harness API key. Account ID is auto-extracted from PAT and SAT tokens, org/project defaults are optional, and toolset filtering lets you expose only what you need.
+- **Extensible by design.** Adding a new Harness resource means adding a declarative data file — no new tool registration, no schema changes, no prompt updates.
+
+## Prerequisites
+
+Before installing or running the server, you need a Harness API key:
+
+1. Log in to your [Harness account](https://app.harness.io)
+2. Go to **My Profile** → **API Keys** → **+ New API Key**
+3. Create a new **Token** under the API key — this generates a PAT or SAT in the format `<prefix>.<accountId>.<tokenId>.<secret>`
+4. Save the token somewhere secure — you'll need it in the next step
+
+> For detailed instructions, see the [Harness API Quickstart](https://developer.harness.io/docs/platform/automation/api/api-quickstart/).
+
+## Quick Start
+
+### Option 0: Hosted Harness MCP
+
+If your Harness account has the hosted MCP service enabled, clients that support remote MCP servers can connect directly to the managed endpoint instead of running the server locally.
+
+> **Important:** The hosted MCP service uses **Harness Platform OAuth**, not `HARNESS_API_KEY`. It must also be enabled/configured per account by **Harness Support** before the endpoint can be used.
+
+See [Hosted Harness MCP](#hosted-harness-mcp) for configuration examples.
+
+### Option 1: npx (Recommended)
+
+No install required — just run it:
+
+```bash
+HARNESS_API_KEY=pat.xxx.xxx.xxx npx harness-mcp-v2@latest
+```
+
+Or configure the API key in your AI client (see [Client Configuration](#client-configuration) below).
+
+```bash
+# Stdio transport (default — for Claude Desktop, Cursor, Devin Desktop, etc.)
+HARNESS_API_KEY=pat.xxx npx harness-mcp-v2
+
+# HTTP transport (for remote/shared deployments)
+HARNESS_API_KEY=pat.xxx npx harness-mcp-v2 http --port 8080
+```
+
+> **Note:** The account ID is auto-extracted from PAT and SAT tokens (`pat.<accountId>...` or `sat.<accountId>...`), so `HARNESS_ACCOUNT_ID` is only needed for API keys without an embedded account segment.
+
+### Option 2: Global Install
+
+```bash
+npm install -g harness-mcp-v2
+
+# Then run directly
+harness-mcp-v2
+```
+
+### Option 3: Build from Source
+
+For development or customization:
+
+```bash
+git clone https://github.com/harness/mcp-server.git
+cd mcp-server
+pnpm install
+pnpm build
+
+# Run
+pnpm start              # Stdio transport
+pnpm start:http         # HTTP transport
+pnpm inspect            # Test with MCP Inspector
+```
+
+### Anthropic MCP Directory bundle
+
+The MCPB bundle manifest lives in `[mcp-directory/](mcp-directory/)`, and the 512×512 bundle icon is tracked at `[icon.png](icon.png)` in the repository root. The packaged archive contains root-level `manifest.json`, `icon.png`, `server/`, `package.json`, `npm-shrinkwrap.json`, and production `node_modules/`.
+
+To keep the archive small, build MCPB packages from a staging directory:
+
+```bash
+pnpm prepare:mcpb
+```
+
+The staging directory is written to `dist/mcpb/` with production dependencies installed from `npm-shrinkwrap.json` using npm's flat layout. The pinned official MCPB CLI validates it and creates `dist/harness-mcp-server-<version>.mcpb`.
+
+Version tags matching `v*.*.*` publish that bundle to the corresponding GitHub Release automatically. To backfill an existing release without republishing npm, run the `Release` workflow manually with its `release_tag` input (for example, `v3.2.20`). The workflow checks out and builds that exact tag before replacing only its versioned MCPB asset.
+
+### CLI Usage
+
+```bash
+harness-mcp-v2 [stdio|http] [--port <number>]
+
+Options:
+  --port <number>  Port for HTTP transport (default: 3000, or PORT env var)
+  --help           Show help message and exit
+  --version        Print version and exit
+```
+
+Transport defaults to `stdio` if not specified. Use `http` for remote/shared deployments.
+
+### HTTP Transport
+
+When running in HTTP mode, the server exposes:
+
+
+| Endpoint  | Method    | Description                                                      |
+| --------- | --------- | ---------------------------------------------------------------- |
+| `/mcp`    | `POST`    | MCP JSON-RPC endpoint (initialize + session requests)            |
+| `/mcp`    | `GET`     | SSE stream for server-initiated messages (progress, elicitation) |
+| `/mcp`    | `DELETE`  | Terminate an active MCP session                                  |
+| `/mcp`    | `OPTIONS` | CORS preflight                                                   |
+| `/health` | `GET`     | Health check — returns `{ "status": "ok", "sessions": <count> }` |
+| `/.well-known/oauth-protected-resource` | `GET` | RFC 9728 metadata when `HARNESS_MCP_MODE=oauth` |
+| `/.well-known/oauth-protected-resource/mcp` | `GET` | Path-aware RFC 9728 metadata for the default `/mcp` resource |
+
+
+The HTTP transport runs in **session-based mode**. A new MCP session is created on `initialize`, the server returns an `mcp-session-id` header, and subsequent requests for that session must include the same header.
+
+Operational constraints in HTTP mode:
+
+- Set `HARNESS_MCP_AUTH_TOKEN` for shared or remotely reachable single-user and multi-user deployments. When set, every `POST`, `GET`, and `DELETE` request to `/mcp` must include `Authorization: Bearer <token>`.
+- OAuth mode accepts HarnessID access tokens instead of `HARNESS_MCP_AUTH_TOKEN` and can bind to a non-loopback address without the unauthenticated opt-out.
+- Non-loopback single-user and multi-user binds require `HARNESS_MCP_AUTH_TOKEN` by default. To run unauthenticated on a non-loopback interface anyway, set `HARNESS_MCP_ALLOW_UNAUTHENTICATED_HTTP=true` explicitly.
+- `POST /mcp` without `mcp-session-id` must be an `initialize` request.
+- `POST /mcp`, `GET /mcp`, and `DELETE /mcp` for existing sessions require the `mcp-session-id` header.
+- `GET /mcp` is used for SSE notifications (progress updates and elicitation prompts).
+- Idle sessions are reaped after `MCP_SESSION_TTL_MS` milliseconds once no request or SSE stream is active (default `1800000`, or 30 minutes).
+- `GET /health` is the only non-MCP endpoint.
+- Request body size is capped by `HARNESS_MAX_BODY_SIZE_MB` (default `10` MB).
+- Set `x-harness-pipeline-version: 0` or `1` on the `initialize` request to select V0 or V1 pipeline resources for that HTTP session.
+- Set `x-harness-auto-approve-risk: none|low_write|medium_write|high_write|all` on the `initialize` request to choose a stricter per-session auto-approval threshold. The server caps this value at the deployment-level `HARNESS_AUTO_APPROVE_RISK`, so a session can reduce but not expand the configured approval ceiling.
+
+#### HarnessID OAuth Mode
+
+Set `HARNESS_MCP_MODE=oauth` to let remote MCP clients discover HarnessID and complete OAuth 2.1 Authorization Code with PKCE. OAuth mode is available only with HTTP transport. Production HarnessID, MCP resource, and API routing defaults are built in:
+
+```bash
+HARNESS_MCP_MODE=oauth
+```
+
+This defaults to the issuer `https://id.harness.io/idp/realms/HarnessIDP`, resource `https://mcp.harness.io/mcp`, OAuth client `mcp-client`, and Harness API base `https://mcp.harness.io/cli`. Override them only for QA, local development, or another Harness environment.
+
+`HARNESS_API_KEY` must not be set in this mode. `HARNESS_MCP_OAUTH_JWKS_URI` defaults to `<issuer>/protocol/openid-connect/certs`, and `HARNESS_ACCOUNT_ID` is unnecessary because the account comes from the token.
+
+The server publishes RFC 9728 protected-resource metadata and returns this challenge when a client has not authenticated:
+
+```http
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Bearer resource_metadata="https://mcp.harness.io/.well-known/oauth-protected-resource/mcp"
+```
+
+It validates the HarnessID access token's RS256 signature, `iss`, expiry, and `sub` using the configured JWKS endpoint, and checks that the token was issued to `HARNESS_MCP_OAUTH_CLIENT_ID` through the `azp` claim. `HARNESS_MCP_OAUTH_RESOURCE` is the RFC 9728 protected-resource identifier used for discovery and challenges. Current HarnessID access tokens use `aud: account` rather than the MCP URL, so the resource is not compared with `aud`.
+
+The account ID comes from the token's `HARNESS_MCP_OAUTH_ACCOUNT_CLAIM` claim (`account_id` by default), which the HarnessID `organization` scope populates. Each session stores the caller's access token and forwards it to the Harness API as `Authorization: Bearer`, so Harness RBAC and audit records reflect the logged-in user rather than a shared PAT. The session is bound to the `sub` and account it was created with: a later request may carry a refreshed token, but one for a different user or account is rejected.
+
+Clients normally need only the MCP resource URL:
+
+```json
+{
+  "mcpServers": {
+    "harness": {
+      "url": "https://mcp.harness.io/mcp"
+    }
+  }
+}
+```
+
+The client reads the protected-resource metadata, discovers `HARNESS_MCP_OAUTH_ISSUER`, and then uses that authorization server's RFC 8414 metadata. If the client does not support dynamic client registration, use the pre-registered `mcp-client` client ID.
+
+See [HarnessID OAuth for a self-hosted MCP server](docs/harnessid-oauth.md) for the QA Keycloak checklist and validation commands.
+
+#### Multi-User Mode
+
+Set `HARNESS_MCP_MODE=multi-user` for shared HTTP deployments where each client authenticates as a different Harness user. In this mode:
+
+- `HARNESS_API_KEY` must **not** be set in the server config — the server holds no Harness credentials.
+- Each session must provide `x-harness-api-key` on the `initialize` request. `x-harness-account-id` is required only when the API key does not embed an account segment.
+- Sessions may also provide `x-harness-org` and `x-harness-project` headers to set default scope for that session.
+- The Harness API key flows through to every Harness API call for that session, so the audit trail in Harness reflects the real user.
+- `HARNESS_MCP_AUTH_TOKEN` is independent and can still be used as an additional transport-layer gate.
+
+```bash
+# Health check
+curl http://localhost:3000/health
+
+# MCP initialize request (capture mcp-session-id response header)
+# In multi-user mode, x-harness-api-key is required on initialize.
+# x-harness-account-id is needed only for API keys without an embedded account segment.
+curl -i -X POST http://localhost:3000/mcp \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Authorization: Bearer $HARNESS_MCP_AUTH_TOKEN" \
+  -H "x-harness-api-key: $HARNESS_API_KEY" \
+  -H "x-harness-account-id: $HARNESS_ACCOUNT_ID" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
+
+# Subsequent MCP request (use returned session ID)
+curl -X POST http://localhost:3000/mcp \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Authorization: Bearer $HARNESS_MCP_AUTH_TOKEN" \
+  -H "mcp-session-id: <session-id>" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'
+
+# Terminate session
+curl -X DELETE http://localhost:3000/mcp \
+  -H "Authorization: Bearer $HARNESS_MCP_AUTH_TOKEN" \
+  -H "mcp-session-id: <session-id>"
+```
+
+`HARNESS_MCP_ALLOWED_HOSTS` controls Host-header validation for DNS-rebinding protection, and CORS limits browser origins. Neither is authentication; use `HARNESS_MCP_AUTH_TOKEN` or an authenticated gateway/reverse proxy for access control.
+
+### Client Configuration
+
+> **Note:** `HARNESS_ORG` and `HARNESS_PROJECT` are optional. They set the org ID and project ID used when not specified per tool call. Agents can discover orgs and projects dynamically using `harness_list(resource_type="organization")` and `harness_list(resource_type="project")`. The deprecated names `HARNESS_DEFAULT_ORG_ID` and `HARNESS_DEFAULT_PROJECT_ID` are still accepted for backward compatibility.
+
+#### Hosted Harness MCP
+
+Harness also supports a hosted MCP endpoint for accounts that have the managed service enabled. This is useful when you want a shared remote MCP endpoint instead of running `npx harness-mcp-v2` or self-hosting the HTTP transport yourself.
+
+> **Important:** Hosted MCP authentication uses **Harness Platform OAuth**. It does **not** use `HARNESS_API_KEY` in the client config. Hosted MCP availability is configured per Harness account, so you will need to work with **Harness Support** to enable/configure the setting before using it.
+>
+> The hosted endpoint `https://mcp.harness.io/mcp` is a managed service. Client-side MCP config in Claude, Cursor, or Cowork cannot override which Harness environment it routes to. For Harness0 or another private Harness SaaS environment, ask Harness Support to enable/configure hosted MCP for that environment, or run the local/self-hosted server and set `HARNESS_BASE_URL` to the target Harness host.
+
+**Hosted MCP example:**
+
+```json
+{
+  "mcpServers": {
+    "harness-prod1-mcp": {
+      "url": "https://mcp.harness.io/mcp",
+      "auth": {
+        "CLIENT_ID": "mcp-client"
+      }
+    }
+  }
+}
+```
+
+**Example with both hosted and local entries:**
+
+```json
+{
+  "mcpServers": {
+    "harness-hosted": {
+      "url": "https://mcp.harness.io/mcp",
+      "auth": {
+        "CLIENT_ID": "mcp-client"
+      }
+    },
+    "harness-local": {
+      "command": "/absolute/path/to/npx",
+      "args": ["-y", "harness-mcp-v2@latest"],
+      "env": {
+        "HARNESS_API_KEY": "pat.xxx.xxx.xxx",
+        "PATH": "/directory/containing/node:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  }
+}
+```
+
+> **Troubleshooting `npx ENOENT` or `node: No such file or directory`**
+>
+> This is a client process-launch failure, not a Harness authentication failure. The MCP server has not started yet, so changing `HARNESS_API_KEY` will not affect `spawn npx ENOENT`.
+>
+> GUI apps (Cursor, Claude Desktop, Devin Desktop, VS Code) don't always inherit your shell's `PATH`, so they can fail to find `npx` or `node` after a config reload. Fix this by using absolute paths and explicitly setting `PATH` in the `env` block:
+>
+> ```json
+> {
+>   "mcpServers": {
+>     "harness": {
+>       "command": "/absolute/path/to/npx",
+>       "args": ["-y", "harness-mcp-v2"],
+>       "env": {
+>         "HARNESS_API_KEY": "pat.xxx.xxx.xxx",
+>         "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
+>       }
+>     }
+>   }
+> }
+> ```
+>
+> Find your paths with `which npx` and `which node` in a terminal, then make sure the directory containing `node` is included in the `PATH` value above. Common locations:
+>
+> - **Homebrew (macOS):** `/opt/homebrew/bin/npx`
+> - **nvm:** `~/.nvm/versions/node/v20.x.x/bin/npx` (run `nvm which current` to find the exact path)
+> - **System Node:** `/usr/local/bin/npx`
+
+#### Claude Desktop (`claude_desktop_config.json`)
+
+npx (zero install)
+
+```json
+{
+  "mcpServers": {
+    "harness": {
+      "command": "/absolute/path/to/npx",
+      "args": ["-y", "harness-mcp-v2@latest"],
+      "env": {
+        "HARNESS_API_KEY": "pat.xxx.xxx.xxx",
+        "PATH": "/directory/containing/node:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  }
+}
+```
+
+node (local install)
+
+```bash
+npm install -g harness-mcp-v2
+```
+
+```json
+{
+  "mcpServers": {
+    "harness": {
+      "command": "/absolute/path/to/harness-mcp-v2",
+      "env": {
+        "HARNESS_API_KEY": "pat.xxx.xxx.xxx",
+        "PATH": "/directory/containing/node:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  }
+}
+```
+
+#### Claude Code (via `claude mcp add`)
+
+npx (zero install)
+
+```bash
+claude mcp add harness -- npx harness-mcp-v2
+```
+
+node (local install)
+
+```bash
+npm install -g harness-mcp-v2
+claude mcp add harness -- harness-mcp-v2
+```
+
+Then set `HARNESS_API_KEY` in your environment or `.env` file.
+
+#### Cursor (`.cursor/mcp.json`)
+
+npx (zero install, recommended for local Cursor configs)
+
+```json
+{
+  "mcpServers": {
+    "harness": {
+      "command": "/absolute/path/to/npx",
+      "args": ["-y", "harness-mcp-v2@latest"],
+      "env": {
+        "HARNESS_API_KEY": "pat.xxx.xxx.xxx",
+        "PATH": "/directory/containing/node:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  }
+}
+```
+
+Run `which npx` in a terminal and use that full path for `command`; include the directory from `which node` at the front of `PATH`.
+
+node (local install)
+
+```bash
+npm install -g harness-mcp-v2
+```
+
+```json
+{
+  "mcpServers": {
+    "harness": {
+      "command": "/absolute/path/to/harness-mcp-v2",
+      "env": {
+        "HARNESS_API_KEY": "pat.xxx.xxx.xxx",
+        "PATH": "/directory/containing/node:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  }
+}
+```
+
+Run `which harness-mcp-v2` after `npm install -g harness-mcp-v2` and use that full path for `command`; include the directory from `which node` at the front of `PATH`.
+
+#### Devin Desktop (`~/.windsurf/mcp.json`)
+
+npx (zero install)
+
+```json
+{
+  "mcpServers": {
+    "harness": {
+      "command": "/absolute/path/to/npx",
+      "args": ["-y", "harness-mcp-v2@latest"],
+      "env": {
+        "HARNESS_API_KEY": "pat.xxx.xxx.xxx",
+        "PATH": "/directory/containing/node:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  }
+}
+```
+
+node (local install)
+
+```bash
+npm install -g harness-mcp-v2
+```
+
+```json
+{
+  "mcpServers": {
+    "harness": {
+      "command": "/absolute/path/to/harness-mcp-v2",
+      "env": {
+        "HARNESS_API_KEY": "pat.xxx.xxx.xxx",
+        "PATH": "/directory/containing/node:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  }
+}
+```
+
+Using a local build from source?
+
+Replace the command with the path to your built `index.js`:
+
+```json
+{
+  "command": "node",
+  "args": ["/absolute/path/to/harness-mcp-v2/build/index.js", "stdio"]
+}
+```
+
+### MCP Gateway
+
+The Harness MCP server is fully compatible with MCP Gateways — reverse proxies that provide centralized authentication, governance, tool routing, and observability across multiple MCP servers. Since the server implements the standard MCP protocol with both stdio and HTTP transports, it works behind any MCP-compliant gateway with no code changes.
+
+**Why use a gateway?**
+
+- Centralized credential management — no API keys in agent configs
+- Governance & audit logging for all tool calls across teams
+- Single endpoint for agents instead of N connections to N MCP servers
+- Access control — restrict which teams can use which tools
+
+#### Docker MCP Gateway
+
+Register the server in your Docker MCP Gateway configuration:
+
+```json
+{
+  "mcpServers": {
+    "harness": {
+      "command": "npx",
+      "args": ["harness-mcp-v2"],
+      "env": {
+        "HARNESS_API_KEY": "pat.xxx.xxx.xxx"
+      }
+    }
+  }
+}
+```
+
+#### Portkey
+
+Add the Harness MCP server to your [Portkey MCP Gateway](https://portkey.ai/features/mcp) for enterprise governance, cost tracking, and multi-LLM routing:
+
+```json
+{
+  "mcpServers": {
+    "harness": {
+      "command": "npx",
+      "args": ["harness-mcp-v2"],
+      "env": {
+        "HARNESS_API_KEY": "pat.xxx.xxx.xxx"
+      }
+    }
+  }
+}
+```
+
+#### LiteLLM
+
+Add to your [LiteLLM proxy config](https://docs.litellm.ai/docs/mcp):
+
+```yaml
+mcp_servers:
+  - name: harness
+    command: npx
+    args:
+      - harness-mcp-v2
+    env:
+      HARNESS_API_KEY: "pat.xxx.xxx.xxx"
+```
+
+#### Envoy AI Gateway
+
+The server works with [Envoy AI Gateway's MCP support](https://aigateway.envoyproxy.io/docs/0.5/capabilities/mcp/) via HTTP transport:
+
+```bash
+# Start the server in HTTP mode
+HARNESS_API_KEY=pat.xxx.xxx.xxx npx harness-mcp-v2 http --port 8080
+```
+
+Then configure Envoy to route to `http://localhost:8080/mcp` as an upstream MCP backend.
+
+#### Kong
+
+Use [Kong's AI MCP Proxy plugin](https://developer.konghq.com/mcp/) to expose the Harness MCP server through your existing Kong gateway infrastructure.
+
+#### Other Gateways
+
+Any gateway that supports the MCP specification (Microsoft MCP Gateway, IBM ContextForge, Cloudflare Workers, etc.) can proxy this server. For **stdio-based** gateways, use the default transport. For **HTTP-based** gateways, start the server with `http` transport and point the gateway at the `/mcp` endpoint.
+
+### Docker
+
+Build and run the server as a Docker container:
+
+```bash
+# Build the image
+pnpm docker:build
+
+# Run with your .env file
+pnpm docker:run
+
+# Or run directly with env vars
+docker run --rm -p 3000:3000 \
+  -e HARNESS_API_KEY=pat.xxx.xxx.xxx \
+  -e HARNESS_ACCOUNT_ID=your-account-id \
+  harness-mcp-server
+```
+
+The container runs in HTTP mode on port 3000 by default with a built-in health check.
+
+### Kubernetes
+
+Deploy to a Kubernetes cluster using the provided manifests:
+
+```bash
+# 1. Edit the Secret with your real credentials
+#    k8s/secret.yaml — replace HARNESS_API_KEY and HARNESS_ACCOUNT_ID
+
+# 2. Apply all manifests
+kubectl apply -f k8s/
+
+# 3. Verify the deployment
+kubectl -n harness-mcp get pods
+
+# 4. Port-forward for local testing
+kubectl -n harness-mcp port-forward svc/harness-mcp-server 3000:80
+curl http://localhost:3000/health
+```
+
+The deployment runs 2 replicas with readiness/liveness probes, resource limits, and non-root security context. The Service exposes port 80 internally (targeting container port 3000).
+
+## Configuration
+
+The server automatically loads environment variables from a `.env` file in the project root if one exists. Copy `.env.example` to `.env` and fill in your values. Environment variables can also be set via your shell or MCP client config.
+
+
+| Variable                    | Required | Default                     | Description                                                                                                                                                                                                                                           |
+| --------------------------- | -------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `HARNESS_MCP_MODE`          | No       | `single-user`               | Deployment mode: `single-user` (shared API key), `multi-user` (HTTP with per-session API keys), or `oauth` (HTTP with HarnessID access-token validation)                                                                                              |
+| `HARNESS_API_KEY`           | Yes*     | --                          | Harness personal access token or service account token. Required in `single-user` mode. Must NOT be set in `multi-user` or `oauth` mode, where each session brings its own credential                                                                 |
+| `HARNESS_ACCOUNT_ID`        | No       | *(from PAT/SAT)*            | Harness account identifier. Auto-extracted from PAT/SAT tokens in single-user mode; multi-user sessions can provide their own via `x-harness-account-id` when the API key does not embed one                                                          |
+| `HARNESS_BASE_URL`          | No       | `https://app.harness.io` (`https://mcp.harness.io/cli` in OAuth mode) | Harness API/UI base URL. OAuth mode routes through the hosted MCP `/cli` proxy by default; other modes use the Harness SaaS API directly |
+| `HARNESS_MCP_OAUTH_ISSUER`  | No       | `https://id.harness.io/idp/realms/HarnessIDP` | HarnessID issuer matched exactly against the access token `iss` claim                                                                                                                                                  |
+| `HARNESS_MCP_OAUTH_RESOURCE` | No      | `https://mcp.harness.io/mcp` | Public canonical MCP URL published as the RFC 9728 resource identifier                                                                                                     |
+| `HARNESS_MCP_OAUTH_JWKS_URI` | No      | `<issuer>/protocol/openid-connect/certs` | HarnessID JWKS endpoint used to validate RS256 access-token signatures                                                                                                                                                  |
+| `HARNESS_MCP_OAUTH_CLIENT_ID` | No     | `mcp-client`                | HarnessID client the access token must be issued to, checked against the token's `azp` claim                                                                                                                                                        |
+| `HARNESS_MCP_OAUTH_ACCOUNT_CLAIM` | No | `account_id`                | Access-token claim carrying the Harness account ID, populated by the HarnessID `organization` scope                                                                                                                                                 |
+| `HARNESS_MCP_OAUTH_SCOPES`  | No       | `openid profile email organization` | Space-separated scopes advertised in RFC 9728 protected-resource metadata                                                                                                                                                    |
+| `HARNESS_FME_API_KEY`       | No       | --                          | Optional single-user/self-hosted FME/Split Admin credential used for `fme_` resources in **legacy (`workspace_id`) mode only**. Legacy FME is unavailable in OAuth mode so HarnessID tokens are never sent to `api.split.io`; use Harness-native `org_id`+`project_id` scope instead. Must not be set in `multi-user` or `oauth` mode |
+| `HARNESS_FME_BASE_URL`      | No       | `https://api.split.io`      | Split/FME Admin API base URL used by `fme_` resources in **legacy (`workspace_id`) mode only**. HTTP URLs require `HARNESS_ALLOW_HTTP=true` for local development. Harness-native (`org_id`+`project_id`) mode ignores this and uses the standard `HARNESS_API_KEY`/`HARNESS_BASE_URL` instead |
+| `HARNESS_ORG`               | No       | --                          | Organization ID. Used when `org_id` is not specified per tool call. If omitted, `org_id` must be provided explicitly. Agents can also discover orgs dynamically via `harness_list(resource_type="organization")`                                      |
+| `HARNESS_PROJECT`           | No       | --                          | Project ID. Used when `project_id` is not specified per tool call. Agents can also discover projects dynamically via `harness_list(resource_type="project")`                                                                                          |
+| `HARNESS_API_TIMEOUT_MS`    | No       | `30000`                     | HTTP request timeout in milliseconds                                                                                                                                                                                                                  |
+| `HARNESS_MAX_RETRIES`       | No       | `3`                         | Retry count for transient failures (429, 5xx)                                                                                                                                                                                                         |
+| `HARNESS_MAX_BODY_SIZE_MB`  | No       | `10`                        | Max HTTP request body size in MB for `http` transport                                                                                                                                                                                                 |
+| `HARNESS_RATE_LIMIT_RPS`    | No       | `10`                        | Client-side request throttle (requests per second) to Harness APIs                                                                                                                                                                                    |
+| `LOG_LEVEL`                 | No       | `info`                      | Log verbosity: `debug`, `info`, `warn`, `error`                                                                                                                                                                                                       |
+| `HARNESS_TOOLSETS`          | No       | *(defaults)*                | Comma-separated toolset list. Empty loads default toolsets. Supports `+name` to explicitly include opt-in toolsets and `-name` to remove defaults (see [Toolset Filtering](#toolset-filtering))                                                       |
+| `HARNESS_READ_ONLY`         | No       | `false`                     | Block all mutating operations (create, update, delete, execute). Only list and get are allowed. Useful for shared/demo environments                                                                                                                   |
+| `HARNESS_AUTO_APPROVE_RISK` | No       | `none`                      | Risk-based auto-approve threshold for autonomous workflows. Operations at or below this risk proceed without confirmation. Values: `none`, `low_write`, `medium_write`, `high_write`, `all`. See [Elicitation](#elicitation)                          |
+| `HARNESS_SKIP_ELICITATION`  | No       | `false`                     | **Deprecated** — use `HARNESS_AUTO_APPROVE_RISK=all` instead. Kept for backward compatibility                                                                                                                                                         |
+| `HARNESS_ALLOW_HTTP`        | No       | `false`                     | Allow non-HTTPS `HARNESS_BASE_URL`. By default, the server enforces HTTPS for security. Set to `true` only for local development against a non-TLS Harness instance                                                                                   |
+| `HARNESS_PIPELINE_VERSION`  | No       | `0`                         | **(Alpha)** Pipeline YAML version. `0` loads the `pipeline` resource type and excludes `pipeline_v1`; `1` loads `pipeline_v1` and excludes `pipeline`. HTTP sessions can override this at initialize time with `x-harness-pipeline-version: 0` or `1` |
+| `HARNESS_MCP_ALLOWED_HOSTS` | No       | --                          | Comma-separated hostnames allowed by HTTP transport Host-header validation. `mcp.harness.io` is allowed by default for localhost binds; add proxy/custom domains here                                                                                 |
+| `HARNESS_MCP_AUTH_TOKEN`    | No       | --                          | Static Bearer token required on `/mcp` HTTP routes when set. Required by default for non-loopback single-user and multi-user binds. Must be unset in `oauth` mode                                                                                    |
+| `HARNESS_MCP_ALLOW_UNAUTHENTICATED_HTTP` | No | `false`         | Explicitly allow unauthenticated HTTP transport on non-loopback binds. Use only behind another authenticated control                                                                                                                                    |
+| `HARNESS_MCP_TRUST_PROXY`   | No       | `0`                         | Number of reverse proxy / load balancer hops to trust for client IP resolution (Express `trust proxy`). Set to the proxy count in front of the server so per-IP rate limiting keys on the real client rather than the proxy socket peer                |
+| `HARNESS_MCP_LOG_FILE`      | No       | `~/.claude/harness-mcp.log` | File used for stdio disconnect/crash diagnostics when stderr may no longer be available                                                                                                                                                               |
+| `HARNESS_LOG_UNSAFE_BODIES` | No       | `false`                     | Include raw request/response bodies in logs. Off by default since bodies can contain secrets; enable only for local debugging                                                                                                                          |
+| `HARNESS_AUDIT_FILE`        | No       | --                          | Append audit events to a newline-delimited JSON file for durable local collection                                                                                                                                                                      |
+| `HARNESS_AUDIT_WEBHOOK_URL` | No       | --                          | HTTPS endpoint that receives batched audit events. HTTP URLs require `HARNESS_ALLOW_HTTP=true` for local development                                                                                                                                   |
+| `HARNESS_AUDIT_WEBHOOK_TOKEN` | No     | --                          | Optional bearer token sent to the audit webhook                                                                                                                                                                                                        |
+| `HARNESS_AUDIT_WEBHOOK_BATCH_SIZE` | No | `10`                       | Number of audit events to batch before webhook flush                                                                                                                                                                                                   |
+| `HARNESS_AUDIT_WEBHOOK_FLUSH_MS` | No  | `5000`                     | Max time to hold audit events before webhook flush                                                                                                                                                                                                     |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | No     | --                          | Enables OpenTelemetry audit spans when the optional OpenTelemetry packages are installed                                                                                                                                                               |
+| `HARNESS_SEARCH_PROVIDER`   | No       | `local`                     | Semantic search backend: `local` (in-process ONNX embeddings, default), `remote` (external search service via HTTP, required for multi-user mode), or `none` (disable semantic search, fall back to keyword scatter-gather only). Use `none` in air-gapped environments or when startup model loading is undesirable |
+| `HARNESS_SEARCH_SERVICE_URL` | No      | --                          | Base URL of the remote search service when `HARNESS_SEARCH_PROVIDER=remote` (e.g. `http://search-svc:8080`). Required when using the `remote` provider |
+| `HARNESS_SEARCH_SERVICE_HEADERS` | No  | --                          | JSON object of headers sent with every request to the remote search service. Supports any auth scheme: `{"Authorization":"Bearer tok"}`, `{"x-api-key":"key"}`, or multiple internal service-to-service headers |
+| `HARNESS_HF_CACHE_DIR`      | No       | `/tmp/hf-cache`             | Directory for the `@huggingface/transformers` model cache used by the `local` search provider. The Docker image pre-bakes the model into `/app/.cache/hf` to avoid runtime downloads. Set to a persistent volume path in production deployments       |
+| `HARNESS_DIAGNOSE_LOG_FETCH_CONCURRENCY` | No | `3`              | Max concurrent log-blob downloads issued by `harness_diagnose` when fetching logs for failed steps. Increase only if diagnose latency is dominated by log-fetch wall-clock and the pod has memory headroom                                              |
+
+
+### Semantic Search
+
+`harness_search` uses semantic routing to narrow scatter-gather API calls before fanning out to Harness. Three search providers are available:
+
+| Provider | When to use |
+|----------|-------------|
+| `local` (default) | Single-user stdio mode. Runs `all-MiniLM-L6-v2` in-process via `@huggingface/transformers`. Downloads ~23 MB model on first use; subsequent starts use the cache. |
+| `remote` | Multi-user HTTP mode (Harness-hosted). Delegates embedding and retrieval to an external search service. Tenant isolation is enforced via `tenant_id` — static knowledge/docs use `global`, per-account entity data uses the account ID. |
+| `none` | Disable semantic search entirely; falls back to keyword scatter-gather across all resource types. |
+
+**Remote provider configuration:**
+
+```bash
+HARNESS_SEARCH_PROVIDER=remote
+HARNESS_SEARCH_SERVICE_URL=http://search-svc:8080
+
+# Auth — any scheme via HARNESS_SEARCH_SERVICE_HEADERS (JSON object):
+HARNESS_SEARCH_SERVICE_HEADERS='{"Authorization":"Bearer <token>"}'   # standard bearer
+HARNESS_SEARCH_SERVICE_HEADERS='{"x-api-key":"<key>"}'               # API key header
+HARNESS_SEARCH_SERVICE_HEADERS='{"x-harness-token":"<svc-token>"}'   # internal service-to-service
+# Multiple headers (e.g. service mesh + tenant routing):
+HARNESS_SEARCH_SERVICE_HEADERS='{"x-harness-token":"<tok>","x-tenant":"<id>"}'
+# No auth (service mesh / mTLS handles it):
+# omit HARNESS_SEARCH_SERVICE_HEADERS entirely
+```
+
+**Testing the remote provider locally** with the included stub service (no external dependencies):
+
+```bash
+# 1. Create a venv and install FastAPI
+python3 -m venv .venv-stub
+.venv-stub/bin/pip install fastapi uvicorn
+
+# 2. Start the stub (in-memory, cosine similarity, corpus + tenant filtering)
+.venv-stub/bin/uvicorn stub-search-service:app --port 8082
+
+# 3. Build the MCP server
+pnpm build
+
+# 4. Run the integration smoke test
+node test-remote-provider.mjs
+# Expected output:
+#   available: true
+#   indexed 2 docs
+#   entity search results: pipeline:ts-test score=... corpus=entities
+#   knowledge search results: schema:trigger score=...
+#   all-corpus search results: (merged, sorted by score)
+#   isolation check (other-acct, should be empty): PASS
+
+# 5. Tear down
+kill $(lsof -ti :8082)
+```
+
+The stub (`stub-search-service.py`) implements the same `/v1/health`, `/v1/ingest`, and `/v1/search` contract as the production search service. It uses a simple bag-of-chars embedding so no model download is required — results are semantically plausible but not production-quality.
+
+### HTTPS Enforcement
+
+`HARNESS_BASE_URL` must use HTTPS by default. If you set a non-HTTPS URL (e.g. `http://localhost:8080`), the server will refuse to start with:
+
+```
+HARNESS_BASE_URL must use HTTPS (got "http://..."). If you need HTTP for local development, set HARNESS_ALLOW_HTTP=true.
+```
+
+### Audit Logging
+
+All registry-dispatched Harness API operations (`list`, `get`, `create`, `update`, `delete`, and `execute`) emit structured audit events when audit sinks are configured. Mutating events include the confirmation path used by elicitation or auto-approval when a confirmation context is present; read events currently omit confirmation metadata. Local metadata and schema discovery tools that bypass the registry, such as `harness_describe` and `harness_schema`, are not part of this audit stream. A stderr sink is registered by default but goes through the normal logger and obeys `LOG_LEVEL`; configure file or webhook sinks for durable audit collection:
+
+- `HARNESS_AUDIT_FILE` appends newline-delimited JSON events for local collection.
+- `HARNESS_AUDIT_WEBHOOK_URL` posts `{ "events": [...] }` batches to an HTTPS webhook, optionally with `HARNESS_AUDIT_WEBHOOK_TOKEN`. Failed batches are re-enqueued with bounded capacity and eventually dropped with a warning rather than blocking tool execution.
+- `OTEL_EXPORTER_OTLP_ENDPOINT` enables audit spans when the optional OpenTelemetry peer dependencies are installed. The sink reuses an existing tracer provider when one is registered, otherwise it bootstraps a standalone OTLP exporter.
+
+Each event includes the tool name, resource type, operation, identifiers, timestamp, risk, outcome, HTTP method/path, duration, and confirmation method when applicable. Audit sinks are best-effort telemetry; delivery issues are logged and never replay or change the underlying Harness API operation. For OTel setup details and span attributes, see [`specs/005-otel-audit-sink.md`](specs/005-otel-audit-sink.md).
+
+## Tools Reference
+
+The server exposes 11 MCP tools. Most API tools accept `org_id` and `project_id` as optional overrides — if omitted, they fall back to `HARNESS_ORG` and `HARNESS_PROJECT`. `harness_describe` is local metadata only and does not use org/project scope.
+
+**URL support:** Most API-facing tools accept a `url` parameter — paste a Harness UI URL and the server auto-extracts org, project, resource type, resource ID, pipeline ID, and execution ID. `harness_describe` does not accept `url`.
+
+**Scope support:** Resource types with account/org/project variants expose `supportedScopes` in `harness_describe`. Pass `resource_scope` when you need a specific level:
+
+- `resource_scope: "account"` sends only `accountIdentifier`.
+- `resource_scope: "org"` sends `accountIdentifier` and `orgIdentifier`.
+- `resource_scope: "project"` sends account, org, and project identifiers.
+
+Current multi-scope resources include `connector`, `service`, `environment`, `infrastructure`, `secret`, `file_store`, `template`, `policy`, and `policy_set`. If `resource_scope` is omitted, the registry uses the resource's default scope and configured defaults, except resources marked as optional scope may omit org/project unless explicitly passed. Harness URLs can also set the scope automatically when the path contains account-level or project-level context.
+
+**Structured output:** Every tool declares an MCP `outputSchema`. `harness_list` normalizes list-like Harness responses into object-shaped structured content so strict clients can validate it: top-level arrays become `{ "items": [...], "total": <count>, "page": <page> }`, and common wrapper keys such as `content`, `data`, `body`, `objects`, or `features` are hoisted to `items` when needed. The text response still contains the compact JSON payload returned to all clients.
+
+
+| Tool               | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| --------------------| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `harness_describe` | Discover available resource types, operations, and fields. No API call — returns local registry metadata.                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `harness_schema`   | Fetch exact YAML/JSON Schema definitions and examples for creating/updating resources. Pipeline/template schemas are bundled; connector, environment, service, secret, and infrastructure schemas are scope-aware entity schemas fetched from bundled snapshots or NG `/yaml-schema`; `release_process` and `release_activity` schemas are fetched live from RMG `/api/yamlSchema`. Supports deep drilling via `path`.                                                                                                          |
+| `harness_list`     | List resources of a given type with filtering, search, and pagination.                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `harness_get`      | Get a single resource by its identifier.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `harness_create`   | Create a new resource. Supports inline and remote (Git-backed) pipelines. Prompts for user confirmation via [elicitation](#elicitation).                                                                                                                                                                                                                                                                                                                                                                                        |
+| `harness_update`   | Update an existing resource. Supports inline and remote (Git-backed) pipelines. Prompts for user confirmation via [elicitation](#elicitation).                                                                                                                                                                                                                                                                                                                                                                                  |
+| `harness_delete`   | Delete a resource. Prompts for user confirmation via [elicitation](#elicitation). Destructive.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `harness_execute`  | Execute an action on a resource (run/retry pipeline, import pipeline from Git, toggle flag, sync app). Prompts for user confirmation via [elicitation](#elicitation). For pipeline runs, use the runtime-input workflow below (supports `branch`/`tag`/`pr_number`/`commit_sha` shorthand expansion).                                                                                                                                                                                                                           |
+| `harness_search`   | Search across Harness resource types with a single query. Uses semantic routing (local `all-MiniLM-L6-v2` ONNX embeddings, 384-dim) to predict relevant resource types from a `knowledge` corpus indexed at startup — typically narrowing from ~163 types to 1–8 before scatter-gather. Falls back to full keyword scatter-gather when semantic confidence is low. Response includes `semantic_routed` and `types_skipped` when routing fires. See `docs/search-guidelines.md` for how to make new resource types discoverable. |
+| `harness_diagnose` | Diagnose `pipeline`, `connector`, `delegate`, and `gitops_application` resources (aliases: `execution` -> `pipeline`, `gitops_app` -> `gitops_application`). For pipelines, returns stage/step timing and failure details; for connectors/delegates/GitOps apps, returns targeted health and troubleshooting signals.                                                                                                                                                                                                           |
+| `harness_status`   | Get a real-time project health dashboard — recent executions, failure rates, and deep links.                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+
+
+### Schema Lookup Workflow
+
+Use `harness_schema` before creating or updating YAML-backed resources so agents can copy exact field names and constraints instead of guessing from prose.
+
+- Bundled schemas include `pipeline`, `template`, `trigger`, `pipeline_v1`, `template_v1`, `inputSet_v1`, `overlayInputSet_v1`, and `agent-pipeline`.
+- Entity schemas include `connector`, `environment`, `service`, `secret`, and `infrastructure`. They are scope-aware (`account`, `org`, or `project`) and require `org_id`/`project_id` when the selected scope requires them.
+- Release Management definitions (`release_process`, `release_activity`) fetch live JSON Schema from RMG `/api/yamlSchema` (not bundled). Pass `scope`, `org_id`, and `project_id` when scoping to org or project.
+- Vendored entity snapshots are used first when they match the runtime account; otherwise the tool falls back to the Harness NG `/yaml-schema` API and caches the result.
+- Omit `path` for a field/section summary, then pass a dot-separated `path` to inspect a nested definition.
+
+Examples:
+
+```json
+{ "resource_type": "pipeline", "path": "pipeline.stages" }
+```
+
+```json
+{
+  "resource_type": "connector",
+  "scope": "project",
+  "org_id": "default",
+  "project_id": "payments"
+}
+```
+
+Maintainers can refresh the vendored entity snapshots with `pnpm sync-entity-schemas` when Harness entity YAML schemas change.
+
+### Tool Examples
+
+**Discover what resources are available:**
+
+```json
+{ "resource_type": "pipeline" }
+```
+
+**List organizations in the account:**
+
+```json
+{ "resource_type": "organization" }
+```
+
+**List projects in an organization:**
+
+```json
+{ "resource_type": "project", "org_id": "default" }
+```
+
+**List pipelines in a project:**
+
+```json
+{ "resource_type": "pipeline", "search_term": "deploy", "size": 10 }
+```
+
+**Get a specific service:**
+
+```json
+{ "resource_type": "service", "resource_id": "my-service-id" }
+```
+
+**Run a pipeline:**
+
+```json
+{
+  "resource_type": "pipeline",
+  "action": "run",
+  "resource_id": "my-pipeline",
+  "inputs": { "tag": "v1.2.3" },
+  "wait": true
+}
+```
+
+**Toggle a feature flag:**
+
+```json
+{
+  "resource_type": "feature_flag",
+  "action": "toggle",
+  "resource_id": "new_checkout_flow",
+  "enable": true,
+  "environment": "production"
+}
+```
+
+**Search across all resource types:**
+
+```json
+{ "query": "payment-service" }
+```
+
+**Diagnose an execution by ID (summary mode — default):**
+
+```json
+{ "execution_id": "abc123XYZ" }
+```
+
+**Diagnose from a Harness URL:**
+
+```json
+{ "url": "https://app.harness.io/ng/account/.../pipelines/myPipeline/executions/abc123XYZ/pipeline" }
+```
+
+**Diagnose connector connectivity:**
+
+```json
+{ "resource_type": "connector", "resource_id": "my_github_connector" }
+```
+
+**Diagnose delegate health:**
+
+```json
+{ "resource_type": "delegate", "resource_id": "delegate-us-east-1" }
+```
+
+**Diagnose a GitOps application (with options):**
+
+```json
+{
+  "resource_type": "gitops_application",
+  "resource_id": "checkout-app",
+  "options": { "agent_id": "gitops-agent-1" }
+}
+```
+
+**Get the latest execution report for a pipeline:**
+
+```json
+{ "pipeline_id": "my-pipeline" }
+```
+
+**Full diagnostic mode with YAML and failed step logs:**
+
+```json
+{ "execution_id": "abc123XYZ", "summary": false }
+```
+
+**Summary mode with logs enabled (best of both):**
+
+```json
+{ "execution_id": "abc123XYZ", "include_logs": true }
+```
+
+**Get project health status:**
+
+```json
+{ "org_id": "default", "project_id": "my-project", "limit": 5 }
+```
+
+**List database schemas filtered by migration type:**
+
+```json
+{ "resource_type": "database_schema", "migration_type": "Liquibase" }
+```
+
+**List database instances for a schema:**
+
+```json
+{ "resource_type": "database_instance", "dbschema_id": "my_schema" }
+```
+
+**Get the resolved LLM authoring pipeline for a schema and instance:**
+
+```json
+{ "resource_type": "database_llm_authoring_pipeline", "resource_id": "my_schema", "dbinstance_id": "prod_db" }
+```
+
+**List snapshot object names (e.g. tables) for a schema instance:**
+
+```json
+{
+  "resource_type": "database_snapshot_object",
+  "dbschema_id": "my_schema",
+  "dbinstance_id": "prod_db",
+  "object_type": "Table"
+}
+```
+
+**Get full snapshot metadata for specific named objects:**
+
+```json
+{
+  "resource_type": "database_snapshot_object",
+  "resource_id": "prod_db",
+  "params": {
+    "dbschema_id": "my_schema",
+    "object_type": "Table",
+    "object_names": ["users", "orders"]
+  }
+}
+```
+
+### Pipeline Run Workflow (Recommended)
+
+For v0 pipelines, use this sequence to reduce execution-time input errors:
+
+1. **Discover required runtime inputs**
+  - `harness_get(resource_type="runtime_input_template", resource_id="<pipeline_id>")`
+  - The returned template shows `<+input>` placeholders that need values.
+2. **Choose input strategy**
+  - **Simple variables:** pass flat key-value `inputs` (for example `{"branch":"main","env":"prod"}`).
+  - **Complex/structural inputs:** use `input_set_ids` (CI codebase/build blocks and nested template inputs are best handled this way).
+  - **CI codebase shorthand keys (pipeline run only):**
+
+    | Shorthand key | Expanded structure                                     |
+    | ------------- | ------------------------------------------------------ |
+    | `branch`      | `build.type=branch`, `build.spec.branch=<value>`       |
+    | `tag`         | `build.type=tag`, `build.spec.tag=<value>`             |
+    | `pr_number`   | `build.type=PR`, `build.spec.number=<value>`           |
+    | `commit_sha`  | `build.type=commitSha`, `build.spec.commitSha=<value>` |
+
+  - **Constraint:** shorthand expansion is skipped when `inputs.build` is already present (explicit `build` wins).
+3. **Execute the run**
+  - `harness_execute(resource_type="pipeline", action="run", resource_id="<pipeline_id>", ...)`
+  - For Git-backed pipelines whose YAML should be loaded from a non-default branch, pass `params.pipeline_branch` (sent to Harness as `branch`). This explicit definition selector takes precedence over the `params.branch` alias. `inputs.branch` independently selects the CI codebase branch:
+
+    ```json
+    {
+      "resource_type": "pipeline",
+      "action": "run",
+      "resource_id": "deploy_app",
+      "params": { "pipeline_branch": "feature/new-stage" },
+      "inputs": { "branch": "main" },
+      "wait": true
+    }
+    ```
+4. **Optional: combine both**
+  - Use `input_set_ids` for the base shape and `inputs` for simple overrides.
+
+For v1 pipelines:
+
+1. Fetch `harness_get(resource_type="runtime_input_template_v1", resource_id="<pipeline_id>")`.
+   For Git-backed pipelines, pass `branch_name`, `connector_ref`, and `repo_name` through `params`.
+2. Use each returned `inputs[].details.name` as a top-level key in `harness_execute.inputs`.
+3. Run `harness_execute(resource_type="pipeline_v1", action="run", resource_id="<pipeline_id>", inputs={...})`.
+   The server wraps these values under an `inputs:` YAML root and sends the API's `inputs_yaml` body.
+
+If required fields are unresolved, the tool returns a pre-flight error with expected keys and suggested input sets. You can inspect available shorthand mappings with `harness_describe(resource_type="pipeline")` (`executeActions.run.inputShorthands`).
+
+### Dynamic Pipeline Execution
+
+Use `pipeline_dynamic_execution.run` when an agent or external system generates the full v0 pipeline YAML at runtime and needs to run it against an existing Harness pipeline shell. This is not a replacement for normal `pipeline.run`: the saved v0 pipeline must already exist, account-level and pipeline-level **Allow Dynamic Execution** must be enabled, and the caller needs Edit plus Execute permissions on the pipeline.
+
+```json
+{
+  "resource_type": "pipeline_dynamic_execution",
+  "action": "run",
+  "resource_id": "deploy_app",
+  "body": {
+    "yaml": "pipeline:\n  identifier: deploy_app\n  name: Deploy App\n  stages: []"
+  },
+  "params": {
+    "module_type": "CD",
+    "notes": "agent-generated dynamic run",
+    "notify_only_user": true
+  }
+}
+```
+
+Constraints:
+
+- `body` must be an object with a `yaml` field. Raw string bodies are rejected by the public `harness_execute` schema.
+- `body.yaml` may be a YAML string or a JSON pipeline object; JSON is serialized to YAML before the request.
+- Runtime `<+input>` placeholders are not resolved by this API. Submit fully resolved YAML.
+- Input sets, selective stage execution, retry, and triggers are not supported by the dynamic execution endpoint.
+- The action is `high_write` and uses the normal confirmation/auto-approval path. The response projects the API envelope to `{ "execution_id": "...", "status": "..." }` and includes an `openInHarness` execution link when scope data is available.
+
+If Harness rejects the run as not enabled, check both the account-level Allow Dynamic Execution setting and the pipeline-level toggle under Pipeline -> Advanced Options -> Dynamic Execution Settings.
+
+### Execution Input Forensics
+
+Use `execution_inputs` after a run to inspect the merged input YAML that produced a specific execution. This is useful when a failure depends on input-set merging, Git-backed input set branches, or trigger/runtime values that are hard to reconstruct from the execution page alone.
+
+```json
+{
+  "resource_type": "execution_inputs",
+  "resource_id": "PLAN_EXECUTION_ID",
+  "params": {
+    "resolve_expressions": true,
+    "resolve_expressions_type": "RESOLVE_ALL_EXPRESSIONS"
+  }
+}
+```
+
+The get response is projected to:
+
+- `executionId` - the plan execution ID from `resource_id`.
+- `inputSetYaml` - merged runtime input YAML used for the run, or `null`.
+- `inputSetTemplateYaml` - input template at execution time, or `null`.
+- `resolvedYaml` - expression-resolved YAML when `resolve_expressions=true`, otherwise usually `null`.
+- `inputSetDetails` - contributing saved input sets as `{ identifier, name }` pairs.
+- `inputSetBranchName` - source branch for Git-backed input sets, or `null`.
+
+`execution_inputs` is get-only and read-risk. If `resolve_expressions` is omitted, the server omits the API query parameters and Harness uses its default `UNKNOWN` resolution mode.
+
+### Pipeline Execute Wait Mode
+
+For `pipeline.run`, `pipeline.retry`, and `pipeline_v1.run`, pass `wait: true` to let the server poll until the execution reaches a terminal status. This keeps a pipeline launch and status check in one tool call instead of asking the client or LLM to run a polling loop.
+
+```json
+{
+  "resource_type": "pipeline",
+  "action": "run",
+  "resource_id": "deploy_app",
+  "inputs": { "branch": "main" },
+  "wait": true,
+  "wait_timeout_seconds": 900,
+  "wait_poll_interval_seconds": 5
+}
+```
+
+Wait mode behavior:
+
+- Default timeout is 600 seconds; allowed range is 10 seconds to 7200 seconds.
+- Initial poll interval defaults to 3 seconds, backs off by 1.5x, and caps at 30 seconds.
+- On success or failure, the response includes fields such as `execution_id`, `execution_status`, `execution_terminal`, `execution_elapsed_ms`, and `execution_poll_count`.
+- If the timeout fires, the original trigger still succeeded; the response includes `execution_timed_out: true` and `_wait.hint` with the last observed status.
+- If polling fails after the trigger succeeds, the response includes `_wait.error` and a recheck hint. Do not blindly rerun the pipeline unless you have confirmed the first execution is not running.
+- Failed terminal statuses include `_diagnose_hint` pointing to `harness_diagnose(resource_type="execution", options={execution_id: "..."})`.
+
+**Ask the AI DevOps Agent to create a pipeline:**
+
+```json
+{
+  "prompt": "Create a pipeline that builds a Go app with Docker and deploys to Kubernetes",
+  "action": "CREATE_PIPELINE"
+}
+```
+
+**Update a service via natural language:**
+
+```json
+{
+  "prompt": "Add a sidecar container for logging",
+  "action": "UPDATE_SERVICE",
+  "conversation_id": "prev-conversation-id",
+  "context": [{ "type": "yaml", "payload": "<existing service YAML>" }]
+}
+```
+
+### Pipeline Storage Modes
+
+Harness pipelines can be stored in three ways:
+
+
+| Mode                      | Description                                             | When to use                                                        |
+| ------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------ |
+| **Inline**                | Pipeline YAML stored in Harness                         | Default. Simplest setup, no Git required.                          |
+| **Remote (External Git)** | Pipeline YAML stored in GitHub, GitLab, Bitbucket, etc. | Teams using Git-backed pipeline-as-code with an external provider. |
+| **Remote (Harness Code)** | Pipeline YAML stored in a Harness Code repository       | Teams using Harness's built-in Git hosting.                        |
+
+
+**Create an inline pipeline (default):**
+
+```json
+// harness_create
+{
+  "resource_type": "pipeline",
+  "body": {
+    "yamlPipeline": "pipeline:\n  name: My Pipeline\n  identifier: my_pipeline\n  stages:\n    - stage:\n        name: Build\n        type: CI\n        spec:\n          execution:\n            steps:\n              - step:\n                  type: Run\n                  name: Echo\n                  spec:\n                    command: echo hello"
+  }
+}
+```
+
+**Create a remote pipeline (External Git — e.g. GitHub):**
+
+```json
+// harness_create
+{
+  "resource_type": "pipeline",
+  "body": {
+    "yamlPipeline": "pipeline:\n  name: Deploy Service\n  identifier: deploy_service\n  stages: []"
+  },
+  "params": {
+    "store_type": "REMOTE",
+    "connector_ref": "my_github_connector",
+    "repo_name": "my-repo",
+    "branch": "main",
+    "file_path": ".harness/deploy-service.yaml",
+    "commit_msg": "Add deploy pipeline via MCP"
+  }
+}
+```
+
+**Create a remote pipeline (Harness Code — no connector needed):**
+
+```json
+// harness_create
+{
+  "resource_type": "pipeline",
+  "body": {
+    "yamlPipeline": "pipeline:\n  name: Build App\n  identifier: build_app\n  stages: []"
+  },
+  "params": {
+    "store_type": "REMOTE",
+    "is_harness_code_repo": true,
+    "repo_name": "product-management",
+    "branch": "main",
+    "file_path": ".harness/build-app.yaml",
+    "commit_msg": "Add build pipeline via MCP"
+  }
+}
+```
+
+**Update a remote pipeline:**
+
+```json
+// harness_update
+{
+  "resource_type": "pipeline",
+  "resource_id": "deploy_service",
+  "body": {
+    "yamlPipeline": "pipeline:\n  name: Deploy Service\n  identifier: deploy_service\n  stages:\n    - stage:\n        name: Deploy\n        type: Deployment"
+  },
+  "params": {
+    "store_type": "REMOTE",
+    "connector_ref": "my_github_connector",
+    "repo_name": "my-repo",
+    "branch": "main",
+    "file_path": ".harness/deploy-service.yaml",
+    "commit_msg": "Update deploy pipeline via MCP",
+    "last_object_id": "abc123",
+    "last_commit_id": "def456"
+  }
+}
+```
+
+**Import a pipeline from an external Git repo:**
+
+```json
+// harness_execute
+{
+  "resource_type": "pipeline",
+  "action": "import",
+  "params": {
+    "connector_ref": "my_github_connector",
+    "repo_name": "my-repo",
+    "branch": "main",
+    "file_path": ".harness/existing-pipeline.yaml"
+  },
+  "body": {
+    "pipeline_name": "Existing Pipeline",
+    "pipeline_description": "Imported from GitHub"
+  }
+}
+```
+
+**Import a pipeline from a Harness Code repo:**
+
+```json
+// harness_execute
+{
+  "resource_type": "pipeline",
+  "action": "import",
+  "params": {
+    "is_harness_code_repo": true,
+    "repo_name": "product-management",
+    "branch": "main",
+    "file_path": ".harness/existing-pipeline.yaml"
+  },
+  "body": {
+    "pipeline_name": "Existing Pipeline"
+  }
+}
+```
+
+**Create a connector:**
+
+```json
+{
+  "resource_type": "connector",
+  "body": { "connector": { "name": "My Docker Hub", "identifier": "my_docker", "type": "DockerRegistry" } }
+}
+```
+
+**Delete a trigger:**
+
+```json
+{
+  "resource_type": "trigger",
+  "resource_id": "nightly-trigger",
+  "pipeline_id": "my-pipeline"
+}
+```
+
+**List input sets for a pipeline:**
+
+```json
+{
+  "resource_type": "input_set",
+  "pipeline_id": "my-pipeline"
+}
+```
+
+**Get a specific input set:**
+
+```json
+{
+  "resource_type": "input_set",
+  "resource_id": "prod-inputs",
+  "pipeline_id": "my-pipeline"
+}
+```
+
+**Create an input set:**
+
+```json
+{
+  "resource_type": "input_set",
+  "pipeline_id": "my-pipeline",
+  "body": "inputSet:\n  name: Production Inputs\n  identifier: prod_inputs\n  pipeline:\n    identifier: my-pipeline\n    variables:\n      - name: env\n        type: String\n        value: production"
+}
+```
+
+**Update an input set:**
+
+```json
+{
+  "resource_type": "input_set",
+  "resource_id": "prod_inputs",
+  "pipeline_id": "my-pipeline",
+  "body": "inputSet:\n  name: Production Inputs\n  identifier: prod_inputs\n  pipeline:\n    identifier: my-pipeline\n    variables:\n      - name: env\n        type: String\n        value: production\n      - name: replicas\n        type: String\n        value: \"3\""
+}
+```
+
+**Delete an input set:**
+
+```json
+{
+  "resource_type": "input_set",
+  "resource_id": "prod_inputs",
+  "pipeline_id": "my-pipeline"
+}
+```
+
+## Resource Types
+
+255 resource types organized across 41 toolsets. Each resource type supports a subset of CRUD operations and optional execute actions.
+
+### Platform
+
+
+| Resource Type  | List | Get | Create | Update | Delete | Execute Actions |
+| -------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `organization` | x    | x   | x      | x      | x      |                 |
+| `project`      | x    | x   | x      | x      | x      |                 |
+
+
+### Pipelines
+
+
+| Resource Type                  | List | Get | Create | Update | Delete | Execute Actions     |
+| ------------------------------ | ---- | --- | ------ | ------ | ------ | ------------------- |
+| `pipeline`                     | x    | x   | x      | x      | x      | `run`, `retry`      |
+| `pipeline_v1` **(Alpha)**      | x    | x   | x      | x      | x      | `run`               |
+| `pipeline_dynamic_execution`   |      |     |        |        |        | `run`               |
+| `execution`                    | x    | x   |        |        |        | `interrupt`         |
+| `execution_inputs`             |      | x   |        |        |        |                     |
+| `trigger`                      | x    | x   | x      | x      | x      |                     |
+| `pipeline_summary`             |      | x   |        |        |        |                     |
+| `input_set`                    | x    | x   | x      | x      | x      |                     |
+| `runtime_input_template`       |      | x   |        |        |        |                     |
+| `runtime_input_template_v1`    |      | x   |        |        |        |                     |
+| `pipeline_resolved_yaml`       |      | x   |        |        |        |                     |
+| `approval_instance`            | x    |     |        |        |        | `approve`, `reject` |
+
+
+Both pipeline YAML resource types are available when the pipelines toolset is enabled. `HARNESS_PIPELINE_VERSION` and the HTTP `x-harness-pipeline-version` initialization header select the default version preference; they do not hide the other version.
+
+### AI Agents
+
+
+| Resource Type | List | Get | Create | Update | Delete | Execute Actions |
+| ------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `agent`       | x    | x   | x      | x      | x      |                 |
+| `agent_run`   | x    |     |        |        |        |                 |
+
+
+### Services
+
+
+| Resource Type | List | Get | Create | Update | Delete | Execute Actions |
+| ------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `service`     | x    | x   | x      | x      | x      |                 |
+
+
+### Environments
+
+
+| Resource Type | List | Get | Create | Update | Delete | Execute Actions |
+| ------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `environment` | x    | x   | x      | x      | x      | `move_configs`  |
+
+
+### Connectors
+
+
+| Resource Type         | List | Get | Create | Update | Delete | Execute Actions   |
+| --------------------- | ---- | --- | ------ | ------ | ------ | ----------------- |
+| `connector`           | x    | x   | x      | x      | x      | `test_connection` |
+| `connector_catalogue` | x    |     |        |        |        |                   |
+
+
+### Infrastructure
+
+
+| Resource Type    | List | Get | Create | Update | Delete | Execute Actions |
+| ---------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `infrastructure` | x    | x   | x      | x      | x      | `move_configs`  |
+
+
+### Secrets
+
+
+| Resource Type | List | Get | Create | Update | Delete | Execute Actions |
+| ------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `secret`      | x    | x   |        |        |        |                 |
+
+
+### Execution Logs
+
+
+| Resource Type   | List | Get | Create | Update | Delete | Execute Actions |
+| --------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `execution_log` |      | x   |        |        |        |                 |
+
+
+### Audit Trail
+
+
+| Resource Type | List | Get | Create | Update | Delete | Execute Actions |
+| ------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `audit_event` | x    | x   |        |        |        |                 |
+
+
+### Delegates
+
+
+| Resource Type    | List | Get | Create | Update | Delete | Execute Actions           |
+| ---------------- | ---- | --- | ------ | ------ | ------ | ------------------------- |
+| `delegate`       | x    | x   |        |        |        |                           |
+| `delegate_token` | x    | x   | x      |        | x      | `revoke`, `get_delegates` |
+
+
+### Code Repositories
+
+
+| Resource Type  | List | Get | Create | Update | Delete | Execute Actions      |
+| -------------- | ---- | --- | ------ | ------ | ------ | -------------------- |
+| `repository`   | x    | x   | x      | x      |        |                      |
+| `branch`       | x    | x   | x      |        | x      |                      |
+| `commit`       | x    | x   | x      |        |        | `diff`, `diff_stats` |
+| `file_content` | x    | x   |        |        |        | `blame`              |
+| `tag`          | x    |     | x      |        | x      |                      |
+| `repo_rule`    | x    | x   |        |        |        |                      |
+| `space_rule`   | x    | x   |        |        |        |                      |
+
+`commit` creation commits one or more file actions directly through the Harness Code API without cloning. Pass `body.title`, `body.branch`, and `body.actions`; each action is `CREATE`, `UPDATE`, `DELETE`, or `MOVE`, and `UPDATE` requires the current blob SHA.
+
+`file_content` list returns every path at a ref; get returns file or directory content (omit or pass empty `path` for the repo root; nested paths keep slashes). Omit `git_ref` to use the repository default branch — do not guess `main`.
+
+
+### Artifact Registries
+
+
+| Resource Type      | List | Get | Create | Update | Delete | Execute Actions |
+| ------------------ | ---- | --- | ------ | ------ | ------ | --------------- |
+| `registry`         | x    | x   |        |        |        |                 |
+| `artifact`         | x    |     |        |        |        |                 |
+| `artifact_version` | x    |     |        |        |        |                 |
+| `artifact_file`    | x    |     |        |        |        |                 |
+
+
+### File Store
+
+
+| Resource Type | List | Get | Create | Update | Delete | Execute Actions |
+| ------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `file_store`  | x    | x   | x      | x      | x      | `list_children` |
+
+`file_store` manages Harness File Store files and folders through the generic tools. It supports account, org, and project scope; pass `resource_scope="account"|"org"|"project"` or paste a Harness File Store URL so the server can derive scope and IDs.
+
+Common calls:
+
+```text
+# List the account-level File Store.
+harness_list(resource_type="file_store", resource_scope="account")
+
+# Create a folder at the current scope root.
+harness_create(resource_type="file_store", body={
+  name: "scripts",
+  type: "FOLDER",
+  parent_identifier: "Root"
+})
+
+# Upload a UTF-8 script file. Use content_base64 instead for binary data.
+harness_create(resource_type="file_store", body={
+  name: "deploy.sh",
+  type: "FILE",
+  parent_identifier: "Root",
+  content: "#!/usr/bin/env bash\n./deploy",
+  mime_type: "text/x-shellscript",
+  file_usage: "SCRIPT"
+})
+
+# Rename metadata without replacing file content.
+harness_update(resource_type="file_store", resource_id="deploy_script", body={
+  name: "deploy-prod.sh",
+  type: "FILE",
+  parent_identifier: "Root"
+})
+
+# List first-level children of a folder. This is a read-risk execute action.
+harness_execute(resource_type="file_store", action="list_children",
+  resource_id="scripts_folder", params={folder_name: "scripts"})
+```
+
+Multipart body constraints:
+
+- Create/update accept JSON `body`, then convert it to `multipart/form-data` for `/ng/api/file-store`.
+- `name`, `type` (`FILE` or `FOLDER`), and `parent_identifier` are required; use the literal `"Root"` only for the root of the selected scope.
+- `FILE` create requires exactly one of `content` (UTF-8 string) or `content_base64` (valid non-empty base64). `FILE` update can omit content for metadata-only updates, or provide exactly one content field to replace content.
+- `FOLDER` create/update must omit `content` and `content_base64`.
+- Optional `file_usage` must be `MANIFEST_FILE`, `CONFIG`, or `SCRIPT`; optional scalar metadata such as `description`, `mime_type`, `path`, and `tags` must be strings.
+- Upload content is capped at 100 MB. Confirmation prompts redact `content`, `content_base64`, and `contentBase64` previews before elicitation.
+
+`list_children` accepts either shorthand (`resource_id` plus `params.folder_name`, or `params.file_store_id`/`params.folder_identifier` plus `params.folder_name`) or a full FileStoreNode `body` with `identifier`, `name`, and `type: "FOLDER"`. Full bodies use Harness camelCase `parentIdentifier`; shorthand may use `params.parent_identifier`.
+
+
+### Templates
+
+
+| Resource Type | List | Get | Create | Update | Delete | Execute Actions |
+| ------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `template`    | x    | x   | x      | x      | x      |                 |
+
+Template operations use the Harness Template service paths (`/template/api/templates...`). Create and update require the full template YAML string in `body.template_yaml` or `body.yaml`; `version_label` targets a specific version for update/delete, while deleting without `version_label` deletes all versions.
+
+
+### Dashboards
+
+
+| Resource Type    | List | Get | Create | Update | Delete | Execute Actions |
+| ---------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `dashboard`      | x    | x   |        |        |        |                 |
+| `dashboard_data` |      | x   |        |        |        |                 |
+
+
+### Database DevOps
+
+
+| Resource Type                     | List | Get | Create | Update | Delete | Execute Actions |
+| --------------------------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `database_schema`                 | x    | x   | x      | x      | x      |                 |
+| `database_instance`               | x    | x   | x      | x      | x      |                 |
+| `database_snapshot_object`        | x    | x   |        |        |        |                 |
+| `database_llm_authoring_pipeline` |      | x   |        |        |        |                 |
+
+
+### Infrastructure as Code Management (IaCM)
+
+IaCM resources are default-enabled and mostly project-scoped. Start with `iacm_workspace` to find workspace identifiers, then use that `workspace_id` for workspace resources, costs, and activity diffs. Use `iacm_variable_set` for reusable variable sets at account, org, or project scope. The provider registry is account-scoped.
+
+`iacm_module` spans account, org, and project scope. It defaults to the account registry; every operation (list, get, create, update) sends the same `scope_org` / `scope_project` query params, so a module you create is discoverable at the scope you created it. Select the scope with `resource_scope="account" | "org" | "project"` plus `org_id`/`project_id`. Scoping is opt-in: when `resource_scope` is omitted, `org_id`/`project_id` apply only if you pass them explicitly — configured `HARNESS_ORG`/`HARNESS_PROJECT` defaults are not applied, so an ambient project config cannot silently register an account module under a project. A module body's own `org`/`project` fields locate its Git connector and are unrelated to this visibility scope.
+
+`iacm_workspace` create/update return `{ policy_evaluation }` only — follow up with `harness_get` to fetch the workspace. `iacm_variable_set` and `iacm_module` create/update return the resource itself. `iacm_provider` create returns `{ id }` only — follow up with `harness_get`; **update is version-oriented only** (POST/PUT `/providers/{id}/version`) — there is no metadata PUT. Version writes may return an empty body; HarnessClient normalizes that to `{ status: "SUCCESS", message: "No content" }`.
+
+Variable-set **update is HTTP PUT with full-replacement collections** — always `harness_get` first, then PUT the full desired body (`terraform_variables` / `environment_variables` are required on update; omit/empty clears connectors and variable files). Module update is also PUT — prefer get-then-put for optional fields. Writes are `medium_write` and require confirmation (elicitation or `confirm: true`).
+
+Variable-set and provider-registry RBAC (`iac_variableset_*`, `iac_providerregistry_*`) are currently Experimental in Harness — access checks always allow until iac-server activates enforcement. Module registry RBAC (`iac_registry_view` / `iac_registry_edit`) is Active and enforceable. MCP always forwards the caller PAT/SAT unchanged.
+
+| Resource Type                   | List | Get | Create | Update | Delete | Execute Actions |
+| ------------------------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `iacm_workspace`                | x    | x   | x      | x      |        |                 |
+| `iacm_variable_set`             | x    | x   | x      | x      |        |                 |
+| `iacm_resource`                 | x    |     |        |        |        |                 |
+| `iacm_module`                   | x    | x   | x      | x      |        |                 |
+| `iacm_provider`                 | x    | x   | x      | x      |        |                 |
+| `iacm_workspace_costs`          | x    |     |        |        |        |                 |
+| `iacm_activity_resource_change` | x    |     |        |        |        |                 |
+
+Typical workflow:
+
+1. `harness_list(resource_type="iacm_workspace", org_id="...", project_id="...")` to find the workspace.
+2. `harness_create` / `harness_update` on `iacm_workspace` to create from scratch or a template (`associated_template`), or update an existing workspace — response is `{ policy_evaluation }` only.
+3. `harness_get(resource_type="iacm_workspace", workspace_id="...")` to fetch the created/updated workspace.
+4. `harness_list` / `harness_create` / `harness_update` on `iacm_variable_set` (optionally with `resource_scope`) for reusable Terraform/env variable sets — response is the VariableSet resource.
+5. `harness_list` / `harness_create` / `harness_update` on `iacm_module` for the module registry (`name` + `system` required; add `resource_scope` with `org_id`/`project_id` for an org- or project-scoped module) — response is the module resource.
+6. `harness_list` / `harness_create` / `harness_update` on `iacm_provider` for the account provider registry (`body.type` required for create; create returns `{ id }` only — then `harness_get`; update creates/updates **versions** only) — version update may return empty success.
+7. `harness_list(resource_type="iacm_resource", org_id="...", project_id="...", workspace_id="...")` to inspect Terraform resources, outputs, and data sources.
+8. `harness_list(resource_type="iacm_workspace_costs", org_id="...", project_id="...", workspace_id="...")` to review per-execution cost entries.
+9. `harness_list(resource_type="iacm_activity_resource_change", org_id="...", project_id="...", activity_id="...", workspace_id="...")` to inspect before/after resource diffs for a plan, apply, or destroy activity.
+
+IaCM list responses expose `page_count` as the count for the current page only (except `iacm_variable_set`, which is not paginated). When `has_more` is true, keep requesting the next 1-based page and sum page counts if you need a total.
+
+### Internal Developer Portal (IDP)
+
+
+| Resource Type           | List | Get | Create | Update | Delete | Execute Actions |
+| ----------------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `idp_entity`            | x    | x   |        |        |        |                 |
+| `scorecard`             | x    | x   |        |        |        |                 |
+| `scorecard_check`       | x    | x   |        |        |        |                 |
+| `scorecard_stats`       |      | x   |        |        |        |                 |
+| `scorecard_check_stats` |      | x   |        |        |        |                 |
+| `idp_score`             | x    | x   |        |        |        |                 |
+| `idp_workflow`          | x    |     |        |        |        | `execute`       |
+| `idp_tech_doc`          | x    |     |        |        |        |                 |
+
+
+### Pull Requests
+
+
+| Resource Type  | List | Get | Create | Update | Delete | Execute Actions |
+| -------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `pull_request` | x    | x   | x      | x      |        | `close`, `merge` |
+| `pr_reviewer`  | x    |     | x      |        |        | `submit_review` |
+| `pr_comment`   |      |     | x      | x      | x      |                 |
+| `pr_check`     | x    |     |        |        |        |                 |
+| `pr_activity`  | x    |     |        |        |        |                 |
+
+Use `harness_execute(resource_type="pull_request", action="close", ...)` for an explicit close operation. `harness_update` also accepts `body.state` (`open` or `closed`) and routes state changes to the dedicated Harness Code PR state endpoint; send title/description edits in a separate update call.
+
+Use `harness_list(resource_type="pr_activity", filters={type: ["comment", "code-comment"]}, ...)` to read PR comments. Use `pr_comment` for comment write operations.
+
+
+### Release Management
+
+Release Management (RMG) resources are default-enabled. Definition resources (`release_process`, `release_activity`) support list/get/create/update/delete with `body.yaml`; call `harness_schema(resource_type="release_process"|"release_activity")` before create/update. Execution resources monitor running releases — most list operations require `release_id` (UUID from `harness_list resource_type=release`, or the UI URL slug such as `identifier-1.0.0-abc`). Paste an RMG release URL into `harness_list` to auto-fill `release_id`.
+
+RMG calls use `${HARNESS_BASE_URL}/gateway/rmg` with account scoping via the `Harness-Account` header. Org/project scope uses header-based scoping when `org_id`/`project_id` are provided. `release_execution_phase` is list-only — use each phase item's `identifier` field as `params.phase_identifier` when calling `harness_get` on phase input/output resources (do not call `harness_get` on `release_execution_phase` itself). Release list `status` filtering is applied client-side on the current page only; keep paging with the same filters when results may span pages.
+
+| Resource Type                         | List | Get | Create | Update | Delete | Execute Actions |
+| ------------------------------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `release_process`                     | x    | x   | x      | x      | x      |                 |
+| `release_activity`                    | x    | x   | x      | x      | x      |                 |
+| `release`                             | x    | x   |        |        |        |                 |
+| `release_execution_phase`             | x    |     |        |        |        |                 |
+| `release_execution_task`              | x    |     |        |        |        |                 |
+| `release_execution_activity`          | x    |     |        |        |        |                 |
+| `release_input`                       |      | x   |        |        |        |                 |
+| `release_execution_phase_input`       |      | x   |        |        |        |                 |
+| `release_execution_phase_output`      |      | x   |        |        |        |                 |
+| `release_execution_activity_input`    |      | x   |        |        |        |                 |
+| `release_execution_activity_output`   |      | x   |        |        |        |                 |
+
+Typical workflow:
+
+1. `harness_list(resource_type="release_process", org_id="...", project_id="...")` to discover orchestration process definitions.
+2. `harness_schema(resource_type="release_process")` (or `release_activity`) before create/update; then `harness_create` / `harness_update` with `body.yaml`.
+3. `harness_list(resource_type="release", org_id="...", project_id="...")` to find active or recent releases (default 30-day look-back; optional `filters.status`, `filters.search_term`, `filters.days_back`).
+4. `harness_get(resource_type="release", release_id="...")` for release details.
+5. `harness_list(resource_type="release_execution_phase", filters={ release_id: "..." })` for phase status; same `release_id` for `release_execution_task` and `release_execution_activity`.
+6. `harness_get` on `release_input`, `release_execution_phase_input`, `release_execution_phase_output`, `release_execution_activity_output`, or `release_execution_activity_input` using `release_id` plus `params.phase_identifier` / `params.activity_identifier` / `activity_execution_id` as documented on each resource.
+
+
+### Vibe
+
+The default-enabled `vibe` toolset covers the [Vibe Orchestrator BFF contract](tests/fixtures/vibe-bff-openapi.yaml) under `${HARNESS_BASE_URL}/vibe/v1`. It uses the existing Harness connection and account header, without adding account/org/project query parameters or scope fields to request bodies. The team validated the Vibe flow using Harness API-key authentication (PAT/SAT), so no opt-in setting is required for default sessions. The curated OpenAPI documents bearer/session authentication; the server's OAuth mode forwards the current session's bearer token. Automated regressions verify both header paths; gateway authentication remains subject to the target environment's configuration.
+
+| Resource Type | List | Get | Create | Update | Delete | Execute Actions |
+| ------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `vibe_project` |      |     | x      |        |        | `prepare`, `deploy` |
+| `vibe_app_lifecycle` | | x | | | | `events` |
+
+The API supports two intake paths. Keep these API-native request shapes:
+
+| Source available to the coding agent | API flow |
+| ----------------------------------- | -------- |
+| GitHub repository link/connector | `harness_create` with `resource_type="vibe_project"` and `body.mode` plus the mode-specific fields. The contract names `github_link` and `github_connector` but does not define their URL, branch, or connector field shapes; these fields are forwarded to the backend without inventing a mapping. |
+| ZIP file | Call `prepare` with the app name and file metadata, upload the bytes to the returned signed target, then call `deploy`. |
+| Local source directory | The coding agent archives the intended workspace source into a ZIP locally, then follows the ZIP flow. A local path or conversational context is not an API-supported source upload. |
+
+When packaging a directory, include the source, manifests, lockfiles, configuration, and intended uncommitted edits needed to build it. Exclude credentials, `.git`, installed dependencies, and generated artifacts. Packaging and the signed upload happen where the files are accessible; a hosted MCP server cannot read the coding agent's local directory.
+
+For an existing ZIP, prepare the upload:
+
+```json
+{
+  "resource_type": "vibe_project",
+  "action": "prepare",
+  "body": {
+    "name": "demo-app",
+    "file": {
+      "path": "app.zip",
+      "size_bytes": 12345,
+      "content_type": "application/zip"
+    }
+  }
+}
+```
+
+Pass this to `harness_execute`. The size must describe the actual ZIP; `size_bytes`, `content_type`, and `md5` are optional and nullable. Additional prepare fields are preserved for backend validation, as permitted by the OpenAPI. Preparation returns `projectId`, `sourceId`, and `upload`, including each file's `uploadUrl`, `method`, `headers`, and `expiresAt`. Upload the file bytes directly using that signed URL, method, and headers; preserve the URL exactly and do not add Harness credentials to the storage request. The prepare action does not read or upload local files.
+
+After a successful upload, explicitly deploy:
+
+```json
+{
+  "resource_type": "vibe_project",
+  "action": "deploy",
+  "resource_id": "<projectId returned by prepare>"
+}
+```
+
+For JSON imports, use the returned `id` instead. Deployment also accepts `body: {"project_id": "<Vibe app id>"}` or `params.app_id`; the API wire field is snake_case `project_id` even though prepare returns camelCase `projectId`. The generic tool's top-level `project_id` is a Harness scope identifier and is never used as the Vibe app id. Import and prepare create the app/source; neither starts deployment. Writes are not automatically retried, and deployment uses the existing high-risk confirmation policy.
+
+Read progress with `harness_get(resource_type="vibe_app_lifecycle", resource_id="<Vibe app id>")`. It retains app URLs, execution stages, substeps, failures, log lines, and build-analyzer details. The `events` execute action accepts `resource_id` or `params.app_id` and consumes the SSE endpoint as a finite batch: up to 20 JSON events or five seconds after connection, with a 1 MiB response limit. These limits belong to the Vibe endpoint. The connection's `HARNESS_API_TIMEOUT_MS` also bounds connection and stream consumption together; expiration returns a timeout error. A completed batch returns `events` and `stop_reason` (`end`, `event_limit`, or `duration_limit`) and closes the stream. Neither initial connection failures nor broken streams are retried. Events are transient diffs with no documented replay cursor; use lifecycle get for an authoritative snapshot. Both lifecycle reads are available in read-only mode.
+
+### Feature Flags
+
+
+| Resource Type                       | List | Get | Create | Update | Delete | Execute Actions                           |
+| ----------------------------------- | ---- | --- | ------ | ------ | ------ | ----------------------------------------- |
+| `fme_workspace`                     | x    |     |        |        |        |                                           |
+| `fme_environment`                   | x    | x   | x      | x      | x      |                                           |
+| `fme_feature_flag`                  | x    | x   | x      | x      | x      | `kill`, `restore`, `reallocate`, `archive`, `unarchive` |
+| `fme_feature_flag_definition`       | x    | x   | x      | x      | x      | `kill`, `restore`, `reallocate`           |
+| `fme_rollout_status`                | x    |     |        |        |        |                                           |
+| `fme_rule_based_segment`            | x    | x   | x      |        | x      |                                           |
+| `fme_rule_based_segment_definition` | x    |     |        | x      |        | `enable`, `disable`, `change_request`     |
+| `fme_traffic_type`                  | x    |     |        |        |        |                                           |
+| `fme_identity`                      |      |     | x      | x      |        |                                           |
+| `fme_standard_segment`              | x    | x   |        |        |        |                                           |
+| `fme_segment_keys`                  | x    |     |        | x      |        |                                           |
+| `fme_segment`                       | x    | x   | x      | x      | x      |                                           |
+| `fme_segment_definition`            | x    | x   | x      | x      | x      | `list_keys`, `add_keys`, `remove_keys`    |
+| `fme_metric`                        | x    | x   | x      | x      | x      |                                           |
+| `fme_event_type`                    | x    | x   |        |        |        |                                           |
+
+
+**FME (Split.io) resources** — `fme_`* resources support **dual-mode scoping**: legacy calls pass `workspace_id` and hit the Split.io API (`api.split.io`); newer calls pass `org_id`+`project_id` together and hit Harness-native endpoints (standard `HARNESS_API_KEY`/`HARNESS_BASE_URL`, same auth as every other `harness_*` resource) instead. Passing both `workspace_id` and `org_id`/`project_id` on the same call, or mixing `org_id` with `project_id` alone, is an error — pick one mode per call. Every operation below is available in legacy mode, unchanged, unless the resource is marked Harness-native only. Harness-native mode coverage is currently narrower:
+
+- **`fme_workspace`** — no Harness-native equivalent; legacy-only (used to discover `workspace_id` values).
+- **`fme_environment`** — dual-mode `list` (`workspace_id` or `org_id`+`project_id`). `get`/`create`/`update`/`delete` are Harness-native only (`/fme/api/v4/environments`) — MCP never had a `workspace_id` contract for those ops. Native list uses optional `offset`/`limit` (max 100; `harness_list` `size` maps to `limit`); envelope `{data, limit, offset, totalCount}` is promoted to `items`/`total`. Native create/update use `isProduction` (`production` accepted as an alias). Native update is JSON Merge Patch; `name` and `isProduction` are not clearable. Name max 15 characters.
+- **`fme_feature_flag`** — dual-mode, both branches fully wired. Harness-native (`org_id`+`project_id`): `list`/`get`/`create`/`delete` hit `/fme/api/v4/feature-flags` (body for `create`: `name`, `trafficType`, optional `description`/`tags`/`owners`, per `CreateFeatureFlagRequest`); `update` sends a merge-patch to `/fme/api/v4/feature-flags/{name}`; `archive`/`unarchive` hit `/fme/api/v4/feature-flags/{name}/archive|unarchive` (optional `comment` only — no `title`, per `ArchiveUnarchiveRequest`); `kill`/`restore`/`reallocate` hit `/fme/api/v4/feature-flag-definitions/{name}/kill|restore|reallocate` with `environment_id` as a query param (optional `comment`/`title`, per `FeatureFlagDefinitionActionRequest`).
+- **`fme_feature_flag_definition`** — `get`/`create`/`update` remain dual-mode (`workspace_id` or `org_id`+`project_id`). `list`/`delete`/`kill`/`restore`/`reallocate` are Harness-native only (`org_id`+`project_id`) — MCP never had a `workspace_id` contract for those ops. Native list requires `feature_flag_name` and uses `offset`/`limit` (default 100, max 100); it does not take `environment_id`. Delete and execute require `environment_id`. Kill/restore/reallocate are the same actions as on `fme_feature_flag`. Get/create/update body matches legacy (`treatments`, `defaultTreatment`, `defaultRule`, optional `rules`/`baselineTreatment`/`trafficAllocation`/`comment`), plus optional `title` in Harness-native mode. Native update is JSON Merge Patch.
+- **`fme_rollout_status`** — dual-mode `list`. Pass `org_id`+`project_id` (preferred) or the deprecated `workspace_id`. Native pagination uses `offset`/`limit` (max 100; `harness_list` `size` maps to `limit`); results are promoted to `items`/`total`. Each item has `id`, `name`, and optional `description`.
+
+- **`fme_rule_based_segment`** — (Deprecated — see `fme_segment`.) Harness-native mode is rejected on every operation (`list`/`get`/`create`/`delete`) — use `fme_segment` instead; this resource supports only the legacy `workspace_id` contract.
+- **`fme_rule_based_segment_definition`** — (Deprecated — see `fme_segment_definition`.) Harness-native mode is rejected on every operation/action (`list`/`update`/`enable`/`disable`/`change_request`) — use `fme_segment_definition` instead (no `enable`/`disable`/`change_request` equivalent there); this resource supports only the legacy `workspace_id`/`environment_id` contract.
+- **`fme_traffic_type`** — dual-mode `list`. Pass `org_id`+`project_id` (preferred) or the deprecated `workspace_id`. Native pagination uses `offset`/`limit` (max 100; `harness_list` `size` maps to `limit`); results are promoted to `items`/`total`. Each item has `id` and `name` (no `displayAttributeId`).
+- **`fme_identity`** — `create`/`update` are not yet implemented if `org_id`+`project_id` are passed together; otherwise proceeds as a normal legacy call.
+- **`fme_standard_segment`** — deprecated. Legacy `workspace_id` still hits Split v2. Harness-native is rejected — use `fme_segment`.
+- **`fme_segment_keys`** — `list`/`update` remain legacy (`workspace_id` / `environment_id`+`segment_name`). Harness-native (`org_id`+`project_id`) is rejected — use `fme_segment_definition` execute `list_keys`/`add_keys`/`remove_keys`.
+- **`fme_segment`** — Native only (`org_id`+`project_id`). CRUD. `list`/`get`/`update`/`delete` require `segment_type`: `STANDARD` | `LARGE` | `RULE_BASED`. Create body: `name`, `trafficType`, `segmentType`; optional `description`, `tags`, `owners`.
+- **`fme_segment_definition`** — Native only. CRUD plus execute `list_keys`/`add_keys`/`remove_keys`. Update is description only. Delete fails with `hasDependents` while keys remain.
+- **`fme_metric`** — Harness-native only (no legacy `workspace_id` support). `list`/`get`/`create`/`update`/`delete` are wired to `/fme/api/v4/metrics` (`list`'s `harness_list` `size` maps to `limit`). `create` requires `spread` even though the backend `CreateMetricRequest` keeps it optional (default `PER`) — an MCP-side-only stricter contract, since omitting it silently changes a `RATE` metric's semantics. `update` is JSON Merge Patch; `name`/`trafficType` are immutable and not accepted. `delete` is a permanent hard delete (no archive/restore) — classified `destructive`.
+- **`fme_event_type`** — Harness-native only (no legacy `workspace_id` support). Read-only: `list`/`get` are wired to `/fme/api/v4/event-types`; `id` is the event name. Only event types with events in the last 30 days are visible; `get` returns a 404 for an event type outside the requesting workspace's traffic-type scope, or idle longer than 30 days. List filters: `name` (substring), `traffic_type` (by ID or name), `offset`/`limit` (`harness_list` `size` maps to `limit`). Use this to discover real event type IDs before referencing one in `fme_metric`'s `baseEventTypes`/`filterEventType` or `event_type_ids` filter, instead of guessing an ID.
+
+In single-user/self-hosted mode, legacy-mode auth uses a Bearer token from `HARNESS_FME_API_KEY`, falling back to a non-placeholder `HARNESS_API_KEY`. `HARNESS_FME_API_KEY` may be a legacy Split admin key or an FME-entitled Harness PAT/SAT, but it is rejected in `multi-user` mode so shared deployments cannot override each session user's credential. Hosted OAuth/service-routing credentials for Harness platform APIs do not authenticate direct Split.io requests. `fme_feature_flag` supports full lifecycle management in legacy mode: create (requires `traffic_type_id`), list, get, update metadata, delete, and kill/restore/reallocate/archive/unarchive execute actions. Use `fme_traffic_type` to discover traffic type IDs, `fme_identity` to create/update identity attributes, and `fme_standard_segment` / `fme_segment_keys` to inspect standard segments and add member keys. `fme_rule_based_segment` provides CRUD for targeting segments, while `fme_rule_based_segment_definition` manages environment-specific segment rules with enable/disable and change request approval flows.
+
+### GitOps
+
+
+| Resource Type                | List | Get | Create | Update | Delete | Execute Actions |
+| ---------------------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `gitops_agent`               | x    | x   |        |        |        |                 |
+| `gitops_argo_project`        | x    |     |        |        |        |                 |
+| `gitops_app_project_mapping` | x    |     | x      | x      | x      | `import`        |
+| `gitops_autocreate_log`      | x    |     |        |        |        |                 |
+| `gitops_application`         | x    | x   |        |        |        | `sync`          |
+| `gitops_cluster`             | x    | x   |        |        |        |                 |
+| `gitops_repository`          | x    | x   |        |        |        |                 |
+| `gitops_applicationset`      | x    | x   |        |        |        |                 |
+| `gitops_repo_credential`     | x    | x   |        |        |        |                 |
+| `gitops_app_event`           | x    |     |        |        |        |                 |
+| `gitops_pod_log`             |      | x   |        |        |        |                 |
+| `gitops_managed_resource`    | x    |     |        |        |        |                 |
+| `gitops_resource_action`     | x    |     |        |        |        |                 |
+| `gitops_dashboard`           |      | x   |        |        |        |                 |
+| `gitops_app_resource_tree`   |      | x   |        |        |        |                 |
+| `gitops_cluster_link`        | x    |     | x      |        | x      |                 |
+
+
+### Chaos Engineering
+
+
+| Resource Type                    | List | Get | Create | Update | Delete | Execute Actions                                                              |
+|----------------------------------| ---- | --- | ------ | ------ | ------ |------------------------------------------------------------------------------|
+| `chaos_experiment`               | x    | x   | x      |        | x      | `run`, `stop`                                                                |
+| `chaos_experiment_run`           |      | x   |        |        |        |                                                                              |
+| `chaos_experiment_variable`      | x    |     |        |        |        |                                                                              |
+| `chaos_component_variable`       |      | x   |        |        |        |                                                                              |
+| `chaos_input_set`                | x    | x   | x      | x      | x      |                                                                              |
+| `chaos_experiment_template`      | x    | x   |        |        | x      | `create_from_template`, `list_revisions`, `get_variables`, `get_yaml`, `compare_revisions` |
+| `chaos_probe`                    | x    | x   | x      |        | x      | `enable`, `verify`, `get_manifest`                                           |
+| `chaos_probe_in_run`             | x    |     |        |        |        |                                                                              |
+| `chaos_probe_template`           | x    | x   |        |        | x      | `get_variables`                                                              |
+| `chaos_infrastructure`           | x    |     |        |        |        |                                                                              |
+| `chaos_k8s_infrastructure`       | x    | x   | x      |        |        | `check_health`                                                               |
+| `chaos_enabled_infrastructure`   | x    |     |        |        |        |                                                                              |
+| `chaos_environment`              | x    |     |        |        |        |                                                                              |
+| `chaos_hub`                      | x    | x   | x      | x      | x      |                                                                              |
+| `chaos_hub_fault`                | x    |     |        |        |        |                                                                              |
+| `chaos_fault`                    | x    | x   |        |        | x      | `get_variables`, `get_yaml`                                                  |
+| `chaos_fault_template`           | x    | x   |        |        | x      | `list_revisions`, `get_variables`, `get_yaml`, `compare_revisions`           |
+| `chaos_fault_experiment_run`     | x    |     |        |        |        |                                                                              |
+| `chaos_action`                   | x    | x   | x      |        | x      | `get_manifest`                                                               |
+| `chaos_action_template`          | x    | x   |        |        | x      | `list_revisions`, `get_variables`, `compare_revisions`                       |
+| `chaos_loadtest`                 | x    | x   | x      | x      | x      | `run`, `stop`                                                                |
+| `chaos_service`                  | x    | x   | x      | x      | x      | `list_experiment_runs`, `list_load_tests`                                    |
+| `chaos_application_map`          | x    | x   |        |        |        |                                                                              |
+| `discovered_agent`               | x    |     |        |        |        |                                                                              |
+| `discovered_namespace`           | x    |     |        |        |        |                                                                              |
+| `discovered_service`             | x    |     |        |        |        |                                                                              |
+| `discovered_network_map`         | x    |     |        |        |        |                                                                              |
+| `chaos_guard_condition`          | x    | x   |        |        | x      |                                                                              |
+| `chaos_guard_rule`               | x    | x   |        |        | x      | `enable`                                                                     |
+| `chaos_recommendation`           | x    | x   |        |        |        |                                                                              |
+| `chaos_risk`                     | x    | x   |        |        |        |                                                                              |
+| `chaos_dr_test`                  | x    |     | x      |        |        |                                                                              |
+| `scanned_risk`                   | x    | x   |        |        |        | `occurrences`, `summary_by_service`                                          |
+| `chaos_risk_rule`                | x    | x   |        |        |        |                                                                              |
+| `chaos_risk_scan`                | x    | x   | x      | x      | x      | `retry`, `abort`, `report`, `report_download`, `heatmap`                     |
+
+### Cloud Cost Management (CCM)
+
+
+| Resource Type                | List | Get | Create | Update | Delete | Execute Actions                                                                |
+| ---------------------------- | ---- | --- | ------ | ------ | ------ | ------------------------------------------------------------------------------ |
+| `cost_perspective`           | x    | x   | x      | x      | x      |                                                                                |
+| `cost_breakdown`             | x    |     |        |        |        |                                                                                |
+| `cost_timeseries`            | x    |     |        |        |        |                                                                                |
+| `cost_summary`               | x    | x   |        |        |        |                                                                                |
+| `cost_recommendation`        | x    | x   |        |        |        | `update_state`, `override_savings`, `create_jira_ticket`, `create_snow_ticket` |
+| `cost_anomaly`               | x    |     |        |        |        |                                                                                |
+| `cost_anomaly_summary`       |      | x   |        |        |        |                                                                                |
+| `cost_category`              | x    | x   |        |        |        |                                                                                |
+| `cost_account_overview`      |      | x   |        |        |        |                                                                                |
+| `cost_filter_value`          | x    |     |        |        |        |                                                                                |
+| `cost_recommendation_stats`  |      | x   |        |        |        |                                                                                |
+| `cost_recommendation_detail` |      | x   |        |        |        |                                                                                |
+| `cost_commitment`            |      | x   |        |        |        |                                                                                |
+| `ai_budget`                  | x    | x   | x      | x      | x      |                                                                                |
+| `ai_budget_overview`         |      | x   |        |        |        |                                                                                |
+| `ai_budget_consumption`      | x    |     |        |        |        |                                                                                |
+| `ai_budget_override_request` | x    | x   | x      |        |        | `approve`, `reject`                                                            |
+
+
+### Software Engineering Insights (SEI)
+
+SEI resources are consolidated for token efficiency. Use `metric` or `aspect` params for DORA, team/org-tree details, and AI insights.
+
+
+| Resource Type             | List | Get | Create | Update | Delete | Execute Actions                                                                                          |
+| ------------------------- | ---- | --- | ------ | ------ | ------ | -------------------------------------------------------------------------------------------------------- |
+| `sei_metric`              | x    |     |        |        |        |                                                                                                          |
+| `sei_productivity_metric` |      | x   |        |        |        |                                                                                                          |
+| `sei_dora_metric`         |      | x   |        |        |        | Pass `metric`: deployment_frequency, change_failure_rate, mttr, lead_time, or *_drilldown                |
+| `sei_team`                | x    | x   |        |        |        |                                                                                                          |
+| `sei_team_detail`         | x    |     |        |        |        | Pass `aspect`: integrations, developers, integration_filters                                             |
+| `sei_org_tree`            | x    | x   |        |        |        |                                                                                                          |
+| `sei_org_tree_detail`     | x    | x   |        |        |        | Pass `aspect`: efficiency_profile, productivity_profile, business_alignment_profile, integrations, teams |
+| `sei_business_alignment`  | x    | x   |        |        |        | Pass `aspect`: feature_metrics, feature_summary, drilldown for get                                       |
+| `sei_ai_usage`            | x    | x   |        |        |        | Pass `aspect`: metrics, breakdown, summary, top_languages                                                |
+| `sei_ai_adoption`         | x    | x   |        |        |        | Pass `aspect`: metrics, breakdown, summary                                                               |
+| `sei_ai_impact`           |      | x   |        |        |        | Pass `aspect`: pr_velocity, rework                                                                       |
+| `sei_ai_raw_metric`       | x    |     |        |        |        |                                                                                                          |
+
+
+### Software Supply Chain Assurance (SCS)
+
+
+| Resource Type              | List | Get | Create | Update | Delete | Execute Actions |
+| -------------------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `scs_artifact_source`      | x    |     |        |        |        |                 |
+| `artifact_security`        | x    | x   |        |        |        |                 |
+| `scs_artifact_component`   | x    |     |        |        |        |                 |
+| `scs_artifact_remediation` |      | x   |        |        |        |                 |
+| `scs_chain_of_custody`     |      | x   |        |        |        |                 |
+| `scs_compliance_result`    | x    |     |        |        |        |                 |
+| `code_repo_security`       | x    | x   |        |        |        |                 |
+| `scs_sbom`                 |      | x   |        |        |        |                 |
+
+
+### Evidence Vault
+
+Evidence Vault stores in-toto attestations (SDLC evidences). List supports account/org/project scope via `resource_scope`. Singular free-text filters (pipeline, artifact alone, gitoid) use `search_term`; an additional Name constraint uses `filters.subject_name`; subject content digest uses `filters.subject_digest`. Get looks up by `gitoid_sha256` and requires `org_id`/`project_id` (from the list row). Download (`harness_execute` action `download`) returns a time-limited `download_url` — always show that link to the user. Requires feature flag `SCS_EVIDENCE_VAULT`.
+
+
+| Resource Type | List | Get | Create | Update | Delete | Execute Actions |
+| ------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `attestation` | x    | x   |        |        |        | `download`      |
+
+
+
+### Security Testing Orchestration (STO)
+
+
+| Resource Type             | List | Get | Create | Update | Delete | Execute Actions                |
+| ------------------------- | ---- | --- | ------ | ------ | ------ | ------------------------------ |
+| `security_issue`          | x    |     |        |        |        |                                |
+| `security_issue_filter`   | x    |     |        |        |        |                                |
+| `security_exemption`      | x    |     | x      |        |        | `approve`, `reject` |
+| `remediation_diff`        | x    |     |        |        |        |                                |
+
+`security_exemption` create is a `high_write` operation. The server derives `requester_id` from the authenticated PAT, sets `exemptFutureOccurrences=true`, and defaults `duration_days` to 30 when not provided. For listing exemptions, pass a small explicit page size (for example `filters: { "status": "Pending", "size": 5 }`) and follow the `_nextPageHint` returned in each response.
+
+Security exemption execute workflow:
+
+- Use `harness_list` with `resource_type="security_exemption"` and an explicit `status` such as `Pending`, `Approved`, `Rejected`, `Expired`, or `Canceled`.
+- Use `harness_execute` with `action="approve"` and a required `body.scope`: `CURRENT`, `ACCOUNT`, `ORG`, or `PROJECT`. `CURRENT` approves at the exemption's existing scope; the other scopes use the STO promote endpoint internally. The server auto-fills `body.approver_id` from the authenticated user when omitted; `body.comment` is optional.
+- Use `action="reject"` to reject an exemption. `body.approver_id` is also auto-filled when omitted.
+- There is no separate `promote` execute action. Use `action="approve"` with a non-`CURRENT` `body.scope` when the requested outcome is approval at account, organization, or project scope.
+
+
+### Access Control
+
+
+| Resource Type     | List | Get | Create | Update | Delete | Execute Actions |
+| ----------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `user`            | x    | x   |        |        |        |                 |
+| `user_group`      | x    | x   | x      | x      | x      |                 |
+| `service_account` | x    | x   | x      |        | x      |                 |
+| `role`            | x    | x   | x      |        | x      |                 |
+| `role_assignment` | x    |     | x      |        |        |                 |
+| `resource_group`  | x    | x   | x      |        | x      |                 |
+| `permission`      | x    |     |        |        |        |                 |
+
+
+### Governance
+
+
+| Resource Type       | List | Get | Create | Update | Delete | Execute Actions |
+| ------------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `policy`            | x    | x   | x      | x      | x      |                 |
+| `policy_set`        | x    | x   | x      | x      | x      |                 |
+| `policy_evaluation` | x    | x   |        |        |        |                 |
+
+
+### Deployment Freeze
+
+
+| Resource Type   | List | Get | Create | Update | Delete | Execute Actions |
+| --------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `freeze_window` | x    | x   | x      | x      | x      | `toggle_status` |
+| `global_freeze` |      | x   |        |        |        | `manage`        |
+
+
+### Service Overrides
+
+
+| Resource Type      | List | Get | Create | Update | Delete | Execute Actions |
+| ------------------ | ---- | --- | ------ | ------ | ------ | --------------- |
+| `service_override` | x    | x   | x      | x      | x      |                 |
+
+
+### Settings
+
+
+| Resource Type | List | Get | Create | Update | Delete | Execute Actions |
+| ------------- | ---- | --- | ------ | ------ | ------ | --------------- |
+| `setting`     | x    |     |        |        |        |                 |
+
+
+## MCP Prompts
+
+### DevOps
+
+
+| Prompt                         | Description                                                                                                                                                                                                                                                                                                                                                                           | Parameters                                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `build-deploy-app`             | End-to-end CI/CD workflow: scan a git repo, generate CI pipeline (build & push Docker image), discover or generate K8s manifests, create CD pipeline, and deploy — with auto-retry on CI failures (up to 5 attempts) and CD failures (up to 3 attempts with user permission). On exhausted retries, provides Harness UI deep links to all created resources for manual investigation. | `repoUrl` (required), `imageName` (required), `projectId` (optional), `namespace` (optional)         |
+| `debug-pipeline-failure`       | Analyze a failed execution: accepts an execution ID, pipeline ID, or Harness URL. Gets stage/step breakdown, failure details, delegate info, and failed step logs via `harness_diagnose`, then provides root cause analysis and suggested fixes. Automatically follows chained pipeline failures.                                                                                     | `executionId` (optional), `projectId` (optional)                                                     |
+| `pipeline_summarizer`          | Fetch and summarize ALL step logs from a pipeline execution. Uses `harness_diagnose` with `include_logs: true, include_all_step_logs: true` to get every step's log, then presents a table with Step Name, Status, Duration, and What Happened (log-based summary). Does NOT skip any steps.                                                                                          | `executionId` (optional), `projectId` (optional)                                                     |
+| `create-pipeline`              | Generate a new pipeline YAML from natural language requirements, reviewing existing resources for context                                                                                                                                                                                                                                                                             | `description` (required), `projectId` (optional)                                                     |
+| `create-agent`                 | Interactively build a Harness AI agent — check existing agents (detecting current `agent.uses` vs. legacy `agent.step.group.steps` spec format when updating), gather requirements, generate the agent spec in the appropriate format, confirm with user, then create or update via `harness_create`/`harness_update`                                                                | `agent_name` (required), `task_description` (required), `org_id` (optional), `project_id` (optional) |
+| `onboard-service`              | Walk through onboarding a new service with environments and a deployment pipeline                                                                                                                                                                                                                                                                                                     | `serviceName` (required), `projectId` (optional)                                                     |
+| `dora-metrics-review`          | Review DORA metrics (deployment frequency, change failure rate, MTTR, lead time) with Elite/High/Medium/Low classification and improvement recommendations                                                                                                                                                                                                                            | `teamRefId` (optional), `dateStart` (optional), `dateEnd` (optional)                                 |
+| `setup-gitops-application`     | Guide through onboarding a GitOps application — verify agent, cluster, repo, and create the application                                                                                                                                                                                                                                                                               | `agentId` (required), `projectId` (optional)                                                         |
+| `chaos-resilience-test`        | Design a chaos experiment to test service resilience with fault injection, probes, and expected outcomes                                                                                                                                                                                                                                                                              | `serviceName` (required), `projectId` (optional)                                                     |
+| `feature-flag-rollout`         | Plan and execute a progressive feature flag rollout across environments with safety gates                                                                                                                                                                                                                                                                                             | `flagIdentifier` (required), `projectId` (optional)                                                  |
+| `migrate-pipeline-to-template` | Analyze an existing pipeline and extract reusable stage/step templates from it                                                                                                                                                                                                                                                                                                        | `pipelineId` (required), `projectId` (optional)                                                      |
+| `delegate-health-check`        | Check delegate connectivity, health, token status, and troubleshoot infrastructure issues                                                                                                                                                                                                                                                                                             | `projectId` (optional)                                                                               |
+| `developer-portal-scorecard`   | Review IDP scorecards for services and identify gaps to improve developer experience                                                                                                                                                                                                                                                                                                  | `projectId` (optional)                                                                               |
+| `pending-approvals`            | Find pipeline executions waiting for approval, show details, and offer to approve or reject                                                                                                                                                                                                                                                                                           | `projectId` (optional), `orgId` (optional), `pipelineId` (optional)                                  |
+
+
+### FinOps
+
+
+| Prompt                          | Description                                                                                              | Parameters                                         |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `optimize-costs`                | Analyze cloud cost data, surface recommendations and anomalies, prioritized by potential savings         | `projectId` (optional)                             |
+| `cloud-cost-breakdown`          | Deep-dive into cloud costs by service, environment, or cluster with trend analysis and anomaly detection | `perspectiveId` (optional), `projectId` (optional) |
+| `commitment-utilization-review` | Analyze reserved instance and savings plan utilization to find waste and optimize commitments            | `projectId` (optional)                             |
+| `cost-anomaly-investigation`    | Investigate cost anomalies — determine root cause, impacted resources, and remediation                   | `projectId` (optional)                             |
+| `rightsizing-recommendations`   | Review and prioritize rightsizing recommendations, optionally create Jira or ServiceNow tickets          | `projectId` (optional), `minSavings` (optional)    |
+
+
+### DevSecOps
+
+
+| Prompt                      | Description                                                                                                   | Parameters                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `security-review`           | Review security issues across Harness resources and suggest remediations by severity                          | `projectId` (optional), `severity` (optional, default: `critical,high`) |
+| `vulnerability-triage`      | Triage security vulnerabilities across pipelines and artifacts, prioritize by severity and exploitability     | `projectId` (optional), `severity` (optional)                           |
+| `sbom-compliance-check`     | Audit SBOM and compliance posture for artifacts — license risks, policy violations, component vulnerabilities | `artifactId` (optional), `projectId` (optional)                         |
+| `supply-chain-audit`        | End-to-end software supply chain security audit — provenance, chain of custody, policy compliance             | `projectId` (optional)                                                  |
+| `security-exemption-review` | Review pending security exemptions and make batch approval or rejection decisions                             | `projectId` (optional)                                                  |
+| `bulk-exemption-create`     | Create justified security exemptions for multiple STO issues with explicit scope and duration guidance        | `projectId` (required), `exemption_type` (required), `reason` (required), issue filters (optional) |
+| `access-control-audit`      | Audit user permissions, over-privileged accounts, and role assignments to enforce least-privilege             | `projectId` (optional), `orgId` (optional)                              |
+
+
+### Harness Code
+
+
+| Prompt           | Description                                                                                                                                  | Parameters                                                                                                       |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `code-review`    | Review a pull request — analyze diff, commits, checks, and comments to provide structured feedback on bugs, security, performance, and style | `repoId` (required), `prNumber` (required), `projectId` (optional)                                               |
+| `pr-summary`     | Auto-generate a PR title and description from the commit history and diff of a branch                                                        | `repoId` (required), `sourceBranch` (required), `targetBranch` (optional, default: main), `projectId` (optional) |
+| `branch-cleanup` | Analyze branches in a repository and recommend stale or merged branches to delete                                                            | `repoId` (required), `projectId` (optional)                                                                      |
+
+
+## MCP Resources
+
+
+| Resource URI                                   | Description                                                      | MIME Type                 |
+| ---------------------------------------------- | ---------------------------------------------------------------- | ------------------------- |
+| `pipeline:///{pipelineId}`                     | Pipeline YAML definition                                         | `application/x-yaml`      |
+| `pipeline:///{orgId}/{projectId}/{pipelineId}` | Pipeline YAML (with explicit scope)                              | `application/x-yaml`      |
+| `executions:///recent`                         | Last 10 pipeline execution summaries                             | `application/json`        |
+| `schema:///pipeline`                           | Harness pipeline JSON Schema                                     | `application/schema+json` |
+| `schema:///template`                           | Harness template JSON Schema                                     | `application/schema+json` |
+| `schema:///trigger`                            | Harness trigger JSON Schema                                      | `application/schema+json` |
+| `schema:///pipeline_v1` **(Alpha)**            | Harness V1 pipeline JSON Schema (simplified stages/steps format) | `application/schema+json` |
+| `schema:///agent-pipeline`                     | Harness AI agent pipeline JSON Schema                            | `application/schema+json` |
+| `agent-docs:///legacy-format`                  | Legacy agent spec format reference (`agent.step.group.steps` / `PLUGIN_TASK`), read by the `create-agent` prompt when updating an existing legacy-format agent | `text/markdown`           |
+
+
+## Toolset Filtering
+
+By default, 41 of 45 toolsets are enabled. Four toolsets are opt-in and excluded from the defaults:
+
+- **`ansible`** — Harness Ansible (inventories, playbooks, hosts, activity). Opt-in because it is project-scoped and adds concepts many users do not need.
+- **`autonomous_work`** — Development Harness (autonomous work). Opt-in; see toolset description for scope.
+- **`observability-evaluations`** — Scheduled production-telemetry evaluation rules. Opt-in because it depends on the deployed scoring control plane.
+- **`registries-v3`** — Harness Artifact Registry v3 (packages, versions, files, metadata, scans, firewall exceptions). Opt-in until v3 writes land, so agents don't have to disambiguate between v1 registries/artifacts and v3 packages/versions.
+
+### Adding toolsets with `+` prefix
+
+Use the `+` prefix to explicitly include opt-in toolsets alongside all defaults:
+
+```bash
+# Explicitly include Ansible alongside all defaults
+HARNESS_TOOLSETS=+ansible
+```
+
+### Removing default toolsets
+
+Use the `-` prefix to exclude toolsets you don't need:
+
+```bash
+# Remove chaos and ccm from defaults
+HARNESS_TOOLSETS=-chaos,-ccm
+```
+
+### Combining + and -
+
+```bash
+# Add Ansible, remove chaos
+HARNESS_TOOLSETS=+ansible,-chaos
+```
+
+### Explicit allowlist
+
+An explicit comma-separated list (no prefixes) replaces the defaults entirely. Only the listed toolsets are enabled:
+
+```bash
+# Only expose pipelines, services, and connectors
+HARNESS_TOOLSETS=pipelines,services,connectors
+```
+
+Available toolset names:
+
+
+| Toolset                 | Resource Types                                                                                                                                                                                                                                                                                  |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `platform`              | organization, project                                                                                                                                                                                                                                                                           |
+| `pipelines`             | pipeline, pipeline_v1, pipeline_dynamic_execution, execution, execution_inputs, trigger, pipeline_summary, input_set, approval_instance                                                                                                                                                         |
+| `agents`                | agent, agent_run                                                                                                                                                                                                                                                                                |
+| `services`              | service                                                                                                                                                                                                                                                                                         |
+| `environments`          | environment                                                                                                                                                                                                                                                                                     |
+| `connectors`            | connector, connector_catalogue                                                                                                                                                                                                                                                                  |
+| `infrastructure`        | infrastructure                                                                                                                                                                                                                                                                                  |
+| `secrets`               | secret                                                                                                                                                                                                                                                                                          |
+| `logs`                  | execution_log                                                                                                                                                                                                                                                                                   |
+| `audit`                 | audit_event                                                                                                                                                                                                                                                                                     |
+| `delegates`             | delegate, delegate_token                                                                                                                                                                                                                                                                        |
+| `repositories`          | repository, branch, commit, file_content, tag, repo_rule, space_rule                                                                                                                                                                                                                            |
+| `registries`            | registry, artifact, artifact_version, artifact_file                                                                                                                                                                                                                                             |
+| `file_store`            | file_store                                                                                                                                                                                                                                                                                      |
+| `templates`             | template                                                                                                                                                                                                                                                                                        |
+| `dashboards`            | dashboard, dashboard_data                                                                                                                                                                                                                                                                       |
+| `idp`                   | idp_entity, scorecard, scorecard_check, scorecard_stats, scorecard_check_stats, idp_score, idp_workflow, idp_tech_doc                                                                                                                                                                           |
+| `pull-requests`         | pull_request, pr_reviewer, pr_comment, pr_check, pr_activity                                                                                                                                                                                                                                    |
+| `feature-flags`         | fme_workspace, fme_environment, fme_feature_flag, fme_feature_flag_definition, fme_rollout_status, fme_rule_based_segment, fme_rule_based_segment_definition, fme_traffic_type, fme_identity, fme_standard_segment, fme_segment_keys, fme_segment, fme_segment_definition, fme_metric, fme_event_type                       |
+| `gitops`                | gitops_agent, gitops_argo_project, gitops_app_project_mapping, gitops_autocreate_log, gitops_application, gitops_cluster, gitops_repository, gitops_applicationset, gitops_repo_credential, gitops_app_event, gitops_pod_log, gitops_managed_resource, gitops_resource_action, gitops_dashboard, gitops_app_resource_tree, gitops_cluster_link |
+| `chaos`                 | chaos_experiment, chaos_experiment_run, chaos_experiment_variable, chaos_component_variable, chaos_input_set, chaos_experiment_template, chaos_probe, chaos_probe_in_run, chaos_probe_template, chaos_infrastructure, chaos_k8s_infrastructure, chaos_enabled_infrastructure, chaos_environment, chaos_hub, chaos_hub_fault, chaos_fault, chaos_fault_template, chaos_fault_experiment_run, chaos_action, chaos_action_template, chaos_loadtest, chaos_service, chaos_application_map, discovered_agent, discovered_namespace, discovered_service, discovered_network_map, chaos_guard_condition, chaos_guard_rule, chaos_recommendation, chaos_risk, chaos_dr_test, scanned_risk, chaos_risk_rule, chaos_risk_scan |
+| `ccm`                   | cost_perspective, cost_breakdown, cost_timeseries, cost_summary, cost_recommendation, cost_anomaly, cost_anomaly_summary, cost_category, cost_account_overview, cost_filter_value, cost_recommendation_stats, cost_recommendation_detail, cost_commitment                                       |
+| `sei`                   | sei_metric, sei_productivity_metric, sei_dora_metric, sei_team, sei_team_detail, sei_org_tree, sei_org_tree_detail, sei_business_alignment, sei_ai_usage, sei_ai_adoption, sei_ai_impact, sei_ai_raw_metric                                                                                     |
+| `scs`                   | scs_artifact_source, artifact_security, scs_artifact_component, scs_artifact_remediation, scs_chain_of_custody, scs_compliance_result, code_repo_security, scs_sbom                                                                                                                             |
+| `evidence-vault`        | attestation                                                                                                                                                                                                                                                                                     |
+| `sto`                   | security_issue, security_issue_filter, security_exemption, remediation_diff                                                                                                                                                                                                                     |
+| `dbops`                 | database_schema, database_instance, database_snapshot_object, database_llm_authoring_pipeline                                                                                                                                                                                                   |
+| `autonomous_work` *(opt-in)* | work_item, work_item_resume, work_item_approve, work_timeline, work_budget, work_phase, work_phase_artifact, work_artifact, budget, budget_grant, budget_usage, work_class, work_trigger, capability, risk_evaluator, team, member, member_template, software_component, content_source_connector |
+| `access_control`        | user, user_group, service_account, role, role_assignment, resource_group, permission                                                                                                                                                                                                            |
+| `governance`            | policy, policy_set, policy_evaluation                                                                                                                                                                                                                                                           |
+| `freeze`                | freeze_window, global_freeze                                                                                                                                                                                                                                                                    |
+| `overrides`             | service_override                                                                                                                                                                                                                                                                                |
+| `settings`              | setting                                                                                                                                                                                                                                                                                         |
+| `knowledge-graph`       | kg_queryable_type_summary, kg_grammar, hql_query                                                                                                                                                                                                                                                |
+| `semantic-layer`        | kg_type, kg_related_type                                                                                                                                                                                                                                                                        |
+| `ai-evals`              | eval_dataset, eval_dataset_item, evaluation, eval_run, eval_run_item, eval_run_by_eval, eval_metric, eval_metric_set, eval_metric_set_entry, eval_suite, eval_suite_evaluation, eval_suite_run, eval_target, eval_annotation, eval_analytics, eval_git_settings, eval_registry_item, eval_git_registration, online_eval |
+| `observability-evaluations` *(opt-in)* | observability_evaluation_rule                                                                                                                                                                                                                                                    |
+| `iacm`                  | iacm_workspace, iacm_variable_set, iacm_resource, iacm_module, iacm_provider, iacm_workspace_costs, iacm_activity_resource_change                                                                                                                                                               |
+| `ansible` *(opt-in)*    | ansible_inventory, ansible_playbook, ansible_host, ansible_host_activity, ansible_activity                                                                                                                                                                                                      |
+| `registries-v3` *(opt-in)* | package_v3, version_v3, file_v3, registry_metadata_v3, package_metadata_v3, version_metadata_v3, file_metadata_v3, metadata_key_v3, metadata_value_v3, artifact_scan_v3, bulk_scan_evaluation_v3, firewall_exception_v3, firewall_exception_version_v3                                       |
+| `release-management`  | release_process, release_activity, release, release_execution_phase, release_execution_task, release_execution_activity, release_input, release_execution_phase_input, release_execution_phase_output, release_execution_activity_input, release_execution_activity_output |
+| `vibe`                | vibe_project, vibe_app_lifecycle |
+
+
+## Architecture
+
+```
+                 +------------------+
+                 |   AI Agent       |
+                 |  (Claude, etc.)  |
+                 +--------+---------+
+                          |  MCP (stdio or HTTP)
+                 +--------v---------+
+                |    MCP Server     |
+                | 11 Generic Tools  |
+                 +--------+---------+
+                          |
+                 +--------v---------+
+                |    Registry       |  <-- Declarative resource definitions
+                | 45 Toolsets (41 default) |
+                |  255 Resource Types|
+                 +--------+---------+
+                          |
+                 +--------v---------+
+                 |  HarnessClient    |  <-- Auth, retry, rate limiting
+                 +--------+---------+
+                          |  HTTPS
+                 +--------v---------+
+                 |  Harness REST API |
+                 +-------------------+
+```
+
+### How It Works
+
+1. **Tools** are generic verbs: `harness_list`, `harness_get`, etc. They accept a `resource_type` parameter that routes to the correct API endpoint.
+2. **The Registry** maps each `resource_type` to a `ResourceDefinition` — a declarative data structure specifying the HTTP method, URL path, path/query parameter mappings, and response extraction logic.
+3. **Dispatch** resolves the resource definition, builds the HTTP request (path substitution, query params, `resource_scope`-aware account/org/project injection), calls the Harness API through `HarnessClient`, and extracts the relevant response data.
+4. **Toolset filtering** (`HARNESS_TOOLSETS`) controls which resource definitions are loaded into the registry at startup.
+5. **Structured output** is declared with MCP `outputSchema`; `harness_list` coerces arrays and common list wrappers into object-shaped `structuredContent` for strict clients.
+6. **Deep links** are automatically appended to responses, providing direct Harness UI URLs for every resource.
+7. **Compact mode** strips verbose metadata from list results, keeping only actionable fields (identity, status, type, timestamps, deep links) to minimize token usage.
+
+### Adding a New Resource Type
+
+Create a new file in `src/registry/toolsets/` or add a resource to an existing toolset:
+
+```typescript
+// src/registry/toolsets/my-module.ts
+import type { ToolsetDefinition } from "../types.js";
+
+export const myModuleToolset: ToolsetDefinition = {
+  name: "my-module",
+  displayName: "My Module",
+  description: "Description of the module",
+  resources: [
+    {
+      resourceType: "my_resource",
+      displayName: "My Resource",
+      description: "What this resource represents",
+      toolset: "my-module",
+      scope: "project",                    // "project" | "org" | "account"
+      identifierFields: ["resource_id"],
+      listFilterFields: ["search_term"],
+      operations: {
+        list: {
+          method: "GET",
+          path: "/my-module/api/resources",
+          queryParams: { search_term: "search", page: "page", size: "size" },
+          responseExtractor: (raw) => raw,
+          description: "List resources",
+        },
+        get: {
+          method: "GET",
+          path: "/my-module/api/resources/{resourceId}",
+          pathParams: { resource_id: "resourceId" },
+          responseExtractor: (raw) => raw,
+          description: "Get resource details",
+        },
+      },
+    },
+  ],
+};
+```
+
+Then import it in `src/registry/index.ts` and add it to the `ALL_TOOLSETS` array. No changes needed to any tool files.
+
+## Development
+
+```bash
+# Build
+pnpm build
+
+# Watch mode
+pnpm dev
+
+# Type check
+pnpm typecheck
+
+# Run tests
+pnpm test
+
+# Watch tests
+pnpm test:watch
+
+# Interactive MCP Inspector
+pnpm inspect
+
+# Refresh generated README counts from the built registry
+pnpm docs:generate
+
+# Verify README counts and clone instructions are current
+pnpm docs:check
+
+# Sync and verify JSON Schemas used by harness_schema
+pnpm sync-schemas
+pnpm check-schema-coverage
+```
+
+### Project Structure
+
+```
+src/
+  index.ts                          # Entrypoint, transport setup
+  config.ts                         # Env var validation (Zod)
+  client/
+    harness-client.ts               # HTTP client (auth, retry, rate limiting)
+    types.ts                        # Shared API types
+  registry/
+    index.ts                        # Registry class + dispatch logic
+    types.ts                        # ResourceDefinition, ToolsetDefinition, etc.
+    toolsets/                        # One file per toolset (declarative data)
+      platform.ts
+      pipelines.ts
+      services.ts
+      ccm.ts
+      access-control.ts
+      ...
+  tools/                            # 11 generic MCP tools
+    harness-list.ts
+    harness-get.ts
+    harness-create.ts
+    harness-update.ts
+    harness-delete.ts
+    harness-execute.ts
+    harness-search.ts
+    harness-diagnose.ts
+    harness-describe.ts
+    harness-status.ts
+    harness-schema.ts
+
+  resources/                        # MCP resource providers
+    pipeline-yaml.ts
+    execution-summary.ts
+  prompts/                          # MCP prompt templates
+    build-deploy-app.ts             # DevOps: end-to-end build & deploy workflow
+    debug-pipeline.ts               # DevOps: debug failed executions
+    create-pipeline.ts              # DevOps: generate pipeline from requirements
+    onboard-service.ts              # DevOps: onboard new service
+    dora-metrics.ts                 # DevOps: DORA metrics review
+    setup-gitops.ts                 # DevOps: GitOps application setup
+    chaos-resilience.ts             # DevOps: chaos experiment design
+    feature-flag-rollout.ts         # DevOps: progressive flag rollout
+    migrate-to-template.ts          # DevOps: extract templates from pipeline
+    delegate-health.ts              # DevOps: delegate health check
+    developer-scorecard.ts          # DevOps: IDP scorecard review
+    optimize-costs.ts               # FinOps: cost optimization
+    cloud-cost-breakdown.ts         # FinOps: cost deep-dive
+    commitment-utilization.ts       # FinOps: RI/savings plan analysis
+    cost-anomaly.ts                 # FinOps: anomaly investigation
+    rightsizing.ts                  # FinOps: rightsizing recommendations
+    security-review.ts              # DevSecOps: security issue review
+    vulnerability-triage.ts         # DevSecOps: vulnerability triage
+    sbom-compliance.ts              # DevSecOps: SBOM compliance audit
+    supply-chain-audit.ts           # DevSecOps: supply chain audit
+    exemption-review.ts             # DevSecOps: exemption approval
+    access-control-audit.ts         # DevSecOps: access control audit
+    code-review.ts                  # Harness Code: PR code review
+    pr-summary.ts                   # Harness Code: auto-generate PR summary
+    branch-cleanup.ts               # Harness Code: stale branch cleanup
+    pending-approvals.ts            # Approvals: find and act on pending approvals
+  utils/
+    cli.ts                          # CLI arg parsing (transport, port)
+    errors.ts                       # Error normalization
+    logger.ts                       # stderr-only logger
+    progress.ts                     # MCP progress & logging notifications
+    rate-limiter.ts                 # Client-side rate limiting
+    deep-links.ts                   # Harness UI deep link builder
+    response-formatter.ts           # Consistent MCP response formatting
+    compact.ts                      # Compact list output for token efficiency
+tests/
+  config.test.ts                    # Config schema validation tests
+  utils/
+    response-formatter.test.ts
+    deep-links.test.ts
+    errors.test.ts
+  registry/
+    registry.test.ts                # Registry loading, filtering, dispatch tests
+```
+
+## Elicitation
+
+The write tools (`harness_create`, `harness_update`, `harness_delete`, `harness_execute`) use [MCP elicitation](https://modelcontextprotocol.io/specification/2025-03-26/server/utilities/elicitation) to prompt the user for confirmation when the action's risk requires it — `medium_write`, `high_write`, and `destructive` operations only. Low-risk creates / updates / reads (e.g. `pipeline.create`, `pipeline.update`, `hql_query.run`) proceed silently with no prompt. When a prompt is surfaced, the user sees what's about to happen and accepts or declines, giving real human-in-the-loop approval for the operations that actually mutate or run things.
+
+**How it works:**
+
+1. The LLM calls a write tool with `medium_write`+ risk (e.g. `harness_delete`, `harness_execute pipeline.run`). Low-risk creates / updates / reads do not surface a prompt.
+2. The server sends an elicitation request to the client with a summary of the operation and a `confirm` checkbox (default checked).
+3. The user sees the details and clicks **Accept** (with `confirm` checked) or **Decline / Cancel**.
+4. If accepted with `confirm: true`, the operation proceeds. If accepted with `confirm` unchecked, declined, or cancelled, it's blocked and the LLM is told (an explicit decline is **authoritative** and not bypassed by `confirm: true` on the tool call).
+
+**Client support:**
+
+
+| Client            | Elicitation Support |
+| ----------------- | ------------------- |
+| Cursor            | Yes                 |
+| VS Code (Copilot) | Yes                 |
+| Claude Desktop    | Not yet             |
+| Devin Desktop | Not yet             |
+| MCP Inspector     | Yes                 |
+
+
+Elicitation behavior varies by operation risk when client support is missing:
+
+
+| Risk Level                                    | Client supports elicitation | `confirm: true` passed | Behavior                                          |
+| --------------------------------------------- | --------------------------- | ---------------------- | ------------------------------------------------- |
+| `read`, `low_write`                           | any                         | any                    | Proceed silently — no prompt is surfaced (`confirm` has no effect at this risk tier) |
+| `medium_write`, `high_write`, `destructive`   | Yes                         | any                    | Prompt user. Proceed only if user accepts **with** `confirm: true` (the schema's default). An explicit decline, cancel, or accept with `confirm: false` (user unchecked the box) is **authoritative** and is not bypassed by `confirm: true` on the tool call. An accept missing the `confirm` field is treated as the client failing to surface a usable prompt — recoverable by retrying with `confirm: true` |
+| `medium_write`, `high_write`, `destructive`   | No                          | No                     | **BLOCK** (return error with hint to retry with `confirm: true`) |
+| `medium_write`, `high_write`, `destructive`   | No                          | Yes                    | Proceed (explicit opt-in for non-interactive automation) |
+| any (at or below `HARNESS_AUTO_APPROVE_RISK`) | any                         | any                    | Auto-approve without prompting                    |
+
+
+If `elicitInput` fails at runtime (transport error, unsupported method) for a `medium_write`+ operation, the call is blocked unless the caller passes `confirm: true`. `confirm: true` is honored as a fallback when the client could not surface a prompt or returned a degenerate accept (`{action: "accept"}` without the confirm field), but it does **not** override an explicit decline/cancel from a client that completed the elicitation handshake.
+
+### Autonomous Mode
+
+**Autonomous mode** means the server proceeds with all operations — including writes and destructive actions — without prompting for confirmation. Enable it by setting:
+
+```bash
+HARNESS_AUTO_APPROVE_RISK=all
+```
+
+This is the deployment-level ceiling: once set, individual sessions cannot escalate beyond it (though they can choose a stricter threshold per-session via the `x-harness-auto-approve-risk` header).
+
+Or in your MCP client config:
+
+```json
+{
+  "mcpServers": {
+    "harness": {
+      "command": "npx",
+      "args": ["harness-mcp-v2"],
+      "env": {
+        "HARNESS_API_KEY": "pat.xxx.xxx.xxx",
+        "HARNESS_AUTO_APPROVE_RISK": "all"
+      }
+    }
+  }
+}
+```
+
+**Partial autonomy:** You can also auto-approve only up to a specific risk level while still prompting for higher-risk operations:
+
+```bash
+# Auto-approve reads and low-risk writes; prompt for medium_write, high_write, destructive
+HARNESS_AUTO_APPROVE_RISK=low_write
+
+# Auto-approve up to high-risk writes; only prompt for destructive operations
+HARNESS_AUTO_APPROVE_RISK=high_write
+```
+
+| Value | What's auto-approved |
+|---|---|
+| `none` (default) | Nothing — no auto-approval threshold |
+| `low_write` | Reads + low-risk writes |
+| `medium_write` | Reads + low + medium-risk writes |
+| `high_write` | Reads + low + medium + high-risk writes |
+| `all` | Everything, including destructive operations |
+
+> **Autonomous mode warning:** `HARNESS_AUTO_APPROVE_RISK=all` skips confirmation for **all** operations including `harness_delete`. Use with caution and consider pairing with `HARNESS_TOOLSETS` to restrict which resource types are available.
+
+> **Migration note:** `HARNESS_SKIP_ELICITATION=true` is still supported and maps to `HARNESS_AUTO_APPROVE_RISK=all`. A deprecation warning is logged to stderr. If both are set, `HARNESS_AUTO_APPROVE_RISK` takes precedence.
+
+## Safety
+
+- **Secrets are never exposed.** The `secret` resource type returns metadata only (name, type, scope) — secret values are never included in any response.
+- **Confirmation-requiring operations use elicitation when available.** When a write or execute action has `medium_write`, `high_write`, or `destructive` risk, `harness_create`, `harness_update`, `harness_delete`, and `harness_execute` attempt MCP elicitation before proceeding (see [Elicitation](#elicitation)). Low-risk actions (`read`, `low_write` — e.g. `pipeline.create`, `pipeline.update`, `hql_query.run`) proceed silently with no prompt.
+- **Medium-risk and above fail closed.** If confirmation cannot be obtained for `medium_write`, `high_write`, or `destructive` operations, they are blocked instead of executing blindly. Override with `HARNESS_AUTO_APPROVE_RISK` for autonomous workflows.
+- **CORS restricted to same-origin.** The HTTP transport only allows same-origin requests, preventing CSRF attacks from malicious websites targeting the MCP server on localhost.
+- **HTTP rate limiting.** The HTTP transport enforces 60 requests per minute per IP to prevent request flooding.
+- **API rate limiting.** The Harness API client enforces a 10 requests/second limit to avoid hitting upstream rate limits.
+- **Pagination bounds enforced.** List queries are capped at 10,000 items total and 100 per page to prevent memory exhaustion.
+- **Retries with backoff.** Transient failures (HTTP 429, 5xx) are retried with exponential backoff and jitter.
+- **Localhost binding.** The HTTP transport binds to `127.0.0.1` by default — not accessible from the network.
+- **No stdout logging.** All logs go to stderr to avoid corrupting the stdio JSON-RPC transport.
+
+## Complementary Skills
+
+The Harness MCP server pairs well with **[Harness Skills](https://github.com/harness/harness-skills)** — a collection of ready-made Claude Code skills (slash commands) designed for common Harness workflows. Install them alongside this MCP server to get high-level automation like `/deploy`, `/rollback`, `/triage`, and more without writing custom prompts.
+
+## Troubleshooting & Common Pitfalls
+
+
+| Symptom                                                                          | Likely Cause                                                                                         | What to Do                                                                                                                           |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `HARNESS_ACCOUNT_ID is required when the API key does not include an account ID segment...` | API key is not in a supported account-scoped format (`pat.<accountId>...` or `sat.<accountId>...`) so account ID cannot be inferred | Set `HARNESS_ACCOUNT_ID` explicitly |
+| `Unknown transport: "..."` on startup                                            | Unsupported CLI transport arg                                                                        | Use `stdio` or `http` only                                                                                                           |
+| `Invalid HARNESS_TOOLSETS: ...` on startup                                       | One or more toolset names are not recognized                                                         | Use only names from [Toolset Filtering](#toolset-filtering) (exact match)                                                            |
+| HTTP `mcp-session-id header is required...`                                      | A session request was sent without session header                                                    | Send `initialize` first, then include `mcp-session-id` on `POST/GET/DELETE /mcp`                                                     |
+| HTTP `Session not found...`                                                      | Session expired after `MCP_SESSION_TTL_MS` idle milliseconds or already closed                        | Re-run `initialize` to create a new session, then retry with new header                                                              |
+| HTTP `405 Method Not Allowed` on `/mcp`                                          | Unsupported method for MCP endpoint                                                                  | Use `POST`, `GET`, `DELETE`, or `OPTIONS` only                                                                                       |
+| HTTP `Invalid request`                                                           | Invalid JSON body or request body exceeded `HARNESS_MAX_BODY_SIZE_MB`                                | Validate JSON payload size/shape; increase `HARNESS_MAX_BODY_SIZE_MB` if needed                                                      |
+| `Unknown resource_type "..."` from tools                                         | Resource type is misspelled or filtered out via `HARNESS_TOOLSETS`                                   | Call `harness_describe` (with optional `search_term`) to discover valid types                                                        |
+| `Missing required field "... for path parameter ..."`                            | A project/org scoped call is missing identifiers                                                     | Set `HARNESS_ORG`/`HARNESS_PROJECT` or pass `org_id`/`project_id` per tool call                                                      |
+| `resource_scope "org" requires org_id...` or `resource_scope "project" requires project_id...` | A multi-scope resource was forced to org/project scope without enough identifiers                     | Pass the missing `org_id`/`project_id`, configure `HARNESS_ORG`/`HARNESS_PROJECT`, or use `resource_scope: "account"` when supported |
+| `Read-only mode is enabled ... operations are not allowed`                       | `HARNESS_READ_ONLY=true` blocks create/update/delete/execute                                         | Set `HARNESS_READ_ONLY=false` if write operations are intended                                                                       |
+| Pipeline run fails pre-flight with unresolved required inputs                    | Provided `inputs` did not cover required runtime placeholders                                        | Fetch `runtime_input_template`, supply missing simple keys, or use `input_set_ids` for structural inputs                             |
+| Pipeline CI shorthand (`branch`, `tag`, `pr_number`, `commit_sha`) did not apply | `inputs.build` was already provided, so shorthand expansion was intentionally skipped                | Remove `inputs.build` to use shorthand expansion, or keep full explicit `build` structure                                            |
+| Pipeline run loaded the wrong YAML revision                                     | The pipeline definition is stored in Git and the run did not specify the desired pipeline branch      | Pass `params.pipeline_branch` on the `run` action; this maps to Harness `branch`                                                     |
+| `wait: true` returned `_wait.error`                                              | The pipeline trigger succeeded, but server-side polling failed                                       | Recheck the `execution_id` with `harness_get(resource_type="execution", ...)` before deciding whether to rerun                        |
+| `wait: true` returned `execution_timed_out: true`                                | The execution did not reach a terminal status before `wait_timeout_seconds`                          | Use the returned `execution_id` to recheck status; wait for a terminal status before running `harness_diagnose`                       |
+| Execution logs are empty or blob downloads return 403                           | Harness-hosted log blob URLs require the configured Harness client/auth path, especially for internal or self-managed hosts | Keep `HARNESS_BASE_URL` pointed at the target Harness host and use `harness_get(resource_type="execution_log", ...)` or `harness_diagnose(..., include_logs=true)` rather than bypassing the MCP client |
+| `Operation declined by user` / `Operation cancelled by user`                     | User declined or cancelled the elicitation confirmation dialog — authoritative                       | Verify operation details with the user; `confirm: true` does **not** bypass an explicit decline. The user must accept the prompt   |
+| `Operation blocked: the client could not surface a usable confirmation prompt`   | Client lacks elicitation support, `elicitInput` failed, or returned a degenerate accept              | Retry with `confirm: true` for non-interactive automation, or use a client that supports elicitation                                |
+| `body.template_yaml (or body.yaml) is required` for template create/update       | Template APIs expect full YAML payload                                                               | Provide full `template_yaml` string in `body`; for deletes, pass `version_label` to delete one version (omit to delete all versions) |
+| `HARNESS_BASE_URL must use HTTPS` on startup                                     | `HARNESS_BASE_URL` is set to an HTTP URL                                                             | Use HTTPS, or set `HARNESS_ALLOW_HTTP=true` for local development                                                                    |
+
+
+## License
+
+MIT

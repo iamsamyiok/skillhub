@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Helper script for running turbo with tracking disabled
+# so that we don't have to export this env var everywhere.
+
+export DO_NOT_TRACK=1
+
+turbo "$@"

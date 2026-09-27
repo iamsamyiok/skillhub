@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "latex-mcp-server"
+version = "0.1.0"
+description = "MCP server for LaTeX projects combining Python and TypeScript functions"
+authors = [ { name = "Yeok", email = "yeoktattcheah@gmail.com" } ]
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+  "typing-extensions>=4.8.0",
+  "pypdf>=4.0.0"
+]
+
+[project.scripts]
+latex-mcp-server = "latex_mcp_server.server:main"
+
+[project.optional-dependencies]
+dev = [
+  "black>=24.0.0",
+  "ruff>=0.5.0",
+  "mypy>=1.8.0",
+  "pytest>=8.0.0"
+]
+
+[tool.setuptools.package-data]
+"latex_mcp_server" = ["ts_dist/**/*"]
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+
+[tool.mypy]
+strict = false
+
+[tool.setuptools]
+# Use automatic package discovery so subpackages (e.g. latex_mcp_server.functions) are included
+
+[tool.setuptools.packages.find]
+include = ["latex_mcp_server", "latex_mcp_server.*"]

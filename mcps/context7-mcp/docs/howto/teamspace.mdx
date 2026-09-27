@@ -1,0 +1,67 @@
+---
+title: Manage Your Teamspace
+description: Invite members and manage teamspace permissions
+---
+
+Add team members, assign roles, and manage access to your Context7 dashboard from the [members tab](https://context7.com/dashboard?tab=members).
+
+![Members tab displaying team members list with owner, admins, and developers](/images/dashboard/members-tab.png)
+
+## Creating a Teamspace
+
+![Create teamspace dropdown](/images/dashboard/user-dropdown.png)
+
+<Steps>
+  <Step title="Open the teamspace menu">
+    Click **Create a teamspace** from the top-left dropdown.
+  </Step>
+  <Step title="Name the teamspace">
+    Enter a teamspace name.
+  </Step>
+</Steps>
+
+<Note>You must have a Pro or Enterprise plan to create a teamspace. Only the teamspace owner needs a paid plan — invited members don't need their own subscription. Once added, all members automatically benefit from the team's Pro or Enterprise limits.</Note>
+
+## Roles
+
+| Permission            | Owner | Admin | Developer |
+| --------------------- | ----- | ----- | --------- |
+| View dashboard        | ✓     | ✓     | ✓         |
+| Create API keys       | ✓     | ✓     | ✓         |
+| Manage team members   | ✓     | ✓     | ✗         |
+| Manage library access | ✓     | ✓     | ✗         |
+| Manage private sources | ✓     | ✓     | ✗         |
+| Rename teamspace      | ✓     | ✗     | ✗         |
+| Delete teamspace      | ✓     | ✗     | ✗         |
+
+## Inviting Members
+
+<Steps>
+  <Step title="Enter the member's email">
+    Enter the email address of the person you want to invite.
+  </Step>
+  <Step title="Select a role">
+    Choose **Developer** or **Admin**.
+  </Step>
+  <Step title="Send the invite">
+    Click **Add**. The member receives an invitation email and is automatically added to the teamspace once they sign in.
+  </Step>
+</Steps>
+
+<Note>The invitation will remain pending until they sign in.</Note>
+
+## Teamspace Settings
+
+If you are the owner of the teamspace, you can rename or delete the teamspace under the overview tab.
+
+![Teamspace management card](/images/dashboard/teamspace-management.png)
+
+<Warning>Deleting a teamspace is permanent. All members lose access immediately.</Warning>
+
+## Limits
+
+| Plan       | Max Members       |
+| ---------- | ----------------- |
+| Free       | 1 (personal only) |
+| Pro        | 10                |
+| Enterprise | Unlimited         |

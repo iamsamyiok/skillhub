@@ -1,0 +1,519 @@
+/**
+ * Core types for the resource registry and dispatch system.
+ */
+
+import type { RequestOptions } from "../client/types.js";
+
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+// ---------------------------------------------------------------------------
+// OperationPolicy — risk + retry contract for every endpoint spec
+// ---------------------------------------------------------------------------
+
+export type RiskLevel =
+  | "read"
+  | "low_write"
+  | "medium_write"
+  | "high_write"
+  | "destructive";
+
+export type RetryPolicy =
+  | "safe"
+  | "idempotency_key_required"
+  | "do_not_retry";
+
+export interface OperationPolicy {
+  risk: RiskLevel;
+  retryPolicy: RetryPolicy;
+}
+
+/**
+ * @deprecated Use `requiresConfirmation()` instead. After the P3 elicitation
+ * refactor, the blocking threshold is `medium_write` (not just `high_write`).
+ * This function remains for backward compatibility only.
+ */
+export function isBlockingRisk(risk: RiskLevel): boolean {
+  return risk === "high_write" || risk === "destructive";
+}
+
+// ---------------------------------------------------------------------------
+// Risk severity ordering + auto-approve / confirmation helpers
+// ---------------------------------------------------------------------------
+
+/** Explicit numeric ordering of risk levels. */
+export const RISK_SEVERITY: ReadonlyMap<RiskLevel, number> = new Map([
+  ["read", 0],
+  ["low_write", 1],
+  ["medium_write", 2],
+  ["high_write", 3],
+  ["destructive", 4],
+]);
+
+export type AutoApproveRisk = "none" | RiskLevel | "all";
+
+/**
+ * Returns true when the operation risk is at or below the auto-approve
+ * threshold, meaning it should proceed without user confirmation.
+ */
+export function shouldAutoApprove(opRisk: RiskLevel, threshold: AutoApproveRisk): boolean {
+  if (threshold === "none") return false;
+  if (threshold === "all") return true;
+  const opSeverity = RISK_SEVERITY.get(opRisk) ?? 999;
+  const thresholdSeverity = RISK_SEVERITY.get(threshold as RiskLevel) ?? -1;
+  return opSeverity <= thresholdSeverity;
+}
+
+/**
+ * Returns true when the risk level requires blocking the operation on clients
+ * that lack elicitation support (medium_write and above).
+ */
+export function requiresConfirmation(risk: RiskLevel): boolean {
+  return risk === "medium_write" || risk === "high_write" || risk === "destructive";
+}
+
+// ---------------------------------------------------------------------------
+// Minimal interfaces for PreflightContext (avoids circular imports).
+// The concrete HarnessClient and Registry satisfy these structurally, so
+// preflight hooks can call the methods they need without unsafe casts.
+// `RequestOptions` is imported from client/types (which has no registry
+// imports), so no dependency cycle is introduced.
+// ---------------------------------------------------------------------------
+
+export interface HarnessClientInterface {
+  readonly account: string;
+  /** Resolve the current user's id (cached). Used by preflight hooks that stamp requester/approver. */
+  getCurrentUserId(): Promise<string>;
+  /** Issue an authenticated Harness request. Used by preflight hooks that fetch defaults. */
+  request<T>(options: RequestOptions): Promise<T>;
+}
+
+export interface RegistryDispatchInterface {
+  dispatch(
+    client: HarnessClientInterface,
+    resourceType: string,
+    operation: string,
+    input: Record<string, unknown>,
+    signal?: AbortSignal,
+  ): Promise<unknown>;
+  getResource(resourceType: string): ResourceDefinition;
+  /** Default org identifier from config, when set. */
+  readonly orgId: string | undefined;
+  /** Default project identifier from config, when set. */
+  readonly projectId: string | undefined;
+}
+
+/**
+ * Context passed to EndpointSpec.preflight hooks. Uses structural interfaces
+ * so this module does not import HarnessClient/Registry (which would create a
+ * cycle), while still exposing the concrete methods hooks need.
+ */
+export interface PreflightContext {
+  client: HarnessClientInterface;
+  input: Record<string, unknown>;
+  registry: RegistryDispatchInterface;
+  signal?: AbortSignal;
+  /**
+   * Effective tenant for this dispatch (`registry.getAccountId()`).
+   * In chat MCP this is the per-request account, not `client.account`
+   * (the process-scoped placeholder).
+   */
+  accountId?: string;
+}
+
+export type ToolsetName =
+  | "pipelines"
+  | "agents"
+  | "services"
+  | "environments"
+  | "infrastructure"
+  | "connectors"
+  | "secrets"
+  | "logs"
+  | "audit"
+  | "delegates"
+  | "repositories"
+  | "registries"
+  | "registries-v3"
+  | "templates"
+  | "dashboards"
+  | "idp"
+  | "pull-requests"
+  | "feature-flags"
+  | "gitops"
+  | "chaos"
+  | "ccm"
+  | "sei"
+  | "scs"
+  | "evidence-vault"
+  | "sto"
+  | "dbops"
+  | "autonomous_work"
+  | "access_control"
+  | "settings"
+  | "platform"
+  | "file_store"
+
+  | "governance"
+  | "freeze"
+  | "overrides"
+  | "iacm"
+  | "ansible"
+  | "ai-evals"
+  | "observability-evaluations"
+  | "incidents"
+  | "alerts"
+  | "deploys"
+  | "release-management"
+  | "vibe"
+  | "knowledge-graph"
+  | "semantic-layer";
+
+export type ProductName = "harness" | "fme";
+
+export type OperationName = "list" | "get" | "create" | "update" | "delete";
+export type ResourceScope = "project" | "org" | "account";
+
+/**
+ * Lightweight field descriptor for body schemas.
+ * Pure data (not Zod) — serializable to JSON for harness_describe output.
+ */
+export interface BodyFieldSpec {
+  /** Field name as the API expects it */
+  name: string;
+  /** Data type hint */
+  type: "string" | "number" | "boolean" | "object" | "array" | "yaml";
+  /** Whether the field is required for the operation to succeed */
+  required: boolean;
+  /** Brief description (shown to agents) */
+  description: string;
+  /** For "object" type: nested fields */
+  fields?: BodyFieldSpec[];
+  /** For "array" type: item type description */
+  itemType?: string;
+}
+
+/**
+ * Body schema for a write operation (create/update/execute action).
+ * Advisory — bodyBuilder still does actual transformation.
+ */
+export interface BodySchema {
+  /** Brief description of what the body represents */
+  description: string;
+  /** The fields the body expects */
+  fields: BodyFieldSpec[];
+}
+
+/**
+ * Schema for path/query params passed via the `params` argument.
+ * Surfaced by harness_describe so agents know what identifiers to pass and under what names.
+ */
+export interface ParamsSchema {
+  /** The params this operation requires or accepts */
+  fields: Array<{
+    /** Field name as used in the `params` argument (e.g. "repo_id", "pr_number") */
+    name: string;
+    /** Whether this param is required for the operation to succeed */
+    required: boolean;
+    /** Brief description shown to agents */
+    description: string;
+  }>;
+}
+
+/**
+ * Descriptor for a filter field that can be used in list operations.
+ */
+export interface FilterFieldSpec {
+  /** Field name as it appears in the API */
+  name: string;
+  /** Human-readable description for LLMs */
+  description: string;
+  /** Value type — defaults to "string" when omitted */
+  type?: "string" | "number" | "boolean";
+  /** Allowed values, if the field is constrained to a known set */
+  enum?: string[];
+  /** When true, this filter is mandatory for the list operation to succeed.
+   *  The registry validates required filters before making the API call. */
+  required?: boolean;
+}
+
+/**
+ * Declarative rule for expanding shorthand input keys into full nested structures.
+ * Applied before runtime input resolution so the template matcher sees the expanded form.
+ */
+export interface InputExpansionRule {
+  /** Input key that triggers the expansion (e.g. "branch", "tag") */
+  triggerKey: string;
+  /** Structure to merge into inputs. Use "$value" as placeholder for the trigger key's value. */
+  expand: Record<string, unknown>;
+  /** If set, skip expansion when user already provided this key (prevents double-expand). */
+  skipIfPresent?: string;
+}
+
+/**
+ * Config type for pathBuilder (avoids circular import).
+ */
+export type PathBuilderConfig = { HARNESS_ACCOUNT_ID?: string; HARNESS_ORG?: string; HARNESS_PROJECT?: string };
+
+/**
+ * Output of `EndpointSpec.routeResolver`: fully-resolved path for a specific call,
+ * plus optional product override. When `product` is omitted, the resource-level
+ * `def.product` applies. Enables dual-mode routing (e.g. FME legacy Split.io
+ * vs. Harness-native based on caller-supplied params).
+ */
+export interface ResolvedRoute {
+  path: string;
+  product?: ProductName;
+  /**
+   * Optional override of the resource-level `scopeParams` (query param names for
+   * account/org/project), scoped to this specific resolved route. When omitted,
+   * `def.scopeParams` applies. Use for dual-mode resources whose Harness-native
+   * branch needs different query param names than its legacy branch — the legacy
+   * branch's wire format stays untouched since it simply doesn't set this.
+   */
+  scopeParams?: { account?: string; org?: string; project?: string };
+  /**
+   * Optional override of the resource/operation-level `headers` (e.g. Content-Type), scoped to
+   * this specific resolved route. Use for dual-mode resources whose branches need different
+   * headers on the same operation (e.g. FME Harness-native JSON Merge Patch vs. legacy JSON
+   * Patch on the same `update` operation) — the legacy branch's headers stay untouched since it
+   * simply doesn't set this.
+   */
+  headers?: Record<string, string>;
+}
+
+/**
+ * Specifies how a single CRUD operation maps to the Harness API.
+ */
+export interface EndpointSpec {
+  method: HttpMethod;
+  /** Optional dynamic method override. When set, takes precedence over `method`. */
+  methodBuilder?: (input: Record<string, unknown>) => HttpMethod;
+  /** Path template, e.g. "/pipeline/api/pipelines/{pipelineIdentifier}". Ignored when pathBuilder is set. */
+  path: string;
+  /** Optional dynamic path builder. When set, used instead of path + pathParams for account-scoped or multi-endpoint resources. */
+  pathBuilder?: (input: Record<string, unknown>, config: PathBuilderConfig) => string;
+  /**
+   * Optional per-call route resolver. When set, its output supersedes BOTH
+   * `path`/`pathParams`/`pathBuilder` on this endpoint AND the resource-level
+   * `product` on the call. Use when a single resourceType has multiple route paths
+   * AND different backend products depending on caller-supplied params
+   * (e.g. FME dual-mode: legacy Split.io vs. Harness-native). Purely additive;
+   * resources that don't set it are completely unaffected.
+   */
+  routeResolver?: (input: Record<string, unknown>, config: PathBuilderConfig) => ResolvedRoute;
+  /** Maps tool input field names to path param placeholders */
+  pathParams?: Record<string, string>;
+  /** Maps tool input field names to query param names */
+  queryParams?: Record<string, string>;
+  /** Static query parameters always included in the request (not derived from input) */
+  staticQueryParams?: Record<string, string>;
+  /** Default query params to include if not overridden by input */
+  defaultQueryParams?: Record<string, string>;
+  /**
+   * When true, if `orgIdentifier` (or custom `scopeParams.org`) is still unset after scope
+   * resolution, set it from `input.org_id` or `config.HARNESS_ORG`. Used for account-scoped
+   * resources whose NG endpoints require `orgIdentifier` on the query string (e.g. POST /ng/api/projects).
+   */
+  injectOrgQueryFallback?: boolean;
+  /** Override default scope query param names (e.g. for APIs using snake_case) */
+  scopeParams?: { account?: string; org?: string; project?: string };
+  /** For POST/PUT: how to build the request body from tool input */
+  bodyBuilder?: (input: Record<string, unknown>, config: PathBuilderConfig) => unknown;
+  /**
+   * Static headers to merge into the request (e.g. Content-Type override). For dual-mode
+   * resources whose branches need different headers on the same operation, set the per-route
+   * override on `ResolvedRoute.headers` instead, returned from `routeResolver` — that reuses the
+   * same override mechanism already used for `product`/`scopeParams` per branch.
+   */
+  headers?: Record<string, string>;
+  /** For GET: extract the useful part from the raw response */
+  responseExtractor?: (raw: unknown, input?: Record<string, unknown>) => unknown;
+  /** Request JSON, binary, or a bounded JSON SSE batch. */
+  responseType?: "json" | "buffer" | "sse";
+  /** Required with responseType=sse; explicitly declares this endpoint's batch policy. */
+  sseLimits?: RequestOptions["sseLimits"];
+  /** Description shown in harness_describe output */
+  description?: string;
+  /** Optional body schema for write operations — exposed via harness_describe */
+  bodySchema?: BodySchema;
+  /**
+   * Optional schema for params (path/query identifiers) — exposed via harness_describe.
+   * Use this to document required path identifiers (e.g. repo_id, pr_number) so agents
+   * know the exact field names to pass via the `params` argument.
+   */
+  paramsSchema?: ParamsSchema;
+  /**
+   * When the bodyBuilder wraps user fields inside a single key
+   * (e.g. `{ project: { identifier, name } }`), set this to the wrapper key
+   * so required-field validation checks the inner object, not the wrapper.
+   */
+  bodyWrapperKey?: string;
+  /**
+   * When true, do not inject orgIdentifier/projectIdentifier into POST/PUT
+   * bodies. Some APIs take scope only in query/path and reject extra body fields.
+   */
+  skipScopeBodyInjection?: boolean;
+  /** Override HARNESS_API_TIMEOUT_MS for this endpoint only (milliseconds). */
+  timeoutMs?: number;
+  /** Declares the risk level and retry behavior for this operation. */
+  operationPolicy: OperationPolicy;
+  /**
+   * Declarative input expansion rules. When present, matching shorthand keys
+   * in user input are expanded into full nested structures before resolution.
+   */
+  inputExpansions?: InputExpansionRule[];
+  /** When true, the API uses 1-based pagination. The registry adds 1 to the
+   *  0-based `page` value from harness_list before sending the request. */
+  pageOneIndexed?: boolean;
+  /** When an API error message matches one of these patterns, return an empty
+   *  list/result instead of throwing. Useful for backends that return 500 for
+   *  "no data" scenarios (e.g. disconnected GitOps agent). */
+  emptyOnErrorPatterns?: RegExp[];
+  /** When true, omit the automatic `accountIdentifier` query param from the
+   *  request URL. Some APIs (e.g. SEI) use only the `Harness-Account` header. */
+  headerBasedScoping?: boolean;
+  /**
+   * When true, inject `accountIdentifier` from config into the POST/PUT request body.
+   * Required for gRPC-gateway APIs (e.g. GitOps) where `body: "*"` means the entire
+   * JSON body IS the proto message — query-param-only accountIdentifier is invisible
+   * to the handler.
+   */
+  injectAccountInBody?: boolean | string;
+  /**
+   * Optional preflight hook that runs before the request is sent.
+   * Use for server-side invariants (e.g. duplicate-check before creating a
+   * resource). Throw from the hook to block the operation — the error message
+   * is surfaced directly to the agent.
+   *
+   * Typed loosely to avoid a circular import back into the registry/dispatcher.
+   * The runtime shape is `{ client: HarnessClient, input, registry: Registry, signal? }`.
+   */
+  preflight?: (ctx: PreflightContext) => Promise<void>;
+  /**
+   * When true, the MCP layer controls ELK→Mongo fallback for this endpoint:
+   *  1. First request sent with `enforce_elasticsearch=true` (ELK path).
+   *  2. On failure (4xx except 401/403, 5xx, or timeout), retried with
+   *     `enforce_elasticsearch=false` (Mongo path).  A 404 often means the
+   *     ES index doesn't exist yet; a 400 may be ES-specific.
+   * The response includes `_data_source: "elasticsearch" | "mongodb"` so the caller
+   * knows which backend served the data.
+   * Only applicable to ssca-manager endpoints that accept the `enforce_elasticsearch` query param.
+   */
+  elkFallback?: boolean;
+  /**
+   * When true, harness_list will NOT run the global compactItems whitelist pass
+   * on this response's `items`. Use this when `responseExtractor` already
+   * produces a minimal, hand-picked projection and further compaction would
+   * strip intentional display fields (e.g. `severity`, `requested_by`).
+   */
+  skipCompact?: boolean;
+}
+
+/**
+ * Declarative definition of a Harness resource type and how it maps to CRUD endpoints.
+ */
+export interface ResourceDefinition {
+  /** Unique key: "pipeline", "service", "connector", etc. */
+  resourceType: string;
+  /** Human-readable name: "Pipeline", "Service", etc. */
+  displayName: string;
+  /** Brief description for harness_describe output */
+  description: string;
+  /** Which toolset this resource belongs to (for HARNESS_TOOLSETS filtering) */
+  toolset: string;
+  /** Default scope level: "project" | "org" | "account" */
+  scope: ResourceScope;
+  /**
+   * Scopes this resource can query when the caller passes `resource_scope`.
+   * If omitted, the resource supports only its default `scope`.
+   */
+  supportedScopes?: readonly ResourceScope[];
+  /**
+   * When true, org/project params are only added if explicitly provided in input.
+   * Use for resources that support multiple scopes (e.g., Harness Code repos/PRs
+   * which can be account, org, or project scoped depending on where they live).
+   * Default: false (scope params always added based on `scope` field).
+   */
+  scopeOptional?: boolean;
+  /**
+   * Override default scope query parameter names.
+   * Standard NG API uses orgIdentifier / projectIdentifier.
+   * Some APIs (e.g., Chaos) use organizationIdentifier instead.
+   * STO uses accountId / orgId / projectId.
+   * When `account` is set, an additional account param is injected from config.
+   */
+  scopeParams?: { account?: string; org?: string; project?: string };
+  /** Primary identifier field names: ["pipeline_id"], ["service_id"], etc. */
+  identifierFields: string[];
+  /** Additional filter fields for list operations */
+  listFilterFields?: FilterFieldSpec[];
+  /**
+   * Optional per-resource compaction override for list items. When set,
+   * harness_list applies this instead of the generic key-name whitelist
+   * (utils/compact.ts) to each item in compact mode. Use when a resource's
+   * useful fields aren't expressible as a flat key whitelist — e.g. fields
+   * that must be derived (deploy `services` from `buildVersions`) or truncated
+   * (deploy `summary` to its first line). Returns the slimmed item.
+   */
+  compactItem?: (item: Record<string, unknown>) => Record<string, unknown>;
+  /** Harness UI deep-link URL template */
+  deepLinkTemplate?: string;
+  /** Troubleshooting guidance for LLMs. Describes how to diagnose issues with this resource type. */
+  diagnosticHint?: string;
+  /**
+   * Alternative search terms that should match this resource type.
+   * Helps LLMs find SCS-specific types when searching with generic terms
+   * like "artifact" or "repository". Matched at high priority (score 90)
+   * in searchResources().
+   */
+  searchAliases?: string[];
+  /**
+   * Related resources that are commonly used together in multi-turn flows.
+   * Helps LLMs understand the resource graph and retain context across turns.
+   * Shown in harness_describe output.
+   */
+  relatedResources?: Array<{
+    resourceType: string;
+    relationship: string;
+    description: string;
+  }>;
+  /** Execution guidance for LLMs. Describes how to discover and provide runtime inputs. */
+  executeHint?: string;
+  /** CRUD endpoint mappings */
+  operations: Partial<Record<OperationName, EndpointSpec>>;
+  /** Execute action mappings (e.g. run pipeline, toggle FF) */
+  executeActions?: Record<string, EndpointSpec & { actionDescription: string }>;
+  /**
+   * Product backend for this resource. Defaults to "harness" (uses HARNESS_BASE_URL).
+   * @deprecated The "fme" value (Split.io API at https://api.split.io) is legacy-only,
+   * used solely by FME resources' deprecated workspace_id-mode calls (see
+   * `routeResolver` on `EndpointSpec` and `resolveFmeDualMode` in scope-utils.ts).
+   * New code should not introduce new "fme"-product resources — FME itself is
+   * migrating to plain Harness-native ("harness") routing per-call.
+   */
+  product?: ProductName;
+  /**
+   * When true, this resource uses header-based scoping (Harness-Account header)
+   * instead of the standard `accountIdentifier` query param. Also prevents
+   * automatic org/project injection into POST/PUT request bodies.
+   * Used by SEI APIs which scope entirely via headers and query params.
+   */
+  headerBasedScoping?: boolean;
+}
+
+/**
+ * A toolset groups related ResourceDefinitions together.
+ */
+export interface ToolsetDefinition {
+  name: string;
+  displayName: string;
+  description: string;
+  resources: ResourceDefinition[];
+  /**
+   * When true, this toolset is excluded by default (when HARNESS_TOOLSETS is
+   * unset). Users must explicitly list it in HARNESS_TOOLSETS to enable it.
+   * Useful for preview/experimental toolsets that shouldn't pollute the
+   * default resource list.
+   */
+  optIn?: boolean;
+}

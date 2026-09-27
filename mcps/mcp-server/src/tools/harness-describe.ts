@@ -1,0 +1,151 @@
+import * as z from "zod/v4";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { Registry } from "../registry/index.js";
+import type { InputExpansionRule } from "../registry/types.js";
+import { jsonResult } from "../utils/response-formatter.js";
+import { getExamplesForResource } from "../data/examples/index.js";
+import { describeOutputSchema } from "./output-schemas.js";
+import { describeScopeHint } from "./input-schemas.js";
+
+export function registerDescribeTool(server: McpServer, registry: Registry): void {
+  const allTypes = registry.getAllResourceTypes() as [string, ...string[]];
+  const allToolsets = registry.getAllToolsets().map(t => t.name) as [string, ...string[]];
+
+  server.registerTool(
+    "harness_describe",
+    {
+      description: "Describe available Harness resource types, their supported operations, and fields. No API call — returns local metadata only. Use this to discover what resource_types you can use with other harness_ tools.",
+      inputSchema: {
+        resource_type: z.enum(allTypes).optional().describe("Get details for a specific resource type"),
+        toolset: z.enum(allToolsets).optional().describe("Filter to a specific toolset"),
+        search_term: z.string().optional().describe("Search for resource types by keyword (matches type name, display name, toolset, description)"),
+      },
+      outputSchema: describeOutputSchema,
+      annotations: {
+        title: "Describe Harness Resources",
+        readOnlyHint: true,
+        destructiveHint: false,
+        // Local registry metadata only — no external API call
+        openWorldHint: false,
+      },
+    },
+    async (args) => {
+      if (args.resource_type) {
+        try {
+          const def = registry.getResource(args.resource_type);
+          const resourceScopes = registry.getSupportedScopes(args.resource_type);
+          const supportedScopes = resourceScopes.length > 1 ? resourceScopes : undefined;
+          return jsonResult({
+            resource_type: def.resourceType,
+            displayName: def.displayName,
+            description: def.description,
+            toolset: def.toolset,
+            scope: def.scope,
+            supportedScopes,
+            scopeHint: supportedScopes && supportedScopes.length > 1
+              ? describeScopeHint({
+                  scopeOptional: def.scopeOptional,
+                  hasOrgDefault: Boolean(registry.orgId?.trim()),
+                  hasProjectDefault: Boolean(registry.projectId?.trim()),
+                })
+              : undefined,
+            identifierFields: def.identifierFields,
+            listFilterFields: def.listFilterFields,
+            operations: Object.entries(def.operations).map(([op, spec]) => ({
+              operation: op,
+              method: spec.method,
+              description: spec.description,
+              paramsSchema: spec.paramsSchema ?? undefined,
+              bodySchema: spec.bodySchema ?? undefined,
+            })),
+            executeActions: def.executeActions
+              ? Object.entries(def.executeActions).map(([action, spec]) => ({
+                  action,
+                  method: spec.method,
+                  description: spec.actionDescription,
+                  paramsSchema: spec.paramsSchema ?? undefined,
+                  bodySchema: spec.bodySchema ?? undefined,
+                  ...(spec.inputExpansions?.length
+                    ? { inputShorthands: buildShorthands(spec.inputExpansions) }
+                    : {}),
+                }))
+              : undefined,
+            diagnosticHint: def.diagnosticHint ?? undefined,
+            relatedResources: def.relatedResources ?? undefined,
+            executeHint: def.executeHint ?? undefined,
+            ...(() => {
+              const examples = getExamplesForResource(def.resourceType);
+              return examples.length > 0
+                ? {
+                    examples_available: examples.map((e) => ({ name: e.name, description: e.description })),
+                    examples_hint: `Use harness_schema(resource_type='${def.resourceType}', example='<name>') to fetch full YAML.`,
+                  }
+                : {};
+            })(),
+          });
+        } catch (err) {
+          // Resource type not found — return the compact summary with an error hint
+          const summary = registry.describeSummary();
+          return jsonResult({
+            error: err instanceof Error ? err.message : String(err),
+            ...summary,
+          });
+        }
+      }
+
+      // Search by keyword
+      if (args.search_term) {
+        const results = registry.searchResources(args.search_term);
+        return jsonResult({
+          search_term: args.search_term,
+          total_results: results.length,
+          resource_types: results,
+          hint: results.length > 0
+            ? "Call harness_describe with resource_type='<type>' for full details on a specific match."
+            : "No matches found. Try a broader term, or call harness_describe with no arguments to see all resource types.",
+        });
+      }
+
+      // Filter by toolset if specified — use full detail
+      if (args.toolset) {
+        const describe = registry.describe();
+        const toolsets = describe.toolsets as Record<string, unknown>;
+        const filtered = toolsets[args.toolset];
+        if (!filtered) {
+          return jsonResult({
+            error: `Unknown toolset "${args.toolset}". Available: ${Object.keys(toolsets).join(", ")}`,
+            available_toolsets: Object.keys(toolsets),
+          });
+        }
+        return jsonResult({ toolset: args.toolset, ...filtered as object });
+      }
+
+      // No-args: return compact summary (~30 tokens per resource type)
+      return jsonResult(registry.describeSummary());
+    },
+  );
+}
+
+/** Generate human-readable shorthand descriptions from expansion rules. */
+function buildShorthands(rules: InputExpansionRule[]): Array<{ shorthand: string; expands_to: string }> {
+  return rules.map((rule) => ({
+    shorthand: rule.triggerKey,
+    expands_to: summarizeExpansion(rule.expand),
+  }));
+}
+
+/** Flatten an expand template into a readable dot-path summary. */
+function summarizeExpansion(obj: Record<string, unknown>, prefix = ""): string {
+  const parts: string[] = [];
+  for (const [key, value] of Object.entries(obj)) {
+    const path = prefix ? `${prefix}.${key}` : key;
+    if (value === "$value") {
+      parts.push(path);
+    } else if (typeof value === "string") {
+      parts.push(`${path}=${value}`);
+    } else if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+      parts.push(summarizeExpansion(value as Record<string, unknown>, path));
+    }
+  }
+  return parts.join(", ");
+}

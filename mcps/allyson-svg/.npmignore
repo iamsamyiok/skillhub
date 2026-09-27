@@ -1,0 +1,38 @@
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+
+# Development files
+.git/
+.DS_Store
+*.log
+
+# Testing
+test/
+tests/
+__tests__/
+coverage/
+
+# Development dependencies
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Git files
+.gitignore
+
+# CI/CD files
+.github/
+CONTRIBUTING.md
+
+# Documentation (keep README.md)
+*.md
+!README.md 

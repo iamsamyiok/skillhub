@@ -1,0 +1,4 @@
+{
+  "title": "Sandbox SDK",
+  "pages": ["index", "pool", "interfaces", "image", "os-image-catalog", "typescript", "runtime-support"]
+}
