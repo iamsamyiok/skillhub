@@ -1,0 +1,24 @@
+{
+  "total": 1,
+  "categories": [
+    "开发工具"
+  ],
+  "items": [
+    {
+      "id": "weather-mcp",
+      "name": "weather-mcp",
+      "description": "Weather MCP Server — 提供实时天气查询、预报、空气质量等工具。支持 stdio/SSE/HTTP 传输方式，兼容 Claude Desktop、Cursor、VSCode 等主流编辑器。",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "mcp",
+        "weather",
+        "api"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T04:53:54.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js"
+    }
+  ]
+}

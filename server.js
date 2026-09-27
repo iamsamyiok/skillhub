@@ -477,4 +477,205 @@ if (require.main === module) {
     console.log(`AI 入口：/llms.txt、/skills.txt、/api/skills；管理：/admin`);
   });
 }
-module.exports = { server, skillDetail, allSkillIds, zipOf, tarGz, parseFrontmatter };
+// MCP 支持补丁 - 添加到 server.js
+
+// MCP 目录和工具函数
+const MCPS_DIR = path.join(ROOT, 'mcps');
+
+function mcpDir(id) { return path.join(MCPS_DIR, id); }
+
+function allMcpIds() {
+  if (!fs.existsSync(MCPS_DIR)) return [];
+  return fs.readdirSync(MCPS_DIR).filter(id => 
+    fs.existsSync(path.join(mcpDir(id), 'README.md'))
+  );
+}
+
+function mcpDetail(id) {
+  const dir = mcpDir(id);
+  if (!ID_RE.test(id) || !fs.existsSync(path.join(dir, 'README.md'))) return null;
+  
+  const meta = META();
+  const m = meta.mcps?.[id] || {};
+  const readme = fs.readFileSync(path.join(dir, 'README.md'), 'utf8');
+  
+  // 读取 package.json 获取依赖信息
+  let deps = [];
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
+    deps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.devDependencies || {}));
+  } catch {}
+  
+  // 列出 scripts 目录
+  const files = [];
+  if (fs.existsSync(path.join(dir, 'scripts'))) {
+    for (const f of fs.readdirSync(path.join(dir, 'scripts'))) {
+      files.push({ path: `scripts/${f}`, size: fs.statSync(path.join(dir, 'scripts', f)).size });
+    }
+  }
+  
+  return {
+    id,
+    name: m.name || id,
+    description: m.description || '',
+    version: m.version || '1.0.0',
+    category: m.category || '开发工具',
+    tags: m.tags || [],
+    downloads: m.downloads || 0,
+    updatedAt: m.updatedAt || new Date().toISOString(),
+    runtime: m.runtime || 'node',
+    entry: m.entry || 'scripts/server.js',
+    args: m.args || [],
+    env: m.env || {},
+    readme,
+    files,
+    md: readme
+  };
+}
+
+// MCP 列表（检索）
+route('GET', /^\/api\/mcps(\?.*)?$/, (req, res, url) => {
+  const q = (url.searchParams.get('q') || '').toLowerCase();
+  const cat = url.searchParams.get('category') || '';
+  const items = [];
+  for (const id of allMcpIds()) {
+    const s = mcpDetail(id);
+    if (!s) continue;
+    if (cat && s.category !== cat) continue;
+    if (q) {
+      const hay = `${s.name} ${s.description} ${s.category} ${(s.tags || []).join(' ')}`.toLowerCase();
+      if (!hay.includes(q)) continue;
+    }
+    items.push({ 
+      id: s.id, name: s.name, description: s.description, version: s.version, 
+      category: s.category, tags: s.tags, downloads: s.downloads, 
+      updatedAt: s.updatedAt, runtime: s.runtime, entry: s.entry 
+    });
+  }
+  items.sort((a, b) => a.name.localeCompare(b.name));
+  const categories = [...new Set(Object.values(META().mcps || {}).map((s) => s.category).filter(Boolean))].sort();
+  send(res, 200, { total: items.length, categories, items });
+});
+
+// MCP 详情
+route('GET', /^\/api\/mcps\/([\w.-]+)$/, (req, res, url, m) => {
+  const s = mcpDetail(m[1]);
+  if (!s) return notFound(res, 'mcp not found');
+  send(res, 200, s);
+});
+
+// MCP 下载
+route('GET', /^\/api\/mcps\/([\w.-]+)\/download$/, (req, res, url, m) => {
+  const s = mcpDetail(m[1]);
+  if (!s) return notFound(res, 'mcp not found');
+  const wantTgz = url.searchParams.get('format') === 'tgz';
+  const buf = wantTgz
+    ? tarGz(s.files.map((f) => ({ id: s.id, path: f.path })))
+    : zipOf(s.files.map((f) => ({ name: `${s.id}/${f.path}`, data: fs.readFileSync(path.join(ROOT, 'mcps', s.id, f.path)) })));
+  const meta = META();
+  if (meta.mcps[s.id]) meta.mcps[s.id].downloads = (meta.mcps[s.id].downloads || 0) + 1;
+  saveMeta(meta);
+  const filename = wantTgz ? `${s.id}.tar.gz` : `${s.id}.zip`;
+  send(res, 200, buf, {
+    'Content-Type': wantTgz ? 'application/gzip' : 'application/zip',
+    'Content-Disposition': `attachment; filename="${filename}"`,
+    'Access-Control-Allow-Origin': '*',
+  });
+});
+
+// MCP 配置文件生成
+route('GET', /^\/api\/mcps\/([\w.-]+)\/config$/, (req, res, url, m) => {
+  const s = mcpDetail(m[1]);
+  if (!s) return notFound(res, 'mcp not found');
+  
+  const runtime = s.runtime || 'node';
+  const entry = s.entry || 'scripts/server.js';
+  const args = s.args || [];
+  const env = s.env || {};
+  
+  // 根据运行时生成配置
+  let command, cmdArgs;
+  if (runtime === 'node') {
+    command = 'node';
+    cmdArgs = [entry, ...args];
+  } else if (runtime === 'python') {
+    command = 'python3';
+    cmdArgs = [entry, ...args];
+  } else if (runtime === 'go') {
+    command = entry;
+    cmdArgs = args;
+  } else {
+    command = entry;
+    cmdArgs = args;
+  }
+  
+  const config = {
+    mcpServers: {
+      [s.id]: {
+        command,
+        args: cmdArgs,
+        env,
+        transport: url.searchParams.get('transport') || 'stdio'
+      }
+    }
+  };
+  
+  send(res, 200, config);
+});
+
+// MCP 创建/更新
+route('POST', /^\/api\/mcps$/, async (req, res) => {
+  if (!isManager(req)) return send(res, 401, { error: '需要登录' });
+  let body;
+  try { body = JSON.parse((await readBody(req)).toString('utf8')); } catch { return send(res, 400, { error: 'JSON 解析失败' }); }
+  
+  const id = String(body.id || body.name || '').toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^[._-]+/, '').slice(0, 64);
+  if (!ID_RE.test(id)) return send(res, 400, { error: 'id 非法' });
+  if (!body.files || !body.files['README.md']) return send(res, 400, { error: 'files 必须包含 README.md' });
+  
+  const dir = mcpDir(id);
+  const existed = fs.existsSync(path.join(dir, 'README.md'));
+  fs.mkdirSync(dir, { recursive: true });
+  
+  for (const [rel, content] of Object.entries(body.files)) {
+    const norm = path.normalize(rel).replace(/^([.][.](\/|\\|$))+/, '');
+    const full = path.join(dir, norm);
+    if (!full.startsWith(dir + path.sep)) return send(res, 400, { error: `文件路径非法: ${rel}` });
+    fs.mkdirSync(path.dirname(full), { recursive: true });
+    fs.writeFileSync(full, typeof content === 'string' ? content : String(content));
+  }
+  
+  const meta = META();
+  if (!meta.mcps) meta.mcps = {};
+  const prev = meta.mcps[id] || {};
+  meta.mcps[id] = {
+    version: body.version || prev.version || '1.0.0',
+    category: body.category || prev.category || '开发工具',
+    tags: Array.isArray(body.tags) ? body.tags : prev.tags || [],
+    description: body.description || prev.description || '',
+    runtime: body.runtime || prev.runtime || 'node',
+    entry: body.entry || prev.entry || 'scripts/server.js',
+    args: body.args || prev.args || [],
+    env: body.env || prev.env || {},
+    downloads: prev.downloads || 0,
+    createdAt: prev.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  saveMeta(meta);
+  send(res, existed ? 200 : 201, { ok: true, id, name: id, updated: existed });
+});
+
+// MCP 删除
+route('DELETE', /^\/api\/mcps\/([\w.-]+)$/, (req, res, url, m) => {
+  if (!isManager(req)) return send(res, 401, { error: '需要登录' });
+  const id = m[1];
+  if (!mcpDetail(id)) return notFound(res, 'mcp not found');
+  fs.rmSync(mcpDir(id), { recursive: true, force: true });
+  const meta = META();
+  if (meta.mcps) delete meta.mcps[id];
+  saveMeta(meta);
+  send(res, 200, { ok: true, id });
+});
+
+
+module.exports = { server, skillDetail, allSkillIds, mcpDetail, allMcpIds, zipOf, tarGz, parseFrontmatter };

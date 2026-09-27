@@ -1,0 +1,12 @@
+{
+  "name": "weather-mcp",
+  "version": "1.0.0",
+  "description": "Weather MCP Server",
+  "main": "scripts/server.js",
+  "scripts": {
+    "start": "node scripts/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

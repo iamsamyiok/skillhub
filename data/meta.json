@@ -450,5 +450,26 @@
       "updatedAt": "2026-09-26T15:30:00.000Z",
       "description": "SkillManager — 技能管理器。手动触发技能组合建议、扫描技能目录更新全局索引、单技能MD归档标记、静态HTML仪表盘。无侵入原有Agent逻辑,全部数据仅用MD文件存储,零外部服务。"
     }
+  },
+  "mcps": {
+    "weather-mcp": {
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "mcp",
+        "weather",
+        "api"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T04:53:54.000Z",
+      "updatedAt": "2026-09-27T04:53:54.000Z",
+      "description": "Weather MCP Server — 提供实时天气查询、预报、空气质量等工具。支持 stdio/SSE/HTTP 传输方式，兼容 Claude Desktop、Cursor、VSCode 等主流编辑器。",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {
+        "OPENWEATHER_API_KEY": "${WEATHER_API_KEY}"
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 # SkillHub
 
-> 面向人类与 AI Agent 的技能（skill）下载站（GitHub Pages 静态镜像）。下载 https://iamsamyiok.github.io/skillhub/downloads/{id}.zip（Windows）或 {id}.tar.gz；SKILL.md 原文 https://iamsamyiok.github.io/skillhub/skills-md/{id}.md。完整 API 与管理功能请自托管本仓库。
+> 面向人类与 AI Agent 的技能（skill）和 MCP server 下载站。Skill: https://iamsamyiok.github.io/skillhub/skills-md/{id}.md + https://iamsamyiok.github.io/skillhub/downloads/{id}.zip；MCP: https://iamsamyiok.github.io/skillhub/mcps-md/{id}.md + https://iamsamyiok.github.io/skillhub/api/mcps/{id}/config。完整 API 与管理功能请自托管本仓库。
 
 ## Skills
 
@@ -72,6 +72,12 @@
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/world-generator.zip
 - [xlsx](https://iamsamyiok.github.io/skillhub/skills-md/xlsx.md): 电子表格处理技能：凡以表格文件为主要输入或输出的任务即触发——打开、读取、编辑、修复现有 .xlsx/.xlsm/.xltx/.csv/.tsv（加列、算公式、排版、做图、清洗脏数据），从零或从其他数据源新建表格，表格格式互转，以及把混乱的表格数据整理成规范表格。当用户按名字或路径提到某个表格文件（如「我下载夹里的 x
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/xlsx.zip
+
+## MCPS
+
+- [weather-mcp (MCP)](https://iamsamyiok.github.io/skillhub/mcps-md/weather-mcp.md): Weather MCP Server — 提供实时天气查询、预报、空气质量等工具。支持 stdio/SSE/HTTP 传输方式，兼容 Claude Desktop、Cursor、VSCode 等主流编辑器。
+  - 配置: https://iamsamyiok.github.io/skillhub/api/mcps/weather-mcp/config
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/weather-mcp.zip
 
 ## Source
 

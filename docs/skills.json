@@ -1,5 +1,5 @@
 {
-  "total": 34,
+  "total": 35,
   "categories": [
     "写作工具",
     "前端开发",
@@ -35,7 +35,8 @@
       "updatedAt": "2026-09-18T10:00:00.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/anysearch.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/anysearch.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/anysearch.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/anysearch.tar.gz",
+      "type": "skill"
     },
     {
       "id": "book-to-skill",
@@ -54,7 +55,8 @@
       "updatedAt": "2026-09-11T00:00:00.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/book-to-skill.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/book-to-skill.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/book-to-skill.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/book-to-skill.tar.gz",
+      "type": "skill"
     },
     {
       "id": "d2-chart",
@@ -75,7 +77,8 @@
       "updatedAt": "2026-09-12T17:23:44.984Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/d2-chart.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/d2-chart.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/d2-chart.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/d2-chart.tar.gz",
+      "type": "skill"
     },
     {
       "id": "doc-to-md",
@@ -94,7 +97,8 @@
       "updatedAt": "2026-09-15T09:26:58.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/doc-to-md.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/doc-to-md.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/doc-to-md.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/doc-to-md.tar.gz",
+      "type": "skill"
     },
     {
       "id": "docx",
@@ -111,7 +115,8 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/docx.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/docx.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/docx.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/docx.tar.gz",
+      "type": "skill"
     },
     {
       "id": "find-skills",
@@ -128,7 +133,8 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/find-skills.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/find-skills.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/find-skills.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/find-skills.tar.gz",
+      "type": "skill"
     },
     {
       "id": "firecrawl",
@@ -145,7 +151,8 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/firecrawl.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/firecrawl.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/firecrawl.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/firecrawl.tar.gz",
+      "type": "skill"
     },
     {
       "id": "grilling",
@@ -166,7 +173,8 @@
       "updatedAt": "2026-09-10T13:59:55.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/grilling.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/grilling.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/grilling.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/grilling.tar.gz",
+      "type": "skill"
     },
     {
       "id": "handoff",
@@ -186,7 +194,8 @@
       "updatedAt": "2026-09-21T00:00:00.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/handoff.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/handoff.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/handoff.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/handoff.tar.gz",
+      "type": "skill"
     },
     {
       "id": "image-analysis",
@@ -207,7 +216,8 @@
       "updatedAt": "2026-09-10T13:14:39.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/image-analysis.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/image-analysis.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/image-analysis.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/image-analysis.tar.gz",
+      "type": "skill"
     },
     {
       "id": "localtunnel-preview",
@@ -226,7 +236,8 @@
       "updatedAt": "2026-09-26T15:04:23.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/localtunnel-preview.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/localtunnel-preview.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/localtunnel-preview.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/localtunnel-preview.tar.gz",
+      "type": "skill"
     },
     {
       "id": "mcp-builder",
@@ -243,7 +254,8 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/mcp-builder.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/mcp-builder.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/mcp-builder.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/mcp-builder.tar.gz",
+      "type": "skill"
     },
     {
       "id": "oss-scout",
@@ -259,7 +271,8 @@
       "updatedAt": "2026-09-09T14:10:50.547Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/oss-scout.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/oss-scout.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/oss-scout.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/oss-scout.tar.gz",
+      "type": "skill"
     },
     {
       "id": "page-visual-review",
@@ -276,7 +289,8 @@
       "updatedAt": "2026-09-10T14:52:37.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/page-visual-review.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/page-visual-review.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/page-visual-review.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/page-visual-review.tar.gz",
+      "type": "skill"
     },
     {
       "id": "pdf",
@@ -293,7 +307,8 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/pdf.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/pdf.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/pdf.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/pdf.tar.gz",
+      "type": "skill"
     },
     {
       "id": "planning-with-files",
@@ -310,7 +325,8 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/planning-with-files.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/planning-with-files.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/planning-with-files.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/planning-with-files.tar.gz",
+      "type": "skill"
     },
     {
       "id": "pptx",
@@ -327,7 +343,8 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/pptx.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/pptx.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/pptx.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/pptx.tar.gz",
+      "type": "skill"
     },
     {
       "id": "program-to-gif",
@@ -346,7 +363,8 @@
       "updatedAt": "2026-09-19T17:40:00.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/program-to-gif.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/program-to-gif.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/program-to-gif.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/program-to-gif.tar.gz",
+      "type": "skill"
     },
     {
       "id": "recorder2skill",
@@ -365,7 +383,8 @@
       "updatedAt": "2026-09-15T15:30:00.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/recorder2skill.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.tar.gz",
+      "type": "skill"
     },
     {
       "id": "show-deploy",
@@ -386,7 +405,8 @@
       "updatedAt": "2026-09-10T14:52:54.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/show-deploy.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/show-deploy.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/show-deploy.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/show-deploy.tar.gz",
+      "type": "skill"
     },
     {
       "id": "skill-creator",
@@ -406,7 +426,8 @@
       "updatedAt": "2026-09-10T13:59:55.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/skill-creator.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/skill-creator.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skill-creator.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skill-creator.tar.gz",
+      "type": "skill"
     },
     {
       "id": "skill-updater",
@@ -427,7 +448,8 @@
       "updatedAt": "2026-09-10T14:33:19.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/skill-updater.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/skill-updater.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skill-updater.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skill-updater.tar.gz",
+      "type": "skill"
     },
     {
       "id": "skillmanager",
@@ -445,7 +467,8 @@
       "updatedAt": "2026-09-26T15:30:00.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/skillmanager.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/skillmanager.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skillmanager.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skillmanager.tar.gz",
+      "type": "skill"
     },
     {
       "id": "slides-maker",
@@ -464,7 +487,8 @@
       "updatedAt": "2026-09-18T08:00:00.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/slides-maker.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/slides-maker.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/slides-maker.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/slides-maker.tar.gz",
+      "type": "skill"
     },
     {
       "id": "text-to-d2",
@@ -487,7 +511,8 @@
       "updatedAt": "2026-09-12T17:54:12.772Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/text-to-d2.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/text-to-d2.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-d2.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-d2.tar.gz",
+      "type": "skill"
     },
     {
       "id": "text-to-diagram",
@@ -504,7 +529,8 @@
       "updatedAt": "2026-09-09T14:10:50.505Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/text-to-diagram.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/text-to-diagram.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-diagram.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-diagram.tar.gz",
+      "type": "skill"
     },
     {
       "id": "text-to-image",
@@ -526,7 +552,8 @@
       "updatedAt": "2026-09-09T14:45:26.676Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/text-to-image.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/text-to-image.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-image.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-image.tar.gz",
+      "type": "skill"
     },
     {
       "id": "typesafe-ai",
@@ -546,7 +573,8 @@
       "updatedAt": "2026-09-20T02:00:00.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/typesafe-ai.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/typesafe-ai.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/typesafe-ai.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/typesafe-ai.tar.gz",
+      "type": "skill"
     },
     {
       "id": "unslop",
@@ -563,7 +591,8 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/unslop.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/unslop.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/unslop.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/unslop.tar.gz",
+      "type": "skill"
     },
     {
       "id": "use-tinyfish",
@@ -580,7 +609,8 @@
       "updatedAt": "2026-09-09T14:10:50.548Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/use-tinyfish.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.tar.gz",
+      "type": "skill"
     },
     {
       "id": "video-publish",
@@ -599,7 +629,8 @@
       "updatedAt": "2026-09-18T08:00:00.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/video-publish.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/video-publish.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/video-publish.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/video-publish.tar.gz",
+      "type": "skill"
     },
     {
       "id": "vision-for-dev",
@@ -618,7 +649,8 @@
       "updatedAt": "2026-09-18T22:52:50.932Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/vision-for-dev.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/vision-for-dev.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/vision-for-dev.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/vision-for-dev.tar.gz",
+      "type": "skill"
     },
     {
       "id": "world-generator",
@@ -638,7 +670,8 @@
       "updatedAt": "2026-09-26T00:00:00.000Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/world-generator.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/world-generator.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/world-generator.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/world-generator.tar.gz",
+      "type": "skill"
     },
     {
       "id": "xlsx",
@@ -655,7 +688,25 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/xlsx.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/xlsx.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/xlsx.tar.gz"
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/xlsx.tar.gz",
+      "type": "skill"
+    },
+    {
+      "id": "weather-mcp",
+      "name": "weather-mcp",
+      "description": "Weather MCP Server — 提供实时天气查询、预报、空气质量等工具。支持 stdio/SSE/HTTP 传输方式，兼容 Claude Desktop、Cursor、VSCode 等主流编辑器。",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "mcp",
+        "weather",
+        "api"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T04:53:54.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "type": "mcp"
     }
   ]
 }

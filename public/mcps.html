@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCPs · SkillHub</title>
+<meta name="description" content="MCP Server 列表与下载">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner">
+  <a class="logo" href="/"><span class="logo-mark">S</span>SkillHub</a>
+  <nav>
+    <a href="/">浏览</a>
+    <a href="/mcps" class="active">MCPs</a>
+    <a href="/setup">密钥配置</a>
+    <a href="/ai">Agent 接入</a>
+    <a href="/admin">管理</a>
+  </nav>
+</div></header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>MCP Server 列表</h1>
+    <p class="sub">Model Context Protocol 服务器，为 AI Agent 提供工具扩展。</p>
+    <div class="pill-row">
+      <span class="pill" id="stat-mcps">— 个 MCP</span>
+      <span class="pill" id="stat-mcp-cats">— 个分类</span>
+      <span class="pill">stdio/SSE/HTTP 传输</span>
+      <span class="pill">一键配置生成</span>
+    </div>
+    <form class="search-box" onsubmit="return false;">
+      <input id="q" type="search" placeholder="搜索 MCP 名称、能力描述…" autocomplete="off">
+      <button id="go">搜索</button>
+    </form>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="cat-row" id="cats"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty hidden" id="empty">没有匹配的 MCP，换个关键词试试。</div>
+
+  <h2 class="machines-title">MCP 配置指南</h2>
+  <p class="machines-sub">下载后参考以下配置方式接入主流编辑器。</p>
+  <div class="for-machines">
+    <div class="machine-card">
+      <h3>Claude Desktop</h3>
+      <p>编辑 ~/.claude/settings.json，添加 mcpServers 配置。</p>
+      <code>{ "mcpServers": { "my-mcp": { "command": "node", "args": ["server.js"] } } }</code>
+    </div>
+    <div class="machine-card">
+      <h3>Cursor / VSCode</h3>
+      <p>通过 MCP 扩展管理服务器，或直接编辑配置文件。</p>
+      <code>GET /api/mcps/{id}/config → 下载 JSON</code>
+    </div>
+    <div class="machine-card">
+      <h3>一键配置</h3>
+      <p>获取标准配置的 API 端点。</p>
+      <code>curl /api/mcps/{id}/config -o ~/.config/mcp.json</code>
+    </div>
+  </div>
+</main>
+
+<footer><div class="wrap">SkillHub · MCP Server 库 · <a href="/mcps">MCPs</a> · <a href="/admin">管理后台</a></div></footer>
+<script src="/flags.js"></script>
+<script src="/app-mcps.js"></script>
+</body>
+</html>
