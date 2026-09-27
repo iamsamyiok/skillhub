@@ -1,0 +1,93 @@
+{
+ "ready": {
+  "@modelcontextprotocol/server-memory": {
+   "args": [],
+   "human": "持久记忆: 知识图谱式长期记忆"
+  },
+  "@modelcontextprotocol/server-sequential-thinking": {
+   "args": [],
+   "human": "顺序思考: 结构化分步推理"
+  },
+  "@modelcontextprotocol/server-github": {
+   "args": [],
+   "needs": "GITHUB_PERSONAL_ACCESS_TOKEN(免费)",
+   "human": "GitHub 官方(已deprecated 建议用 github/github-mcp-server 官方远程版)"
+  },
+  "mcp-server-fetch": {
+   "uvx": true,
+   "human": "网页抓取: 网页转 Markdown"
+  },
+  "mcp-server-git": {
+   "uvx": true,
+   "human": "Git 仓库: 读写搜索"
+  },
+  "mcp-server-time": {
+   "uvx": true,
+   "human": "时间查询: 时区换算"
+  },
+  "@playwright/mcp": {
+   "args": [],
+   "human": "Playwright: 驱动本机浏览器(免费)"
+  },
+  "@antv/mcp-server-chart": {
+   "args": [],
+   "human": "AntV 图表: 文字生成可视化"
+  },
+  "@upstash/context7-mcp": {
+   "args": [],
+   "human": "Context7: 最新库文档注入(免费)"
+  },
+  "@cloudflare/mcp-server-cloudflare": {
+   "args": [],
+   "needs": "CLOUDFLARE_API_TOKEN(免费可办)",
+   "human": "Cloudflare: Workers/KV/R2 管理"
+  }
+ },
+ "needs_key": {
+  "Browserbase (云端浏览器)": {
+   "key": "BROWSERBASE_API_KEY",
+   "get": "browserbase.com 免费注册",
+   "human": "Serverless 浏览器池, 本机Playwright 已覆盖其功能"
+  },
+  "Octagon 深度调研": {
+   "key": "OCTAGON_API_KEY",
+   "get": "octagonai.xyz",
+   "human": "多步深度网络调研"
+  },
+  "Allyson SVG 动画": {
+   "key": "ALLYSON_API_KEY",
+   "get": "allyson.ai",
+   "human": "静态图转SVG动画"
+  },
+  "ScreenshotMCP": {
+   "key": "SCREENSHOT_API_KEY(或本地)",
+   "get": "见repo",
+   "human": "URL截图 — 可用已装Lightpanda替代"
+  },
+  "Stripe": {
+   "key": "STRIPE_SECRET_KEY",
+   "get": "stripe.com",
+   "human": "支付管理 — 无商户账号则搁置"
+  },
+  "LaTeX 编译": {
+   "key": "无(需本地TeX发行版)",
+   "get": "装 MiKTeX/TeXLive",
+   "human": "LaTeX 编译 — Windows 需装 TeX"
+  },
+  "Cua": {
+   "key": "无(需要额外运行环境)",
+   "get": "github.com/trycua/cua",
+   "human": "电脑操作 — 本机已有 computer-use 插件覆盖"
+  },
+  "4EVERLAND 托管": {
+   "key": "4EVERLAND_TOKEN",
+   "get": "4everland.org",
+   "human": "去中心化托管"
+  },
+  "AWS Bedrock KB / Harness / Atlan / Adfin 等": {
+   "key": "各平台钥",
+   "get": "各自平台",
+   "human": "企业服务, 无账号暂搁置"
+  }
+ }
+}
