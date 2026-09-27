@@ -1,5 +1,5 @@
 {
-  "total": 33,
+  "total": 34,
   "categories": [
     "写作工具",
     "前端开发",
@@ -1467,6 +1467,31 @@
       ]
     },
     {
+      "id": "skillmanager",
+      "name": "skillmanager",
+      "description": "SkillManager — 技能管理器。手动触发技能组合建议(采纳才挂回调)、扫描技能目录更新全局索引、 单技能MD归档标记、静态HTML仪表盘(调用次数/成功率/平均耗时/高频报错,排序与筛选)。 无侵入原有Agent逻辑,全部数据仅用MD文件存储,零外部服务。 当用户要求\"管理技能/技能建议/技能统计/技能归档/技能仪表盘\"或输入 /skillmanager 时使用。",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "技能管理",
+        "仪表盘",
+        "归档",
+        "建议"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-26T15:30:00.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 3664
+        },
+        {
+          "path": "scripts/skillmanager.py",
+          "size": 28710
+        }
+      ]
+    },
+    {
       "id": "slides-maker",
       "name": "slides-maker",
       "description": "制作、重设计、评审演示级幻灯片（.pptx）：科研组会、工作汇报、大会演讲、答辩、教学、网络研讨会均适用。支持有模板（跟随模板风格）或无模板（自动设计干净版式），可从提供的代码/文档/图表取材，也可联网调研并核查事实，中英文皆可。当用户想\"做幻灯片/做个PPT/把内容转成slides/优化排版太挤的页面/评审我的演示稿\"时使用。",
@@ -2504,7 +2529,7 @@
         },
         {
           "path": "scripts/cards.mjs",
-          "size": 14244
+          "size": 19558
         },
         {
           "path": "scripts/compose.js",

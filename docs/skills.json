@@ -1,5 +1,5 @@
 {
-  "total": 33,
+  "total": 34,
   "categories": [
     "写作工具",
     "前端开发",
@@ -428,6 +428,24 @@
       "md": "https://iamsamyiok.github.io/skillhub/skills-md/skill-updater.md",
       "zip": "https://iamsamyiok.github.io/skillhub/downloads/skill-updater.zip",
       "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skill-updater.tar.gz"
+    },
+    {
+      "id": "skillmanager",
+      "name": "skillmanager",
+      "description": "SkillManager — 技能管理器。手动触发技能组合建议(采纳才挂回调)、扫描技能目录更新全局索引、 单技能MD归档标记、静态HTML仪表盘(调用次数/成功率/平均耗时/高频报错,排序与筛选)。 无侵入原有Agent逻辑,全部数据仅用MD文件存储,零外部服务。 当用户要求\"管理技能/技能建议/技能统计/技能归档/技能仪表盘\"或输入 /skillmanager 时使用。",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "技能管理",
+        "仪表盘",
+        "归档",
+        "建议"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-26T15:30:00.000Z",
+      "md": "https://iamsamyiok.github.io/skillhub/skills-md/skillmanager.md",
+      "zip": "https://iamsamyiok.github.io/skillhub/downloads/skillmanager.zip",
+      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skillmanager.tar.gz"
     },
     {
       "id": "slides-maker",
