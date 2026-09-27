@@ -17,7 +17,7 @@ fs.rmSync(OUT, { recursive: true, force: true });
 for (const d of ['data', 'skills-md', 'mcps-md', 'downloads', 'css']) fs.mkdirSync(path.join(OUT, d), { recursive: true });
 
 /* 资源直接复制 */
-for (const f of ['style.css', 'app.js', 'setup.js']) fs.copyFileSync(path.join(ROOT, 'public', f), path.join(OUT, f));
+for (const f of ['style.css', 'app.js', 'app-mcps.js', 'setup.js']) fs.copyFileSync(path.join(ROOT, 'public', f), path.join(OUT, f));
 
 /* flags：静态模式 */
 fs.writeFileSync(path.join(OUT, 'flags.js'), "window.SKILLHUB_STATIC = true;\nwindow.SKILLHUB_BASE = './';\n");
