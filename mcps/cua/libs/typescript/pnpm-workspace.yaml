@@ -1,8 +1,0 @@
-packages:
-  - "computer"
-  - "core"
-  - "agent"
-  - "fleet"
-  - "playground"
-
-minimumReleaseAge: 46080

@@ -1,3 +1,0 @@
-This directory contains pre-built JavaScript artifacts compiled from the TypeScript sources
-in ../ts_functions/src. Modify the TypeScript, run `npm run build`, and ensure updated files
-are copied here before publishing the Python package.
