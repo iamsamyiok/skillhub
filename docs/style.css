@@ -240,11 +240,49 @@ footer a:hover { color: var(--brand); }
 .empty { text-align: center; color: var(--muted); padding: 48px 0; }
 
 @media (max-width: 640px) {
-  .wrap { padding: 0 16px; }
-  .hero { padding: 36px 0 32px; }
+  .wrap { padding: 0 14px; }
+  .hero { padding: 32px 0 28px; }
   .hero h1 { font-size: 23px; }
   .grid { grid-template-columns: 1fr; }
-  .md-body { padding: 22px 18px; }
-  .topbar-inner { height: 50px; }
-  .topbar nav a { padding: 6px 9px; font-size: 12.5px; }
+  .md-body { padding: 22px 16px; overflow-x: auto; }
+
+  /* 顶栏: 不换行, 横向可滚(移动端常见导航模式), 触控目标加大 */
+  .topbar-inner { height: auto; min-height: 46px; flex-wrap: nowrap; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .topbar-inner::-webkit-scrollbar { display: none; }
+  .topbar .logo { flex-shrink: 0; }
+  .topbar nav { margin-left: 0; gap: 4px; flex-shrink: 0; }
+  .topbar nav a { padding: 8px 11px; font-size: 13px; white-space: nowrap; }
+
+  /* 卡片触控与排版 */
+  .skill-card { padding: 14px; }
+  .skill-card .foot { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .skill-card .foot-btns { width: 100%; display: flex; gap: 8px; }
+  .skill-card .foot-btns .mini-btn { flex: 1; text-align: center; padding: 10px 8px; font-size: 13.5px; }
+  .skill-card .head { flex-wrap: wrap; row-gap: 4px; }
+
+  /* 需钥指引与徽章: 窄屏不挤压 */
+  .keyline { word-break: break-all; }
+  .keyline code { display: inline-block; max-width: 100%; overflow-wrap: anywhere; }
+  #keyguide { padding: 12px 14px; font-size: 13px; }
+
+  /* 表格/代码块横向滚动防破版 */
+  table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  pre, code { overflow-wrap: anywhere; white-space: pre-wrap; word-break: break-word; }
+  pre { overflow-x: auto; white-space: pre; }
+
+  /* 筛选 chips 横向滚动 */
+  .cat-row { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; scrollbar-width: none; }
+  .cat-row::-webkit-scrollbar { display: none; }
+  .cat-row .chip { white-space: nowrap; flex-shrink: 0; }
+
+  /* 搜索框堆叠 */
+  .search-box { flex-direction: column; }
+  .search-box input { width: 100%; }
+  .search-box button { width: 100%; }
+}
+
+@media (max-width: 400px) {
+  .wrap { padding: 0 10px; }
+  .hero h1 { font-size: 20px; }
+  .topbar nav a { padding: 8px 8px; font-size: 12px; }
 }
