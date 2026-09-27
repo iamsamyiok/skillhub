@@ -1,0 +1,19 @@
+{
+  "name": "summarize_md",
+  "version": "1.0.0",
+  "capabilities": ["doc.summarize"],
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "capability": { "type": "string", "const": "doc.summarize" },
+      "file": { "type": "string", "description": "Markdown 文件路径" },
+      "max_chars": { "type": "integer", "default": 400 },
+      "meta": { "type": "object" }
+    },
+    "required": ["capability", "file"]
+  },
+  "use_when": "需要快速了解某个 Markdown 文件讲什么(标题+首段摘要)",
+  "avoid_when": "需要全文或目录清单",
+  "cost_hint": "单文件毫秒级; 返回固定不超过 max_chars",
+  "human_summary": "摘要器: 提取 Markdown 的标题层级与首段摘要。"
+}
