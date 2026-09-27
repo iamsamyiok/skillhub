@@ -1,0 +1,18 @@
+{
+  "name": "reindex_kb",
+  "version": "1.0.0",
+  "capabilities": ["doc.reindex"],
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "capability": { "type": "string", "const": "doc.reindex" },
+      "target": { "type": "string" },
+      "out": { "type": "string", "default": "index.md" }
+    },
+    "required": ["capability", "target"]
+  },
+  "use_when": "知识库文件批量变动后需要重建索引页(长任务,返回句柄)",
+  "avoid_when": "只需查看清单(用 doc.scan 即可)",
+  "cost_hint": "长任务: 立即返回 task_id, 完成需数秒",
+  "human_summary": "重索引器: 异步重建知识库 index.md(返回任务句柄)。"
+}
