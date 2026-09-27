@@ -84,11 +84,12 @@ async function initHome() {
     const cats = data.categories || [];
     if (cats.length) document.getElementById('stat-cats').textContent = `${cats.length} 个分类`;
     grid.innerHTML = data.items.map((s) => `
-      <div class="skill-card">
+      <div class="skill-card" data-needskey="${s.needsKey ? 1 : 0}">
         <div class="head">
           <span class="name">${esc(s.name)}</span>
           <span class="ver">v${esc(s.version)}</span>
           <span class="cat">${esc(s.category)}</span>
+          ${s.needsKey ? '<span class="badge" style="border-color:#d29922;color:#d29922;font-size:11px;padding:1px 8px;border-radius:5px" title="此技能需要配置 API 密钥">🔑 需要密钥</span>' : ''}
         </div>
         <div class="desc">${esc(s.description)}</div>
         ${(s.tags || []).length ? `<div class="tags-row">${s.tags.map((t) => `<button class="tag-btn" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : ''}

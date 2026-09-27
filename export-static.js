@@ -42,7 +42,7 @@ function rewrite(html) {
 const items = [];
 for (const id of allSkillIds()) {
   const s = skillDetail(id);
-  items.push({ id: s.id, name: s.name, description: s.description, version: s.version, category: s.category, tags: s.tags, downloads: s.downloads, updatedAt: s.updatedAt, files: s.files });
+  items.push({ id: s.id, name: s.name, description: s.description, version: s.version, category: s.category, tags: s.tags, downloads: s.downloads, updatedAt: s.updatedAt, files: s.files, needsKey: s.body.includes('API 钥') || s.body.includes('API_KEY') || s.body.includes('密钥') });
 }
 const categories = [...new Set(items.map((s) => s.category))].sort();
 fs.writeFileSync(path.join(OUT, 'data', 'skills.json'), JSON.stringify({ total: items.length, categories, items }, null, 2));
@@ -84,6 +84,7 @@ const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const agentItems = items.map((s) => ({
   id: s.id, name: s.name, description: s.description, version: s.version,
   category: s.category, tags: s.tags, downloads: s.downloads, updatedAt: s.updatedAt,
+  needsKey: !!s.needsKey,
   md: `${base}/skills-md/${s.id}.md`, zip: `${base}/downloads/${s.id}.zip`, tgz: `${base}/downloads/${s.id}.tar.gz`,
 }));
 const agentJson = JSON.stringify({ total: agentItems.length, categories, site: base || '.', skills: agentItems }).replace(/<\//g, '<\\/');
@@ -125,7 +126,7 @@ fs.writeFileSync(path.join(OUT, 'README-static.md'), '# 本目录为 GitHub Page
 const mcpItems = [];
 for (const id of allMcpIds()) {
   const s = mcpDetail(id);
-  mcpItems.push({ id: s.id, name: s.name, description: s.description, version: s.version, category: s.category, tags: s.tags, downloads: s.downloads, updatedAt: s.updatedAt, runtime: s.runtime, entry: s.entry });
+  mcpItems.push({ id: s.id, name: s.name, description: s.description, version: s.version, category: s.category, tags: s.tags, downloads: s.downloads, updatedAt: s.updatedAt, runtime: s.runtime, entry: s.entry, env: s.env || {} });
 }
 const mcpCategories = [...new Set(mcpItems.map((s) => s.category))].sort();
 fs.mkdirSync(path.join(OUT, 'data'), { recursive: true });

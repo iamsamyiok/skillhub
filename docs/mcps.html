@@ -15,7 +15,7 @@
     <a href="./mcps" class="active">MCPs</a>
     <a href="./setup.html">密钥配置</a>
     <a href="./ai.html">Agent 接入</a>
-    <a href="https://github.com/iamsamyiok/skillhub#自托管">管理</a>
+    <a href="./index.html">管理</a>
   </nav>
 </div></header>
 
@@ -28,6 +28,7 @@
       <span class="pill" id="stat-mcp-cats">— 个分类</span>
       <span class="pill">stdio/SSE/HTTP 传输</span>
       <span class="pill">一键配置生成</span>
+      <span class="pill" id="stat-mcp-needskey" style="cursor:pointer;border-color:var(--org,#f78166);color:#f78166" onclick="showNeedsKey()" title="点击筛选所有需要配置 API 密钥的 MCP">🔑 需要密钥: — 个</span>
     </div>
     <form class="search-box" onsubmit="return false;">
       <input id="q" type="search" placeholder="搜索 MCP 名称、能力描述…" autocomplete="off">
@@ -38,6 +39,10 @@
 
 <main class="wrap">
   <div class="cat-row" id="cats"></div>
+  <div id="keyguide" class="hidden" style="background:#1a1710;border:1px solid #d29922;border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:14px;line-height:1.8">
+    <b style="color:#d29922">🔑 需要密钥的 MCP — 取钥指引</b>
+    <div id="keyguide-body">加载中…</div>
+  </div>
   <div class="grid" id="grid"></div>
   <div class="empty hidden" id="empty">没有匹配的 MCP，换个关键词试试。</div>
 
@@ -62,7 +67,7 @@
   </div>
 </main>
 
-<footer><div class="wrap">SkillHub · MCP Server 库 · <a href="./mcps">MCPs</a> · <a href="https://github.com/iamsamyiok/skillhub#自托管">管理后台</a></div></footer>
+<footer><div class="wrap">SkillHub · MCP Server 库 · <a href="./mcps">MCPs</a> · <a href="./index.html">管理后台</a></div></footer>
 <script src="./flags.js"></script>
 <script src="/app-mcps.js"></script>
 </body>
