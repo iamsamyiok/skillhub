@@ -1,0 +1,18 @@
+{
+  "name": "scan_dir",
+  "version": "1.0.0",
+  "capabilities": ["doc.scan"],
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "capability": { "type": "string", "const": "doc.scan" },
+      "target": { "type": "string", "description": "要扫描的目录" },
+      "meta": { "type": "object", "description": "{with_detail:true} 获取全量列表" }
+    },
+    "required": ["capability", "target"]
+  },
+  "use_when": "需要知道某目录有哪些 Markdown 文档及其标题",
+  "avoid_when": "目标不是目录或需要读取文件全文",
+  "cost_hint": "千文件级秒级; 默认只返回前5条+计数",
+  "human_summary": "文档扫描器: 列出目录中的 Markdown 文件清单与标题。"
+}
