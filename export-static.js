@@ -26,7 +26,7 @@ fs.writeFileSync(path.join(OUT, 'flags.js'), "window.SKILLHUB_STATIC = true;\nwi
 function rewrite(html) {
   return html
     .replace(/href="\/style\.css"/g, 'href="./style.css"')
-    .replace(/src="\/(flags|app|setup)\.js"/g, 'src="./$1.js"')
+    .replace(/src="\/(flags|app|app-mcps|setup)\.js"/g, 'src="./$1.js"')
     .replace(/href="\//g, 'href="./')
     .replace(/href="\.\/"/g, 'href="./index.html"')
     .replace(/href="\.\/skill\?id=/g, 'href="./skill.html?id=')
