@@ -1,0 +1,79 @@
+{
+ "mcpServers": {
+  "@modelcontextprotocol/server-memory": {
+   "command": "npx",
+   "args": [
+    "-y",
+    "@modelcontextprotocol/server-memory"
+   ]
+  },
+  "@modelcontextprotocol/server-sequential-thinking": {
+   "command": "npx",
+   "args": [
+    "-y",
+    "@modelcontextprotocol/server-sequential-thinking"
+   ]
+  },
+  "@modelcontextprotocol/server-github": {
+   "command": "npx",
+   "args": [
+    "-y",
+    "@modelcontextprotocol/server-github"
+   ]
+  },
+  "mcp-server-fetch": {
+   "command": "uvx",
+   "args": [
+    "mcp-server-fetch"
+   ]
+  },
+  "mcp-server-git": {
+   "command": "uvx",
+   "args": [
+    "mcp-server-git"
+   ]
+  },
+  "mcp-server-time": {
+   "command": "uvx",
+   "args": [
+    "mcp-server-time"
+   ]
+  },
+  "@playwright/mcp": {
+   "command": "npx",
+   "args": [
+    "-y",
+    "@playwright/mcp"
+   ]
+  },
+  "@antv/mcp-server-chart": {
+   "command": "npx",
+   "args": [
+    "-y",
+    "@antv/mcp-server-chart"
+   ]
+  },
+  "@upstash/context7-mcp": {
+   "command": "npx",
+   "args": [
+    "-y",
+    "@upstash/context7-mcp"
+   ]
+  },
+  "@cloudflare/mcp-server-cloudflare": {
+   "command": "npx",
+   "args": [
+    "-y",
+    "@cloudflare/mcp-server-cloudflare"
+   ]
+  },
+  "github-remote": {
+   "command": "npx",
+   "args": [
+    "-y",
+    "mcp-remote",
+    "https://api.githubcopilot.com/mcp/"
+   ]
+  }
+ }
+}
