@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SVG 精准修改 · 点选组件 + 一句话提交</title>
+<style>
+  :root { --blue:#1d4e89; --bg:#f4f6f9; --line:#d9dee6; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; }
+  body { font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+         display:flex; flex-direction:column; height:100vh; color:#1f2329; font-size:13px; background:var(--bg); }
+
+  /* 顶部工具栏 */
+  #topbar { display:flex; align-items:center; gap:10px; padding:10px 14px;
+            background:var(--blue); color:#fff; flex:none; }
+  #topbar .title { font-weight:600; font-size:14px; margin-right:auto; }
+  #topbar button { background:rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.4);
+                   padding:6px 14px; border-radius:6px; cursor:pointer; font-size:13px; }
+  #topbar button:hover { background:rgba(255,255,255,.28); }
+  #topbar .fname { font-size:12px; opacity:.9; font-family:ui-monospace,Consolas,monospace; }
+
+  /* 画布区 */
+  #stage { flex:1; overflow:auto; display:flex; align-items:center; justify-content:center; padding:20px; }
+  #svgWrap { max-width:100%; }
+  #svgWrap svg { max-width:100%; height:auto; background:#fff; box-shadow:0 2px 12px rgba(0,0,0,.08); }
+  .empty { color:#8a9099; font-size:14px; padding:60px; text-align:center; }
+
+  /* 底部提交栏 */
+  #bottombar { flex:none; display:flex; align-items:center; gap:12px; padding:10px 14px;
+               background:#fff; border-top:1px solid var(--line); }
+  #selInfo { font-size:12px; color:var(--blue); font-weight:600; white-space:nowrap;
+             font-family:ui-monospace,Consolas,monospace; max-width:42%; overflow:hidden; text-overflow:ellipsis; }
+  #cmd { flex:1; padding:9px 12px; border:1px solid var(--line); border-radius:8px; font-size:13px; font-family:inherit; }
+  #cmd:focus { outline:none; border-color:var(--blue); }
+  #submit { background:var(--blue); color:#fff; border:none; padding:9px 18px; border-radius:8px;
+            cursor:pointer; font-size:13px; white-space:nowrap; }
+  #submit:active { transform:translateY(1px); }
+  #toast { position:fixed; left:50%; bottom:74px; transform:translateX(-50%);
+           background:#1f2329; color:#fff; padding:8px 16px; border-radius:8px; font-size:13px;
+           opacity:0; transition:opacity .25s; pointer-events:none; }
+  #toast.show { opacity:.94; }
+</style>
+</head>
+<body>
+  <div id="topbar">
+    <span class="title">SVG 精准修改</span>
+    <span class="fname" id="fname"></span>
+  </div>
+
+  <div id="stage">
+    <div id="svgWrap"><div class="empty">在聊天里告诉 AI 要编辑哪张图<br>AI 会为你自动打开本页</div></div>
+  </div>
+
+  <div id="bottombar">
+    <span id="selInfo">已选：无</span>
+    <input id="cmd" placeholder="选中组件后，在此输入修改内容，回车提交（自动复制指令）" autocomplete="off">
+    <button id="submit">提交</button>
+  </div>
+
+  <div id="toast"></div>
+
+<script>
+const SVG_NS = "http://www.w3.org/2000/svg";
+let allElements = [];          // {id, tag, text, el}
+let selected = new Set();       // 选中的 id
+let svgEl = null, highlightG = null, hoverG = null;
+let currentFile = "";
+
+const wrap = document.getElementById('svgWrap');
+const selInfo = document.getElementById('selInfo');
+const cmd = document.getElementById('cmd');
+const fnameEl = document.getElementById('fname');
+
+cmd.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+document.getElementById('submit').addEventListener('click', submit);
+
+function loadSVG(text){
+  wrap.innerHTML = text;
+  const svg = wrap.querySelector('svg');
+  if (!svg) { wrap.innerHTML = '<div class="empty">不是有效的 SVG 文件</div>'; return; }
+  svgEl = svg;
+  if (!svg.getAttribute('xmlns')) svg.setAttribute('xmlns', SVG_NS);
+  // 注入高亮动画样式（仅用于预览，导出时会被剥离）
+  const style = document.createElementNS(SVG_NS, 'style');
+  style.id = '__se_style__';
+  style.textContent = '@keyframes sePulse{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}.se-sel-box{animation:sePulse 1.1s ease-in-out infinite}';
+  svg.appendChild(style);
+  highlightG = document.createElementNS(SVG_NS, 'g'); highlightG.id = '__se_sel__'; highlightG.setAttribute('pointer-events','none');
+  hoverG = document.createElementNS(SVG_NS, 'g'); hoverG.id = '__se_hov__'; hoverG.setAttribute('pointer-events','none');
+  svg.appendChild(hoverG); svg.appendChild(highlightG);   // 高亮层放最上层
+
+  // 扫描所有可寻址元素，自动补 id
+  allElements = []; selected.clear();
+  let idx = 0;
+  svg.querySelectorAll('*').forEach(el => {
+    const tag = el.tagName.replace(/^[^:]+:/, '');
+    if (tag === 'svg') return;
+    if (!el.id) el.id = 'se-' + (++idx);
+    allElements.push({ id: el.id, tag, text:(el.textContent||'').trim().slice(0,30), el });
+  });
+  updateSelInfo(); drawSelection();
+}
+
+// 单击元素：切换选中
+wrap.addEventListener('click', e => {
+  let t = e.target;
+  while (t && t.nodeType === 1 && t.tagName.replace(/^[^:]+:/, '') !== 'svg') {
+    if (t.id && t.id !== '__' && !t.id.startsWith('__se')) { toggle(t.id); return; }
+    t = t.parentNode;
+  }
+});
+// 悬停预览（红色虚线 + 浅红填充，明显区分未选中态）
+let lastHover = null;
+wrap.addEventListener('mouseover', e => {
+  if (!hoverG) return;
+  let t = e.target, found = null;
+  while (t && t.nodeType === 1 && t.tagName.replace(/^[^:]+:/, '') !== 'svg') {
+    if (t.id && !t.id.startsWith('__se')) { found = t; break; }
+    t = t.parentNode;
+  }
+  if (!found) { if (lastHover) { hoverG.innerHTML = ''; lastHover = null; } return; }
+  if (found.id === lastHover) return;
+  lastHover = found.id; hoverG.innerHTML = ''; decorate(hoverG, found, 'hov');
+});
+wrap.addEventListener('mouseleave', () => { if (hoverG) { hoverG.innerHTML = ''; lastHover = null; } });
+
+function toggle(id){ selected.has(id) ? selected.delete(id) : selected.add(id); updateSelInfo(); drawSelection(); }
+
+function updateSelInfo(){
+  selInfo.textContent = selected.size ? '已选：' + [...selected].join(', ') : '已选：无';
+}
+
+function drawSelection(){
+  if (!highlightG) return; highlightG.innerHTML = '';
+  selected.forEach(id => { const it = allElements.find(x => x.id === id); if (it) decorate(highlightG, it.el, 'sel'); });
+}
+
+// 把元素 bbox（含祖先变换）换算到 svg 根坐标系，绘制强对比高亮装饰
+function setAttrs(el, o){ for (const k in o) el.setAttribute(k, o[k]); }
+function decorate(g, el, mode){
+  try {
+    const bb = el.getBBox(); const m = el.getCTM();
+    const pts = [[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x+bb.width,bb.y+bb.height],[bb.x,bb.y+bb.height]]
+      .map(([x,y]) => new DOMPoint(x,y).matrixTransform(m));
+    const xs = pts.map(p=>p.x), ys = pts.map(p=>p.y);
+    let x = Math.min(...xs), y = Math.min(...ys), w = Math.max(...xs)-x, h = Math.max(...ys)-y;
+    const pad = 5; x -= pad; y -= pad; w += pad*2; h += pad*2;
+
+    if (mode === 'sel') {
+      // 半透明黄色填充：直接给选中区域着色
+      const fill = document.createElementNS(SVG_NS,'rect');
+      setAttrs(fill, {x, y, width:w, height:h, fill:'#ffd400','fill-opacity':'0.22', stroke:'none','pointer-events':'none'});
+      g.appendChild(fill);
+      // 粗实线橙色边框 + 呼吸动画：高对比，明显区别于蓝线图纸
+      const box = document.createElementNS(SVG_NS,'rect');
+      setAttrs(box, {x, y, width:w, height:h, fill:'none', stroke:'#ff6b00','stroke-width':'3',
+        'vector-effect':'non-scaling-stroke','stroke-linejoin':'round','pointer-events':'none','class':'se-sel-box'});
+      g.appendChild(box);
+      // 四角手柄
+      const hs = 8;
+      [[x,y],[x+w,y],[x+w,y+h],[x,y+h]].forEach(([cx,cy])=>{
+        const c = document.createElementNS(SVG_NS,'rect');
+        setAttrs(c,{x:cx-hs/2, y:cy-hs/2, width:hs, height:hs, fill:'#ff6b00', stroke:'#fff','stroke-width':'1.5','vector-effect':'non-scaling-stroke','pointer-events':'none'});
+        g.appendChild(c);
+      });
+      // id 标签：明确告诉用户选中了哪一个
+      const label = el.id || '?';
+      const tw = label.length*7 + 12;
+      const lb = document.createElementNS(SVG_NS,'rect');
+      setAttrs(lb,{x, y:y-19, width:tw, height:17, rx:3, fill:'#ff6b00','pointer-events':'none'});
+      g.appendChild(lb);
+      const tx = document.createElementNS(SVG_NS,'text');
+      setAttrs(tx,{x:x+6, y:y-7, fill:'#fff','font-size':'11','font-family':'monospace','pointer-events':'none'});
+      tx.textContent = label; g.appendChild(tx);
+    } else {
+      const box = document.createElementNS(SVG_NS,'rect');
+      setAttrs(box,{x, y, width:w, height:h, fill:'#e74c3c','fill-opacity':'0.12', stroke:'#e74c3c','stroke-width':'2.5',
+        'stroke-dasharray':'6 4','vector-effect':'non-scaling-stroke','pointer-events':'none'});
+      g.appendChild(box);
+    }
+  } catch(_){}
+}
+
+// 提交：经本地桥接服务直达 agent；改完自动回传 SVG 就地重载；失败降级为复制指令
+function submit(){
+  if (!selected.size) { toast('请先在画布中点选至少一个组件'); return; }
+  const ins = cmd.value.trim();
+  if (!ins) { toast('请输入修改内容'); cmd.focus(); return; }
+  const ids = [...selected];
+  const payload =
+`请按以下请求修改 SVG 文件：${currentFile || '<SVG路径>'}
+- 选中元素 id：${ids.join(', ')}
+- 修改意图（自然语言）：${ins}
+请使用 svg-edit-v1.1 skill 的 svg_toolkit.py 确定性地完成修改（按 id 定位，勿重写源码），修改后运行 validate 并导出最终 SVG。`;
+
+  if (!location.protocol.startsWith('http')) {
+    copyText(payload); toast('已复制指令，请粘贴给 AI（或改用 http://127.0.0.1:8620/ 打开本页即可直连）'); cmd.value=''; return;
+  }
+
+  const body = { svg: currentFile, selected: ids, instruction: ins, svgText: serialize() };
+  toast('已提交，AI 正在执行修改…');
+  fetch('/submit', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(data => {
+      if (!data.reqid) throw new Error('no reqid');
+      pollResult(data.reqid, payload);
+      cmd.value = '';
+    })
+    .catch(() => { copyText(payload); toast('桥接不可用，已复制指令，请粘贴给 AI'); cmd.value=''; });
+}
+
+// 轮询修改结果（agent 改完写入 outputs/ 后即拉取），完成后就地重载画布
+function pollResult(reqid, payload){
+  const t0 = Date.now();
+  const timer = setInterval(async () => {
+    try {
+      const r = await fetch('/output/' + reqid);
+      if (r.ok) {
+        clearInterval(timer);
+        const svgTxt = await r.text();
+        loadSVG(svgTxt);
+        let sum = '', outfile = '';
+        try {
+          const s = await fetch('/summary/' + reqid);
+          if (s.ok) { const m = await s.json(); sum = m.summary || ''; outfile = m.outfile || ''; }
+        } catch(_){}
+        if (outfile) { currentFile = outfile; fnameEl.textContent = outfile; }  // 更新为版本化文件名
+        toast('已修改：' + (sum || '完成'));
+      } else if (Date.now() - t0 > 180000) {
+        clearInterval(timer);
+        copyText(payload); toast('等待超时，已复制指令，请粘贴给 AI');
+      }
+    } catch(_) { /* 网络抖动时继续轮询 */ }
+  }, 2000);
+}
+
+function copyText(t){
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).catch(() => fallbackCopy(t));
+  } else fallbackCopy(t);
+}
+function fallbackCopy(t){
+  const ta = document.createElement('textarea'); ta.value = t;
+  ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta);
+  ta.select(); try { document.execCommand('copy'); } catch(_){} document.body.removeChild(ta);
+}
+
+// 保存 / 另存为：序列化当前 svg 下载（浏览器安全限制，file:// 下为下载）
+function serialize(){
+  if (!svgEl) return '';
+  const clone = svgEl.cloneNode(true);
+  clone.querySelectorAll('#__se_style__, #__se_sel__, #__se_hov__').forEach(n => n.remove());
+  return new XMLSerializer().serializeToString(clone);
+}
+
+let toastTimer;
+function toast(msg){
+  const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// 启动引导：agent 经 ?file= 注入初始图（守护进程会替换下方占位符）；无 boot 时等待 agent 打开
+/*__SE_BOOT__*/
+if (window.__SE_BOOT__ && window.__SE_BOOT__.svg) {
+  currentFile = window.__SE_BOOT__.name || 'diagram.svg';
+  fnameEl.textContent = currentFile;
+  loadSVG(window.__SE_BOOT__.svg);
+} else {
+  fnameEl.textContent = '在聊天里告诉 AI 要编辑哪张图，会为你自动打开本页';
+}
+</script>
+</body>
+</html>
