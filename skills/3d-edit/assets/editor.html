@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>3d-edit · 人工编辑器</title>
+<!-- ==========================================================================
+     3d-edit host v1 — 单文件场景的「人工编辑宿主页」（与 agent 自然语言通道同源）
+     装法：node scripts/edit3d.mjs editor <scene.html> --install   （拷到场景同目录）
+     用法：node scripts/edit3d.mjs serve <scene.html> 后打开
+           http://localhost:PORT/editor.html?src=scene.html
+     分工：本页只做 DOM 面板，零 three 依赖；3D 侧（拾取/gizmo/写入/历史/落盘）全在
+           场景内的 kit v1.3。两边写同一条 patch 命令流 ⇒ 手动改的东西 agent 能读懂、
+           能续改、能撤销、能写回文件的 patches 区（不是整场景序列化）。
+     ========================================================================== -->
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root{--bg:#099;--pan:352px}
+  html,body{height:100%;margin:0;background:#05080e;color:#cfe2f7;
+    font:12px/1.6 Consolas,"Microsoft YaHei",monospace}
+  #stage{position:fixed;left:0;top:0;right:var(--pan);bottom:0}
+  #fr{width:100%;height:100%;border:0;display:block;background:#000}
+  #pan{position:fixed;right:0;top:0;bottom:0;width:var(--pan);overflow:auto;
+    background:#0a1220;border-left:1px solid #2a3f5c}
+  .bar{display:flex;gap:6px;align-items:center;padding:7px 9px;border-bottom:1px solid #22344c;
+    position:sticky;top:0;background:#0a1220;z-index:2;flex-wrap:wrap}
+  .bar b{color:#ffd9a0;letter-spacing:1px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .r{display:flex;gap:6px;align-items:center;padding:3px 9px}
+  .r>label{flex:0 0 78px;color:#8fb0d6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .r input[type=range]{flex:1;min-width:0;accent-color:#ffb84d}
+  .r input[type=number],.r input[type=text]{width:66px;background:#0e1a2b;border:1px solid #2a3f5c;
+    color:#cfe2f7;border-radius:4px;padding:1px 3px;font:12px Consolas,monospace}
+  .r input[type=text]{flex:1;width:auto}
+  .r input[type=color]{width:34px;height:20px;border:1px solid #2a3f5c;background:#0e1a2b;border-radius:4px;padding:0}
+  .r select{flex:1;background:#0e1a2b;border:1px solid #2a3f5c;color:#cfe2f7;border-radius:4px;padding:1px}
+  .b{cursor:pointer;padding:2px 7px;border:1px solid #2a3f5c;border-radius:5px;background:#12203a;color:#cfe2f7;white-space:nowrap}
+  .b:hover{border-color:#4d7ba8;color:#ffd9a0}
+  .b.on{border-color:#ffb84d;color:#ffd9a0}
+  .g{padding:6px 9px;border-top:1px solid #22344c;display:flex;flex-wrap:wrap;gap:4px}
+  .i{cursor:pointer;padding:1px 8px;margin:0 9px;color:#9db8d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .i:hover{color:#ffd9a0}.i.sel{background:#1c3352;color:#ffd9a0;border-radius:4px}
+  .s{padding:4px 9px;color:#6f8db3}
+  .w{padding:6px 9px;color:#ffb84d;background:#1a1408;border-top:1px solid #22344c}
+  #toast{position:fixed;left:12px;bottom:12px;z-index:9;color:#ffd9a0;
+    background:rgba(9,15,24,.9);border:1px solid #2a3f5c;border-radius:6px;padding:4px 10px;
+    opacity:0;transition:.2s;pointer-events:none;max-width:60vw}
+  #toast.on{opacity:1}
+  h4{margin:8px 9px 2px;font-size:12px;color:#7fa3c9;font-weight:400;letter-spacing:1px}
+  .p3{background:#131d2e;border:1px dashed #2a3f5c;border-radius:6px;margin:6px 9px;padding:6px 8px;color:#8fb0d6}
+</style>
+</head>
+<body>
+<div id="stage"><iframe id="fr" allow="autoplay"></iframe></div>
+<aside id="pan"></aside>
+<div id="toast"></div>
+
+<script>
+(() => {
+  const q = new URLSearchParams(location.search);
+  const SRC = q.get('src') || q.get('file') || 'index.html';
+  const pan = document.getElementById('pan'), fr = document.getElementById('fr');
+  const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  let C = null, S = null, tab = '参数', stat = null, syncs = [], mode = 'translate', space = 'world';
+  const toast = (m, ms = 1900) => { const t = document.getElementById('toast'); t.textContent = m;
+    t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), ms); };
+  const err = r => { const e = (r || []).find(x => x.error); if (e) toast('✗ ' + e.error, 3000); return !e; };
+
+  /* ---------- 等 kit 就位（场景里 module 是异步执行的） ---------- */
+  async function ready() {
+    for (let i = 0; i < 120; i++) {
+      try { const w = fr.contentWindow; if (w && w.CITY && w.CITY.editable && w.SCENE) { C = w.CITY; S = w.SCENE; return true; } } catch (e) {}
+      await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
+  }
+  const W = () => fr.contentWindow;
+
+  const tabs = {};
+  ['参数', '选中', '对象', '加物件', '历史'].forEach(k => tabs[k] = mk('div'));
+  function statusLine() {
+    const s = C.surface();
+    return `参数 ${s.params}（热 ${s.hot}）· 实体 ${s.entities} · 已改 ${s.edits}/${s.history} 步`
+      + (s.controls ? '' : ' · ⚠ 契约缺 three.controls（拖 gizmo 会转相机）');
+  }
+  function chrome() {
+    pan.textContent = '';
+    const h = mk('div', 'bar');
+    h.appendChild(mk('b', null, 'EDIT · ' + (S.meta && S.meta.name || SRC)));
+    Object.keys(tabs).forEach(k => { const b = mk('span', 'b' + (k === tab ? ' on' : ''), k);
+      b.onclick = () => show(k); h.appendChild(b); });
+    const rl = mk('span', 'b', '↻ 重载'); rl.title = '丢弃未保存改动，重新加载场景文件';
+    rl.onclick = () => { if (C.pendingRestore() && !confirm('本地草稿会被丢弃，继续？')) return; C.discardDraft(); location.reload(); };
+    const op = mk('a', 'b'); op.href = SRC; op.target = '_blank'; op.textContent = '↗ 纯预览';
+    op.title = '不带编辑器打开场景（交付给别人时用这个）'; op.style.textDecoration = 'none';
+    h.appendChild(rl); h.appendChild(op);
+    pan.appendChild(h);
+    stat = mk('div', 's', statusLine()); pan.appendChild(stat);
+    Object.values(tabs).forEach(p => pan.appendChild(p));
+    const bar = mk('div', 'g');
+    const btn = (t, f) => { const b = mk('span', 'b', t); b.onclick = f; bar.appendChild(b); };
+    btn('↶ 撤销', () => { const u = C.undo(); u ? (upd(), toast('已撤销 ' + (u.undid || ''))) : toast('没有可撤销'); });
+    btn('↷ 重做', () => { C.redo() ? upd() : toast('没有可重做'); });
+    btn('💾 保存 Ctrl+S', save); btn('⬇ 导出', dl); btn('📋 复制给AI', cp);
+    btn('⟲ 出厂', () => { if (confirm('丢弃全部编辑？（只清页面状态，点保存才写回文件）')) { C.ungiz(); C.reset(); upd(); toast('已回出厂状态'); } });
+    pan.appendChild(bar);
+    show(tab);
+  }
+  function show(k) {
+    tab = k;
+    Object.entries(tabs).forEach(([n, p]) => p.style.display = n === k ? '' : 'none');
+    syncs.length = 0; tabs[k].textContent = '';
+    ({ 参数: buildParams, 选中: buildSel, 对象: buildTree, 加物件: buildAdd, 历史: buildHist })[k](tabs[k]);
+    if (stat) stat.textContent = statusLine();
+  }
+
+  /* ---------- 声明式行工厂（借 three.js Editor 的 Sidebar*Property + threepipe 的 uiConfig）
+     一行 = 标签 + 控件 + 经命令写入 + 订阅变更回填 + 该类实体没这个属性就不出现 ---------- */
+  const hex = v => '#' + (typeof v === 'number' ? v : parseInt(String(v).replace('#', ''), 16) || 0).toString(16).padStart(6, '0');
+  function ctl(host, d, getV, setV, live) {
+    const row = mk('div', 'r');
+    const lab = mk('label', null, d.label); if (d.desc) lab.title = d.desc;
+    row.appendChild(lab);
+    const v0 = getV();
+    if (v0 === undefined || v0 === null) return;                    // 缺项隐藏
+    const kind = d.kind || (typeof v0 === 'number' ? 'number' : typeof v0 === 'boolean' ? 'bool' : 'text');
+    let sync = () => {};
+    if (kind === 'bool') {
+      const i = mk('input'); i.type = 'checkbox'; i.checked = !!v0;
+      i.onchange = () => setV(i.checked); row.appendChild(i); sync = () => { i.checked = !!getV(); };
+    } else if (kind === 'color') {
+      const i = mk('input'); i.type = 'color'; i.value = hex(v0);
+      i.oninput = () => setV(i.value, true);
+      row.appendChild(i); sync = () => { if (W().document.activeElement !== i) i.value = hex(getV()); };
+    } else if (Array.isArray(d.options)) {
+      const i = mk('select');
+      d.options.forEach(o => i.appendChild(mk('option', null, String(o))));
+      i.value = v0; i.onchange = () => setV(i.value);
+      row.appendChild(i); sync = () => { i.value = getV(); };
+    } else if (kind === 'number' && d.min != null && d.max != null) {
+      const r = mk('input'); r.type = 'range'; r.min = d.min; r.max = d.max; r.step = d.step || (d.max - d.min) / 200;
+      const n = mk('input'); n.type = 'number'; n.step = r.step; r.value = n.value = v0;
+      r.oninput = () => { n.value = r.value; setV(+r.value, live); };
+      n.onchange = () => setV(+n.value, false);
+      row.appendChild(r); row.appendChild(n);
+      sync = () => { if (W().document.activeElement !== r && W().document.activeElement !== n) r.value = n.value = getV(); };
+    } else {
+      const n = mk('input'); n.type = 'number'; n.value = v0; n.step = d.step || .1;
+      n.onchange = () => setV(+n.value, false); row.appendChild(n);
+      sync = () => { if (W().document.activeElement !== n) n.value = getV(); };
+    }
+    host.appendChild(row); syncs.push(sync);
+  }
+
+  /* ---------- 参数页：直接吃 MANIFEST ⇒ 场景加一个参数，这里自动多一行 ---------- */
+  function buildParams(host) {
+    const q1 = mk('div', 'r'); const si = mk('input'); si.type = 'text'; si.placeholder = '雾 / 路灯 / 辉光 / 天空…';
+    q1.appendChild(mk('label', null, '搜索')); q1.appendChild(si); host.appendChild(q1);
+    const box = mk('div'); host.appendChild(box);
+    const draw = f => {
+      box.textContent = ''; syncs.length = 0;
+      C.manifest().filter(d => !f || (d.path + d.label + (d.desc || '') + (d.aliases || []).join('')).toLowerCase().includes(f.toLowerCase()))
+        .forEach(d => ctl(box, d, () => C.get(d.path), (v, live) => err(C.set(d.path, v, { merge: live })), d.effect === 'hot'));
+      box.appendChild(mk('div', 's', '共 ' + syncs.length + ' 项 · 热更新项拖动即时生效；重建项松手才重画（会慢一下）'));
+    };
+    draw(''); si.oninput = () => draw(si.value.trim());
+    if (W().CITY.snap) {
+      host.appendChild(mk('h4', null, '预设机位'));
+      const g = mk('div', 'g');
+      for (let k = 1; k <= 6; k++) { const b = mk('span', 'b', String(k));
+        b.onclick = () => { C.patch([{ op: 'preset', value: k }]); toast('机位 ' + k); }; g.appendChild(b); }
+      host.appendChild(g);
+    }
+  }
+
+  /* ---------- 选中页：gizmo 模式 + 实体属性（gizmo 由场景内 kit 装载，同 realm） ---------- */
+  const EPROP = { color: { label: '颜色', kind: 'color' }, emissiveIntensity: { label: '自发光', min: 0, max: 6, step: .05 },
+    opacity: { label: '不透明', min: 0, max: 1, step: .02 }, roughness: { label: '粗糙', min: 0, max: 1, step: .02 },
+    metalness: { label: '金属', min: 0, max: 1, step: .02 }, intensity: { label: '灯光强度', min: 0, max: 8, step: .1 } };
+  function buildSel(host) {
+    const id = C.selected();
+    if (!id) { host.appendChild(mk('div', 's', '未选中 —— 在左边画面里点一个物体，或到「对象」页挑。（拖动相机不会误选：位移 >3px 不算点击）')); return; }
+    const e = C.describe(id) || { id, label: id, group: '', target: 'object' };
+    const xf = C.xform(id);
+    const t = mk('div', 's'); t.textContent = (e.group || e.kind) + ' / ';
+    t.appendChild(mk('b', null, id));
+    t.appendChild(mk('span', null, '  ' + (e.label || '') + (xf ? '' : '（整组）')));
+    host.appendChild(t);
+    const bar = mk('div', 'g');
+    [['移动', 'translate'], ['旋转', 'rotate'], ['缩放', 'scale']].forEach(([tt, m]) => {
+      const b = mk('span', 'b' + (mode === m ? ' on' : ''), tt);
+      b.onclick = () => { mode = m; C.gizmoMode(m); show('选中'); }; bar.appendChild(b);
+    });
+    const sp = mk('span', 'b', space === 'world' ? '世界' : '局部');
+    sp.onclick = () => { space = space === 'world' ? 'local' : 'world'; C.gizmoSpace(space); show('选中'); }; bar.appendChild(sp);
+    const f1 = mk('span', 'b', '聚焦F'); f1.onclick = () => { C.focus(id); toast('已对准 ' + id); }; bar.appendChild(f1);
+    const f2 = mk('span', 'b', '隐藏Del'); f2.onclick = hideSel; bar.appendChild(f2);
+    if (e.target === 'object' && (e.group || '') === 'props') {
+      const f3 = mk('span', 'b', '删除'); f3.title = '删掉这个加进来的物件（原生几何只能隐藏或做 P3 手术）';
+      f3.onclick = () => { err(C.remove(id)); C.ungiz(); show('对象'); toast('已删除 ' + id + '（↶ 可撤销）'); }; bar.appendChild(f3);
+    }
+    host.appendChild(bar);
+    if (e.target === 'instance') host.appendChild(mk('div', 'w',
+      '⚠ 这是实例（楼群/车流里的一个）：位置·缩放·旋转只动它自己；颜色/自发光等材质是整个网格共享 —— 改这栋 = 改全部同类。要单独换色得叫 AI 做规则层手术。'));
+    const gs = C.gizmoState();
+    host.appendChild(mk('div', 's', gs ? 'gizmo 已挂上（' + gs.mode + ' / ' + gs.space + '）：在画面里直接拖箭头/环。'
+      : xf ? 'gizmo 未装载 —— 首次拖会加载 TransformControls（CDN），失败时可用下面数值改。'
+        : '整组实体不能拖动：几何归生成规则管，只能显隐与整体材质。'));
+    if (xf) {
+      ['X', 'Y', 'Z'].forEach((ax, i) => ctl(host, { label: '位置' + ax, min: -2e4, max: 2e4, step: .5 },
+        () => +C.xform(id).p[i].toFixed(2), v => { const x = C.xform(id); err(C.setXform(id, { p: x.p.map((n, k) => k === i ? v : n) })); }));
+      ['X', 'Y', 'Z'].forEach((ax, i) => ctl(host, { label: '缩放' + ax, min: .02, max: 60, step: .02 },
+        () => +C.xform(id).s[i].toFixed(3), v => { const x = C.xform(id); err(C.setXform(id, { s: x.s.map((n, k) => k === i ? v : n) })); }));
+      ctl(host, { label: '绕Y°', min: -180, max: 180, step: 1 },
+        () => +(C.xform(id).r[1] * 57.2958).toFixed(1), v => err(C.setXform(id, { r: [0, v / 57.2958, 0] })));
+    }
+    Object.entries(EPROP).forEach(([k, d]) => ctl(host, d, () => C.entProp(id, k),
+      v => err(C.patch([{ op: 'entity', id, prop: k, value: v }], { merge: true })), true));
+    ctl(host, { label: '可见', kind: 'bool' }, () => C.entProp(id, 'visible') !== false,
+      v => err(C.patch([{ op: 'entity', id, prop: 'visible', value: v }], { merge: true })));
+    host.appendChild(mk('div', 's', '拖动 gizmo / 拖滑块 = 一步撤销（同属性 500ms 内合并）。改完点「保存」写回文件。'));
+    attach();
+  }
+  const hideSel = () => { const id = C.selected(); if (!id) return toast('没选中');
+    err(C.entity(id, { visible: false })); show('选中'); toast('已隐藏 ' + id + '（↶ 撤销可恢复）'); };
+  async function attach() {
+    const id = C.selected();
+    if (!id) { C.ungiz(); return; }
+    const r = await C.gizmo(id, { mode, space });
+    if (r && r.error) toast('⚠ ' + r.error, 3200);
+  }
+
+  /* ---------- 对象页：组优先聚合（1702 个实例不铺满列表） ---------- */
+  function buildTree(host) {
+    const all = C.entities('', { limit: 1e5 });
+    const sf = C.surface(), cnt = {};
+    all.forEach(e => { const k = e.group || e.kind; cnt[k] = (cnt[k] || 0) + 1; });
+    const chips = mk('div', 'g');
+    const si = mk('input'); si.type = 'text'; si.placeholder = '找 id / 名称…';
+    ['', ...Object.keys(cnt)].forEach(gr => {
+      const c = mk('span', 'b', (gr || '全部') + ' ' + (gr ? cnt[gr] : sf.entities));
+      c.onclick = () => { si.value = gr; draw(gr); }; chips.appendChild(c);
+    });
+    host.appendChild(chips);
+    const q1 = mk('div', 'r'); q1.appendChild(mk('label', null, '搜索')); q1.appendChild(si); host.appendChild(q1);
+    const list = mk('div'); host.appendChild(list);
+    const draw = f => {
+      syncs.length = 0; list.textContent = '';
+      C.entities(f || '', { limit: 200 }).forEach(e => {
+        if (!e.id) return;
+        const i = mk('div', 'i' + (e.id === C.selected() ? ' sel' : ''), `${e.id}  ${e.label || ''}`);
+        i.onclick = () => { C.select(e.id); show('选中'); }; list.appendChild(i);
+      });
+      if (list.children.length >= 200) list.appendChild(mk('div', 's', '只列前 200 条：用组芯片或搜索缩小范围'));
+    };
+    draw(''); si.oninput = () => draw(si.value.trim());
+  }
+
+  /* ---------- 加物件页：kit 自带图元工厂，产出 {op:'add'} 数据（可存 / 可撤销 / agent 能续改） ---------- */
+  function buildAdd(host) {
+    host.appendChild(mk('div', 's', '加进来的东西以数据形式存进 patches 区，不是往场景里塞一次性对象 —— 保存后重开还在，agent 也读得到。'));
+    const P = { kind: 'box', size: 10, color: '#d8dde3', x: 0, y: null, z: 0 };
+    const row = (lab, input) => { const r = mk('div', 'r'); r.appendChild(mk('label', null, lab)); r.appendChild(input); host.appendChild(r); return input; };
+    const kinds = C.prefabs();
+    const sel = mk('select'); kinds.forEach(k => sel.appendChild(mk('option', null, k)));
+    row('图元', sel); sel.onchange = () => P.kind = sel.value;
+    const sz = mk('input'); sz.type = 'number'; sz.step = .5; sz.value = 10; sz.onchange = () => P.size = +sz.value; row('尺寸', sz);
+    const col = mk('input'); col.type = 'color'; col.value = '#d8dde3'; col.oninput = () => P.color = col.value; row('颜色', col);
+    const st = mk('input'); st.type = 'text'; st.placeholder = '点画面里某处 → 自动填落点'; st.readOnly = true; row('落点', st);
+    host.appendChild(mk('div', 's', '先在画面里点一下取落点（y 由场景地形决定；场景没提供高度查询时 y=0，可加完再拖）。'));
+    const put = (nx, ny) => { const h = C.pick(nx, ny); if (h && h.hit) {
+      P.x = +h.hit[0].toFixed(1); P.z = +h.hit[2].toFixed(1); P.y = h.hit[1]; st.value = `[${P.x}, ${P.y}, ${P.z}]`; } };
+    put(0, 0);   // 默认落在视线中心：不预填的话物件会埋在城心原点(0,0,0)，加了却看不见
+    const go = mk('div', 'g');
+    const b1 = mk('span', 'b on', '＋ 加一个'); b1.onclick = () => {
+      const r = C.add(P.kind, { size: P.size, color: P.color, pos: [P.x, P.y == null ? 0 : P.y, P.z] });
+      if (err(r)) { toast('已加 ' + C.selected() + '，可在「选中」页拖 gizmo 微调'); show('选中'); }
+    };
+    const b2 = mk('span', 'b', '换落点：接着点画面'); b2.onclick = () => { pickOnce = put; toast('到左边画面点一下（Esc 取消）'); };
+    go.appendChild(b1); go.appendChild(b2); host.appendChild(go);
+    host.appendChild(mk('div', 'p3', '想要"真的凭空造一栋带窗光的楼"这类事，图元做不到 —— 那是 P3 规则层（改生成代码），叫 AI 来。'));
+  }
+
+  /* ---------- 历史页：点一条 = 跳到那个状态（借 three.js Editor 的 goToState） ---------- */
+  function buildHist(host) {
+    const dr = C.pendingRestore();
+    if (dr) {
+      const bar = mk('div', 'g');
+      bar.appendChild(mk('span', 's', '⚠ 本地草稿与文件不同（' + dr.patches.length + ' 条）：'));
+      const a = mk('span', 'b', '套用草稿'); a.onclick = () => { C.restore(dr); upd(); toast('已套用草稿'); };
+      const b = mk('span', 'b', '丢弃草稿'); b.onclick = () => { C.discardDraft(); show('历史'); toast('草稿已丢弃'); };
+      bar.appendChild(a); bar.appendChild(b); host.appendChild(bar);
+    }
+    C.history().forEach(c => {
+      const i = mk('div', 'i' + (c.applied ? ' sel' : ''),
+        `${c.applied ? '●' : '○'} ${c.i + 1}. ${c.label} = ${JSON.stringify(c.value)}`);
+      i.onclick = () => { let cur = C.surface().edits; const tg = c.i + 1;
+        while (cur > tg && C.undo()) cur--; while (cur < tg && C.redo()) cur++; upd(); };
+      host.appendChild(i);
+    });
+    if (!C.history().length) host.appendChild(mk('div', 's', '还没有编辑'));
+    host.appendChild(mk('div', 's', '● = 当前状态之前。历史只在页面会话内；文件里存的是全部生效 patches。'));
+  }
+
+  /* ---------- 落盘 ---------- */
+  async function save() {
+    const j = await C.saveFile();
+    toast(j.ok ? `✓ 已写回 ${j.file}（${j.count} 条）—— 刷新后画面应与现在一致`
+      : '✗ ' + (j.error || '失败') + '：' + (j.hint || '改用「导出」或粘给 AI'), 3400);
+  }
+  function dl() { const b = new Blob([C.save()], { type: 'application/json' });
+    const a = mk('a'); a.href = URL.createObjectURL(b); a.download = (S.meta && S.meta.name || 'scene') + '.patches.json'; a.click(); }
+  async function cp() { try { await navigator.clipboard.writeText(C.save()); toast('patches 已复制 —— 粘给 AI 即可续改'); }
+    catch (e) { console.log(C.save()); toast('剪贴板不可用，已打印到 console'); } }
+
+  /* ---------- 拾取：官方 Editor 的两条纪律照抄（位移阈值 + gizmo 拖动中不抢选） ---------- */
+  let pickOnce = null, down = null;
+  function pickAt(ev) {
+    /* 事件在 iframe 文档里，clientX/Y 相对 iframe 视口 —— 用帧内尺寸换算，别用宿主页 rect */
+    const win = W();
+    const nx = (ev.clientX / win.innerWidth) * 2 - 1, ny = -(ev.clientY / win.innerHeight) * 2 + 1;
+    if (pickOnce) { const f = pickOnce; pickOnce = null; return f(nx, ny); }
+    const gs = C.gizmoState(); if (gs && gs.dragging) return;
+    const h = C.pick(nx, ny);
+    if (!h) return;
+    if (h.id) { C.select(h.id); show('选中'); toast('选中 ' + h.id); }
+    else { C.select(null); C.ungiz(); show('参数');
+      toast('这里没有可编辑实体（' + (h.type || '背景') + '）—— 属生成规则层，叫 AI 做锚点手术'); }
+  }
+  function bindFrameDoc() {
+    const d = fr.contentDocument;
+    d.addEventListener('pointerdown', ev => { down = { x: ev.clientX, y: ev.clientY }; });
+    d.addEventListener('pointerup', ev => {
+      if (!down || !C) return;
+      if (Math.hypot(ev.clientX - down.x, ev.clientY - down.y) > 3) return;   // 拖相机不算点击选中
+      pickAt(ev);
+    });
+    d.addEventListener('keydown', onKey);
+    d.addEventListener('keyup', ev => { if (ev.key === 'Escape') pickOnce = null; });
+  }
+
+  function upd() { if (!C) return; show(tab); }
+  function refresh() { syncs.forEach(f => { try { f(); } catch (e) {} }); if (stat) stat.textContent = statusLine(); }
+  function onKey(ev) {
+    if (/input|textarea|select/i.test(ev.target.tagName || '')) return;
+    const k = ev.key.toLowerCase(), m = ev.ctrlKey || ev.metaKey;
+    if (!C) return;
+    if (k === 'z' && m) { ev.preventDefault(); ev.shiftKey ? (C.redo() && upd()) : (() => { const u = C.undo(); u ? (upd(), toast('已撤销 ' + (u.undid || ''))) : toast('没有可撤销'); })(); }
+    else if (k === 'y' && m) { ev.preventDefault(); C.redo() && upd(); }
+    else if (k === 's' && m) { ev.preventDefault(); save(); }
+    else if (k === 'g') { mode = { translate: 'rotate', rotate: 'scale', scale: 'translate' }[mode]; C.gizmoMode(mode); show('选中'); }
+    else if (k === 'f') { C.focus(); toast('已对准选中体'); }
+    else if (k === 'delete') hideSel();
+    else if (k === 'escape') { C.select(null); C.ungiz(); show('参数'); }
+  }
+
+  async function boot() {
+    fr.src = SRC;
+    fr.addEventListener('load', async () => {
+      bindFrameDoc();
+      const good = await ready();
+      if (!good) { pan.textContent = ''; pan.appendChild(mk('div', 'w',
+        `✗ 没等到 kit v1.3（${SRC}）。跑：node scripts/edit3d.mjs sync ${SRC} && node scripts/edit3d.mjs check ${SRC}`)); return; }
+      const sf = C.surface();
+      if (sf.kit !== 'v1.3') { pan.appendChild(mk('div', 'w', '⚠ kit 版本 ' + sf.kit + '，本页按 v1.3 写的 → 跑 edit3d.mjs sync 升级')); }
+      chrome();
+      ['entityChanged', 'paramsChanged', 'sceneGraphChanged', 'gizmoCommit', 'gizmoChanged']
+        .forEach(k => C.signals.on(k, refresh));
+      C.signals.on('gizmoCommit', () => { if (tab === '选中') show('选中'); });
+      C.signals.on('sceneGraphChanged', () => { if (tab === '对象' || tab === '历史') show(tab); });
+      const dr = C.pendingRestore();
+      toast(dr ? `⚠ 本地有 ${dr.patches.length} 条草稿与文件不同 → 「历史」页可套用/丢弃`
+        : `就绪：${sf.params} 个参数 · ${sf.entities} 个实体 · 点画面选物体`, 3200);
+    });
+  }
+  addEventListener('keydown', onKey);
+  boot();
+})();
+</script>
+</body>
+</html>
