@@ -1,0 +1,11 @@
+cadAPI.clear();
+cadAPI.rect(-80,-20,160,100,{strokeW:3,fill:"#f5f5f5"});
+cadAPI.polygon([[-100,-20],[0,-100],[100,-20]],{stroke:"#c0392b",strokeW:3,fill:"#e74c3c"});
+cadAPI.rect(-30,10,25,70,{stroke:"#5a3a22",strokeW:2,fill:"#8b5a2b"});
+cadAPI.rect(20,10,35,35,{strokeW:2,fill:"#aee"});
+cadAPI.spline([[ -60,60],[-20,90],[20,40],[60,80]], false, {stroke:"#2d7ce0",strokeW:2});
+cadAPI.dimLine(-80,-40,80,-40,{stroke:"#c0392b"});
+cadAPI.text(-50,-110,"MY HOUSE",16);
+cadAPI.fit();
+const v = cadAPI.verify();
+return JSON.stringify({count:v.count, validate:v.validate, dims:v.dims});
