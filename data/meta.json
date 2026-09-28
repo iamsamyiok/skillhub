@@ -1,1 +1,774 @@
-ewogICJza2lsbHMiOiB7CiAgICAidGV4dC10by1kaWFncmFtIjogewogICAgICAiY2F0ZWdvcnkiOiAi5byA5Y+R5bel5YW3IiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIuWbvuihqCIsCiAgICAgICAgIuWPr+inhuWMliIsCiAgICAgICAgImNsaSIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDEsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0wOVQxNDoxMDo1MC4zNjVaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTA5VDE0OjEwOjUwLjUwNVoiCiAgICB9LAogICAgIm9zcy1zY291dCI6IHsKICAgICAgImNhdGVnb3J5IjogIueglOeptuWIhuaekCIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLlvIDmupDpgInlnosiLAogICAgICAgICJnaXRodWIiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMDlUMTQ6MTA6NTAuNTQ3WiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0wOVQxNDoxMDo1MC41NDdaIgogICAgfSwKICAgICJ1c2UtdGlueWZpc2giOiB7CiAgICAgICJjYXRlZ29yeSI6ICLnvZHnu5zkuI7mkJzntKIiLAogICAgICAidGFncyI6IFsKICAgICAgICAi5pCc57SiIiwKICAgICAgICAi5rWP6KeI5ZmoIiwKICAgICAgICAi5oqT5Y+WIgogICAgICBdLAogICAgICAiZG93bmxvYWRzIjogMSwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTA5VDE0OjEwOjUwLjU0OFoiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMDlUMTQ6MTA6NTAuNTQ4WiIKICAgIH0sCiAgICAidGV4dC10by1pbWFnZSI6IHsKICAgICAgImNhdGVnb3J5IjogIuWbvuWDj+eUn+aIkCIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLmlofnlJ/lm74iLAogICAgICAgICLnlJ/miJDlm77niYciLAogICAgICAgICLlm77niYfnlJ/miJAiLAogICAgICAgICLnlLvlm74iLAogICAgICAgICLmtbfmiqUiLAogICAgICAgICLmj5LnlLsiLAogICAgICAgICLphY3lm74iLAogICAgICAgICLntKDmnZAiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAzLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMDlUMTQ6MzY6MzUuMjQxWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0wOVQxNDo0NToyNi42NzZaIgogICAgfSwKICAgICJpbWFnZS1hbmFseXNpcyI6IHsKICAgICAgImNhdGVnb3J5IjogIuWbvuWDj+eQhuinoyIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLor4blm74iLAogICAgICAgICLnnIvlm74iLAogICAgICAgICLlm77niYfnkIbop6MiLAogICAgICAgICLlm77lg4/liIbmnpAiLAogICAgICAgICJPQ1IiLAogICAgICAgICLmj5Dlj5bmloflrZciLAogICAgICAgICLluIPlsYDliIbmnpAiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMDlUMTQ6MzY6MzUuMjQ2WiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0xMFQxMzoxNDozOS4wMDBaIgogICAgfSwKICAgICJncmlsbGluZyI6IHsKICAgICAgImNhdGVnb3J5IjogIumcgOaxguais+eQhiIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLmi7fpl64iLAogICAgICAgICLpnIDmsYLmorPnkIYiLAogICAgICAgICLljovlipvmtYvor5UiLAogICAgICAgICLorr/osIgiLAogICAgICAgICLlhrPnrZbmoJEiLAogICAgICAgICJncmlsbCIsCiAgICAgICAgInN0cmVzcy10ZXN0IgogICAgICBdLAogICAgICAiZG93bmxvYWRzIjogMCwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTEwVDEzOjU5OjU1LjAwMFoiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMTBUMTM6NTk6NTUuMDAwWiIKICAgIH0sCiAgICAic2tpbGwtY3JlYXRvciI6IHsKICAgICAgImNhdGVnb3J5IjogIuaKgOiDveW8gOWPkSIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLmioDog73liJvlu7oiLAogICAgICAgICJza2lsbCIsCiAgICAgICAgIuivhOS8sCIsCiAgICAgICAgIuWFg+aKgOiDvSIsCiAgICAgICAgInNraWxs5byA5Y+RIiwKICAgICAgICAiZXZhbHMiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMTBUMTM6NTk6NTUuMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0xMFQxMzo1OTo1NS4wMDBaIgogICAgfSwKICAgICJza2lsbC11cGRhdGVyIjogewogICAgICAiY2F0ZWdvcnkiOiAi5oqA6IO95byA5Y+RIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIuaKgOiDvei/m+WMliIsCiAgICAgICAgIuiHquWKqOabtOaWsCIsCiAgICAgICAgInNraWxsIiwKICAgICAgICAi6L+b5YyWIiwKICAgICAgICAiU2tpbGxFdm8iLAogICAgICAgICJldmFscyIsCiAgICAgICAgIuiHquWKqOS8mOWMliIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0xMFQxNDozMzoxOS4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTEwVDE0OjMzOjE5LjAwMFoiCiAgICB9LAogICAgInBhZ2UtdmlzdWFsLXJldmlldyI6IHsKICAgICAgImNhdGVnb3J5IjogIuWJjeerr+W8gOWPkSIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLor4blm74iLAogICAgICAgICJRQSIsCiAgICAgICAgIuinhuinieWuoeafpSIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDUsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0wOVQxNDoxMDo1MC41MjVaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTEwVDE0OjUyOjM3LjAwMFoiCiAgICB9LAogICAgInNob3ctZGVwbG95IjogewogICAgICAiY2F0ZWdvcnkiOiAi5byA5Y+R5bel5YW3IiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIumDqOe9siIsCiAgICAgICAgIumdmeaAgeermeeCuSIsCiAgICAgICAgIumihOiniCIsCiAgICAgICAgIuS4tOaXtuaJmOeuoSIsCiAgICAgICAgInNob3ciLAogICAgICAgICJwcmV2aWV3IiwKICAgICAgICAiZGVwbG95IgogICAgICBdLAogICAgICAiZG93bmxvYWRzIjogMCwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTEwVDE0OjUyOjU0LjAwMFoiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMTBUMTQ6NTI6NTQuMDAwWiIKICAgIH0sCiAgICAiYm9vay10by1za2lsbCI6IHsKICAgICAgInZlcnNpb24iOiAiMS4xLjAiLAogICAgICAiY2F0ZWdvcnkiOiAi55+l6K+G6L2s5YyWIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIuS5puexjei9rOWMliIsCiAgICAgICAgIuefpeivhuaPkOeCvCIsCiAgICAgICAgIlNLSUxMLm1kIiwKICAgICAgICAi5oqA6IO955Sf5oiQIiwKICAgICAgICAiYm9vay10by1za2lsbCIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0xMVQwMDowMDowMC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTExVDAwOjAwOjAwLjAwMFoiCiAgICB9LAogICAgImQyLWNoYXJ0IjogewogICAgICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgICAgICJjYXRlZ29yeSI6ICLlvIDlj5Hlt6XlhbciLAogICAgICAidGFncyI6IFsKICAgICAgICAi5Zu+6KGoIiwKICAgICAgICAiRDIiLAogICAgICAgICLlj6/op4bljJYiLAogICAgICAgICLmnrbmnoTlm74iLAogICAgICAgICLmtYHnqIvlm74iLAogICAgICAgICLlm77ooajnlJ/miJAiLAogICAgICAgICJkMiIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0xMlQxNzoyMzo0NC45ODRaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTEyVDE3OjIzOjQ0Ljk4NFoiCiAgICB9LAogICAgInRleHQtdG8tZDIiOiB7CiAgICAgICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAgICAgImNhdGVnb3J5IjogIuW8gOWPkeW3peWFtyIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLlm77ooagiLAogICAgICAgICLmlofmnKzovazlm74iLAogICAgICAgICJEMiIsCiAgICAgICAgIuWPr+inhuWMliIsCiAgICAgICAgIua1geeoi+WbviIsCiAgICAgICAgIuaetuaehOWbviIsCiAgICAgICAgIuivreS5ieaKveWPliIsCiAgICAgICAgInRleHQtdG8tZGlhZ3JhbSIsCiAgICAgICAgImQyLWNoYXJ0IgogICAgICBdLAogICAgICAiZG93bmxvYWRzIjogMCwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTEyVDE3OjU0OjEyLjc3MloiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMTJUMTc6NTQ6MTIuNzcyWiIKICAgIH0sCiAgICAiZmluZC1za2lsbHMiOiB7CiAgICAgICJjYXRlZ29yeSI6ICLlvIDlj5Hlt6XlhbciLAogICAgICAidGFncyI6IFsKICAgICAgICAi5oqA6IO95Y+R546wIiwKICAgICAgICAi55Sf5oCBIiwKICAgICAgICAiY2xpIgogICAgICBdLAogICAgICAiZG93bmxvYWRzIjogMCwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTEzVDA1OjE4OjA4LjM0MVoiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMTNUMDU6MTg6MDguMzQxWiIKICAgIH0sCiAgICAiZmlyZWNyYXdsIjogewogICAgICAiY2F0ZWdvcnkiOiAi572R57uc5LiO5pCc57SiIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIuaKk+WPliIsCiAgICAgICAgIueIrOiZqyIsCiAgICAgICAgIumcgEFQSUtleSIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0xM1QwNToxODowOC4zNDFaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTEzVDA1OjE4OjA4LjM0MVoiCiAgICB9LAogICAgInBkZiI6IHsKICAgICAgImNhdGVnb3J5IjogIuaWh+aho+WkhOeQhiIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICJQREYiLAogICAgICAgICLmlofmoaMiLAogICAgICAgICJPQ1IiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMTNUMDU6MTg6MDguMzQxWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0xM1QwNToxODowOC4zNDFaIgogICAgfSwKICAgICJkb2N4IjogewogICAgICAiY2F0ZWdvcnkiOiAi5paH5qGj5aSE55CGIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIldvcmQiLAogICAgICAgICLmlofmoaMiLAogICAgICAgICLnlJ/miJAiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMTNUMDU6MTg6MDguMzQxWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0xM1QwNToxODowOC4zNDFaIgogICAgfSwKICAgICJ4bHN4IjogewogICAgICAiY2F0ZWdvcnkiOiAi5paH5qGj5aSE55CGIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIkV4Y2VsIiwKICAgICAgICAi6KGo5qC8IiwKICAgICAgICAi5YWs5byPIgogICAgICBdLAogICAgICAiZG93bmxvYWRzIjogMCwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTEzVDA1OjE4OjA4LjM0MVoiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMTNUMDU6MTg6MDguMzQxWiIKICAgIH0sCiAgICAicHB0eCI6IHsKICAgICAgImNhdGVnb3J5IjogIuaWh+aho+WkhOeQhiIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICJQUFQiLAogICAgICAgICLlubvnga/niYciLAogICAgICAgICLmvJTnpLoiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMTNUMDU6MTg6MDguMzQxWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0xM1QwNToxODowOC4zNDFaIgogICAgfSwKICAgICJtY3AtYnVpbGRlciI6IHsKICAgICAgImNhdGVnb3J5IjogIuW8gOWPkeW3peWFtyIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICJNQ1AiLAogICAgICAgICLohJrmiYvmnrYiLAogICAgICAgICJzZXJ2ZXIiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMTNUMDU6MTg6MDguMzQxWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0xM1QwNToxODowOC4zNDFaIgogICAgfSwKICAgICJwbGFubmluZy13aXRoLWZpbGVzIjogewogICAgICAiY2F0ZWdvcnkiOiAi5bel5L2c5rWBIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIuinhOWIkiIsCiAgICAgICAgIuS7u+WKoeeuoeeQhiIsCiAgICAgICAgIuaMgeS5heWMliIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0xM1QwNToxODowOC4zNDFaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTEzVDA1OjE4OjA4LjM0MVoiCiAgICB9LAogICAgInVuc2xvcCI6IHsKICAgICAgImNhdGVnb3J5IjogIuWGmeS9nOW3peWFtyIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLljrtBSeiFlCIsCiAgICAgICAgIua2puiJsiIsCiAgICAgICAgIuaWh+ahiCIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0xM1QwNToxODowOC4zNDFaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTEzVDA1OjE4OjA4LjM0MVoiCiAgICB9LAogICAgInJlY29yZGVyMnNraWxsIjogewogICAgICAiY2F0ZWdvcnkiOiAi5oqA6IO95byA5Y+RIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIuWxj+W5leW9leWItiIsCiAgICAgICAgIuaKgOiDveeUn+aIkCIsCiAgICAgICAgIlNLSUxMLm1kIiwKICAgICAgICAi6Ieq5Yqo5YyWIiwKICAgICAgICAicmVjb3JkZXIyc2tpbGwiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMTVUMDA6MDA6MDAuMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0xNVQxNTozMDowMC4wMDBaIgogICAgfSwKICAgICJkb2MtdG8tbWQiOiB7CiAgICAgICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAgICAgImNhdGVnb3J5IjogIuaWh+aho+WkhOeQhiIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLmlofmoaPovazmjaIiLAogICAgICAgICJNYXJrZG93biIsCiAgICAgICAgIk9DUiIsCiAgICAgICAgIuagvOW8j+aJuemHj+WkhOeQhiIsCiAgICAgICAgImRvYy10by1tZCIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0xNVQwOToyNjo1OC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTE1VDA5OjI2OjU4LjAwMFoiCiAgICB9LAogICAgInNsaWRlcy1tYWtlciI6IHsKICAgICAgInZlcnNpb24iOiAiMS4wLjAiLAogICAgICAiY2F0ZWdvcnkiOiAi5paH5qGj5aSE55CGIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIuW5u+eBr+eJhyIsCiAgICAgICAgIlBQVCIsCiAgICAgICAgIua8lOekuuiuvuiuoSIsCiAgICAgICAgInBwdHgiLAogICAgICAgICJzbGlkZXMtbWFrZXIiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMTVUMDk6MjY6NTguMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0xOFQwODowMDowMC4wMDBaIgogICAgfSwKICAgICJ2aWRlby1wdWJsaXNoIjogewogICAgICAidmVyc2lvbiI6ICIxLjUuMCIsCiAgICAgICJjYXRlZ29yeSI6ICLop4bpopHliJvkvZwiLAogICAgICAidGFncyI6IFsKICAgICAgICAi5a6j5Lyg6KeG6aKRIiwKICAgICAgICAi5b2V5bGPIiwKICAgICAgICAiVFRT6YWN6Z+zIiwKICAgICAgICAiQuermeaKleeovyIsCiAgICAgICAgInZpZGVvLXB1Ymxpc2giCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMThUMDY6MDY6MTcuMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0xOFQwODowMDowMC4wMDBaIgogICAgfSwKICAgICJhbnlzZWFyY2giOiB7CiAgICAgICJ2ZXJzaW9uIjogIjMuMS4xIiwKICAgICAgImNhdGVnb3J5IjogIue9kee7nOS4juaQnOe0oiIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLmkJzntKLlvJXmk44iLAogICAgICAgICLnvZHpobXmipPlj5YiLAogICAgICAgICLlnoLnm7TmkJzntKIiLAogICAgICAgICLmibnph4/mkJzntKIiLAogICAgICAgICJhbnlzZWFyY2giCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMThUMTA6MDA6MDAuMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0xOFQxMDowMDowMC4wMDBaIgogICAgfSwKICAgICJ2aXNpb24tZm9yLWRldiI6IHsKICAgICAgImNhdGVnb3J5IjogIuW8gOWPkeiwg+ivlSIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLop4bop4novoXliqnlvIDlj5EiLAogICAgICAgICLor4blm77lrqHmn6UiLAogICAgICAgICJHVUnmjpLpmpwiLAogICAgICAgICJXaW5lIiwKICAgICAgICAi5oiq5Zu+6Ieq5Yqo5YyWIgogICAgICBdLAogICAgICAiZG93bmxvYWRzIjogMCwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTE4VDIyOjUyOjUwLjkzMloiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMThUMjI6NTI6NTAuOTMyWiIKICAgIH0sCiAgICAicHJvZ3JhbS10by1naWYiOiB7CiAgICAgICJjYXRlZ29yeSI6ICLop4bpopHliJvkvZwiLAogICAgICAidGFncyI6IFsKICAgICAgICAiR0lGIiwKICAgICAgICAiVkhTIiwKICAgICAgICAi57uI56uv5b2V5Yi2IiwKICAgICAgICAi5ryU56S65Yqo5Zu+IiwKICAgICAgICAiUkVBRE1F6YWN5Zu+IgogICAgICBdLAogICAgICAiZG93bmxvYWRzIjogMCwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTE5VDE3OjQwOjAwLjAwMFoiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMTlUMTc6NDA6MDAuMDAwWiIKICAgIH0sCiAgICAidHlwZXNhZmUtYWkiOiB7CiAgICAgICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAgICAgImNhdGVnb3J5IjogIuW8gOWPkeW3peWFtyIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICJUeXBlU2FmZSIsCiAgICAgICAgIkpFViIsCiAgICAgICAgIlN5c3RlbSBPbmUiLAogICAgICAgICLnu5PmnoTljJblhrPnrZYiLAogICAgICAgICJBSeW8gOWPkSIsCiAgICAgICAgIkpldiIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0yMFQwMjowMDowMC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTIwVDAyOjAwOjAwLjAwMFoiCiAgICB9LAogICAgImhhbmRvZmYiOiB7CiAgICAgICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAgICAgImNhdGVnb3J5IjogIuW3peS9nOa1gSIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICLkuqTmjqUiLAogICAgICAgICJoYW5kb2ZmIiwKICAgICAgICAiQ2xhdWRlIENvZGUiLAogICAgICAgICJDb2RleCIsCiAgICAgICAgIkhBTkRPRkYubWQiLAogICAgICAgICJBSeWNj+S9nCIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0yMVQwMDowMDowMC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTIxVDAwOjAwOjAwLjAwMFoiCiAgICB9LAogICAgIndvcmxkLWdlbmVyYXRvciI6IHsKICAgICAgInZlcnNpb24iOiAiMS41LjAiLAogICAgICAiY2F0ZWdvcnkiOiAi5YmN56uv5byA5Y+RIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIjNEIiwKICAgICAgICAiVGhyZWUuanMiLAogICAgICAgICLnqIvluo/ljJbnlJ/miJAiLAogICAgICAgICLlnLrmma/nlJ/miJAiLAogICAgICAgICLkuqTkupLnvJbovpEiLAogICAgICAgICLlj4LmlbDljJYiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMjVUMDA6MDA6MDAuMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0yNlQwMDowMDowMC4wMDBaIiwKICAgICAgImRlc2NyaXB0aW9uIjogIumAmueUqOWPguaVsOWMliAzRCDkuJbnlYznlJ/miJDlmajvvJpBSSDor63kuYnop4TliJIgKyDnqIvluo/lh6DkvZXmsYLop6PvvIzku44gSlNPTiDlnLrmma/orqHliJLkuIDplK7nlJ/miJDljZXmlofku7Ygd29ybGQuaHRtbO+8iOeFp+eJh+e6pyBDQzAgUEJSIOi0tOWbvuWGheW1jOOAgUhEUkkg5a6e5pmvIElCTOOAgVNTQU8vU01BQSDlvbHop4bnuqflkI7lpITnkIbjgIHnhafniYfotLTlm77lhajph4/nu5HlrprjgIHliIbml7bmrrXlj4wgSERSSe+8iOeZveWkqS/pu4TmmI/vvInjgIHlnIbop5Llu7rnrZHkuI7lj7blmarmoJHlhqDvvIzpm7bov5DooYzml7blpJbpg6jkvp3otZbvvInvvIzmlK/mjIHmgLvlm77mi7zmjqUgbGludOOAgea4kOi/m+e7huWMliByZWZpbmXjgIHlsYDpg6jooaXkuIEgcGF0Y2jvvIjluIPlsYAgKyDlrp7kvovlsZ7mgKfvvJrml4vovawv57yp5pS+L+adkOi0qC/mmL7pmpAv6Ieq5a6a5LmJ5YWD5pWw5o2u77yM6ZmE5bGe5oCn5YC85oyH5a+85bqT77yJ5LiO5Y+v6KeG5YyW54K56YCJ57yW6L6R6Zet546v44CC5b2T55So5oi36ZyA6KaB55Sf5oiQ5oiW57yW6L6RIDNEIOWcuuaZr+OAgeWbreWMuuOAgeWIq+WiheOAgeagoeWbreetieWPguaVsOWMluS4lueVjOaXtuS9v+eUqOOAgiIKICAgIH0sCiAgICAibG9jYWx0dW5uZWwtcHJldmlldyI6IHsKICAgICAgInZlcnNpb24iOiAiMS4wLjAiLAogICAgICAiY2F0ZWdvcnkiOiAi5byA5Y+R5bel5YW3IiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIumihOiniCIsCiAgICAgICAgIuS4tOaXtumTvuaOpSIsCiAgICAgICAgImxvY2FsdHVubmVsIiwKICAgICAgICAidHVubmVsIiwKICAgICAgICAi5byA5Y+RIgogICAgICBdLAogICAgICAiZG93bmxvYWRzIjogMCwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTI2VDE1OjA0OjIzLjAwMFoiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMjZUMTU6MDQ6MjMuMDAwWiIsCiAgICAgICJkZXNjcmlwdGlvbiI6ICLpgJrov4cgbG9jYWx0dW5uZWwg5bCG5pys5ZywIFdlYiDmnI3liqHmmrTpnLLkuLrkuLTml7blhaznvZEgVVJM77yMNSDliIbpkp/lkI7oh6rliqjmuIXnkIbjgILmj5DkvpvlronlhajpmLLlvqHvvJrnq6/lj6PojIPlm7TpmZDliLbjgIHov5vnqIvpmpTnprvjgIHoh6rliqjlm57mlLbjgILpgILnlKjkuo7pnIDopoHliIbkuqvmnKzlnLDpobnnm67nu5nku5bkurrpooTop4jnmoTlnLrmma/jgIIiCiAgICB9LAogICAgInNraWxsbWFuYWdlciI6IHsKICAgICAgInZlcnNpb24iOiAiMS4wLjAiLAogICAgICAiY2F0ZWdvcnkiOiAi5byA5Y+R5bel5YW3IiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIuaKgOiDveeuoeeQhiIsCiAgICAgICAgIuS7quihqOebmCIsCiAgICAgICAgIuW9kuahoyIsCiAgICAgICAgIuW7uuiuriIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0yNlQwMDowMDowMC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTI2VDE1OjMwOjAwLjAwMFoiLAogICAgICAiZGVzY3JpcHRpb24iOiAiU2tpbGxNYW5hZ2VyIOKAlCDmioDog73nrqHnkIblmajjgILmiYvliqjop6blj5HmioDog73nu4TlkIjlu7rorq7jgIHmiavmj4/mioDog73nm67lvZXmm7TmlrDlhajlsYDntKLlvJXjgIHljZXmioDog71NROW9kuaho+agh+iusOOAgemdmeaAgUhUTUzku6rooajnm5jjgILml6DkvrXlhaXljp/mnIlBZ2VudOmAu+i+kSzlhajpg6jmlbDmja7ku4XnlKhNROaWh+S7tuWtmOWCqCzpm7blpJbpg6jmnI3liqHjgIIiCiAgICB9LAogICAgImNhZC1zdmctZWRpdCI6IHsKICAgICAgImNhdGVnb3J5IjogIuW8gOWPkeW3peWFtyIsCiAgICAgICJkZXNjcmlwdGlvbiI6ICLono3lkIggQ0FEIOWIm+W7uuS4jiBTVkcg57K+5YeG57yW6L6R77ya5LuO6Zu257uY5Zu+77yIY2FkIOaXoOWktOW8leaTju+8jOi+k+WHuiBTVkcvUE5HL0NTVu+8ieS4juS/ruaUueW3suaciSBTVkfvvIjmjIHkuYUgaWQg5a+75Z2A44CB56m66Ze0L+aWh+acrOi/h+a7pOOAgeWPr+inhuWMlueCuemAieOAgeaJuemHj+OAgeeJiOacrOWMluS/neWtmO+8ieaMieaEj+WbvuiHquWKqOi3r+eUseOAgiIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICJjYWQiLAogICAgICAgICJzdmciLAogICAgICAgICLnu5jlm74iLAogICAgICAgICLnn6Lph4/lm74iLAogICAgICAgICLnvJbovpEiLAogICAgICAgICLnu5jlm77lvJXmk44iCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0yOFQwMjo1ODo1OS4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTI4VDAyOjU4OjU5LjAwMFoiCiAgICB9LAogICAgIjNkLWVkaXQiOiB7CiAgICAgICJjYXRlZ29yeSI6ICLliY3nq6/lvIDlj5EiLAogICAgICAiZGVzY3JpcHRpb24iOiAi5LiA5Liq5oqA6IO9566h5L2PIDNEIOWbvueahOS4pOS7tuS6i+KAlOKAlOeUqOWNleaWh+S7tiBIVE1MICsgVGhyZWUuanMg56iL5bqP5YyW55Sf5oiQ5a6P5aSn44CB57K+576O44CB5Y+v5Lqk5LqS55qEIDNEIOWcuuaZr++8iOWfjuW4gi/mu6jmsLQv5bGx5ZywL+aVsOWtl+WtqueUny/muLjmiI/ljp/lnosv5Y2V54mp5L2T5Lqn5ZOB5Zu+77yJ77yM5Lul5Y+K5a+55bey5pyJ5Zy65pmv5YGa56Gu5a6a5oCn5bGA6YOo5L+u5pS577yM5bm25oyJ6ZyA5Lqk5LuY57uZ55So5oi36Ieq5bex5Yqo5omL55qE5Y+v6KeG5YyW57yW6L6R5Zmo44CC5b2T55So5oi36KaB5rGCXCLnlLvkuIDkuKozROWfjuW4gi8zROWcuuaZry/kuInnu7Tlj6/op4bljJZcIlwi5YOPIENsYXVkZSDkuIDplK7nlJ/miJAgM0Qg5Z+O5biCXCJcIuWBmuS4quWPr+S6pOS6kueahCAzRCDnvZHpobVcIlwi5rC05bqTL+WOguWMui/nrqHnur/mlbDlrZflrarnlJ8gM0Qg5bGV56S6XCJcIue7meaIkeS4gOS4quWwj+ebkuWtkC/orr7lpIcv5o6o6L2m55qEIDNEIOWbvlwi44CB6KaB5rGCIDNEIOaxh+aKpemhtS/miKrlm74vUE5H77yb5oiW6ICF6K+0XCLmiorpgqPluqfloZTmlLnnuqJcIlwi5rKz5b6A5Lic5byvXCJcIualvOWvhuS4gOeCuVwiXCLpm77lho3mtZPngrlcIuOAgeaMh+edgOaIquWbvuafkOWkhOivtFwi5pS56YKj5LiqXCJcIuWOu+aOiemCo+agi+alvFwi77yb5oiW6K+0XCLmiJHmg7Poh6rlt7HmiYvliqjnvJbovpHov5nkuKogM0Qg5Zu+XCJcIue7meaIkeS4quiDveaLlueahOeVjOmdolwiXCLliKvmr4/mrKHpg73lvpfmib7kvaBcIuaXtuS9v+eUqOOAgumbtue+juacr+i1hOS6p++8iOi0tOWbvi/mqKHlnovlhajpg6jnlLHku6PnoIHnlJ/miJDvvInvvIznp43lrZDpmo/mnLrlj6/lpI3njrDvvIzlhoXnva7mtY/op4jlmajmuLLmn5Poh6rpqozor4Hlvqrnjq8gKyBNQU5JRkVTVC/lrp7kvZMv6ZSa54K55LiJ57qn5bGA6YOo57yW6L6R5bGCICsg6Zu25L6d6LWW5Lq65bel57yW6L6R5a6/5Li76aG144CCIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIjNEIiwKICAgICAgICAiVGhyZWUuanMiLAogICAgICAgICLnqIvluo/ljJbnlJ/miJAiLAogICAgICAgICLlnLrmma/nlJ/miJAiLAogICAgICAgICLlsYDpg6jnvJbovpEiLAogICAgICAgICLlj4LmlbDljJYiLAogICAgICAgICLkurrlt6XnvJbovpEiLAogICAgICAgICLmlbDlrZflrarnlJ8iLAogICAgICAgICJXZWJHTCIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTI4VDAzOjEzOjI1LjAwMFoiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMjhUMDM6MTM6MjUuMDAwWiIKICAgIH0sCiAgICAicHJlLWFsaWduIjogewogICAgICAiY2F0ZWdvcnkiOiAi6ZyA5rGC5qKz55CGIiwKICAgICAgImRlc2NyaXB0aW9uIjogIuS7u+WKoeWJjeWPjOWQkeWvuem9kOKAlOKAlOaKiuOAjOeUqOaIt+efpemBk+iAjCBBSSDkuI3nn6XpgZPjgI3kuI7jgIxBSSDnn6XpgZPogIznlKjmiLfkuI3nn6XpgZPjgI3lj5jmiJDlhbHor4blkI7lho3lvIDlt6XjgIJCaWRpcmVjdGlvbmFsIGFsaWdubWVudCBiZWZvcmUgZXhlY3V0aW5nIG5vbi10cml2aWFsIHRhc2tzLiBUcmlnZ2VyIGF1dG9tYXRpY2FsbHkgZm9yIG11bHRpLXN0ZXAvYW1iaWd1b3VzL2hpZ2gtcmlzay9pcnJldmVyc2libGUgdGFza3MsIG9yIHdoZW4gdGhlIHVzZXIgc2F5cyDlr7npvZDkuIDkuIsgLyDlhYjlr7npnIDmsYIgLyDlr7nkuIDkuIvkv6Hmga8gLyDmt7Hluqblr7npvZAgLyAvcHJlLWFsaWduLiBTa2lwIHNpbGVudGx5IGZvciB0cml2aWFsLCBsb3ctcmlzaywgY2xlYXJseS1zcGVjaWZpZWQgcmVxdWVzdHMuIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIuWvuem9kCIsCiAgICAgICAgIumcgOaxgua+hOa4hSIsCiAgICAgICAgIuWKqOaJi+WJjeehruiupCIsCiAgICAgICAgIuWvuem9kOeugOaKpSIsCiAgICAgICAgIuiuv+iwiCIsCiAgICAgICAgIumqjOaUtuagh+WHhiIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTI4VDAzOjI0OjExLjAwMFoiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMjhUMDM6MjQ6MTEuMDAwWiIKICAgIH0KICB9LAogICJtY3BzIjogewogICAgIndlYXRoZXItbWNwIjogewogICAgICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgICAgICJjYXRlZ29yeSI6ICLlvIDlj5Hlt6XlhbciLAogICAgICAidGFncyI6IFsKICAgICAgICAibWNwIiwKICAgICAgICAid2VhdGhlciIsCiAgICAgICAgImFwaSIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0yN1QwNDo1Mzo1NC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTI3VDA0OjUzOjU0LjAwMFoiLAogICAgICAiZGVzY3JpcHRpb24iOiAiV2VhdGhlciBNQ1AgU2VydmVyIOKAlCDmj5Dkvpvlrp7ml7blpKnmsJTmn6Xor6LjgIHpooTmiqXjgIHnqbrmsJTotKjph4/nrYnlt6XlhbfjgILmlK/mjIEgc3RkaW8vU1NFL0hUVFAg5Lyg6L6T5pa55byP77yM5YW85a65IENsYXVkZSBEZXNrdG9w44CBQ3Vyc29y44CBVlNDb2RlIOetieS4u+a1gee8lui+keWZqOOAgiIsCiAgICAgICJydW50aW1lIjogIm5vZGUiLAogICAgICAiZW50cnkiOiAic2NyaXB0cy9zZXJ2ZXIuanMiLAogICAgICAiYXJncyI6IFtdLAogICAgICAiZW52IjogewogICAgICAgICJPUEVOV0VBVEhFUl9BUElfS0VZIjogIiR7V0VBVEhFUl9BUElfS0VZfSIKICAgICAgfQogICAgfSwKICAgICJnaXRodWItbWNwLXNlcnZlciI6IHsKICAgICAgIm5hbWUiOiAiR2l0SHViIOWumOaWuSIsCiAgICAgICJkZXNjcmlwdGlvbiI6ICLku5PlupMvSXNzdWUvUFIg5YWo5pON5L2cIiwKICAgICAgInZlcnNpb24iOiAiMS4wLjAiLAogICAgICAiY2F0ZWdvcnkiOiAiTUNQIFNlcnZlciIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICJtY3AiLAogICAgICAgICJnaXRodWItbWNwLXNlcnZlciIsCiAgICAgICAgIm5vZGUiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMjdUMDA6MDA6MDAuMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInJ1bnRpbWUiOiAibm9kZSIsCiAgICAgICJlbnRyeSI6ICJzY3JpcHRzL3NlcnZlci5qcyIsCiAgICAgICJhcmdzIjogW10sCiAgICAgICJlbnYiOiB7fQogICAgfSwKICAgICJhbnR2LWNoYXJ0LW1jcCI6IHsKICAgICAgIm5hbWUiOiAiQW50ViDlm77ooajnlJ/miJAiLAogICAgICAiZGVzY3JpcHRpb24iOiAi5paH5a2X5o+P6L+w55Sf5oiQ5Y+v6KeG5YyW5Zu+6KGoIiwKICAgICAgInZlcnNpb24iOiAiMS4wLjAiLAogICAgICAiY2F0ZWdvcnkiOiAiTUNQIFNlcnZlciIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICJtY3AiLAogICAgICAgICJhbnR2LWNoYXJ0LW1jcCIsCiAgICAgICAgIm5vZGUiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMjdUMDA6MDA6MDAuMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInJ1bnRpbWUiOiAibm9kZSIsCiAgICAgICJlbnRyeSI6ICJzY3JpcHRzL3NlcnZlci5qcyIsCiAgICAgICJhcmdzIjogW10sCiAgICAgICJlbnYiOiB7fQogICAgfSwKICAgICJoYXJuZXNzLW1jcCI6IHsKICAgICAgIm5hbWUiOiAiSGFybmVzcyBDSS9DRCIsCiAgICAgICJkZXNjcmlwdGlvbiI6ICLpg6jnvbLmtYHmsLTnur/mk43kvZwiLAogICAgICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgICAgICJjYXRlZ29yeSI6ICJNQ1AgU2VydmVyIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIm1jcCIsCiAgICAgICAgImhhcm5lc3MtbWNwIiwKICAgICAgICAibm9kZSIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTI3VDAwOjAwOjAwLjAwMFoiLAogICAgICAicnVudGltZSI6ICJub2RlIiwKICAgICAgImVudHJ5IjogInNjcmlwdHMvc2VydmVyLmpzIiwKICAgICAgImFyZ3MiOiBbXSwKICAgICAgImVudiI6IHsKICAgICAgICAiSEFSTkVTU19BUElfS0VZIjogIiR7SEFSTkVTU19BUElfS0VZfSIKICAgICAgfQogICAgfSwKICAgICJwbGF5d3JpZ2h0LW1jcCI6IHsKICAgICAgIm5hbWUiOiAiUGxheXdyaWdodCDmtY/op4jlmagiLAogICAgICAiZGVzY3JpcHRpb24iOiAi6amx5Yqo55yf5a6e5rWP6KeI5ZmoIiwKICAgICAgInZlcnNpb24iOiAiMS4wLjAiLAogICAgICAiY2F0ZWdvcnkiOiAiTUNQIFNlcnZlciIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICJtY3AiLAogICAgICAgICJwbGF5d3JpZ2h0LW1jcCIsCiAgICAgICAgIm5vZGUiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMjdUMDA6MDA6MDAuMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInJ1bnRpbWUiOiAibm9kZSIsCiAgICAgICJlbnRyeSI6ICJzY3JpcHRzL3NlcnZlci5qcyIsCiAgICAgICJhcmdzIjogW10sCiAgICAgICJlbnYiOiB7fQogICAgfSwKICAgICJicm93c2VyYmFzZS1tY3AiOiB7CiAgICAgICJuYW1lIjogIuS6keerr+a1j+iniOWZqCIsCiAgICAgICJkZXNjcmlwdGlvbiI6ICJTZXJ2ZXJsZXNzIOaXoOWktOa1j+iniOWZqOaxoCIsCiAgICAgICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAgICAgImNhdGVnb3J5IjogIk1DUCBTZXJ2ZXIiLAogICAgICAidGFncyI6IFsKICAgICAgICAibWNwIiwKICAgICAgICAiYnJvd3NlcmJhc2UtbWNwIiwKICAgICAgICAibm9kZSIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTI3VDAwOjAwOjAwLjAwMFoiLAogICAgICAicnVudGltZSI6ICJub2RlIiwKICAgICAgImVudHJ5IjogInNjcmlwdHMvc2VydmVyLmpzIiwKICAgICAgImFyZ3MiOiBbXSwKICAgICAgImVudiI6IHsKICAgICAgICAiQlJPV1NFUkJBU0VfQVBJX0tFWSI6ICIke0JST1dTRVJCQVNFX0FQSV9LRVl9IgogICAgICB9CiAgICB9LAogICAgIm9jdGFnb24tcmVzZWFyY2giOiB7CiAgICAgICJuYW1lIjogIk9jdGFnb24g5rex5bqm6LCD56CUIiwKICAgICAgImRlc2NyaXB0aW9uIjogIuWkmuatpea3seW6pue9kee7nOiwg+eglCIsCiAgICAgICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAgICAgImNhdGVnb3J5IjogIk1DUCBTZXJ2ZXIiLAogICAgICAidGFncyI6IFsKICAgICAgICAibWNwIiwKICAgICAgICAib2N0YWdvbi1yZXNlYXJjaCIsCiAgICAgICAgIm5vZGUiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMjdUMDA6MDA6MDAuMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInJ1bnRpbWUiOiAibm9kZSIsCiAgICAgICJlbnRyeSI6ICJzY3JpcHRzL3NlcnZlci5qcyIsCiAgICAgICJhcmdzIjogW10sCiAgICAgICJlbnYiOiB7CiAgICAgICAgIk9DVEFHT05fQVBJX0tFWSI6ICIke09DVEFHT05fQVBJX0tFWX0iCiAgICAgIH0KICAgIH0sCiAgICAiYWxseXNvbi1zdmciOiB7CiAgICAgICJuYW1lIjogIkFsbHlzb24gU1ZHIOWKqOeUuyIsCiAgICAgICJkZXNjcmlwdGlvbiI6ICLpnZnmgIHlm77ovaxTVkfliqjnlLsiLAogICAgICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgICAgICJjYXRlZ29yeSI6ICJNQ1AgU2VydmVyIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIm1jcCIsCiAgICAgICAgImFsbHlzb24tc3ZnIiwKICAgICAgICAibm9kZSIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTI3VDAwOjAwOjAwLjAwMFoiLAogICAgICAicnVudGltZSI6ICJub2RlIiwKICAgICAgImVudHJ5IjogInNjcmlwdHMvc2VydmVyLmpzIiwKICAgICAgImFyZ3MiOiBbXSwKICAgICAgImVudiI6IHsKICAgICAgICAiQUxMWVNPTl9BUElfS0VZIjogIiR7QUxMWVNPTl9BUElfS0VZfSIKICAgICAgfQogICAgfSwKICAgICJjdWEtZGVza3RvcCI6IHsKICAgICAgIm5hbWUiOiAiQ3VhIOeUteiEkeaTjeS9nCIsCiAgICAgICJkZXNjcmlwdGlvbiI6ICJBZ2VudCDmk43kvZzlrozmlbTmoYzpnaIiLAogICAgICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgICAgICJjYXRlZ29yeSI6ICJNQ1AgU2VydmVyIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIm1jcCIsCiAgICAgICAgImN1YS1kZXNrdG9wIiwKICAgICAgICAibm9kZSIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTI3VDAwOjAwOjAwLjAwMFoiLAogICAgICAicnVudGltZSI6ICJub2RlIiwKICAgICAgImVudHJ5IjogInNjcmlwdHMvc2VydmVyLmpzIiwKICAgICAgImFyZ3MiOiBbXSwKICAgICAgImVudiI6IHt9CiAgICB9LAogICAgInNjcmVlbnNob3QtbWNwIjogewogICAgICAibmFtZSI6ICLnvZHpobXmiKrlm74iLAogICAgICAiZGVzY3JpcHRpb24iOiAiVVJM5LiA6ZSu5oiq5Zu+IiwKICAgICAgInZlcnNpb24iOiAiMS4wLjAiLAogICAgICAiY2F0ZWdvcnkiOiAiTUNQIFNlcnZlciIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICJtY3AiLAogICAgICAgICJzY3JlZW5zaG90LW1jcCIsCiAgICAgICAgIm5vZGUiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMjdUMDA6MDA6MDAuMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInJ1bnRpbWUiOiAibm9kZSIsCiAgICAgICJlbnRyeSI6ICJzY3JpcHRzL3NlcnZlci5qcyIsCiAgICAgICJhcmdzIjogW10sCiAgICAgICJlbnYiOiB7CiAgICAgICAgIlNDUkVFTlNIT1RfQVBJX0tFWSI6ICIke1NDUkVFTlNIT1RfQVBJX0tFWX0iCiAgICAgIH0KICAgIH0sCiAgICAiY2xvdWRmbGFyZS1tY3AiOiB7CiAgICAgICJuYW1lIjogIkNsb3VkZmxhcmUiLAogICAgICAiZGVzY3JpcHRpb24iOiAiV29ya2Vycy9LVi9SMiDnrqHnkIYiLAogICAgICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgICAgICJjYXRlZ29yeSI6ICJNQ1AgU2VydmVyIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIm1jcCIsCiAgICAgICAgImNsb3VkZmxhcmUtbWNwIiwKICAgICAgICAibm9kZSIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTI3VDAwOjAwOjAwLjAwMFoiLAogICAgICAicnVudGltZSI6ICJub2RlIiwKICAgICAgImVudHJ5IjogInNjcmlwdHMvc2VydmVyLmpzIiwKICAgICAgImFyZ3MiOiBbXSwKICAgICAgImVudiI6IHsKICAgICAgICAiQ0xPVURGTEFSRV9BUElfVE9LRU4iOiAiJHtDTE9VREZMQVJFX0FQSV9UT0tFTn0iCiAgICAgIH0KICAgIH0sCiAgICAiNGV2ZXJsYW5kLWhvc3RpbmciOiB7CiAgICAgICJuYW1lIjogIjRFVkVSTEFORCDmiZjnrqEiLAogICAgICAiZGVzY3JpcHRpb24iOiAi5Y675Lit5b+D5YyW572R56uZ5omY566hIiwKICAgICAgInZlcnNpb24iOiAiMS4wLjAiLAogICAgICAiY2F0ZWdvcnkiOiAiTUNQIFNlcnZlciIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICJtY3AiLAogICAgICAgICI0ZXZlcmxhbmQtaG9zdGluZyIsCiAgICAgICAgIm5vZGUiCiAgICAgIF0sCiAgICAgICJkb3dubG9hZHMiOiAwLAogICAgICAiY3JlYXRlZEF0IjogIjIwMjYtMDktMjdUMDA6MDA6MDAuMDAwWiIsCiAgICAgICJ1cGRhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInJ1bnRpbWUiOiAibm9kZSIsCiAgICAgICJlbnRyeSI6ICJzY3JpcHRzL3NlcnZlci5qcyIsCiAgICAgICJhcmdzIjogW10sCiAgICAgICJlbnYiOiB7CiAgICAgICAgIjRFVkVSTEFORF9UT0tFTiI6ICIkezRFVkVSTEFORF9UT0tFTn0iCiAgICAgIH0KICAgIH0sCiAgICAibGF0ZXgtY29tcGlsZSI6IHsKICAgICAgIm5hbWUiOiAiTGFUZVgg57yW6K+RIiwKICAgICAgImRlc2NyaXB0aW9uIjogIueUn+aIkOW5tue8luivkUxhVGVYIiwKICAgICAgInZlcnNpb24iOiAiMS4wLjAiLAogICAgICAiY2F0ZWdvcnkiOiAiTUNQIFNlcnZlciIsCiAgICAgICJ0YWdzIjogWwogICAgICAgICJtY3AiLAogICAgICAgICJsYXRleC1jb21waWxlIiwKICAgICAgICAibm9kZSIKICAgICAgXSwKICAgICAgImRvd25sb2FkcyI6IDAsCiAgICAgICJjcmVhdGVkQXQiOiAiMjAyNi0wOS0yN1QwMDowMDowMC4wMDBaIiwKICAgICAgInVwZGF0ZWRBdCI6ICIyMDI2LTA5LTI3VDAwOjAwOjAwLjAwMFoiLAogICAgICAicnVudGltZSI6ICJub2RlIiwKICAgICAgImVudHJ5IjogInNjcmlwdHMvc2VydmVyLmpzIiwKICAgICAgImFyZ3MiOiBbXSwKICAgICAgImVudiI6IHt9CiAgICB9LAogICAgImNvbnRleHQ3LWRvY3MiOiB7CiAgICAgICJuYW1lIjogIkNvbnRleHQ3IOaWh+ahoyIsCiAgICAgICJkZXNjcmlwdGlvbiI6ICLmnIDmlrDlupPmlofmoaPlrp7ml7bms6jlhaUiLAogICAgICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgICAgICJjYXRlZ29yeSI6ICJNQ1AgU2VydmVyIiwKICAgICAgInRhZ3MiOiBbCiAgICAgICAgIm1jcCIsCiAgICAgICAgImNvbnRleHQ3LWRvY3MiLAogICAgICAgICJub2RlIgogICAgICBdLAogICAgICAiZG93bmxvYWRzIjogMCwKICAgICAgImNyZWF0ZWRBdCI6ICIyMDI2LTA5LTI3VDAwOjAwOjAwLjAwMFoiLAogICAgICAidXBkYXRlZEF0IjogIjIwMjYtMDktMjdUMDA6MDA6MDAuMDAwWiIsCiAgICAgICJydW50aW1lIjogIm5vZGUiLAogICAgICAiZW50cnkiOiAic2NyaXB0cy9zZXJ2ZXIuanMiLAogICAgICAiYXJncyI6IFtdLAogICAgICAiZW52Ijoge30KICAgIH0KICB9Cn0=
+{
+  "skills": {
+    "text-to-diagram": {
+      "category": "开发工具",
+      "tags": [
+        "图表",
+        "可视化",
+        "cli"
+      ],
+      "downloads": 1,
+      "createdAt": "2026-09-09T14:10:50.365Z",
+      "updatedAt": "2026-09-09T14:10:50.505Z"
+    },
+    "oss-scout": {
+      "category": "研究分析",
+      "tags": [
+        "开源选型",
+        "github"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-09T14:10:50.547Z",
+      "updatedAt": "2026-09-09T14:10:50.547Z"
+    },
+    "use-tinyfish": {
+      "category": "网络与搜索",
+      "tags": [
+        "搜索",
+        "浏览器",
+        "抓取"
+      ],
+      "downloads": 1,
+      "createdAt": "2026-09-09T14:10:50.548Z",
+      "updatedAt": "2026-09-09T14:10:50.548Z"
+    },
+    "text-to-image": {
+      "category": "图像生成",
+      "tags": [
+        "文生图",
+        "生成图片",
+        "图片生成",
+        "画图",
+        "海报",
+        "插画",
+        "配图",
+        "素材"
+      ],
+      "downloads": 3,
+      "createdAt": "2026-09-09T14:36:35.241Z",
+      "updatedAt": "2026-09-09T14:45:26.676Z"
+    },
+    "image-analysis": {
+      "category": "图像理解",
+      "tags": [
+        "识图",
+        "看图",
+        "图片理解",
+        "图像分析",
+        "OCR",
+        "提取文字",
+        "布局分析"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-09T14:36:35.246Z",
+      "updatedAt": "2026-09-10T13:14:39.000Z"
+    },
+    "grilling": {
+      "category": "需求梳理",
+      "tags": [
+        "拷问",
+        "需求梳理",
+        "压力测试",
+        "访谈",
+        "决策树",
+        "grill",
+        "stress-test"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-10T13:59:55.000Z",
+      "updatedAt": "2026-09-10T13:59:55.000Z"
+    },
+    "skill-creator": {
+      "category": "技能开发",
+      "tags": [
+        "技能创建",
+        "skill",
+        "评估",
+        "元技能",
+        "skill开发",
+        "evals"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-10T13:59:55.000Z",
+      "updatedAt": "2026-09-10T13:59:55.000Z"
+    },
+    "skill-updater": {
+      "category": "技能开发",
+      "tags": [
+        "技能进化",
+        "自动更新",
+        "skill",
+        "进化",
+        "SkillEvo",
+        "evals",
+        "自动优化"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-10T14:33:19.000Z",
+      "updatedAt": "2026-09-10T14:33:19.000Z"
+    },
+    "page-visual-review": {
+      "category": "前端开发",
+      "tags": [
+        "识图",
+        "QA",
+        "视觉审查"
+      ],
+      "downloads": 5,
+      "createdAt": "2026-09-09T14:10:50.525Z",
+      "updatedAt": "2026-09-10T14:52:37.000Z"
+    },
+    "show-deploy": {
+      "category": "开发工具",
+      "tags": [
+        "部署",
+        "静态站点",
+        "预览",
+        "临时托管",
+        "show",
+        "preview",
+        "deploy"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-10T14:52:54.000Z",
+      "updatedAt": "2026-09-10T14:52:54.000Z"
+    },
+    "book-to-skill": {
+      "version": "1.1.0",
+      "category": "知识转化",
+      "tags": [
+        "书籍转化",
+        "知识提炼",
+        "SKILL.md",
+        "技能生成",
+        "book-to-skill"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-11T00:00:00.000Z",
+      "updatedAt": "2026-09-11T00:00:00.000Z"
+    },
+    "d2-chart": {
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "图表",
+        "D2",
+        "可视化",
+        "架构图",
+        "流程图",
+        "图表生成",
+        "d2"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-12T17:23:44.984Z",
+      "updatedAt": "2026-09-12T17:23:44.984Z"
+    },
+    "text-to-d2": {
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "图表",
+        "文本转图",
+        "D2",
+        "可视化",
+        "流程图",
+        "架构图",
+        "语义抽取",
+        "text-to-diagram",
+        "d2-chart"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-12T17:54:12.772Z",
+      "updatedAt": "2026-09-12T17:54:12.772Z"
+    },
+    "find-skills": {
+      "category": "开发工具",
+      "tags": [
+        "技能发现",
+        "生态",
+        "cli"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "firecrawl": {
+      "category": "网络与搜索",
+      "tags": [
+        "抓取",
+        "爬虫",
+        "需APIKey"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "pdf": {
+      "category": "文档处理",
+      "tags": [
+        "PDF",
+        "文档",
+        "OCR"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "docx": {
+      "category": "文档处理",
+      "tags": [
+        "Word",
+        "文档",
+        "生成"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "xlsx": {
+      "category": "文档处理",
+      "tags": [
+        "Excel",
+        "表格",
+        "公式"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "pptx": {
+      "category": "文档处理",
+      "tags": [
+        "PPT",
+        "幻灯片",
+        "演示"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "mcp-builder": {
+      "category": "开发工具",
+      "tags": [
+        "MCP",
+        "脚手架",
+        "server"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "planning-with-files": {
+      "category": "工作流",
+      "tags": [
+        "规划",
+        "任务管理",
+        "持久化"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "unslop": {
+      "category": "写作工具",
+      "tags": [
+        "去AI腔",
+        "润色",
+        "文案"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-09-13T05:18:08.341Z"
+    },
+    "recorder2skill": {
+      "category": "技能开发",
+      "tags": [
+        "屏幕录制",
+        "技能生成",
+        "SKILL.md",
+        "自动化",
+        "recorder2skill"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-15T00:00:00.000Z",
+      "updatedAt": "2026-09-15T15:30:00.000Z"
+    },
+    "doc-to-md": {
+      "version": "1.0.0",
+      "category": "文档处理",
+      "tags": [
+        "文档转换",
+        "Markdown",
+        "OCR",
+        "格式批量处理",
+        "doc-to-md"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-15T09:26:58.000Z",
+      "updatedAt": "2026-09-15T09:26:58.000Z"
+    },
+    "slides-maker": {
+      "version": "1.0.0",
+      "category": "文档处理",
+      "tags": [
+        "幻灯片",
+        "PPT",
+        "演示设计",
+        "pptx",
+        "slides-maker"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-15T09:26:58.000Z",
+      "updatedAt": "2026-09-18T08:00:00.000Z"
+    },
+    "video-publish": {
+      "version": "1.5.0",
+      "category": "视频创作",
+      "tags": [
+        "宣传视频",
+        "录屏",
+        "TTS配音",
+        "B站投稿",
+        "video-publish"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-18T06:06:17.000Z",
+      "updatedAt": "2026-09-18T08:00:00.000Z"
+    },
+    "anysearch": {
+      "version": "3.1.1",
+      "category": "网络与搜索",
+      "tags": [
+        "搜索引擎",
+        "网页抓取",
+        "垂直搜索",
+        "批量搜索",
+        "anysearch"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-18T10:00:00.000Z",
+      "updatedAt": "2026-09-18T10:00:00.000Z"
+    },
+    "vision-for-dev": {
+      "category": "开发调试",
+      "tags": [
+        "视觉辅助开发",
+        "识图审查",
+        "GUI排障",
+        "Wine",
+        "截图自动化"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-18T22:52:50.932Z",
+      "updatedAt": "2026-09-18T22:52:50.932Z"
+    },
+    "program-to-gif": {
+      "category": "视频创作",
+      "tags": [
+        "GIF",
+        "VHS",
+        "终端录制",
+        "演示动图",
+        "README配图"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-19T17:40:00.000Z",
+      "updatedAt": "2026-09-19T17:40:00.000Z"
+    },
+    "typesafe-ai": {
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "TypeSafe",
+        "JEV",
+        "System One",
+        "结构化决策",
+        "AI开发",
+        "Jev"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-20T02:00:00.000Z",
+      "updatedAt": "2026-09-20T02:00:00.000Z"
+    },
+    "handoff": {
+      "version": "1.0.0",
+      "category": "工作流",
+      "tags": [
+        "交接",
+        "handoff",
+        "Claude Code",
+        "Codex",
+        "HANDOFF.md",
+        "AI协作"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-21T00:00:00.000Z",
+      "updatedAt": "2026-09-21T00:00:00.000Z"
+    },
+    "world-generator": {
+      "version": "1.5.0",
+      "category": "前端开发",
+      "tags": [
+        "3D",
+        "Three.js",
+        "程序化生成",
+        "场景生成",
+        "交互编辑",
+        "参数化"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-25T00:00:00.000Z",
+      "updatedAt": "2026-09-26T00:00:00.000Z",
+      "description": "通用参数化 3D 世界生成器：AI 语义规划 + 程序几何求解，从 JSON 场景计划一键生成单文件 world.html（照片级 CC0 PBR 贴图内嵌、HDRI 实景 IBL、SSAO/SMAA 影视级后处理、照片贴图全量绑定、分时段双 HDRI（白天/黄昏）、圆角建筑与叶噪树冠，零运行时外部依赖），支持总图拼接 lint、渐进细化 refine、局部补丁 patch（布局 + 实例属性：旋转/缩放/材质/显隐/自定义元数据，附属性值指导库）与可视化点选编辑闭环。当用户需要生成或编辑 3D 场景、园区、别墅、校园等参数化世界时使用。"
+    },
+    "localtunnel-preview": {
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "预览",
+        "临时链接",
+        "localtunnel",
+        "tunnel",
+        "开发"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-26T15:04:23.000Z",
+      "updatedAt": "2026-09-26T15:04:23.000Z",
+      "description": "通过 localtunnel 将本地 Web 服务暴露为临时公网 URL，5 分钟后自动清理。提供安全防御：端口范围限制、进程隔离、自动回收。适用于需要分享本地项目给他人预览的场景。"
+    },
+    "skillmanager": {
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "技能管理",
+        "仪表盘",
+        "归档",
+        "建议"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-26T00:00:00.000Z",
+      "updatedAt": "2026-09-26T15:30:00.000Z",
+      "description": "SkillManager — 技能管理器。手动触发技能组合建议、扫描技能目录更新全局索引、单技能MD归档标记、静态HTML仪表盘。无侵入原有Agent逻辑,全部数据仅用MD文件存储,零外部服务。"
+    },
+    "cad-svg-edit": {
+      "category": "开发工具",
+      "description": "融合 CAD 创建与 SVG 精准编辑：从零绘图（cad 无头引擎，输出 SVG/PNG/CSV）与修改已有 SVG（持久 id 寻址、空间/文本过滤、可视化点选、批量、版本化保存）按意图自动路由。",
+      "tags": [
+        "cad",
+        "svg",
+        "绘图",
+        "矢量图",
+        "编辑",
+        "绘图引擎"
+      ],
+      "downloads": 0,
+      "version": "1.0.0",
+      "createdAt": "2026-09-28T02:58:59.000Z",
+      "updatedAt": "2026-09-28T02:58:59.000Z"
+    },
+    "3d-edit": {
+      "category": "前端开发",
+      "description": "一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求\"画一个3D城市/3D场景/三维可视化\"\"像 Claude 一键生成 3D 城市\"\"做个可交互的 3D 网页\"\"水库/厂区/管线数字孪生 3D 展示\"\"给我一个小盒子/设备/推车的 3D 图\"、要求 3D 汇报页/截图/PNG；或者说\"把那座塔改红\"\"河往东弯\"\"楼密一点\"\"雾再浓点\"、指着截图某处说\"改那个\"\"去掉那栋楼\"；或说\"我想自己手动编辑这个 3D 图\"\"给我个能拖的界面\"\"别每次都得找你\"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页。",
+      "tags": [
+        "3D",
+        "Three.js",
+        "程序化生成",
+        "场景生成",
+        "局部编辑",
+        "参数化",
+        "人工编辑",
+        "数字孪生",
+        "WebGL"
+      ],
+      "downloads": 0,
+      "version": "1.0.0",
+      "createdAt": "2026-09-28T03:13:25.000Z",
+      "updatedAt": "2026-09-28T03:13:25.000Z"
+    },
+    "pre-align": {
+      "category": "需求梳理",
+      "description": "任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests.",
+      "tags": [
+        "对齐",
+        "需求澄清",
+        "动手前确认",
+        "对齐简报",
+        "访谈",
+        "验收标准"
+      ],
+      "downloads": 0,
+      "version": "1.0.0",
+      "createdAt": "2026-09-28T03:24:11.000Z",
+      "updatedAt": "2026-09-28T03:24:11.000Z"
+    }
+  },
+  "mcps": {
+    "weather-mcp": {
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "mcp",
+        "weather",
+        "api"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T04:53:54.000Z",
+      "updatedAt": "2026-09-27T04:53:54.000Z",
+      "description": "Weather MCP Server — 提供实时天气查询、预报、空气质量等工具。支持 stdio/SSE/HTTP 传输方式，兼容 Claude Desktop、Cursor、VSCode 等主流编辑器。",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {
+        "OPENWEATHER_API_KEY": "${WEATHER_API_KEY}"
+      }
+    },
+    "github-mcp-server": {
+      "name": "GitHub 官方",
+      "description": "仓库/Issue/PR 全操作",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "github-mcp-server",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {}
+    },
+    "antv-chart-mcp": {
+      "name": "AntV 图表生成",
+      "description": "文字描述生成可视化图表",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "antv-chart-mcp",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {}
+    },
+    "harness-mcp": {
+      "name": "Harness CI/CD",
+      "description": "部署流水线操作",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "harness-mcp",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {
+        "HARNESS_API_KEY": "${HARNESS_API_KEY}"
+      }
+    },
+    "playwright-mcp": {
+      "name": "Playwright 浏览器",
+      "description": "驱动真实浏览器",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "playwright-mcp",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {}
+    },
+    "browserbase-mcp": {
+      "name": "云端浏览器",
+      "description": "Serverless 无头浏览器池",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "browserbase-mcp",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {
+        "BROWSERBASE_API_KEY": "${BROWSERBASE_API_KEY}"
+      }
+    },
+    "octagon-research": {
+      "name": "Octagon 深度调研",
+      "description": "多步深度网络调研",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "octagon-research",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {
+        "OCTAGON_API_KEY": "${OCTAGON_API_KEY}"
+      }
+    },
+    "allyson-svg": {
+      "name": "Allyson SVG 动画",
+      "description": "静态图转SVG动画",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "allyson-svg",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {
+        "ALLYSON_API_KEY": "${ALLYSON_API_KEY}"
+      }
+    },
+    "cua-desktop": {
+      "name": "Cua 电脑操作",
+      "description": "Agent 操作完整桌面",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "cua-desktop",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {}
+    },
+    "screenshot-mcp": {
+      "name": "网页截图",
+      "description": "URL一键截图",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "screenshot-mcp",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {
+        "SCREENSHOT_API_KEY": "${SCREENSHOT_API_KEY}"
+      }
+    },
+    "cloudflare-mcp": {
+      "name": "Cloudflare",
+      "description": "Workers/KV/R2 管理",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "cloudflare-mcp",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {
+        "CLOUDFLARE_API_TOKEN": "${CLOUDFLARE_API_TOKEN}"
+      }
+    },
+    "4everland-hosting": {
+      "name": "4EVERLAND 托管",
+      "description": "去中心化网站托管",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "4everland-hosting",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {
+        "4EVERLAND_TOKEN": "${4EVERLAND_TOKEN}"
+      }
+    },
+    "latex-compile": {
+      "name": "LaTeX 编译",
+      "description": "生成并编译LaTeX",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "latex-compile",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {}
+    },
+    "context7-docs": {
+      "name": "Context7 文档",
+      "description": "最新库文档实时注入",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "context7-docs",
+        "node"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-09-27T00:00:00.000Z",
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "args": [],
+      "env": {}
+    }
+  }
+}

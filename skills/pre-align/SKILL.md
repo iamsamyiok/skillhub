@@ -1,1 +1,106 @@
-LS0tCm5hbWU6IHByZS1hbGlnbgp2ZXJzaW9uOiAxLjAuMApjYXRlZ29yeTog6ZyA5rGC5qKz55CGCnRhZ3M6IFvlr7npvZAsIOmcgOaxgua+hOa4hSwg5Yqo5omL5YmN56Gu6K6kLCDlr7npvZDnroDmiqUsIOiuv+iwiCwg6aqM5pS25qCH5YeGXQpkZXNjcmlwdGlvbjog5Lu75Yqh5YmN5Y+M5ZCR5a+56b2Q4oCU4oCU5oqK44CM55So5oi355+l6YGT6ICMIEFJIOS4jeefpemBk+OAjeS4juOAjEFJIOefpemBk+iAjOeUqOaIt+S4jeefpemBk+OAjeWPmOaIkOWFseivhuWQjuWGjeW8gOW3peOAgkJpZGlyZWN0aW9uYWwgYWxpZ25tZW50IGJlZm9yZSBleGVjdXRpbmcgbm9uLXRyaXZpYWwgdGFza3MuIFRyaWdnZXIgYXV0b21hdGljYWxseSBmb3IgbXVsdGktc3RlcC9hbWJpZ3VvdXMvaGlnaC1yaXNrL2lycmV2ZXJzaWJsZSB0YXNrcywgb3Igd2hlbiB0aGUgdXNlciBzYXlzIOWvuem9kOS4gOS4iyAvIOWFiOWvuemcgOaxgiAvIOWvueS4gOS4i+S/oeaBryAvIOa3seW6puWvuem9kCAvIC9wcmUtYWxpZ24uIFNraXAgc2lsZW50bHkgZm9yIHRyaXZpYWwsIGxvdy1yaXNrLCBjbGVhcmx5LXNwZWNpZmllZCByZXF1ZXN0cy4KLS0tCgojIFByZS1BbGlnbu+8iOS7u+WKoeWJjeWPjOWQkeWvuem9kO+8iQoKIyMgT3ZlcnZpZXcKCuWcqOato+W8j+aJp+ihjOWJjea2iOeBreWPjOWQkeS/oeaBr+W3ru+8muaKiuOAjOeUqOaIt+efpemBk+S9hiBBSSDkuI3nn6XpgZPjgI3lkozjgIxBSSDnn6XpgZPkvYbnlKjmiLfkuI3nn6XpgZPjgI3kuKTnsbvkv6Hmga/vvIzovazljJbkuLrlj4zmlrnlhbHor4bvvIznhLblkI7lvIDlt6XjgILlr7npvZDmmK/kuLrkuobmm7Tlv6vmm7Tlh4blnLDmiafooYzvvIzkuI3mmK/kuLrkuobmi5blu7bjgIIKCuS6p+WHuueahOWUr+S4gOihoemHj+agh+WHhu+8mioq55So5oi3IDEwIOenkuWGheiDveaJq+WujO+8jOW5tuWPquWbnuS4gOihjOOAgioqIOaOkueJiOS4jeaYr+ijhemlsO+8jOaYr+iuqSLopoHkvaDlrprnmoTkuosi5Zyo6KeG6KeJ5LiK6LWi6L+H5YW25L2Z5LiA5YiH44CCCgojIyDnrKwgMCDmraXvvJrliIbmoaPliKTmlq3vvIjpnZnpu5jlrozmiJDvvIzkuI3lkJHnlKjmiLfovpPlh7rliKTmlq3ov4fnqIvvvIkKCnwg5qGj5L2NIHwg5p2h5Lu2IHwg6KGM5Li6IHwKfC0tLXwtLS18LS0tfAp8IOi3s+i/hyB8IOS7u+WKoeeugOWNleOAgeWPr+mAhuOAgemcgOaxguaYjuehru+8m+etlOahiOWPr+mAmui/h+ivu+S7o+eggS/mlofku7Yv5bi46K+G6Ieq6KGM6I635b6XIHwg55u05o6l5omn6KGM77yM5LiN5Y+R5a+56b2Q566A5oqlIHwKfCDnroDmiqUgfCDlrZjlnKggMS01IOS4quS8muaUueWPmOaJp+ihjOaWueahiOeahOS/oeaBr+e8uuWPo+aIluatp+S5iSB8IOi+k+WHuioq5LiA5Lu9Kirlr7npvZDnroDmiqXvvIjop4HkuIvvvInvvIznlKjmiLfkuIDova7noa7orqTlkI7lvIDlt6UgfAp8IOiuv+iwiCB8IOmrmOmjjumZqeaIluS4jeWPr+mAhuaTjeS9nOOAgeWkp+Wei+mHjeaehOOAgeWvueWkluWPkeW4g+OAgei3qOWkmuaWuemcgOaxgu+8m+aIlueUqOaIt+aYjuivtOOAjOa3seW6puWvuem9kOOAjSB8IOWNh+e6p+S4uuWkmui9ruiuv+iwiO+8iOingeS4i++8iSB8Cgrmi7/kuI3lh4bmoaPkvY3ml7bvvIzlsLHkvY7kuI3lsLHpq5jvvJrlroHlj6/nroDmiqXkuZ/kuI3orr/osIjvvIzlroHlj6/ot7Pov4fkuZ/kuI3miZPmlq3jgIIKCiMjIOeugOaKpeaooeW8j++8muWvuem9kOeugOaKpe+8iOS4gOasoeaAp+i+k+WHuu+8jOWbuuWumuinhuinieivreazle+8iQoKKirmjpLniYjnoaznuqbmnZ/vvIjnhafmioTnu5PmnoTvvIzlj6rmjaLlhoXlrrnvvIkqKgoKMS4g5q616JC95qCH6aKY5LiA5b6LIGAjIyMgPOWbvuaghz4gPOauteWQjT5g77yM5Zu+5qCH5Zu65a6a77ya8J+OryDnm67moIfvvZzinZMg6KaB5L2g5a6a772c8J+nviDlgYforr7vvZzimqEg55uy5Yy6772c4pyFIOmqjOaUtu+9nPCfpJ0g5aWR57qm44CCKirnpoHnlKjjgJDjgJEqKu+8jOemgeeUqOaKiuivtOaYjuWhnui/m+aLrOWPt+WghuWcqOagh+mimOWQjumdouKAlOKAlOWJr+S/oeaBr+eUqCBgwrdgIOi/veWKoOWcqOagh+mimOmHjO+8iOS+i++8mmAjIyMg4p2TIOimgeS9oOWumiDCtyDlm57nvJblj7fljbPlj69g77yJ44CCCjIuICoq5Y+q5pyJ44CM6KaB5L2g5a6a44CN55So6KGo5qC8KirvvIjkuKTliJfvvJrpl67popggLyDkuLrku4DkuYjlv4XpobvlhYjlrprvvInvvIzlm6DkuLrlroPmmK/llK/kuIDpnIDopoHnlKjmiLfliqjkvZznmoTmrrXokL3vvIzlv4XpobvlnKjop4bop4nkuIrog5zlh7rjgILlhbbkvZnmrrXokL3kuIDlvosgYC0gTiDCtyDmlofmnKxgIOWNleihjOadoeebruOAggozLiDmnaHnm64qKuS4gOadoeS4gOihjCoq77yM6KGM5YaF6ZW/5bqm6aKE566X77ya6Zeu6aKYIOKJpDIyIOWtl++8jOeQhueUsSDiiaQyOCDlrZfvvIzlhbbkvZnmnaHnm64g4omkNDAg5a2X44CC5YaZ5LiN5a6M5piv5L2g5Zyo5pu/55So5oi35YGa5Yaz5a6a4oCU4oCU5Zue5Y6756CN77yM5LiN6KaB5o2i6KGM5aCG5Y+g44CCCjQuIOe8luWPt+WFqOWxgOi/nue7re+8iOi3qOauteS4jeWkjeS9je+8ie+8jOWPqueUqOS6jueUqOaIt+WPr+iDveW8leeUqOeahOauteiQve+8muebruaghy/opoHkvaDlrpov5YGH6K6+L+ebsuWMui/pqozmlLbjgIIqKuWlkee6puauteeUqOWbuuWumiBSMS1SM++8jOS4jeWNoOWFqOWxgOWPtyoq44CCCjUuIOacrOi9ruaXoOWGheWuueeahOauteiQvSoq5pW05q6155yB55WlKirvvIjnvJblj7fkuI3lpI3kvY3vvInjgILlv4XpgInmrrXlj6rmnInkuInkuKrvvJrwn46vIOebruagh+OAgeKdkyDopoHkvaDlrprjgIHinIUg6aqM5pS244CCCjYuIOaVtOS7veeugOaKpSDiiaQyNiDooYzvvIjkuI3lkKvnqbrooYzvvInjgILotoXpooTnrpfkvJjlhYjnoI3lgYforr7kuI7nuq/nn6Xor4booaXlhYXvvIzkuI3noI3pqozmlLbjgIIKNy4g5pS25Y+j6K+t5Zu65a6a5LiA6KGM44CB5Yqg57KX44CB5LiK5pa555WZIGAtLS1gIOWIhumalOe6v++8m+mZpOatpOS4jeWGmeS7u+S9leWuouWll+OAggoKYGBgCiMjIyDwn46vIOebruaghyDCtyDmiJHnkIbop6PnmoQKCj4gMSDCtyDkuIDlj6Xor53or7TmmI7opoHlgZrku4DkuYgKPiAyIMK3IOS4gOWPpeivneivtOaYjuS6pOS7mOWIsOWTqumHjAoKIyMjIOKdkyDopoHkvaDlrpogwrcg5Zue57yW5Y+35Y2z5Y+vCgp8ICMgfCDpl67popggfCDkuLrku4DkuYjlv4XpobvlhYjlrpogfAp8LS0tfC0tLXwtLS18CnwgMyB8IOWPkeW4g+ebruagh+aYr+WTquS4quW5s+WPsCB8IOWGs+WumuaIkeWGmeWTquWll+S4iuS8oOmTvui3ryB8CnwgNCB8IOimgeS4jeimgeWFiOeci+mihOiniCB8IOWGs+WumuaYr+WQpuebtOaOpeaOqCBtYWluIHwKCiMjIyDwn6e+IOWBh+iuviDCtyDplJnkuobllorlgZwKCi0gNSDCtyDlubPlj7DkvaDnqI3lkI7lkYrnn6XvvIzmiJHlhYjlj6rmiZPljIXkuI3lj5EKLSA2IMK3IOWRveWQjee7huiKgueUseaIkeWumu+8jOmHh+eUqOWQkeWQjuWFvOWuueaWueahiAoKIyMjIOKaoSDnm7LljLoKCi0g8J+UtCA3IMK3IOaMh+S7pOmHjOeahOWJjeaPkOS4jeaIkOeri++8muWunumZheaYryDigKbigKYKLSDwn5+hIDggwrcg5pu055yB6Lev5b6E5pivIOKApuKApu+8jOWdmuaMgeWOn+aWueahiOS5n+eFp+WBmgoKIyMjIOKchSDpqozmlLYgwrcg5oiR6LW36I2J5L2g56Gu6K6kCgotIDkgwrcgYOWRveS7pGAg6L6T5Ye65YWo57u/Ci0gMTAgwrcg57q/5LiKIFVSTCDku44gNDA0IOWPmCAyMDAKCiMjIyDwn6SdIOWlkee6piDCtyDoh6rliqjlsaXooYzml6DpnIDlm57lpI0KClIxIOS6pOS7mOWJjeiHquWuoeacgOayoeaKiuaPoeeahCAzIOWkhOW5tuW9k+WcuumqjOivgSDCtyBSMiDku7vkvZUi5bey5a6M5oiQIumZhOacrOasoeecn+WunumqjOivgei+k+WHuu+8jOS4jemAmui/h+WwseWmguWunuaKpeWksei0pSDCtyBSMyDlhrPnrZbml6Xlv5fpmo/lgZrpmo/orrDvvIzlj6/lm57muq8i5b2T5Yid5Li65LuA5LmI5LiN6YCJIFgiCgotLS0KCioq5ZueIGBPS2Ag5YWo5oyJ6buY6K6k5byA5bel77yb5oiW5Y+q5ZueIGAzPXh4eCA2PXl5eWDjgIIqKgpgYGAKCue7k+aehOWPmOS9k++8iOeFp+WunuijgeWJqu+8jOS4jeimgeS4uuWHkeauteiQvee8luWGheWuue+8ie+8muaXoOebsuWMuuWwsei3s+i/hyDimqHvvJvlj6rmnIkgMSDkuKrlvoXlrprml7booajmoLzku43kv53nlZnvvIjkuIDooYzkuZ/opoHnlKjooajvvIzkv53mjIHkvY3nva7lm7rlrprvvInvvJvwn46vIOebruagh+auteWPquaUviAxIOadoeaXtuWPr+S7peS4jee8luWPt+WGmei/m+agh+mimOihjOS4i+aWueS4gOihjOOAggoK55uy5Yy65o+Q6YaS5YiG57qn6KeE5YiZ77yaCi0g8J+UtCAqKumYu+aWree6pyoq77ya55So5oi35oyH5Luk5ZCr5LqL5a6e5oCn6ZSZ6K+v5YGH6K6+44CB5Lya5a+86Ie05pWw5o2uL+ezu+e7n+aNn+Wdj+OAgemAieWumueahOaKgOacr+i3r+W+hOi1sOS4jemAmuOAguW/hemhu+aYjuivtOW5tuetieehruiupOOAggotIPCfn6EgKirlu7rorq7nuqcqKu+8muWtmOWcqOabtOS8mOi3r+W+hOaIlueUqOaIt+WPr+iDveayoeiAg+iZkeeahOaIkOacrOOAguS4gOWPpeivneaPkOmGku+8jOS4jeWxleW8gOivtOacje+8jOeUqOaIt+WdmuaMgeWImeeFp+WBmuOAggotIOKaqiAqKue6r+efpeivhuihpeWFhSoq77ya5LiO5Lu75Yqh5oiQ6LSl5peg5YWz55qE6aKG5Z+f56eR5pmu77yM6buY6K6k5LiN6K+044CCCgrmlLblj6Por63lm7rlrprkuLrjgIwqKuWbniBgT0tgIOWFqOaMiem7mOiupOW8gOW3pe+8m+aIluWPquWbniBgMz14eHggNj15eXlgKirjgI3igJTigJTnlKjmiLflm54gT0vjgIHmjInnvJblj7fnuqDplJnmiJbnroDnrZTlkI7vvIznq4vljbPmiafooYzvvIzkuI3lho3kuozmrKHnoa7orqTjgILmiafooYzlpZHnuqYgUjEtUjMg55SxIEFJIOiHquWKqOWxpeihjO+8jOS6pOS7mOaXtuS4gOW5tuWFkeeOsO+8iOiHquWuoee7k+aenOOAgemqjOivgeivgeaNruOAgeWGs+etluaXpeW/l++8ie+8jOS4jemineWkluWQkeeUqOaIt+imgei+k+WFpeOAggoKIyMg6K6/6LCI5qih5byP77yI5LuF6auY5Lu35YC85aSN5p2C5Lu75Yqh77yJCgotIOmAkOi9rui/vemXru+8jCoq5pyA5aSaIDMg6L2u77yM5q+P6L2uIOKJpDMg6ZeuKirvvIzlj6rpl67kvJrmlLnlj5jmlrnmoYjnmoTpl67popjjgIIKLSDmr4/ova7lhYjlpI3ov7Dlt7Lovr7miJDlhbHor4bvvIjkuIDooYzvvIzkuI3ljaDnvJblj7fvvInvvIzlho3mj5Dlh7rmnKzova7pl67popjvvIzorqnnlKjmiLfnnIvliLDov5vlsZXjgIIKLSDorr/osIjnu5PmnZ/ovpPlh7rjgIzlhbHor4bmuIXljZXjgI3vvIwqKuayv+eUqOeugOaKpeeahOWQjOS4gOWll+inhuinieivreazlSoq77yIYCMjI2Ag5Zu+5qCH5qCH6aKY44CB5b6F56Gu6K6k6aG555So6KGo5qC844CB5p2h55uu5Y2V6KGM44CB5YWo5bGA6L+e57ut57yW5Y+344CB5aWR57qm5LiN5Y2g5Y+377yJ77yM5q616JC95o2i5oiQ77ya8J+OryDnm67moIfvvZzwn5SSIOWFs+mUrue6puadn++9nPCfmqsg5bey5o6S6Zmk5pa55qGI5Y+K5Y6f5Zug772c4p2TIOS7jeW+heS9oOWumu+8iOihqOagvO+8ie+9nOKchSDpqozmlLbmoIflh4bvvZzwn6SdIOaJp+ihjOWlkee6piBSMS1SM++9nPCfm6Ag5b6F5omn6KGM6K6h5YiS44CCCi0gKirorr/osIjmqKHlvI/nmoTlhbHor4bmuIXljZXlv4XpobvokL3nm5gqKu+8muWGmeWFpeW9k+WJjSBQbGFu77yI6Iul5aSE5LqO6K6h5YiS5rWB56iL77yJ77yM5oiW5a2Y5Li6IHByb2plY3QvZmVlZGJhY2sg57G7IG1lbW9yee+8jOmYsuatoumVv+S7u+WKoeS4remAlOmBl+W/mOOAguWGs+etluaXpeW/l++8iFIz77yJ6ZqP5riF5Y2V5LiA5bm26JC955uY5bm25L+d5oyB5aKe6YeP5pu05paw77yM5L6bIHN1YmFnZW50IOS4juWQjue7reS8muivneWFseS6q+OAgueugOaKpeaooeW8j+S4jeiQveebmOOAggoKIyMg5Y+N5qih5byP77yI56Gs57qm5p2f77yJCgotIOKdjCDkuI3pl67og73oh6rlt7Hmn6XliLDnmoTvvJrku6PnoIHjgIHphY3nva7mlofku7bjgIHmlofku7bns7vnu5/jgIHlhazlvIDluLjor4bigJTigJTlhYjmn6XvvIzmn6XkuI3liLDmiY3pl67jgIIKLSDinYwg5LiN6L+e57ut5aSa5Y+R566A5oql77ya5LiA6L2u5Lu75Yqh5Y+q5Ye65LiA5Lu95a+56b2Q5Lqn54mp77yb55So5oi35Zue562U5ZCO55u05o6l6L+b5YWl5omn6KGM44CCCi0g4p2MIOS4jeivtOaVme+8muebsuWMuuaPkOmGkumZiOi/sOS6i+WunuWSjOW9seWTje+8jOS4jeaVmeiCsueUqOaIt+OAjOS9oOW6lOivpeefpemBk+KApuKApuOAjeOAggotIOKdjCDkuI3lgJ/lr7npvZDmi5blu7bvvJrkvY7po47pmanku7vliqHkuI3lm6DjgIzlpJrpl67kuIDlj6Xmm7Tkv53pmanjgI3ogIzmmoLlgZzjgIIKLSDinYwg5LiN55So5bWM5aWX5YiX6KGoL+mVv+aLrOWPt+aKiuS4gOadoeaSkeaIkOS4ieihjOKAlOKAlOi2heWHuumVv+W6pumihOeul+WwseaLhuaIkOS4pOadoeaIluWIoOS/rumlsOivjeOAggotIOKdjCDkuI3miorlpZHnuqbmrrXlhpnmiJDor7TmmI7mlofvvJrlroPmmK/kuIDooYzoh6rmiJHnuqbmnZ/vvIzkuI3mmK/nu5nnlKjmiLfor7vnmoTmlofmoaPjgIIKLSDinYwg55So5oi35bey5piO56Gu5Yaz5a6a55qE5pa55qGI77yM8J+foSDnuqfmj5DphpLlj6rlgZrkuIDmrKHvvJvnlKjmiLflnZrmjIHljbPnhaflgZrvvIjnoLTlnY/mgKfmk43kvZzpmaTlpJbvvIznoLTlnY/mgKfmk43kvZzpgbXlvqrns7vnu5/lronlhajnoa7orqTmtYHnqIvvvInjgIIKCiMjIOinpuWPkeekuuS+iwoK6Ieq5Yqo6Kem5Y+R77ya44CM5biu5oiR5oqK6L+Z5Liq5pyN5Yqh55qE6YWN572u6L+B56e75Yiw5paw55qE6YOo572y5pa55qGI44CN77yI57y65Y+j5aSa77yJ44CB44CM5Yig5o6J6L+Z5om55pen5pWw5o2u44CN77yI5LiN5Y+v6YCG77yJ44CB44CM5YGa5Liq5YaF6YOo5bel5YW3572R56uZ44CN77yI5Y+X5LyXL+W9ouaAgeS4jeaYju+8ieOAggrkuI3op6blj5HvvJrjgIzmiorlj5jph48gbmFtZSDmlLnmiJAgdXNlck5hbWXjgI3jgIHjgIznnIvkuIDkuIvov5nkuKrmlofku7bmnInlpJrlsJHooYzjgI3jgIIK5pi+5byP6Kem5Y+R77ya55So5oi36K+044CM5YWI5a+55LiA5LiL6ZyA5rGC44CN44CML3ByZS1hbGlnbuOAjeOAjOWKqOaJi+WJjeWFiOmXruaIkemXrumimOOAjeOAggo=
+---
+name: pre-align
+version: 1.0.0
+category: 需求梳理
+tags: [对齐, 需求澄清, 动手前确认, 对齐简报, 访谈, 验收标准]
+description: 任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests.
+---
+
+# Pre-Align（任务前双向对齐）
+
+## Overview
+
+在正式执行前消灭双向信息差：把「用户知道但 AI 不知道」和「AI 知道但用户不知道」两类信息，转化为双方共识，然后开工。对齐是为了更快更准地执行，不是为了拖延。
+
+产出的唯一衡量标准：**用户 10 秒内能扫完，并只回一行。** 排版不是装饰，是让"要你定的事"在视觉上赢过其余一切。
+
+## 第 0 步：分档判断（静默完成，不向用户输出判断过程）
+
+| 档位 | 条件 | 行为 |
+|---|---|---|
+| 跳过 | 任务简单、可逆、需求明确；答案可通过读代码/文件/常识自行获得 | 直接执行，不发对齐简报 |
+| 简报 | 存在 1-5 个会改变执行方案的信息缺口或歧义 | 输出**一份**对齐简报（见下），用户一轮确认后开工 |
+| 访谈 | 高风险或不可逆操作、大型重构、对外发布、跨多方需求；或用户明说「深度对齐」 | 升级为多轮访谈（见下） |
+
+拿不准档位时，就低不就高：宁可简报也不访谈，宁可跳过也不打断。
+
+## 简报模式：对齐简报（一次性输出，固定视觉语法）
+
+**排版硬约束（照抄结构，只换内容）**
+
+1. 段落标题一律 `### <图标> <段名>`，图标固定：🎯 目标｜❓ 要你定｜🧾 假设｜⚡ 盲区｜✅ 验收｜🤝 契约。**禁用【】**，禁用把说明塞进括号堆在标题后面——副信息用 `·` 追加在标题里（例：`### ❓ 要你定 · 回编号即可`）。
+2. **只有「要你定」用表格**（两列：问题 / 为什么必须先定），因为它是唯一需要用户动作的段落，必须在视觉上胜出。其余段落一律 `- N · 文本` 单行条目。
+3. 条目**一条一行**，行内长度预算：问题 ≤22 字，理由 ≤28 字，其余条目 ≤40 字。写不完是你在替用户做决定——回去砍，不要换行堆叠。
+4. 编号全局连续（跨段不复位），只用于用户可能引用的段落：目标/要你定/假设/盲区/验收。**契约段用固定 R1-R3，不占全局号**。
+5. 本轮无内容的段落**整段省略**（编号不复位）。必选段只有三个：🎯 目标、❓ 要你定、✅ 验收。
+6. 整份简报 ≤26 行（不含空行）。超预算优先砍假设与纯知识补充，不砍验收。
+7. 收口语固定一行、加粗、上方留 `---` 分隔线；除此不写任何客套。
+
+```
+### 🎯 目标 · 我理解的
+
+> 1 · 一句话说明要做什么
+> 2 · 一句话说明交付到哪里
+
+### ❓ 要你定 · 回编号即可
+
+| # | 问题 | 为什么必须先定 |
+|---|---|---|
+| 3 | 发布目标是哪个平台 | 决定我写哪套上传链路 |
+| 4 | 要不要先看预览 | 决定是否直接推 main |
+
+### 🧾 假设 · 错了喊停
+
+- 5 · 平台你稍后告知，我先只打包不发
+- 6 · 命名细节由我定，采用向后兼容方案
+
+### ⚡ 盲区
+
+- 🔴 7 · 指令里的前提不成立：实际是 ……
+- 🟡 8 · 更省路径是 ……，坚持原方案也照做
+
+### ✅ 验收 · 我起草你确认
+
+- 9 · `命令` 输出全绿
+- 10 · 线上 URL 从 404 变 200
+
+### 🤝 契约 · 自动履行无需回复
+
+R1 交付前自审最没把握的 3 处并当场验证 · R2 任何"已完成"附本次真实验证输出，不通过就如实报失败 · R3 决策日志随做随记，可回溯"当初为什么不选 X"
+
+---
+
+**回 `OK` 全按默认开工；或只回 `3=xxx 6=yyy`。**
+```
+
+结构变体（照实裁剪，不要为凑段落编内容）：无盲区就跳过 ⚡；只有 1 个待定时表格仍保留（一行也要用表，保持位置固定）；🎯 目标段只放 1 条时可以不编号写进标题行下方一行。
+
+盲区提醒分级规则：
+- 🔴 **阻断级**：用户指令含事实性错误假设、会导致数据/系统损坏、选定的技术路径走不通。必须明说并等确认。
+- 🟡 **建议级**：存在更优路径或用户可能没考虑的成本。一句话提醒，不展开说服，用户坚持则照做。
+- ⚪ **纯知识补充**：与任务成败无关的领域科普，默认不说。
+
+收口语固定为「**回 `OK` 全按默认开工；或只回 `3=xxx 6=yyy`**」——用户回 OK、按编号纠错或简答后，立即执行，不再二次确认。执行契约 R1-R3 由 AI 自动履行，交付时一并兑现（自审结果、验证证据、决策日志），不额外向用户要输入。
+
+## 访谈模式（仅高价值复杂任务）
+
+- 逐轮追问，**最多 3 轮，每轮 ≤3 问**，只问会改变方案的问题。
+- 每轮先复述已达成共识（一行，不占编号），再提出本轮问题，让用户看到进展。
+- 访谈结束输出「共识清单」，**沿用简报的同一套视觉语法**（`###` 图标标题、待确认项用表格、条目单行、全局连续编号、契约不占号），段落换成：🎯 目标｜🔒 关键约束｜🚫 已排除方案及原因｜❓ 仍待你定（表格）｜✅ 验收标准｜🤝 执行契约 R1-R3｜🛠 待执行计划。
+- **访谈模式的共识清单必须落盘**：写入当前 Plan（若处于计划流程），或存为 project/feedback 类 memory，防止长任务中途遗忘。决策日志（R3）随清单一并落盘并保持增量更新，供 subagent 与后续会话共享。简报模式不落盘。
+
+## 反模式（硬约束）
+
+- ❌ 不问能自己查到的：代码、配置文件、文件系统、公开常识——先查，查不到才问。
+- ❌ 不连续多发简报：一轮任务只出一份对齐产物；用户回答后直接进入执行。
+- ❌ 不说教：盲区提醒陈述事实和影响，不教育用户「你应该知道……」。
+- ❌ 不借对齐拖延：低风险任务不因「多问一句更保险」而暂停。
+- ❌ 不用嵌套列表/长括号把一条撑成三行——超出长度预算就拆成两条或删修饰词。
+- ❌ 不把契约段写成说明文：它是一行自我约束，不是给用户读的文档。
+- ❌ 用户已明确决定的方案，🟡 级提醒只做一次；用户坚持即照做（破坏性操作除外，破坏性操作遵循系统安全确认流程）。
+
+## 触发示例
+
+自动触发：「帮我把这个服务的配置迁移到新的部署方案」（缺口多）、「删掉这批旧数据」（不可逆）、「做个内部工具网站」（受众/形态不明）。
+不触发：「把变量 name 改成 userName」、「看一下这个文件有多少行」。
+显式触发：用户说「先对一下需求」「/pre-align」「动手前先问我问题」。
