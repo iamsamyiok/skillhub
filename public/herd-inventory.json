@@ -1,0 +1,585 @@
+{
+ "name": "herd-2026-09-29",
+ "description": "Hermes 本机技能与 MCP 全量清单勾选快照（2026-09-29）",
+ "source": "Hermes Agent (E:/Desktop/code/files-collect)",
+ "counts": {
+  "skills": 135,
+  "mcps": 8
+ },
+ "skills": [
+  {
+   "name": "agent-browser",
+   "description": "浏览器自动化 CLI：网页操作、表单填写、截图、抓取、Electron 应用自动化"
+  },
+  {
+   "name": "agently-mail",
+   "description": "邮件操作：发送、回复、转发、搜索、附件下载、收件箱管理"
+  },
+  {
+   "name": "agnes-create-image-video",
+   "description": "Agnes AI 免费 API 生成高质量图片和电影级视频"
+  },
+  {
+   "name": "aligo-aliyun-drive",
+   "description": "阿里云盘文件操作：上传、下载、搜索、删除"
+  },
+  {
+   "name": "anydoc",
+   "description": "14 种格式文档转 Markdown（Word/PPT/Excel/PDF/EPUB 等），本地 Rust 引擎秒级转换"
+  },
+  {
+   "name": "anysearch",
+   "description": "实时搜索引擎：全网搜索、垂直领域搜索、批量并行搜索、URL 内容提取"
+  },
+  {
+   "name": "apikey-image-gen",
+   "description": "通过 config.yaml 配置的 API-Key 图像服务商生成或编辑图片"
+  },
+  {
+   "name": "auto-wiki",
+   "description": "文件/文件夹内容转知识库，支持增删查、动态更新和冲突处理"
+  },
+  {
+   "name": "cloudflare-free",
+   "description": "Cloudflare 免费服务：Workers 边缘计算、Pages 托管、KV 存储、Turnstile 验证"
+  },
+  {
+   "name": "contract-review",
+   "description": "合同风险审查：识别高/中/低风险点并给出修改建议"
+  },
+  {
+   "name": "document-processing-troubleshooting",
+   "description": "Word/PDF 文档转换故障排除（python-docx 限制、依赖冲突等）"
+  },
+  {
+   "name": "download-anything",
+   "description": "全类型资源下载：电子书、论文、视频、音乐、软件、网盘搜索、种子/磁力"
+  },
+  {
+   "name": "drawio-diagrams",
+   "description": "Draw.io XML 图表：流程图、泳道图、架构图"
+  },
+  {
+   "name": "edgeone",
+   "description": "腾讯 EdgeOne Makers 平台开发：边缘函数、Cloud Functions、KV/Blob 存储、站点部署"
+  },
+  {
+   "name": "enhanced-patent-skill",
+   "description": "专利全流程：挖掘、查新、写作、质检、迭代，产出技术交底书"
+  },
+  {
+   "name": "global-search",
+   "description": "全网搜索，脚本整理输出结构化结果（标题/链接/作者/摘要）"
+  },
+  {
+   "name": "grok-image-to-video",
+   "description": "xAI Grok Imagine 将本地图片生成为短视频"
+  },
+  {
+   "name": "hermes-desktop-plugins",
+   "description": "编写 Hermes 桌面应用插件（UI 面板与命令）"
+  },
+  {
+   "name": "hermes-themes",
+   "description": "创作 Hermes 全局配色主题"
+  },
+  {
+   "name": "hyperframes",
+   "description": "HTML/CSS/JS 合成 AI 视频（片头、预告、产品宣传、HUD 视效），渲染为 MP4"
+  },
+  {
+   "name": "ima-skill",
+   "description": "腾讯 IMA 知识库/笔记管理：上传文件、收藏网页、搜索检索、笔记增删改"
+  },
+  {
+   "name": "llm-wiki-karpathy",
+   "description": "Karpathy LLM Wiki 模式知识库：LLM 增量构建维护持久 wiki，替代传统 RAG"
+  },
+  {
+   "name": "loop-engineering",
+   "description": "AI Agent 循环工程：从提示工程转向循环设计的工作模式与方法论"
+  },
+  {
+   "name": "markdown-viewer",
+   "description": "Markdown 内嵌图表：Mermaid/PlantUML 架构图、Vega 图表、信息图、UML、云网络拓扑"
+  },
+  {
+   "name": "memo-minutes-creat",
+   "description": "按区管委会标准生成 DOCX 签报/会议纪要公文"
+  },
+  {
+   "name": "minimax-image-to-video",
+   "description": "MiniMax API 图片转视频动画"
+  },
+  {
+   "name": "office-tools",
+   "description": "OfficeCLI 操作 Word/Excel/PPT：创建、读取、修改，中文场景模板"
+  },
+  {
+   "name": "patent-full-workflow",
+   "description": "专利完整工作流：业务分析→挖掘→交底书写作→查新→质检"
+  },
+  {
+   "name": "patent-mining",
+   "description": "从业务/研发/改进项目中提取可专利的创新技术方案"
+  },
+  {
+   "name": "remotion",
+   "description": "React 代码驱动 AI 视频项目：竖屏短视频、产品演示、字幕动画，渲染 MP4"
+  },
+  {
+   "name": "sciverse",
+   "description": "学术文献检索：结构化论文元数据、语义分块、图表提取，带引用级 doc_id"
+  },
+  {
+   "name": "siliconflow-asr",
+   "description": "SiliconFlow TeleSpeech 免费语音转文字，多音频格式"
+  },
+  {
+   "name": "siliconflow-ocr",
+   "description": "SiliconFlow PaddleOCR-VL 免费 PDF 文字识别（扫描件/盖章文档，94.5% 准确率）"
+  },
+  {
+   "name": "skill-installation",
+   "description": "跨平台 Hermes 技能安装、验证、排障标准化流程"
+  },
+  {
+   "name": "skill-integration",
+   "description": "技能整合方法论：分析、融合、验证现有技能创建增强型技能"
+  },
+  {
+   "name": "slide-maker",
+   "description": "制作/重设计/评审演示级 PPT：研究汇报、答辩、教学，任意语言"
+  },
+  {
+   "name": "smart-doc-parser",
+   "description": "智能文档解析：SiliconFlow OCR > OCR-and-Documents > MarkItDown 自动降级链"
+  },
+  {
+   "name": "ui-ux-pro-max",
+   "description": "UI/UX 设计智能：67 风格、161 配色、57 字体搭配、25 图表、21 技术栈"
+  },
+  {
+   "name": "unified-media-generator",
+   "description": "统一媒体生成降级链：Agnes AI > CogView > Pexels"
+  },
+  {
+   "name": "unified-search",
+   "description": "统一搜索降级链：AnySearch > Skilless Search > Global Search"
+  },
+  {
+   "name": "zhida",
+   "description": "调用知乎开放平台 zhida 接口获取结构化回答"
+  },
+  {
+   "name": "ai-agent-orchestrator",
+   "description": "多 AI CLI Agent 的 Web 编排平台：@调用、顺序执行、上下文共享、WebSocket 实时更新"
+  },
+  {
+   "name": "computer-use",
+   "description": "桌面自动化操作，后台优先，信号触发时升级交互"
+  },
+  {
+   "name": "hermes-agent",
+   "description": "Hermes Agent 的使用、配置、主题、扩展与编排"
+  },
+  {
+   "name": "merge-reconciler",
+   "description": "Agent 合并冲突的中立第三方调解"
+  },
+  {
+   "name": "benchmark-report-analysis",
+   "description": "对标报告处理与可行性分析：md 转换、业务摘编、结合公司实际评审"
+  },
+  {
+   "name": "baoyu-infographic",
+   "description": "信息图生成：21 种布局 × 21 种风格"
+  },
+  {
+   "name": "canvas-design",
+   "description": "设计哲学驱动的视觉艺术创作（海报/艺术画，PNG/PDF）"
+  },
+  {
+   "name": "design-md",
+   "description": "Google DESIGN.md 设计令牌规范的编写、校验与导出"
+  },
+  {
+   "name": "excalidraw",
+   "description": "手绘风格 Excalidraw 图表（架构/流程/时序）"
+  },
+  {
+   "name": "humanizer",
+   "description": "文本去 AI 味：去除 AI 腔调，加入真人语感"
+  },
+  {
+   "name": "p5js",
+   "description": "p5.js 创意编程：生成艺术、着色器、交互、3D"
+  },
+  {
+   "name": "pexels-api",
+   "description": "Pexels 免费高质量图片/视频素材搜索与下载"
+  },
+  {
+   "name": "popular-web-designs",
+   "description": "54 个真实设计系统参考（Stripe/Linear/Vercel 的 HTML/CSS）"
+  },
+  {
+   "name": "pretext",
+   "description": "无 DOM 的纯文本布局创意浏览器演示"
+  },
+  {
+   "name": "sketch",
+   "description": "一次性 HTML 页面草稿：2-3 个设计变体对比"
+  },
+  {
+   "name": "songwriting-and-ai-music",
+   "description": "词曲创作方法论与 Suno AI 音乐提示词"
+  },
+  {
+   "name": "touchdesigner-mcp",
+   "description": "通过 twozero MCP 控制 TouchDesigner"
+  },
+  {
+   "name": "hermes-help",
+   "description": "Hermes Agent CLI 命令完整参考手册"
+  },
+  {
+   "name": "email-inbox-triage",
+   "description": "收件箱分诊：线程优先级排序、安全草拟回复"
+  },
+  {
+   "name": "himalaya",
+   "description": "终端 IMAP/SMTP 邮件收发管理"
+  },
+  {
+   "name": "github-auth",
+   "description": "GitHub 认证配置：HTTPS token、SSH 密钥、gh CLI 登录"
+  },
+  {
+   "name": "github-issue-to-pr",
+   "description": "GitHub issue 转验证过的 PR（含真实 CI 状态）"
+  },
+  {
+   "name": "github-pr-workflow",
+   "description": "GitHub PR 生命周期：分支、提交、开启 PR、CI、合并"
+  },
+  {
+   "name": "github-repo-management",
+   "description": "GitHub 仓库管理：克隆/创建/fork、远程、发布"
+  },
+  {
+   "name": "knowledge-base",
+   "description": "IMA 知识库 API（wiki/v1）操作"
+  },
+  {
+   "name": "notes",
+   "description": "IMA 笔记 API（import_doc/append_doc 等写入操作）"
+  },
+  {
+   "name": "autocli",
+   "description": "55+ 社交/内容平台 CLI（知乎/微博/B站/Reddit/X 等），走 Chrome 登录态，网页内容提取"
+  },
+  {
+   "name": "mcp-integration",
+   "description": "Hermes 中 MCP 服务器的配置、测试与排障"
+  },
+  {
+   "name": "skilless-search",
+   "description": "Exa AI 语义搜索，中英文查询"
+  },
+  {
+   "name": "skilless.ai",
+   "description": "Skilless 工具集元技能：状态管理、诊断、更新"
+  },
+  {
+   "name": "skilless.ai-brainstorming",
+   "description": "协作对话将想法转化为完整计划"
+  },
+  {
+   "name": "skilless.ai-research",
+   "description": "多源深度研究 + 媒体抓取：yt-dlp 字幕/视频下载、FFmpeg 转码压缩"
+  },
+  {
+   "name": "skilless.ai-writing",
+   "description": "研究驱动的写作：文章、邮件、文档、报告"
+  },
+  {
+   "name": "gif-search",
+   "description": "Tenor GIF 搜索与下载"
+  },
+  {
+   "name": "heartmula",
+   "description": "HeartMuLa 类 Suno 歌曲生成（歌词+标签）"
+  },
+  {
+   "name": "songsee",
+   "description": "音频频谱/特征分析（mel/chroma/MFCC）"
+  },
+  {
+   "name": "youtube-content",
+   "description": "YouTube 字幕转摘要/推文串/博客"
+  },
+  {
+   "name": "skill-creator",
+   "description": "交互式对话创建规范 Claude Skill 文档"
+  },
+  {
+   "name": "skill-find-download",
+   "description": "SkillsMP 平台与 GitHub 上的技能查询与下载"
+  },
+  {
+   "name": "skill-from-masters",
+   "description": "从领域专家方法中提炼精华辅助创建高质量技能"
+  },
+  {
+   "name": "skill-library-maintenance",
+   "description": "技能库整合与安全删除（备份、路由合并、索引清理）"
+  },
+  {
+   "name": "skill-manager",
+   "description": "搜索/浏览/安装 31000+ 社区技能库"
+  },
+  {
+   "name": "segment-anything-model",
+   "description": "SAM 零样本图像分割（点/框/掩码）"
+  },
+  {
+   "name": "obsidian",
+   "description": "Obsidian 笔记库的读取、搜索、创建、编辑"
+  },
+  {
+   "name": "airtable",
+   "description": "Airtable REST API：记录 CRUD、筛选、upsert"
+  },
+  {
+   "name": "box",
+   "description": "Box 云文件管理：分享、搜索、元数据"
+  },
+  {
+   "name": "chinese-government-docs",
+   "description": "中文政府请示/备案公文起草"
+  },
+  {
+   "name": "document-to-action-items",
+   "description": "从文档提取带引用的义务、期限、任务清单"
+  },
+  {
+   "name": "document-transformation",
+   "description": "半结构化文档转可执行格式（清单、风险表、摘要）"
+  },
+  {
+   "name": "docx",
+   "description": "Word 文档全功能操作：创建/编辑/修订追踪/批注/格式保留"
+  },
+  {
+   "name": "field-survey-report",
+   "description": "现场调研照片+Excel 数据表转图文调研报告"
+  },
+  {
+   "name": "google-workspace",
+   "description": "Gmail/日历/Drive/Docs/Sheets 操作"
+  },
+  {
+   "name": "html-artifact-report",
+   "description": "构建含本地图片的自包含 HTML 报告"
+  },
+  {
+   "name": "maps",
+   "description": "OpenStreetMap/OSRM 地理编码、POI、路线、时区"
+  },
+  {
+   "name": "markitdown",
+   "description": "多格式转 Markdown（含图像 OCR、音频转录）"
+  },
+  {
+   "name": "meeting-action-items",
+   "description": "会议纪要转带引用的决定/负责人/工单"
+  },
+  {
+   "name": "mineru-doc-parser",
+   "description": "MinerU 文档解析：精准模式与 Agent 轻量模式，PDF/Office/图片"
+  },
+  {
+   "name": "nano-pdf",
+   "description": "自然语言提示编辑 PDF 文本"
+  },
+  {
+   "name": "notion",
+   "description": "Notion API + ntn CLI：页面、数据库、Markdown"
+  },
+  {
+   "name": "ocr-and-documents",
+   "description": "PDF/扫描件文字提取（pymupdf、marker-pdf）"
+  },
+  {
+   "name": "openhuman-llm-config",
+   "description": "OpenHuman 桌面应用 LLM 提供商配置与排障"
+  },
+  {
+   "name": "pdf",
+   "description": "PDF 工具箱：文本/表格提取、创建、合并拆分、表单填写"
+  },
+  {
+   "name": "petdex",
+   "description": "Hermes 动态桌面宠物安装与切换"
+  },
+  {
+   "name": "powerpoint",
+   "description": "python-pptx 创建/读取/编辑 PPT"
+  },
+  {
+   "name": "pptx",
+   "description": "PPT 演示文稿创建、编辑与分析"
+  },
+  {
+   "name": "pptx-check",
+   "description": "GLM-4.6V-Flash AI 检测 PPT 设计问题（布局/字体/颜色/对齐）"
+  },
+  {
+   "name": "session-librarian",
+   "description": "会话管理：按提示词查找、重命名、归档、清理"
+  },
+  {
+   "name": "teams-meeting-pipeline",
+   "description": "Teams 会议摘要、任务回放、Graph 订阅"
+  },
+  {
+   "name": "tui-widgets",
+   "description": "Hermes TUI 停靠区动态小部件开发"
+  },
+  {
+   "name": "web-deployment-china",
+   "description": "面向中国网络环境的 Web 部署（URL 汇报格式、网络兼容）"
+  },
+  {
+   "name": "weekly-review-planning",
+   "description": "每周复盘：承诺追踪、停滞工作、下周计划"
+  },
+  {
+   "name": "word-report-generation",
+   "description": "OfficeCLI 生成 Word docx 报告"
+  },
+  {
+   "name": "xlsx",
+   "description": "Excel 全功能操作：公式、格式、数据分析、可视化"
+  },
+  {
+   "name": "arxiv",
+   "description": "arXiv 论文搜索（关键词/作者/分类/ID）"
+  },
+  {
+   "name": "blogwatcher",
+   "description": "博客与 RSS/Atom 订阅源监控"
+  },
+  {
+   "name": "competitor-news-monitor",
+   "description": "指定公司重大新闻监控，输出带引用摘要"
+  },
+  {
+   "name": "doc-coauthoring",
+   "description": "结构化文档协作写作工作流（提案/技术规格/决策文档）"
+  },
+  {
+   "name": "grounded-citations",
+   "description": "答案与文档基于可验证来源的引用锚定"
+  },
+  {
+   "name": "last30days",
+   "description": "研究近 30 天各平台（Reddit/X/YouTube/HN/GitHub）真实舆情"
+  },
+  {
+   "name": "llm-wiki",
+   "description": "Karpathy LLM Wiki：互链 Markdown 知识库构建与查询"
+  },
+  {
+   "name": "patent-mining-from-business",
+   "description": "从企业业务文档系统性提取高质量专利创意（七维度+三性标准）"
+  },
+  {
+   "name": "polymarket",
+   "description": "Polymarket 预测市场查询：市场、价格、订单簿、历史"
+  },
+  {
+   "name": "web-to-markdown",
+   "description": "网页内容下载转干净 Markdown，自动清理广告"
+  },
+  {
+   "name": "wolfram",
+   "description": "Wolfram Alpha API：数学计算、科学数据、天气查询"
+  },
+  {
+   "name": "github",
+   "description": "gh CLI 操作 GitHub：PR、issue、评审、仓库、认证"
+  },
+  {
+   "name": "inspecting-hermes-desktop-dom",
+   "description": "通过 CDP 读取 Hermes 桌面应用实时 DOM/CSS"
+  },
+  {
+   "name": "npm-registry-management",
+   "description": "带访问令牌的 npm 包管理"
+  },
+  {
+   "name": "npm-registry-queries",
+   "description": "npm 包列表、版本、下载量查询"
+  },
+  {
+   "name": "disk-cleanup-windows",
+   "description": "Windows C 盘清理通用流程"
+  },
+  {
+   "name": "mcp-troubleshooting",
+   "description": "MCP 服务器调试排障：连接问题、认证错误、测试验证"
+  },
+  {
+   "name": "ocr-troubleshooting",
+   "description": "OCR 工具故障排除与降级策略（超时/网络/路径/PDF 误判）"
+  },
+  {
+   "name": "windows-system-maintenance",
+   "description": "Windows 系统维护：C 盘清理、缓存、日志、临时文件"
+  },
+  {
+   "name": "blocked-page-recovery",
+   "description": "网页抓取失败恢复：403/429、付费墙、WAF、反爬"
+  },
+  {
+   "name": "task-clarification-workflow",
+   "description": "任务模糊时的结构化提问采访，明确真实需求"
+  }
+ ],
+ "mcps": [
+  {
+   "name": "notion",
+   "description": "Notion 官方 MCP 服务器：页面/数据库/块操作"
+  },
+  {
+   "name": "MinerU",
+   "description": "MinerU 文档解析 MCP：PDF/PPT/Word/图片转 Markdown，云端 OCR/表格/公式识别"
+  },
+  {
+   "name": "modelscope-mcp-server",
+   "description": "魔搭 ModelScope MCP：创空间部署、技能广场、模型/数据集查询、MCP 服务托管"
+  },
+  {
+   "name": "drawio-mcp",
+   "description": "draw.io 图表 MCP：Mermaid/CSV/XML 生成流程图、架构图、泳道图，形状库搜索"
+  },
+  {
+   "name": "hermes-studio-api",
+   "description": "Hermes Studio API MCP：OpenAPI 操作手册查询与端点调用"
+  },
+  {
+   "name": "hermes-studio-browser",
+   "description": "Hermes Studio 浏览器控制 MCP（设备/预览操作）"
+  },
+  {
+   "name": "hermes-studio-devices",
+   "description": "Hermes Studio 设备 MCP：局域网/远程设备扫描、终端、命令执行、文件上传下载"
+  },
+  {
+   "name": "hermes-studio-use",
+   "description": "Hermes Studio 高层操作 MCP：聊天/编码任务、会话管理、用量统计、工作流 CRUD"
+  }
+ ]
+}
