@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>免费 APIs · SkillHub</title>
+<meta name="description" content="免费公开 API 合集导航：精选 GitHub 高星仓库，逐条标注免费类型与额度">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap topbar-inner">
+  <a class="logo" href="/"><span class="logo-mark">S</span>SkillHub</a>
+  <nav>
+    <a href="/">浏览</a>
+    <a href="/mcps">MCPs</a>
+    <a href="/apis" class="active">免费APIs</a>
+    <a href="/setup">密钥配置</a>
+    <a href="/ai">Agent 接入</a>
+    <a href="/admin">管理</a>
+  </nav>
+</div></header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>免费 API 合集</h1>
+    <p class="sub">精选 GitHub 高星免费 API 仓库，人工核实可达，逐条标注免费类型与额度。</p>
+    <div class="pill-row">
+      <span class="pill" id="stat-apis">— 个合集</span>
+      <span class="pill" id="stat-apis-cats">— 个分类</span>
+      <span class="pill" id="stat-apis-entries">收录 — 个 API</span>
+      <span class="pill">免费类型: 永久 / 需注册 / 限定额度 / 混合</span>
+    </div>
+    <form class="search-box" onsubmit="return false;">
+      <input id="q" type="search" placeholder="搜索合集名称、描述、标签…" autocomplete="off">
+      <button id="go">搜索</button>
+    </form>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="cat-row" id="cats"></div>
+  <div class="cat-row" id="ftypes" style="margin-top:8px"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty hidden" id="empty">没有匹配的合集，换个关键词试试。</div>
+
+  <h2 class="machines-title">Agent 取数指南</h2>
+  <p class="machines-sub">机器可读索引，Agent 可直接消费。</p>
+  <div class="for-machines">
+    <div class="machine-card">
+      <h3>JSON 数据</h3>
+      <p>全部合集的结构化清单（含仓库、星标、免费类型）。</p>
+      <code>GET /apis.json</code>
+    </div>
+    <div class="machine-card">
+      <h3>纯文本索引</h3>
+      <p>竖线分隔，一行一个合集。</p>
+      <code>GET /apis.txt</code>
+    </div>
+    <div class="machine-card">
+      <h3>条目原文</h3>
+      <p>每个合集的精选清单（Markdown 表格）。</p>
+      <code>GET /apis-md/{id}.md</code>
+    </div>
+  </div>
+</main>
+
+<footer><div class="wrap">SkillHub · 免费 API 合集 · <a href="/apis">免费APIs</a> · <a href="/admin">管理后台</a></div></footer>
+<script src="/flags.js"></script>
+<script src="/app-apis.js"></script>
+</body>
+</html>

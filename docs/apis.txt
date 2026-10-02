@@ -1,0 +1,14 @@
+# name | category | freeType | stars | description | repo | md
+
+60s | 中文服务 | 限定额度 | 5782 | 中文日常数据聚合接口：每天 60 秒看世界、全平台热搜、金价油价、奥运奖牌榜等，无需 Key；公共实例限额，支持 Docker 一键自部署。 | https://github.com/vikiboss/60s | https://iamsamyiok.github.io/skillhub/apis-md/60s.md
+awesome-free-llm-apis | AI 与大模型 | 限定额度 | 8968 | 收录 Google、Groq、Cohere、智谱、硅基流动等 16+ 提供商的永久免费 LLM API，逐模型标注上下文长度与 RPM/TPD 速率限制。 | https://github.com/mnfst/awesome-free-llm-apis | https://iamsamyiok.github.io/skillhub/apis-md/awesome-free-llm-apis.md
+awesome-free-models | AI 与大模型 | 混合 | 2373 | 免费 AI 资源全景目录：开放权重模型、免费 API 提供商、图像生成、本地推理、聊天 UI、编码助手、RAG、MCP 等 12 大板块。 | https://github.com/12britz/awesome-free-models | https://iamsamyiok.github.io/skillhub/apis-md/awesome-free-models.md
+awesome-freellm-apis | AI 与大模型 | 限定额度 | 3561 | 40+ 提供商的免费 LLM API 汇总，分"永久免费层/可续额度"两类，含 Python/Cursor/Claude Code 接入示例与 Base URL 速查表。 | https://github.com/open-free-llm-api/awesome-freellm-apis | https://iamsamyiok.github.io/skillhub/apis-md/awesome-freellm-apis.md
+free-api | 中文服务 | 混合 | 16274 | 中文免费 API 搬运目录：680+ 接口按月更新（2026-07 仍在更），每个接口有文档页与在线调试，部分需公众号取密钥。 | https://github.com/fangzesheng/free-api | https://iamsamyiok.github.io/skillhub/apis-md/free-api.md
+free-apis-site | 综合合集 | 混合 | 1313 | 基于 public-apis 数据构建的免费 API 浏览网站（React + Tailwind），支持全量/分类两种浏览模式与 Auth、CORS、HTTPS 筛选。 | https://github.com/Free-APIs/Free-APIs.github.io | https://iamsamyiok.github.io/skillhub/apis-md/free-apis-site.md
+gpt-api-free | AI 与大模型 | 限定额度 | 43505 | 免费 GPT/DeepSeek API 中转服务：注册绑定 GitHub 取 Key，免费版每周 50000 点、每天 100 次请求，国内直连低延迟。 | https://github.com/chatanywhere/GPT_API_free | https://iamsamyiok.github.io/skillhub/apis-md/gpt-api-free.md
+ip-info-api | 网络与 IP | 永久 | 1546 | 免费 IP 信息查询 API 合集：聚合 20+ 个本机 IP 与 IP 归属地查询端点，逐个标注可用性（已失效的明确标出），支持多语言。 | https://github.com/ihmily/ip-info-api | https://iamsamyiok.github.io/skillhub/apis-md/ip-info-api.md
+public-api-lists | 综合合集 | 混合 | 15972 | 免费公开 API 的社区精选清单，提供可检索网站与结构化 JSON 数据，收录 800+ API、标注鉴权与 CORS。 | https://github.com/public-api-lists/public-api-lists | https://iamsamyiok.github.io/skillhub/apis-md/public-api-lists.md
+public-apis | 综合合集 | 混合 | 485485 | 免费公开 API 合集的事实标准仓库，1400+ API 按主题分类，覆盖开发、地理、金融、游戏等 40+ 领域。 | https://github.com/public-apis/public-apis | https://iamsamyiok.github.io/skillhub/apis-md/public-apis.md
+public-apis-marcelscruz | 综合合集 | 混合 | 9533 | 社区协作维护的 public APIs 列表，每条标注 Auth 与 CORS，配套 resources.json 结构化数据与自动同步机制。 | https://github.com/marcelscruz/public-apis | https://iamsamyiok.github.io/skillhub/apis-md/public-apis-marcelscruz.md
+public-apis-n0shake | 综合合集 | 混合 | 23944 | 维护多年的老牌免费 API 目录，56 个分类按字母序组织，标注开源与付费层信息，适合按领域浏览。 | https://github.com/n0shake/Public-APIs | https://iamsamyiok.github.io/skillhub/apis-md/public-apis-n0shake.md

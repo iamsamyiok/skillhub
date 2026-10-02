@@ -207,7 +207,7 @@ function zipOf(entries) {
 function tarGz(files) {
   const blocks = [];
   for (const rel of files) {
-    const content = fs.readFileSync(path.join(SKILLS_DIR, rel.id, rel.path));
+    const content = rel.data !== undefined ? Buffer.from(rel.data) : fs.readFileSync(path.join(rel.base || SKILLS_DIR, rel.id, rel.path));
     const name = `${rel.id}/${rel.path}`;
     const header = Buffer.alloc(512);
     header.write(name.slice(0, 100), 0);
@@ -434,7 +434,7 @@ route('GET', /^\/skills\.txt$/, (req, res) => send(res, 200, skillsTxt(req), { '
 route('GET', /^\/robots\.txt$/, (req, res) => send(res, 200, 'User-agent: *\nAllow: /\n', { 'Content-Type': 'text/plain; charset=utf-8' }));
 
 // 静态文件 + 页面路由
-const PAGES = { '/': 'index.html', '/skill': 'skill.html', '/admin': 'admin.html', '/ai': 'ai.html' };
+const PAGES = { '/': 'index.html', '/skill': 'skill.html', '/admin': 'admin.html', '/ai': 'ai.html', '/apis': 'apis.html' };
 function serveStatic(res, file) {
   const full = path.join(PUBLIC_DIR, file);
   if (!full.startsWith(PUBLIC_DIR) || !fs.existsSync(full) || !fs.statSync(full).isFile()) return notFound(res);
@@ -677,5 +677,159 @@ route('DELETE', /^\/api\/mcps\/([\w.-]+)$/, (req, res, url, m) => {
   send(res, 200, { ok: true, id });
 });
 
+// 免费 API 栏目 - 引用型条目（外部 GitHub 仓库）
 
-module.exports = { server, skillDetail, allSkillIds, mcpDetail, allMcpIds, zipOf, tarGz, parseFrontmatter };
+const APIS_DIR = path.join(ROOT, 'apis');
+
+function apiDir(id) { return path.join(APIS_DIR, id); }
+
+function allApiIds() {
+  if (!fs.existsSync(APIS_DIR)) return [];
+  return fs.readdirSync(APIS_DIR).filter(id =>
+    fs.existsSync(path.join(apiDir(id), 'README.md'))
+  );
+}
+
+function apiDetail(id) {
+  const dir = apiDir(id);
+  if (!ID_RE.test(id) || !fs.existsSync(path.join(dir, 'README.md'))) return null;
+
+  const meta = META();
+  const m = meta.apis?.[id] || {};
+  const readme = fs.readFileSync(path.join(dir, 'README.md'), 'utf8');
+  const fm = parseFrontmatter(readme);
+
+  return {
+    id,
+    name: m.name || id,
+    description: m.description || fm.description || '',
+    version: m.version || fm.version || '1.0.0',
+    category: m.category || fm.category || '综合合集',
+    tags: m.tags || fm.tags || [],
+    repo: m.repo || fm.repo || '',
+    stars: m.stars ?? fm.stars ?? 0,
+    pushedAt: m.pushedAt || fm.pushedAt || '',
+    verifiedAt: m.verifiedAt || fm.verifiedAt || '',
+    freeType: m.freeType || fm.freeType || '混合',
+    downloads: m.downloads || 0,
+    updatedAt: m.updatedAt || new Date().toISOString(),
+    readme,
+    md: readme,
+    files: [{ path: 'README.md', size: Buffer.byteLength(readme) }],
+  };
+}
+
+// API 条目列表（检索）
+route('GET', /^\/api\/apis(\?.*)?$/, (req, res, url) => {
+  const q = (url.searchParams.get('q') || '').toLowerCase();
+  const cat = url.searchParams.get('category') || '';
+  const ft = url.searchParams.get('freeType') || '';
+  const items = [];
+  for (const id of allApiIds()) {
+    const s = apiDetail(id);
+    if (!s) continue;
+    if (cat && s.category !== cat) continue;
+    if (ft && s.freeType !== ft) continue;
+    if (q) {
+      const hay = `${s.name} ${s.description} ${s.category} ${s.freeType} ${(s.tags || []).join(' ')}`.toLowerCase();
+      if (!hay.includes(q)) continue;
+    }
+    items.push({
+      id: s.id, name: s.name, description: s.description, version: s.version,
+      category: s.category, tags: s.tags, repo: s.repo, stars: s.stars,
+      pushedAt: s.pushedAt, verifiedAt: s.verifiedAt, freeType: s.freeType,
+      downloads: s.downloads, updatedAt: s.updatedAt
+    });
+  }
+  items.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+  const categories = [...new Set(Object.values(META().apis || {}).map((s) => s.category).filter(Boolean))].sort();
+  const freeTypes = [...new Set(Object.values(META().apis || {}).map((s) => s.freeType).filter(Boolean))].sort();
+  send(res, 200, { total: items.length, categories, freeTypes, items });
+});
+
+// API 条目详情
+route('GET', /^\/api\/apis\/([\w.-]+)$/, (req, res, url, m) => {
+  const s = apiDetail(m[1]);
+  if (!s) return notFound(res, 'api not found');
+  send(res, 200, s);
+});
+
+// API 条目下载（打包 README.md）
+route('GET', /^\/api\/apis\/([\w.-]+)\/download$/, (req, res, url, m) => {
+  const s = apiDetail(m[1]);
+  if (!s) return notFound(res, 'api not found');
+  const wantTgz = url.searchParams.get('format') === 'tgz';
+  const buf = wantTgz
+    ? tarGz([{ id: s.id, path: 'README.md', base: APIS_DIR }])
+    : zipOf([{ name: `${s.id}/README.md`, data: Buffer.from(s.readme, 'utf8') }]);
+  const meta = META();
+  if (meta.apis?.[s.id]) meta.apis[s.id].downloads = (meta.apis[s.id].downloads || 0) + 1;
+  saveMeta(meta);
+  const filename = wantTgz ? `${s.id}.tar.gz` : `${s.id}.zip`;
+  send(res, 200, buf, {
+    'Content-Type': wantTgz ? 'application/gzip' : 'application/zip',
+    'Content-Disposition': `attachment; filename="${filename}"`,
+    'Access-Control-Allow-Origin': '*',
+  });
+});
+
+// API 条目创建/更新（需登录）
+route('POST', /^\/api\/apis$/, async (req, res) => {
+  if (!isManager(req)) return send(res, 401, { error: '需要登录' });
+  let body;
+  try { body = JSON.parse((await readBody(req)).toString('utf8')); } catch { return send(res, 400, { error: 'JSON 解析失败' }); }
+
+  const id = String(body.id || body.name || '').toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^[._-]+/, '').slice(0, 64);
+  if (!ID_RE.test(id)) return send(res, 400, { error: 'id 非法' });
+  if (!body.files || !body.files['README.md']) return send(res, 400, { error: 'files 必须包含 README.md' });
+  const fm = parseFrontmatter(body.files['README.md']);
+  if (!fm.repo || !/^https:\/\/github\.com\//.test(fm.repo)) return send(res, 400, { error: 'frontmatter 必须含合法 repo（GitHub 仓库地址）' });
+  if (!['永久', '需注册', '限定额度', '混合'].includes(fm.freeType || body.freeType || '')) return send(res, 400, { error: 'freeType 必须为 永久/需注册/限定额度/混合 之一' });
+
+  const dir = apiDir(id);
+  const existed = fs.existsSync(path.join(dir, 'README.md'));
+  fs.mkdirSync(dir, { recursive: true });
+
+  for (const [rel, content] of Object.entries(body.files)) {
+    const norm = path.normalize(rel).replace(/^([.][.](\/|\\|$))+/, '');
+    const full = path.join(dir, norm);
+    if (!full.startsWith(dir + path.sep)) return send(res, 400, { error: `文件路径非法: ${rel}` });
+    fs.mkdirSync(path.dirname(full), { recursive: true });
+    fs.writeFileSync(full, typeof content === 'string' ? content : String(content));
+  }
+
+  const meta = META();
+  if (!meta.apis) meta.apis = {};
+  const prev = meta.apis[id] || {};
+  meta.apis[id] = {
+    version: fm.version || body.version || prev.version || '1.0.0',
+    category: fm.category || body.category || prev.category || '综合合集',
+    tags: (fm.tags ? String(fm.tags).split(/,\s*/) : body.tags) || prev.tags || [],
+    description: fm.description || body.description || prev.description || '',
+    repo: fm.repo,
+    stars: Number(fm.stars) || prev.stars || 0,
+    pushedAt: fm.pushedAt || prev.pushedAt || '',
+    verifiedAt: fm.verifiedAt || new Date().toISOString().slice(0, 10),
+    freeType: fm.freeType || body.freeType || prev.freeType || '混合',
+    downloads: prev.downloads || 0,
+    createdAt: prev.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  saveMeta(meta);
+  send(res, existed ? 200 : 201, { ok: true, id, name: id, updated: existed });
+});
+
+// API 条目删除（需登录）
+route('DELETE', /^\/api\/apis\/([\w.-]+)$/, (req, res, url, m) => {
+  if (!isManager(req)) return send(res, 401, { error: '需要登录' });
+  const id = m[1];
+  if (!apiDetail(id)) return notFound(res, 'api not found');
+  fs.rmSync(apiDir(id), { recursive: true, force: true });
+  const meta = META();
+  if (meta.apis) delete meta.apis[id];
+  saveMeta(meta);
+  send(res, 200, { ok: true, id });
+});
+
+
+module.exports = { server, skillDetail, allSkillIds, mcpDetail, allMcpIds, apiDetail, allApiIds, zipOf, tarGz, parseFrontmatter };

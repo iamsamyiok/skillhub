@@ -9,12 +9,13 @@
 | 站点 | https://iamsamyiok.github.io/skillhub（GitHub Pages，由 **docs/** 目录部署，分支 main） |
 | 技能源 | `skills/{id}/`，一个技能一个目录，**必须含 SKILL.md**，可附带 LICENSE/脚本/资源（会被打包进 zip/tar.gz） |
 | MCP 源 | `mcps/{id}/`，一个 MCP 一个目录，**必须含 README.md**，可附带 scripts/package.json（会被打包进 zip/tar.gz） |
-| 元数据 | `data/meta.json` 的 `skills.{id}` 条目（category/tags/downloads/createdAt/updatedAt/version） |
+| 免费API源 | `apis/{id}/`，一个条目一个目录，**必须含 README.md**（frontmatter 含 repo/stars/pushedAt/verifiedAt/freeType） |
+| 元数据 | `data/meta.json` 的 `skills.{id}` / `mcps.{id}` / `apis.{id}` 条目 |
 | 构建 | `node export-static.js --site-url https://iamsamyiok.github.io/skillhub --repo-url https://github.com/iamsamyiok/skillhub` → **清空重建 docs/** |
-| 测试 | `npm test`（= test/health.test.js + test/validate_skill.test.js） |
-| 关键实现 | `server.js`（parseFrontmatter / skillDetail / allSkillIds）、`export-static.js`、`seeds.js` |
+| 测试 | `npm test`（= test/health.test.js + test/validate_skill.test.js + test/validate_api.test.js） |
+| 关键实现 | `server.js`（parseFrontmatter / skillDetail / allSkillIds / apiDetail / allApiIds）、`export-static.js`、`seeds.js` |
 
-构建产出的 docs/ 内容包括：`skills-md/{id}.md`（SKILL.md 原文）、`mcps-md/{id}.md`（MCP README）、`downloads/{id}.zip` 与 `.tar.gz`、`skills.json`、`data/skills.json`、`data/mcps.json`、`llms.txt`、`skills.txt`、`index.html`（内联技能清单 + skills-data JSON）、`mcps.html`（MCP 列表页）、`AGENTS.md`（安装说明）。
+构建产出的 docs/ 内容包括：`skills-md/{id}.md`（SKILL.md 原文）、`mcps-md/{id}.md`（MCP README）、`apis-md/{id}.md`（免费API条目原文）、`downloads/{id}.zip` 与 `.tar.gz`、`skills.json`、`apis.json`、`data/skills.json`、`data/mcps.json`、`data/apis.json`、`llms.txt`、`skills.txt`、`apis.txt`、`index.html`（内联技能清单 + skills-data JSON）、`mcps.html`（MCP 列表页）、`apis.html`（免费API列表页）、`AGENTS.md`（安装说明）。
 
 ## 二、上架新技能：必做清单（按序执行，缺一不可）
 
@@ -126,3 +127,53 @@ TOKEN="<用户的 GitHub token>" git -c credential.helper='!f() { echo "username
 - **改**：同"上架"流程 —— 改源文件或 meta.json → 重建 docs/ → 测试 → 提交推送。
 - **删**：删 `skills/{id}/` 与 meta.json 条目 → 重建 docs/（会清掉对应 zip/md）→ 测试 → 提交推送。
 - 批量新增多个技能时，每个技能独立完成 1–3 步后统一构建一次、逐项验证再推送。
+
+## 六、上架免费 API 条目：必做清单
+
+免费 API 栏目是**引用型**条目：条目本身只含一份 README.md，内容是对外部 GitHub 仓库的精选转述（分类导航 + 精选表单），源仓库才是数据本体。
+
+### 1. 候选核实（硬门禁）
+
+用 `node tools/verify-api-repos.js` 全量核实，或按下列标准逐项人工确认后再上架：
+
+- 仓库存在、未归档、README 可访问（HTTP 200）；
+- 最近 12 个月内有推送；超 6 个月但未超 12 个月的，条目正文必须写明「低活跃」；
+- 抄录 stars 与最近推送日期（frontmatter 要写真实值，核实日写当天）。
+
+### 2. 添加条目目录 `apis/{id}/`
+
+- id 过 ID_RE（`^[a-z0-9][a-z0-9._-]{0,63}$`），与源仓库语义对齐（如 `public-apis`、`60s`）。
+- 只需一个 `README.md`，结构固定：
+
+```markdown
+---
+name: {id}
+version: 1.0.0
+category: 综合合集|AI 与大模型|中文服务|网络与 IP
+tags: [免费API, ...]
+description: 单行描述，200 字内，含规模数字
+repo: https://github.com/{owner}/{repo}
+stars: 12345
+pushedAt: YYYY-MM-DD
+verifiedAt: YYYY-MM-DD
+freeType: 永久|需注册|限定额度|混合
+---
+# {id} —— 标题
+> 引用仓库：[...](repo) · N 星 · 最近推送 ... · 核实于 ...
+> 免费类型主基调：**XX**
+免费类型图例：...
+## 分类导航（大仓适用）/ ## XX表单
+| API | 分类 | 描述 | 免费类型 | 链接 |   ← 五列表头固定
+## 使用建议
+```
+
+- 免费类型只允许四种：`永久`（无需注册）/`需注册`/`限定额度`（必须带括号额度说明）/`混合`。
+- 表内每行的免费类型列同样只允许这四种前缀；描述截断保持单行。
+
+### 3. 更新 `data/meta.json` 的 `apis.{id}`
+
+字段与 frontmatter 一一对应（repo/stars/pushedAt/verifiedAt/freeType 必须同值），另加 `downloads: 0`、`createdAt`、`updatedAt`。
+
+### 4. 构建 / 测试 / 推送
+
+与技能上架相同：`node export-static.js --site-url ... --repo-url ...` → `npm test` → 提交推送。新增产物：`apis-md/{id}.md`、`downloads/{id}.zip|.tar.gz`、`apis.json`、`data/apis.json`、`apis.txt`、`apis.html`。

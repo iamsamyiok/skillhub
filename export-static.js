@@ -4,7 +4,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { skillDetail, allSkillIds, mcpDetail, allMcpIds, zipOf, tarGz, parseFrontmatter } = require('./server.js');
+const { skillDetail, allSkillIds, mcpDetail, allMcpIds, apiDetail, allApiIds, zipOf, tarGz, parseFrontmatter } = require('./server.js');
 
 const argv = process.argv.slice(2);
 const argOf = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; };
@@ -14,10 +14,10 @@ const ROOT = __dirname;
 const OUT = path.join(ROOT, 'docs');
 
 fs.rmSync(OUT, { recursive: true, force: true });
-for (const d of ['data', 'skills-md', 'mcps-md', 'downloads', 'css']) fs.mkdirSync(path.join(OUT, d), { recursive: true });
+for (const d of ['data', 'skills-md', 'mcps-md', 'apis-md', 'downloads', 'css']) fs.mkdirSync(path.join(OUT, d), { recursive: true });
 
 /* 资源直接复制 */
-for (const f of ['style.css', 'app.js', 'app-mcps.js', 'setup.js']) fs.copyFileSync(path.join(ROOT, 'public', f), path.join(OUT, f));
+for (const f of ['style.css', 'app.js', 'app-mcps.js', 'app-apis.js', 'setup.js']) fs.copyFileSync(path.join(ROOT, 'public', f), path.join(OUT, f));
 
 /* flags：静态模式 */
 fs.writeFileSync(path.join(OUT, 'flags.js'), "window.SKILLHUB_STATIC = true;\nwindow.SKILLHUB_BASE = './';\n");
@@ -26,10 +26,12 @@ fs.writeFileSync(path.join(OUT, 'flags.js'), "window.SKILLHUB_STATIC = true;\nwi
 function rewrite(html) {
   return html
     .replace(/href="\/style\.css"/g, 'href="./style.css"')
-    .replace(/src="\/(flags|app|app-mcps|setup)\.js"/g, 'src="./$1.js"')
+    .replace(/src="\/(flags|app|app-mcps|app-apis|setup)\.js"/g, 'src="./$1.js"')
     .replace(/href="\//g, 'href="./')
     .replace(/href="\.\/"/g, 'href="./index.html"')
     .replace(/href="\.\/skill\?id=/g, 'href="./skill.html?id=')
+    .replace(/href="\.\/mcps"/g, 'href="./mcps.html"')
+    .replace(/href="\.\/apis"/g, 'href="./apis.html"')
     .replace(/href="\.\/ai"/g, 'href="./ai.html"')
     .replace(/href="\.\/setup"/g, 'href="./setup.html"')
     .replace(/href="\.\/admin"/g, REPO_URL ? `href="${REPO_URL}#自托管"` : 'href="./index.html"')
@@ -74,7 +76,7 @@ const base = SITE_URL || '.';
 }
 
 /* 页面 */
-for (const f of ['index.html', 'skill.html', 'ai.html', 'setup.html', 'mcps.html']) {
+for (const f of ['index.html', 'skill.html', 'ai.html', 'setup.html', 'mcps.html', 'apis.html']) {
   fs.writeFileSync(path.join(OUT, f), rewrite(fs.readFileSync(path.join(ROOT, 'public', f), 'utf8')));
 }
 
@@ -109,8 +111,10 @@ fs.writeFileSync(path.join(OUT, 'AGENTS.md'), [
   '# SkillHub — Agent Guide', '',
   `- 完整技能清单（JSON）: ${base}/skills.json`,
   `- 完整技能清单（文本）: ${base}/llms.txt · ${base}/skills.txt`,
+  `- 免费 API 合集清单（JSON）: ${base}/apis.json · ${base}/apis.txt`,
   `- 下载安装: ${base}/downloads/{id}.zip（解压到 ~/.claude/skills/ 或项目 .claude/skills/）`,
   `- SKILL.md 原文: ${base}/skills-md/{id}.md`,
+  `- 免费API条目原文: ${base}/apis-md/{id}.md`,
   '', `共 ${agentItems.length} 个 skill: ${agentItems.map((s) => s.id).join(', ')}`, '',
 ].join('\n'));
 fs.writeFileSync(path.join(OUT, 'skills.json'), JSON.stringify({ total: agentItems.length, categories, site: base || '.', skills: agentItems }, null, 2));
@@ -136,19 +140,25 @@ fs.writeFileSync(path.join(OUT, 'data', 'mcps.json'), JSON.stringify({ total: mc
 for (const s of mcpItems.map((x) => mcpDetail(x.id))) {
   fs.writeFileSync(path.join(OUT, 'mcps-md', `${s.id}.md`), s.readme);
   if (s.files.length) {
-    try {
-      fs.mkdirSync(path.join(OUT, 'downloads'), { recursive: true });
+  try {
+    fs.mkdirSync(path.join(OUT, 'downloads'), { recursive: true });
     fs.writeFileSync(path.join(OUT, 'downloads', `${s.id}.zip`), zipOf(s.files.map((f) => ({ name: `${s.id}/${f.path}`, data: fs.readFileSync(path.join(ROOT, 'mcps', s.id, f.path)) }))));
-      fs.writeFileSync(path.join(OUT, 'downloads', `${s.id}.tar.gz`), tarGz(s.files.map((f) => ({ id: s.id, path: f.path }))));
-    } catch (e) {
-      console.warn(`Warning: Failed to package ${s.id}: ${e.message}`);
-    }
+    fs.writeFileSync(path.join(OUT, 'downloads', `${s.id}.tar.gz`), tarGz(s.files.map((f) => ({ id: s.id, path: f.path, base: path.join(ROOT, 'mcps') }))));
+  } catch (e) {
+    console.warn(`Warning: Failed to package ${s.id}: ${e.message}`);
+  }
   }
 }
 
 /* 更新 llms.txt 添加 MCP 索引 */
+/* API 数据：catalog（先于 llms.txt 收集） */
+const apiItems = [];
+for (const id of allApiIds()) {
+  const s = apiDetail(id);
+  apiItems.push({ id: s.id, name: s.name, description: s.description, version: s.version, category: s.category, tags: s.tags, repo: s.repo, stars: s.stars, pushedAt: s.pushedAt, verifiedAt: s.verifiedAt, freeType: s.freeType, downloads: s.downloads, updatedAt: s.updatedAt });
+}
 {
-  const lines = ['# SkillHub', '', `> 面向人类与 AI Agent 的技能（skill）和 MCP server 下载站。Skill: ${base}/skills-md/{id}.md + ${base}/downloads/{id}.zip；MCP: ${base}/mcps-md/{id}.md + ${base}/api/mcps/{id}/config。完整 API 与管理功能请自托管本仓库。`, ''];
+  const lines = ['# SkillHub', '', `> 面向人类与 AI Agent 的技能（skill）、MCP server 与免费 API 合集下载站。Skill: ${base}/skills-md/{id}.md + ${base}/downloads/{id}.zip；MCP: ${base}/mcps-md/{id}.md + ${base}/api/mcps/{id}/config；免费API: ${base}/apis-md/{id}.md。完整 API 与管理功能请自托管本仓库。`, ''];
   if (items.length) {
     lines.push('## Skills', '');
     for (const s of items) lines.push(`- [${s.name}](${base}/skills-md/${s.id}.md): ${s.description.slice(0, 160)}\n  - 下载: ${base}/downloads/${s.id}.zip`);
@@ -157,6 +167,11 @@ for (const s of mcpItems.map((x) => mcpDetail(x.id))) {
   if (mcpItems.length) {
     lines.push('## MCPS', '');
     for (const s of mcpItems) lines.push(`- [${s.name} (MCP)](${base}/mcps-md/${s.id}.md): ${s.description.slice(0, 160)}\n  - 配置: ${base}/api/mcps/${s.id}/config\n  - 下载: ${base}/downloads/${s.id}.zip`);
+    lines.push('');
+  }
+  if (apiItems.length) {
+    lines.push('## Free APIs', '');
+    for (const s of apiItems) lines.push(`- [${s.name} (免费API·${s.freeType})](${base}/apis-md/${s.id}.md): ${s.description.slice(0, 160)}\n  - 仓库: ${s.repo} · 数据: ${base}/apis.json`);
     lines.push('');
   }
   if (REPO_URL) lines.push('## Source', '', `- 仓库（自托管 node server.js）: ${REPO_URL}`, '');
@@ -170,5 +185,39 @@ const agentItemsWithMcp = [
 ];
 fs.writeFileSync(path.join(OUT, 'skills.json'), JSON.stringify({ total: agentItemsWithMcp.length, categories, site: base || '.', skills: agentItemsWithMcp }, null, 2));
 
+// 免费 API 栏目静态导出补丁
 
-console.log(`静态导出完成 → ${OUT}（${items.length} 个技能，${SITE_URL || '相对路径模式'}）`);
+const apiCategories = [...new Set(apiItems.map((s) => s.category))].sort();
+const apiFreeTypes = [...new Set(apiItems.map((s) => s.freeType))].sort();
+fs.writeFileSync(path.join(OUT, 'data', 'apis.json'), JSON.stringify({ total: apiItems.length, categories: apiCategories, freeTypes: apiFreeTypes, items: apiItems }, null, 2));
+
+/* 每个 API 条目：README 原文 + 预打包 zip/tgz */
+for (const s of apiItems.map((x) => apiDetail(x.id))) {
+  fs.writeFileSync(path.join(OUT, 'apis-md', `${s.id}.md`), s.readme);
+  try {
+    fs.mkdirSync(path.join(OUT, 'downloads'), { recursive: true });
+    fs.writeFileSync(path.join(OUT, 'downloads', `${s.id}.zip`), zipOf([{ name: `${s.id}/README.md`, data: Buffer.from(s.readme, 'utf8') }]));
+    fs.writeFileSync(path.join(OUT, 'downloads', `${s.id}.tar.gz`), tarGz([{ id: s.id, path: 'README.md', base: path.join(ROOT, 'apis') }]));
+  } catch (e) {
+    console.warn(`Warning: Failed to package ${s.id}: ${e.message}`);
+  }
+}
+
+/* 根级 apis.json（Agent 直接取用的纯数据端点，含 md/zip 绝对地址） */
+const apiAgentItems = apiItems.map((s) => ({
+  ...s,
+  type: 'api',
+  md: `${base}/apis-md/${s.id}.md`,
+  zip: `${base}/downloads/${s.id}.zip`,
+  tgz: `${base}/downloads/${s.id}.tar.gz`,
+}));
+fs.writeFileSync(path.join(OUT, 'apis.json'), JSON.stringify({ total: apiAgentItems.length, categories: apiCategories, freeTypes: apiFreeTypes, site: base || '.', apis: apiAgentItems }, null, 2));
+
+/* apis.txt：竖线分隔的纯文本索引 */
+{
+  const lines = ['# name | category | freeType | stars | description | repo | md', ''];
+  for (const s of apiAgentItems) lines.push(`${s.name} | ${s.category} | ${s.freeType} | ${s.stars} | ${s.description.replace(/\|/g, '，')} | ${s.repo} | ${s.md}`);
+  fs.writeFileSync(path.join(OUT, 'apis.txt'), lines.join('\n') + '\n');
+}
+
+console.log(`静态导出完成 → ${OUT}（${items.length} 个技能，${mcpItems.length} 个 MCP，${apiItems.length} 个免费API条目，${SITE_URL || '相对路径模式'}）`);

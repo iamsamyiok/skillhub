@@ -786,5 +786,249 @@
       "args": [],
       "env": {}
     }
+  },
+  "apis": {
+    "public-apis": {
+      "name": "public-apis",
+      "version": "1.0.0",
+      "category": "综合合集",
+      "tags": [
+        "免费API",
+        "综合合集",
+        "英文",
+        "1400+API"
+      ],
+      "description": "免费公开 API 合集的事实标准仓库，1400+ API 按主题分类，覆盖开发、地理、金融、游戏等 40+ 领域。",
+      "repo": "https://github.com/public-apis/public-apis",
+      "stars": 485485,
+      "pushedAt": "2026-10-01",
+      "verifiedAt": "2026-10-02",
+      "freeType": "混合",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    },
+    "public-api-lists": {
+      "name": "public-api-lists",
+      "version": "1.0.0",
+      "category": "综合合集",
+      "tags": [
+        "免费API",
+        "综合合集",
+        "JSON数据",
+        "无需注册"
+      ],
+      "description": "免费公开 API 的社区精选清单，提供可检索网站与结构化 JSON 数据，收录 800+ API、标注鉴权与 CORS。",
+      "repo": "https://github.com/public-api-lists/public-api-lists",
+      "stars": 15972,
+      "pushedAt": "2026-09-14",
+      "verifiedAt": "2026-10-02",
+      "freeType": "混合",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    },
+    "public-apis-n0shake": {
+      "name": "public-apis-n0shake",
+      "version": "1.0.0",
+      "category": "综合合集",
+      "tags": [
+        "免费API",
+        "综合合集",
+        "英文"
+      ],
+      "description": "维护多年的老牌免费 API 目录，56 个分类按字母序组织，标注开源与付费层信息，适合按领域浏览。",
+      "repo": "https://github.com/n0shake/Public-APIs",
+      "stars": 23944,
+      "pushedAt": "2026-05-03",
+      "verifiedAt": "2026-10-02",
+      "freeType": "混合",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    },
+    "public-apis-marcelscruz": {
+      "name": "public-apis-marcelscruz",
+      "version": "1.0.0",
+      "category": "综合合集",
+      "tags": [
+        "免费API",
+        "综合合集",
+        "Auth标注",
+        "CORS标注"
+      ],
+      "description": "社区协作维护的 public APIs 列表，每条标注 Auth 与 CORS，配套 resources.json 结构化数据与自动同步机制。",
+      "repo": "https://github.com/marcelscruz/public-apis",
+      "stars": 9533,
+      "pushedAt": "2026-10-02",
+      "verifiedAt": "2026-10-02",
+      "freeType": "混合",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    },
+    "free-apis-site": {
+      "name": "free-apis-site",
+      "version": "1.0.0",
+      "category": "综合合集",
+      "tags": [
+        "免费API",
+        "可视化",
+        "React站点",
+        "低活跃"
+      ],
+      "description": "基于 public-apis 数据构建的免费 API 浏览网站（React + Tailwind），支持全量/分类两种浏览模式与 Auth、CORS、HTTPS 筛选。",
+      "repo": "https://github.com/Free-APIs/Free-APIs.github.io",
+      "stars": 1313,
+      "pushedAt": "2025-02-08",
+      "verifiedAt": "2026-10-02",
+      "freeType": "混合",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    },
+    "awesome-free-llm-apis": {
+      "name": "awesome-free-llm-apis",
+      "version": "1.0.0",
+      "category": "AI 与大模型",
+      "tags": [
+        "免费API",
+        "大模型",
+        "LLM",
+        "APIKey",
+        "永久免费层"
+      ],
+      "description": "收录 Google、Groq、Cohere、智谱、硅基流动等 16+ 提供商的永久免费 LLM API，逐模型标注上下文长度与 RPM/TPD 速率限制。",
+      "repo": "https://github.com/mnfst/awesome-free-llm-apis",
+      "stars": 8968,
+      "pushedAt": "2026-10-02",
+      "verifiedAt": "2026-10-02",
+      "freeType": "限定额度",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    },
+    "awesome-freellm-apis": {
+      "name": "awesome-freellm-apis",
+      "version": "1.0.0",
+      "category": "AI 与大模型",
+      "tags": [
+        "免费API",
+        "大模型",
+        "LLM",
+        "实操指南"
+      ],
+      "description": "40+ 提供商的免费 LLM API 汇总，分\"永久免费层/可续额度\"两类，含 Python/Cursor/Claude Code 接入示例与 Base URL 速查表。",
+      "repo": "https://github.com/open-free-llm-api/awesome-freellm-apis",
+      "stars": 3561,
+      "pushedAt": "2026-10-02",
+      "verifiedAt": "2026-10-02",
+      "freeType": "限定额度",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    },
+    "awesome-free-models": {
+      "name": "awesome-free-models",
+      "version": "1.0.0",
+      "category": "AI 与大模型",
+      "tags": [
+        "免费API",
+        "大模型",
+        "开放权重",
+        "本地部署"
+      ],
+      "description": "免费 AI 资源全景目录：开放权重模型、免费 API 提供商、图像生成、本地推理、聊天 UI、编码助手、RAG、MCP 等 12 大板块。",
+      "repo": "https://github.com/12britz/awesome-free-models",
+      "stars": 2373,
+      "pushedAt": "2026-10-02",
+      "verifiedAt": "2026-10-02",
+      "freeType": "混合",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    },
+    "gpt-api-free": {
+      "name": "gpt-api-free",
+      "version": "1.0.0",
+      "category": "AI 与大模型",
+      "tags": [
+        "免费API",
+        "GPT",
+        "OpenAI兼容",
+        "国内直连",
+        "中转"
+      ],
+      "description": "免费 GPT/DeepSeek API 中转服务：注册绑定 GitHub 取 Key，免费版每周 50000 点、每天 100 次请求，国内直连低延迟。",
+      "repo": "https://github.com/chatanywhere/GPT_API_free",
+      "stars": 43505,
+      "pushedAt": "2026-09-07",
+      "verifiedAt": "2026-10-02",
+      "freeType": "限定额度",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    },
+    "60s": {
+      "name": "60s",
+      "version": "1.0.0",
+      "category": "中文服务",
+      "tags": [
+        "免费API",
+        "中文",
+        "热搜",
+        "金价",
+        "自部署"
+      ],
+      "description": "中文日常数据聚合接口：每天 60 秒看世界、全平台热搜、金价油价、奥运奖牌榜等，无需 Key；公共实例限额，支持 Docker 一键自部署。",
+      "repo": "https://github.com/vikiboss/60s",
+      "stars": 5782,
+      "pushedAt": "2026-09-10",
+      "verifiedAt": "2026-10-02",
+      "freeType": "限定额度",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    },
+    "free-api": {
+      "name": "free-api",
+      "version": "1.0.0",
+      "category": "中文服务",
+      "tags": [
+        "免费API",
+        "中文",
+        "月更",
+        "在线调用"
+      ],
+      "description": "中文免费 API 搬运目录：680+ 接口按月更新（2026-07 仍在更），每个接口有文档页与在线调试，部分需公众号取密钥。",
+      "repo": "https://github.com/fangzesheng/free-api",
+      "stars": 16274,
+      "pushedAt": "2026-07-25",
+      "verifiedAt": "2026-10-02",
+      "freeType": "混合",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    },
+    "ip-info-api": {
+      "name": "ip-info-api",
+      "version": "1.0.0",
+      "category": "网络与 IP",
+      "tags": [
+        "免费API",
+        "IP查询",
+        "归属地",
+        "失效标注"
+      ],
+      "description": "免费 IP 信息查询 API 合集：聚合 20+ 个本机 IP 与 IP 归属地查询端点，逐个标注可用性（已失效的明确标出），支持多语言。",
+      "repo": "https://github.com/ihmily/ip-info-api",
+      "stars": 1546,
+      "pushedAt": "2026-09-29",
+      "verifiedAt": "2026-10-02",
+      "freeType": "永久",
+      "downloads": 0,
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "updatedAt": "2026-10-02T00:00:00.000Z"
+    }
   }
 }

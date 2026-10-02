@@ -1,6 +1,6 @@
 # SkillHub
 
-> 面向人类与 AI Agent 的技能（skill）和 MCP server 下载站。Skill: https://iamsamyiok.github.io/skillhub/skills-md/{id}.md + https://iamsamyiok.github.io/skillhub/downloads/{id}.zip；MCP: https://iamsamyiok.github.io/skillhub/mcps-md/{id}.md + https://iamsamyiok.github.io/skillhub/api/mcps/{id}/config。完整 API 与管理功能请自托管本仓库。
+> 面向人类与 AI Agent 的技能（skill）、MCP server 与免费 API 合集下载站。Skill: https://iamsamyiok.github.io/skillhub/skills-md/{id}.md + https://iamsamyiok.github.io/skillhub/downloads/{id}.zip；MCP: https://iamsamyiok.github.io/skillhub/mcps-md/{id}.md + https://iamsamyiok.github.io/skillhub/api/mcps/{id}/config；免费API: https://iamsamyiok.github.io/skillhub/apis-md/{id}.md。完整 API 与管理功能请自托管本仓库。
 
 ## Skills
 
@@ -132,6 +132,33 @@
 - [weather-mcp (MCP)](https://iamsamyiok.github.io/skillhub/mcps-md/weather-mcp.md): Weather MCP Server — 提供实时天气查询、预报、空气质量等工具。支持 stdio/SSE/HTTP 传输方式，兼容 Claude Desktop、Cursor、VSCode 等主流编辑器。
   - 配置: https://iamsamyiok.github.io/skillhub/api/mcps/weather-mcp/config
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/weather-mcp.zip
+
+## Free APIs
+
+- [60s (免费API·限定额度)](https://iamsamyiok.github.io/skillhub/apis-md/60s.md): 中文日常数据聚合接口：每天 60 秒看世界、全平台热搜、金价油价、奥运奖牌榜等，无需 Key；公共实例限额，支持 Docker 一键自部署。
+  - 仓库: https://github.com/vikiboss/60s · 数据: https://iamsamyiok.github.io/skillhub/apis.json
+- [awesome-free-llm-apis (免费API·限定额度)](https://iamsamyiok.github.io/skillhub/apis-md/awesome-free-llm-apis.md): 收录 Google、Groq、Cohere、智谱、硅基流动等 16+ 提供商的永久免费 LLM API，逐模型标注上下文长度与 RPM/TPD 速率限制。
+  - 仓库: https://github.com/mnfst/awesome-free-llm-apis · 数据: https://iamsamyiok.github.io/skillhub/apis.json
+- [awesome-free-models (免费API·混合)](https://iamsamyiok.github.io/skillhub/apis-md/awesome-free-models.md): 免费 AI 资源全景目录：开放权重模型、免费 API 提供商、图像生成、本地推理、聊天 UI、编码助手、RAG、MCP 等 12 大板块。
+  - 仓库: https://github.com/12britz/awesome-free-models · 数据: https://iamsamyiok.github.io/skillhub/apis.json
+- [awesome-freellm-apis (免费API·限定额度)](https://iamsamyiok.github.io/skillhub/apis-md/awesome-freellm-apis.md): 40+ 提供商的免费 LLM API 汇总，分"永久免费层/可续额度"两类，含 Python/Cursor/Claude Code 接入示例与 Base URL 速查表。
+  - 仓库: https://github.com/open-free-llm-api/awesome-freellm-apis · 数据: https://iamsamyiok.github.io/skillhub/apis.json
+- [free-api (免费API·混合)](https://iamsamyiok.github.io/skillhub/apis-md/free-api.md): 中文免费 API 搬运目录：680+ 接口按月更新（2026-07 仍在更），每个接口有文档页与在线调试，部分需公众号取密钥。
+  - 仓库: https://github.com/fangzesheng/free-api · 数据: https://iamsamyiok.github.io/skillhub/apis.json
+- [free-apis-site (免费API·混合)](https://iamsamyiok.github.io/skillhub/apis-md/free-apis-site.md): 基于 public-apis 数据构建的免费 API 浏览网站（React + Tailwind），支持全量/分类两种浏览模式与 Auth、CORS、HTTPS 筛选。
+  - 仓库: https://github.com/Free-APIs/Free-APIs.github.io · 数据: https://iamsamyiok.github.io/skillhub/apis.json
+- [gpt-api-free (免费API·限定额度)](https://iamsamyiok.github.io/skillhub/apis-md/gpt-api-free.md): 免费 GPT/DeepSeek API 中转服务：注册绑定 GitHub 取 Key，免费版每周 50000 点、每天 100 次请求，国内直连低延迟。
+  - 仓库: https://github.com/chatanywhere/GPT_API_free · 数据: https://iamsamyiok.github.io/skillhub/apis.json
+- [ip-info-api (免费API·永久)](https://iamsamyiok.github.io/skillhub/apis-md/ip-info-api.md): 免费 IP 信息查询 API 合集：聚合 20+ 个本机 IP 与 IP 归属地查询端点，逐个标注可用性（已失效的明确标出），支持多语言。
+  - 仓库: https://github.com/ihmily/ip-info-api · 数据: https://iamsamyiok.github.io/skillhub/apis.json
+- [public-api-lists (免费API·混合)](https://iamsamyiok.github.io/skillhub/apis-md/public-api-lists.md): 免费公开 API 的社区精选清单，提供可检索网站与结构化 JSON 数据，收录 800+ API、标注鉴权与 CORS。
+  - 仓库: https://github.com/public-api-lists/public-api-lists · 数据: https://iamsamyiok.github.io/skillhub/apis.json
+- [public-apis (免费API·混合)](https://iamsamyiok.github.io/skillhub/apis-md/public-apis.md): 免费公开 API 合集的事实标准仓库，1400+ API 按主题分类，覆盖开发、地理、金融、游戏等 40+ 领域。
+  - 仓库: https://github.com/public-apis/public-apis · 数据: https://iamsamyiok.github.io/skillhub/apis.json
+- [public-apis-marcelscruz (免费API·混合)](https://iamsamyiok.github.io/skillhub/apis-md/public-apis-marcelscruz.md): 社区协作维护的 public APIs 列表，每条标注 Auth 与 CORS，配套 resources.json 结构化数据与自动同步机制。
+  - 仓库: https://github.com/marcelscruz/public-apis · 数据: https://iamsamyiok.github.io/skillhub/apis.json
+- [public-apis-n0shake (免费API·混合)](https://iamsamyiok.github.io/skillhub/apis-md/public-apis-n0shake.md): 维护多年的老牌免费 API 目录，56 个分类按字母序组织，标注开源与付费层信息，适合按领域浏览。
+  - 仓库: https://github.com/n0shake/Public-APIs · 数据: https://iamsamyiok.github.io/skillhub/apis.json
 
 ## Source
 
