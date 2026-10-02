@@ -1,0 +1,6 @@
+{
+  "name": "ste-zh-writing-checker",
+  "private": true,
+  "description": "STE-ZH skill 自带检查器的 CommonJS 声明",
+  "type": "commonjs"
+}

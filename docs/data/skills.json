@@ -1,5 +1,5 @@
 {
-  "total": 38,
+  "total": 43,
   "categories": [
     "写作工具",
     "前端开发",
@@ -19,6 +19,69 @@
   ],
   "items": [
     {
+      "id": "3d-edit",
+      "name": "3d-edit",
+      "description": "一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求\"画一个3D城市/3D场景/三维可视化\"\"像 Claude 一键生成 3D 城市\"\"做个可交互的 3D 网页\"\"水库/厂区/管线数字孪生 3D 展示\"\"给我一个小盒子/设备/推车的 3D 图\"、要求 3D 汇报页/截图/PNG；或者说\"把那座塔改红\"\"河往东弯\"\"楼密一点\"\"雾再浓点\"、指着截图某处说\"改那个\"\"去掉那栋楼\"；或说\"我想自己手动编辑这个 3D 图\"\"给我个能拖的界面\"\"别每次都得找你\"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页。",
+      "version": "1.0.0",
+      "category": "前端开发",
+      "tags": [
+        "3D",
+        "Three.js",
+        "程序化生成",
+        "场景生成",
+        "局部编辑",
+        "参数化",
+        "人工编辑",
+        "数字孪生",
+        "WebGL"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-28T03:13:25.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 24123
+        },
+        {
+          "path": "assets/editkit.js",
+          "size": 35798
+        },
+        {
+          "path": "assets/editor.html",
+          "size": 24715
+        },
+        {
+          "path": "assets/template.html",
+          "size": 57614
+        },
+        {
+          "path": "references/checklist.md",
+          "size": 11986
+        },
+        {
+          "path": "references/edit-playbook.md",
+          "size": 12814
+        },
+        {
+          "path": "references/editor-enhance.md",
+          "size": 6826
+        },
+        {
+          "path": "references/recipes.md",
+          "size": 12706
+        },
+        {
+          "path": "scripts/capture.mjs",
+          "size": 1934
+        },
+        {
+          "path": "scripts/edit3d.mjs",
+          "size": 24816
+        }
+      ],
+      "needsKey": false
+    },
+    {
       "id": "anysearch",
       "name": "anysearch",
       "description": "统一实时搜索引擎技能：通用网页搜索、垂直领域搜索（金融/学术/旅行/法律/代码等 17 个领域，先 get_sub_domains 发现子域再搜索）、并行批量搜索、整页内容提取。内置跨平台 CLI 脚本直接调用公开 HTTP 端点，无需安装 MCP 服务器。当用户需要「搜索/查资料/事实核查/读取网页内容/按股票号、CVE、DOI 等标识符查结构化信息/多个独立查询并行执行」时使用。匿名可用，API Key 可提升限额。",
@@ -36,67 +99,67 @@
       "files": [
         {
           "path": ".env.example",
-          "size": 386
+          "size": 375
         },
         {
           "path": "LICENSE",
-          "size": 11415
+          "size": 11215
         },
         {
           "path": "NOTICE",
-          "size": 94
+          "size": 90
         },
         {
           "path": "README.md",
-          "size": 11815
+          "size": 11547
         },
         {
           "path": "README_zh.md",
-          "size": 11775
-        },
-        {
-          "path": "requirements.txt",
-          "size": 187
-        },
-        {
-          "path": "scripts/anysearch_cli.js",
-          "size": 21700
-        },
-        {
-          "path": "scripts/anysearch_cli.ps1",
-          "size": 30491
-        },
-        {
-          "path": "scripts/anysearch_cli.py",
-          "size": 28369
-        },
-        {
-          "path": "scripts/anysearch_cli.sh",
-          "size": 22680
-        },
-        {
-          "path": "scripts/generate.py",
-          "size": 9811
-        },
-        {
-          "path": "scripts/shared/constants.json",
-          "size": 286
-        },
-        {
-          "path": "scripts/shared/doc_spec.md",
-          "size": 10529
-        },
-        {
-          "path": "scripts/test_cli.py",
-          "size": 13249
+          "size": 11507
         },
         {
           "path": "SHA256SUMS.txt",
-          "size": 369
+          "size": 365
         },
         {
           "path": "SKILL.md",
-          "size": 13335
+          "size": 13140
+        },
+        {
+          "path": "requirements.txt",
+          "size": 183
+        },
+        {
+          "path": "scripts/anysearch_cli.js",
+          "size": 21113
+        },
+        {
+          "path": "scripts/anysearch_cli.ps1",
+          "size": 29722
+        },
+        {
+          "path": "scripts/anysearch_cli.py",
+          "size": 27646
+        },
+        {
+          "path": "scripts/anysearch_cli.sh",
+          "size": 22070
+        },
+        {
+          "path": "scripts/generate.py",
+          "size": 9568
+        },
+        {
+          "path": "scripts/shared/constants.json",
+          "size": 278
+        },
+        {
+          "path": "scripts/shared/doc_spec.md",
+          "size": 10292
+        },
+        {
+          "path": "scripts/test_cli.py",
+          "size": 12916
         }
       ],
       "needsKey": true
@@ -118,16 +181,92 @@
       "updatedAt": "2026-09-11T00:00:00.000Z",
       "files": [
         {
-          "path": "scripts/validate_skill.py",
-          "size": 4773
+          "path": "SKILL.md",
+          "size": 6997
         },
         {
-          "path": "SKILL.md",
-          "size": 7185
+          "path": "scripts/validate_skill.py",
+          "size": 4638
         },
         {
           "path": "templates/SKILL.template.md",
-          "size": 830
+          "size": 785
+        }
+      ],
+      "needsKey": false
+    },
+    {
+      "id": "cad-svg-edit",
+      "name": "cad&svg-edit",
+      "description": "融合「CAD 创建」与「SVG 精准编辑」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（cad 无头引擎，输出 SVG/PNG/CSV）走 CAD-CREATE；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans, OR editing/modifying existing SVG files (text, color, position, batch changes).",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "cad",
+        "svg",
+        "绘图",
+        "矢量图",
+        "编辑",
+        "绘图引擎"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-28T02:58:59.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 22838
+        },
+        {
+          "path": "assets/cad-draw.html",
+          "size": 39128
+        },
+        {
+          "path": "assets/preview.html",
+          "size": 12918
+        },
+        {
+          "path": "engine/cad-engine.js",
+          "size": 47910
+        },
+        {
+          "path": "examples/bad.js",
+          "size": 68
+        },
+        {
+          "path": "examples/gear.js",
+          "size": 678
+        },
+        {
+          "path": "examples/house.js",
+          "size": 580
+        },
+        {
+          "path": "examples/nut.js",
+          "size": 2639
+        },
+        {
+          "path": "references/grounding.md",
+          "size": 2303
+        },
+        {
+          "path": "references/operations.md",
+          "size": 4700
+        },
+        {
+          "path": "scripts/daemon.mjs",
+          "size": 5008
+        },
+        {
+          "path": "scripts/next_name.mjs",
+          "size": 470
+        },
+        {
+          "path": "scripts/render_png.mjs",
+          "size": 2813
+        },
+        {
+          "path": "scripts/svg_toolkit.py",
+          "size": 32181
         }
       ],
       "needsKey": false
@@ -143,16 +282,16 @@
       "updatedAt": null,
       "files": [
         {
+          "path": "SKILL.md",
+          "size": 18812
+        },
+        {
           "path": "examples/agent-skill-md-catalog.md",
-          "size": 7669
+          "size": 7502
         },
         {
           "path": "examples/deepseek-harness-example.md",
-          "size": 10846
-        },
-        {
-          "path": "SKILL.md",
-          "size": 18812
+          "size": 10623
         }
       ],
       "needsKey": false
@@ -177,59 +316,59 @@
       "files": [
         {
           "path": ".gitignore",
-          "size": 33
-        },
-        {
-          "path": "package-lock.json",
-          "size": 604
-        },
-        {
-          "path": "package.json",
-          "size": 283
+          "size": 30
         },
         {
           "path": "README.md",
-          "size": 3504
-        },
-        {
-          "path": "scripts/build_preview.mjs",
-          "size": 2643
-        },
-        {
-          "path": "scripts/check_d2.mjs",
-          "size": 1741
-        },
-        {
-          "path": "scripts/generate.mjs",
-          "size": 3730
-        },
-        {
-          "path": "scripts/json_to_d2.mjs",
-          "size": 3441
-        },
-        {
-          "path": "scripts/validate_spec.mjs",
-          "size": 6743
+          "size": 3419
         },
         {
           "path": "SKILL.md",
-          "size": 7185
+          "size": 7068
+        },
+        {
+          "path": "package-lock.json",
+          "size": 582
+        },
+        {
+          "path": "package.json",
+          "size": 268
+        },
+        {
+          "path": "scripts/build_preview.mjs",
+          "size": 2589
+        },
+        {
+          "path": "scripts/check_d2.mjs",
+          "size": 1698
+        },
+        {
+          "path": "scripts/generate.mjs",
+          "size": 3634
+        },
+        {
+          "path": "scripts/json_to_d2.mjs",
+          "size": 3363
+        },
+        {
+          "path": "scripts/validate_spec.mjs",
+          "size": 6602
         },
         {
           "path": "test/json_to_d2.test.mjs",
-          "size": 4029
+          "size": 3921
         },
         {
           "path": "test/validate_spec.test.mjs",
-          "size": 5086
+          "size": 4949
         },
         {
           "path": "vendor/d2.browser.js",
-          "size": 8196890
+          "size": 8194866
         },
         {
           "path": "web/index.html",
-          "size": 10033
+          "size": 9808
         }
       ],
       "needsKey": false
@@ -245,16 +384,20 @@
       "updatedAt": null,
       "files": [
         {
+          "path": "SKILL.md",
+          "size": 1767
+        },
+        {
+          "path": "scripts/README.md",
+          "size": 1089
+        },
+        {
           "path": "scripts/contracts.py",
           "size": 625
         },
         {
           "path": "scripts/harness.py",
           "size": 9158
-        },
-        {
-          "path": "scripts/README.md",
-          "size": 1111
         },
         {
           "path": "scripts/server.py",
@@ -265,16 +408,12 @@
           "size": 2589
         },
         {
-          "path": "SKILL.md",
-          "size": 1767
-        },
-        {
           "path": "tests/test_contract.py",
           "size": 2710
         },
         {
           "path": "tools/reindex_kb/manifest.json",
-          "size": 686
+          "size": 668
         },
         {
           "path": "tools/reindex_kb/tool.py",
@@ -282,7 +421,7 @@
         },
         {
           "path": "tools/scan_dir/manifest.json",
-          "size": 741
+          "size": 723
         },
         {
           "path": "tools/scan_dir/tool.py",
@@ -290,7 +429,7 @@
         },
         {
           "path": "tools/summarize_md/manifest.json",
-          "size": 744
+          "size": 725
         },
         {
           "path": "tools/summarize_md/tool.py",
@@ -317,27 +456,27 @@
       "files": [
         {
           "path": ".gitignore",
-          "size": 40
+          "size": 36
         },
         {
           "path": "CONFIG.md",
-          "size": 2128
+          "size": 2056
         },
         {
           "path": "README.md",
-          "size": 2252
-        },
-        {
-          "path": "scripts/convert.py",
-          "size": 5841
-        },
-        {
-          "path": "scripts/siliconflow_ocr.py",
-          "size": 1648
+          "size": 2177
         },
         {
           "path": "SKILL.md",
-          "size": 2566
+          "size": 2491
+        },
+        {
+          "path": "scripts/convert.py",
+          "size": 5703
+        },
+        {
+          "path": "scripts/siliconflow_ocr.py",
+          "size": 1605
         }
       ],
       "needsKey": true
@@ -358,247 +497,247 @@
       "files": [
         {
           "path": "LICENSE.txt",
-          "size": 1497
-        },
-        {
-          "path": "scripts/accept_changes.py",
-          "size": 4186
-        },
-        {
-          "path": "scripts/comment.py",
-          "size": 14422
-        },
-        {
-          "path": "scripts/merge_runs.py",
-          "size": 9708
-        },
-        {
-          "path": "scripts/office/helpers/pptx_chart.py",
-          "size": 6032
-        },
-        {
-          "path": "scripts/office/helpers/pptx_slide.py",
-          "size": 1735
-        },
-        {
-          "path": "scripts/office/helpers/pptx_theme.py",
-          "size": 3624
-        },
-        {
-          "path": "scripts/office/helpers/__init__.py",
-          "size": 3469
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
-          "size": 2005
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
-          "size": 2565
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
-          "size": 2905
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
-          "size": 1377
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
-          "size": 76483
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
-          "size": 7102
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
-          "size": 52387
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
-          "size": 635
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
-          "size": 155120
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
-          "size": 1254
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
-          "size": 9047
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
-          "size": 15082
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
-          "size": 85288
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
-          "size": 1297
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
-          "size": 7472
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
-          "size": 6556
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
-          "size": 1273
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
-          "size": 898
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
-          "size": 2667
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
-          "size": 3563
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
-          "size": 7702
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
-          "size": 23895
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
-          "size": 1392
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
-          "size": 246716
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
-          "size": 26718
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
-          "size": 25788
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
-          "size": 547
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
-          "size": 5820
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
-          "size": 4106
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
-          "size": 175013
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
-          "size": 4762
-        },
-        {
-          "path": "scripts/office/schemas/mce/mc.xsd",
-          "size": 3202
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-2010.xsd",
-          "size": 27109
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-2012.xsd",
-          "size": 3812
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-2018.xsd",
-          "size": 915
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
-          "size": 1798
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
-          "size": 1015
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
-          "size": 604
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
-          "size": 753
-        },
-        {
-          "path": "scripts/office/soffice.py",
-          "size": 6119
-        },
-        {
-          "path": "scripts/office/validate.py",
-          "size": 6315
-        },
-        {
-          "path": "scripts/office/validators/base.py",
-          "size": 34631
-        },
-        {
-          "path": "scripts/office/validators/docx.py",
-          "size": 17948
-        },
-        {
-          "path": "scripts/office/validators/pptx.py",
-          "size": 16407
-        },
-        {
-          "path": "scripts/office/validators/redlining.py",
-          "size": 11530
-        },
-        {
-          "path": "scripts/office/validators/__init__.py",
-          "size": 351
-        },
-        {
-          "path": "scripts/templates/comments.xml",
-          "size": 2606
-        },
-        {
-          "path": "scripts/templates/commentsExtended.xml",
-          "size": 2614
-        },
-        {
-          "path": "scripts/templates/commentsExtensible.xml",
-          "size": 2710
-        },
-        {
-          "path": "scripts/templates/commentsIds.xml",
-          "size": 2622
-        },
-        {
-          "path": "scripts/templates/people.xml",
-          "size": 118
-        },
-        {
-          "path": "scripts/__init__.py",
-          "size": 2
+          "size": 1467
         },
         {
           "path": "SKILL.md",
-          "size": 6643
+          "size": 6552
+        },
+        {
+          "path": "scripts/__init__.py",
+          "size": 1
+        },
+        {
+          "path": "scripts/accept_changes.py",
+          "size": 4051
+        },
+        {
+          "path": "scripts/comment.py",
+          "size": 14054
+        },
+        {
+          "path": "scripts/merge_runs.py",
+          "size": 9398
+        },
+        {
+          "path": "scripts/office/helpers/__init__.py",
+          "size": 3358
+        },
+        {
+          "path": "scripts/office/helpers/pptx_chart.py",
+          "size": 5862
+        },
+        {
+          "path": "scripts/office/helpers/pptx_slide.py",
+          "size": 1675
+        },
+        {
+          "path": "scripts/office/helpers/pptx_theme.py",
+          "size": 3510
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+          "size": 74984
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+          "size": 6956
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+          "size": 51302
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+          "size": 624
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+          "size": 152039
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+          "size": 1231
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+          "size": 8862
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+          "size": 14795
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+          "size": 83612
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+          "size": 1269
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+          "size": 7328
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+          "size": 6382
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+          "size": 1248
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+          "size": 880
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+          "size": 2608
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+          "size": 3507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+          "size": 7507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+          "size": 23313
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+          "size": 1367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+          "size": 242277
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+          "size": 26148
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+          "size": 25279
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+          "size": 535
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+          "size": 5712
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+          "size": 4010
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+          "size": 171367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+          "size": 4646
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+          "size": 1963
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+          "size": 2515
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+          "size": 2856
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+          "size": 1344
+        },
+        {
+          "path": "scripts/office/schemas/mce/mc.xsd",
+          "size": 3127
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2010.xsd",
+          "size": 26549
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2012.xsd",
+          "size": 3745
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2018.xsd",
+          "size": 901
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+          "size": 1778
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+          "size": 1002
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+          "size": 600
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+          "size": 745
+        },
+        {
+          "path": "scripts/office/soffice.py",
+          "size": 5927
+        },
+        {
+          "path": "scripts/office/validate.py",
+          "size": 6142
+        },
+        {
+          "path": "scripts/office/validators/__init__.py",
+          "size": 336
+        },
+        {
+          "path": "scripts/office/validators/base.py",
+          "size": 33756
+        },
+        {
+          "path": "scripts/office/validators/docx.py",
+          "size": 17482
+        },
+        {
+          "path": "scripts/office/validators/pptx.py",
+          "size": 15966
+        },
+        {
+          "path": "scripts/office/validators/redlining.py",
+          "size": 11231
+        },
+        {
+          "path": "scripts/templates/comments.xml",
+          "size": 2603
+        },
+        {
+          "path": "scripts/templates/commentsExtended.xml",
+          "size": 2611
+        },
+        {
+          "path": "scripts/templates/commentsExtensible.xml",
+          "size": 2707
+        },
+        {
+          "path": "scripts/templates/commentsIds.xml",
+          "size": 2619
+        },
+        {
+          "path": "scripts/templates/people.xml",
+          "size": 115
         }
       ],
       "needsKey": false
@@ -619,7 +758,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 5557
+          "size": 5416
         }
       ],
       "needsKey": false
@@ -639,16 +778,16 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "files": [
         {
+          "path": "SKILL.md",
+          "size": 9499
+        },
+        {
           "path": "rules/install.md",
-          "size": 2981
+          "size": 2889
         },
         {
           "path": "rules/security.md",
-          "size": 1421
-        },
-        {
-          "path": "SKILL.md",
-          "size": 9643
+          "size": 1395
         }
       ],
       "needsKey": true
@@ -672,12 +811,12 @@
       "updatedAt": "2026-09-10T13:59:55.000Z",
       "files": [
         {
-          "path": "agents/openai.yaml",
-          "size": 116
+          "path": "SKILL.md",
+          "size": 2143
         },
         {
-          "path": "SKILL.md",
-          "size": 2172
+          "path": "agents/openai.yaml",
+          "size": 113
         }
       ],
       "needsKey": false
@@ -701,11 +840,11 @@
       "files": [
         {
           "path": "LICENSE",
-          "size": 1086
+          "size": 1065
         },
         {
           "path": "SKILL.md",
-          "size": 4280
+          "size": 4175
         }
       ],
       "needsKey": false
@@ -730,7 +869,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 2728
+          "size": 2685
         }
       ],
       "needsKey": false
@@ -753,7 +892,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 5835
+          "size": 5673
         }
       ],
       "needsKey": false
@@ -774,43 +913,43 @@
       "files": [
         {
           "path": "LICENSE.txt",
-          "size": 11546
-        },
-        {
-          "path": "reference/evaluation.md",
-          "size": 22264
-        },
-        {
-          "path": "reference/mcp_best_practices.md",
-          "size": 7579
-        },
-        {
-          "path": "reference/node_mcp_server.md",
-          "size": 29519
-        },
-        {
-          "path": "reference/python_mcp_server.md",
-          "size": 25817
-        },
-        {
-          "path": "scripts/connections.py",
-          "size": 5026
-        },
-        {
-          "path": "scripts/evaluation.py",
-          "size": 12952
-        },
-        {
-          "path": "scripts/example_evaluation.xml",
-          "size": 1216
-        },
-        {
-          "path": "scripts/requirements.txt",
-          "size": 31
+          "size": 11345
         },
         {
           "path": "SKILL.md",
-          "size": 9316
+          "size": 9080
+        },
+        {
+          "path": "reference/evaluation.md",
+          "size": 21663
+        },
+        {
+          "path": "reference/mcp_best_practices.md",
+          "size": 7330
+        },
+        {
+          "path": "reference/node_mcp_server.md",
+          "size": 28550
+        },
+        {
+          "path": "reference/python_mcp_server.md",
+          "size": 25099
+        },
+        {
+          "path": "scripts/connections.py",
+          "size": 4875
+        },
+        {
+          "path": "scripts/evaluation.py",
+          "size": 12579
+        },
+        {
+          "path": "scripts/example_evaluation.xml",
+          "size": 1194
+        },
+        {
+          "path": "scripts/requirements.txt",
+          "size": 29
         }
       ],
       "needsKey": false
@@ -826,16 +965,16 @@
       "updatedAt": null,
       "files": [
         {
+          "path": "SKILL.md",
+          "size": 1917
+        },
+        {
           "path": "install-plan.json",
           "size": 2602
         },
         {
           "path": "mcpServers-config.json",
           "size": 1402
-        },
-        {
-          "path": "SKILL.md",
-          "size": 1917
         }
       ],
       "needsKey": true
@@ -855,15 +994,15 @@
       "files": [
         {
           "path": ".skill_id",
-          "size": 25
-        },
-        {
-          "path": "scripts/oss_scout.py",
-          "size": 9039
+          "size": 24
         },
         {
           "path": "SKILL.md",
-          "size": 3992
+          "size": 3889
+        },
+        {
+          "path": "scripts/oss_scout.py",
+          "size": 8804
         }
       ],
       "needsKey": false
@@ -883,12 +1022,12 @@
       "updatedAt": "2026-09-10T14:52:37.000Z",
       "files": [
         {
-          "path": "bin/fe-review.cjs",
-          "size": 22819
+          "path": "SKILL.md",
+          "size": 5043
         },
         {
-          "path": "SKILL.md",
-          "size": 5131
+          "path": "bin/fe-review.cjs",
+          "size": 22388
         }
       ],
       "needsKey": true
@@ -908,52 +1047,52 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "files": [
         {
-          "path": "forms.md",
-          "size": 12148
-        },
-        {
           "path": "LICENSE.txt",
-          "size": 1497
-        },
-        {
-          "path": "reference.md",
-          "size": 17303
-        },
-        {
-          "path": "scripts/check_bounding_boxes.py",
-          "size": 2839
-        },
-        {
-          "path": "scripts/check_fillable_fields.py",
-          "size": 279
-        },
-        {
-          "path": "scripts/convert_pdf_to_images.py",
-          "size": 1041
-        },
-        {
-          "path": "scripts/create_validation_image.py",
-          "size": 1295
-        },
-        {
-          "path": "scripts/extract_form_field_info.py",
-          "size": 4422
-        },
-        {
-          "path": "scripts/extract_form_structure.py",
-          "size": 4060
-        },
-        {
-          "path": "scripts/fill_fillable_fields.py",
-          "size": 3917
-        },
-        {
-          "path": "scripts/fill_pdf_form_with_annotations.py",
-          "size": 3342
+          "size": 1467
         },
         {
           "path": "SKILL.md",
-          "size": 8238
+          "size": 7924
+        },
+        {
+          "path": "forms.md",
+          "size": 11854
+        },
+        {
+          "path": "reference.md",
+          "size": 16692
+        },
+        {
+          "path": "scripts/check_bounding_boxes.py",
+          "size": 2774
+        },
+        {
+          "path": "scripts/check_fillable_fields.py",
+          "size": 268
+        },
+        {
+          "path": "scripts/convert_pdf_to_images.py",
+          "size": 1008
+        },
+        {
+          "path": "scripts/create_validation_image.py",
+          "size": 1258
+        },
+        {
+          "path": "scripts/extract_form_field_info.py",
+          "size": 4300
+        },
+        {
+          "path": "scripts/extract_form_structure.py",
+          "size": 3945
+        },
+        {
+          "path": "scripts/fill_fillable_fields.py",
+          "size": 3819
+        },
+        {
+          "path": "scripts/fill_pdf_form_with_annotations.py",
+          "size": 3235
         }
       ],
       "needsKey": false
@@ -973,132 +1112,132 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "files": [
         {
+          "path": "SKILL.md",
+          "size": 37026
+        },
+        {
           "path": "examples.md",
-          "size": 4720
+          "size": 4518
         },
         {
           "path": "reference.md",
-          "size": 8673
+          "size": 8455
         },
         {
           "path": "scripts/attest-plan.ps1",
-          "size": 21530
+          "size": 21021
         },
         {
           "path": "scripts/attest-plan.sh",
-          "size": 11361
+          "size": 11104
         },
         {
           "path": "scripts/check-complete.ps1",
-          "size": 11035
+          "size": 10767
         },
         {
           "path": "scripts/check-complete.sh",
-          "size": 11994
+          "size": 11710
         },
         {
           "path": "scripts/gate-stop.sh",
-          "size": 1484
+          "size": 1452
         },
         {
           "path": "scripts/init-session.ps1",
-          "size": 6720
+          "size": 6490
         },
         {
           "path": "scripts/init-session.sh",
-          "size": 13300
+          "size": 12883
         },
         {
           "path": "scripts/inject-plan.py",
-          "size": 61042
+          "size": 59441
         },
         {
           "path": "scripts/inject-plan.sh",
-          "size": 62458
+          "size": 61086
         },
         {
           "path": "scripts/ledger-append.ps1",
-          "size": 7033
+          "size": 6844
         },
         {
           "path": "scripts/ledger-append.sh",
-          "size": 12536
+          "size": 12190
         },
         {
           "path": "scripts/ledger-summary.ps1",
-          "size": 5478
+          "size": 5335
         },
         {
           "path": "scripts/ledger-summary.sh",
-          "size": 6876
+          "size": 6705
         },
         {
           "path": "scripts/phase-status.ps1",
-          "size": 9659
+          "size": 9412
         },
         {
           "path": "scripts/phase-status.sh",
-          "size": 7078
+          "size": 6866
         },
         {
           "path": "scripts/plan-doctor.sh",
-          "size": 8701
+          "size": 8531
         },
         {
           "path": "scripts/resolve-plan-dir.ps1",
-          "size": 9292
+          "size": 9083
         },
         {
           "path": "scripts/resolve-plan-dir.sh",
-          "size": 15538
+          "size": 15178
         },
         {
           "path": "scripts/session-catchup.py",
-          "size": 36851
+          "size": 35868
         },
         {
           "path": "scripts/set-active-plan.ps1",
-          "size": 1696
+          "size": 1645
         },
         {
           "path": "scripts/set-active-plan.sh",
-          "size": 1555
+          "size": 1505
         },
         {
           "path": "scripts/skill-hook.sh",
-          "size": 17900
-        },
-        {
-          "path": "SKILL.md",
-          "size": 37526
+          "size": 17435
         },
         {
           "path": "templates/analytics_findings.md",
-          "size": 1870
+          "size": 1803
         },
         {
           "path": "templates/analytics_task_plan.md",
-          "size": 2433
+          "size": 2352
         },
         {
           "path": "templates/findings.md",
-          "size": 1208
+          "size": 1161
         },
         {
           "path": "templates/loop.md",
-          "size": 2180
+          "size": 2143
         },
         {
           "path": "templates/progress.md",
-          "size": 1605
+          "size": 1547
         },
         {
           "path": "templates/task_plan.md",
-          "size": 2346
+          "size": 2257
         },
         {
           "path": "templates/task_plan_autonomous.md",
-          "size": 3366
+          "size": 3268
         }
       ],
       "needsKey": false
@@ -1119,227 +1258,251 @@
       "files": [
         {
           "path": "LICENSE.txt",
-          "size": 1497
+          "size": 1467
         },
         {
-          "path": "scripts/add_slide.py",
-          "size": 14904
-        },
-        {
-          "path": "scripts/clean.py",
-          "size": 10724
-        },
-        {
-          "path": "scripts/office/helpers/pptx_chart.py",
-          "size": 6032
-        },
-        {
-          "path": "scripts/office/helpers/pptx_slide.py",
-          "size": 1735
-        },
-        {
-          "path": "scripts/office/helpers/pptx_theme.py",
-          "size": 3624
-        },
-        {
-          "path": "scripts/office/helpers/__init__.py",
-          "size": 3469
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
-          "size": 2005
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
-          "size": 2565
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
-          "size": 2905
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
-          "size": 1377
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
-          "size": 76483
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
-          "size": 7102
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
-          "size": 52387
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
-          "size": 635
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
-          "size": 155120
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
-          "size": 1254
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
-          "size": 9047
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
-          "size": 15082
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
-          "size": 85288
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
-          "size": 1297
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
-          "size": 7472
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
-          "size": 6556
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
-          "size": 1273
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
-          "size": 898
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
-          "size": 2667
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
-          "size": 3563
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
-          "size": 7702
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
-          "size": 23895
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
-          "size": 1392
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
-          "size": 246716
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
-          "size": 26718
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
-          "size": 25788
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
-          "size": 547
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
-          "size": 5820
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
-          "size": 4106
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
-          "size": 175013
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
-          "size": 4762
-        },
-        {
-          "path": "scripts/office/schemas/mce/mc.xsd",
-          "size": 3202
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-2010.xsd",
-          "size": 27109
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-2012.xsd",
-          "size": 3812
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-2018.xsd",
-          "size": 915
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
-          "size": 1798
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
-          "size": 1015
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
-          "size": 604
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
-          "size": 753
-        },
-        {
-          "path": "scripts/office/soffice.py",
-          "size": 6119
-        },
-        {
-          "path": "scripts/office/validate.py",
-          "size": 6315
-        },
-        {
-          "path": "scripts/office/validators/base.py",
-          "size": 34631
-        },
-        {
-          "path": "scripts/office/validators/docx.py",
-          "size": 17948
-        },
-        {
-          "path": "scripts/office/validators/pptx.py",
-          "size": 16407
-        },
-        {
-          "path": "scripts/office/validators/redlining.py",
-          "size": 11530
-        },
-        {
-          "path": "scripts/office/validators/__init__.py",
-          "size": 351
-        },
-        {
-          "path": "scripts/thumbnail.py",
-          "size": 10113
+          "path": "SKILL.md",
+          "size": 20497
         },
         {
           "path": "scripts/__init__.py",
           "size": 0
         },
         {
+          "path": "scripts/add_slide.py",
+          "size": 14537
+        },
+        {
+          "path": "scripts/clean.py",
+          "size": 10415
+        },
+        {
+          "path": "scripts/office/helpers/__init__.py",
+          "size": 3358
+        },
+        {
+          "path": "scripts/office/helpers/pptx_chart.py",
+          "size": 5862
+        },
+        {
+          "path": "scripts/office/helpers/pptx_slide.py",
+          "size": 1675
+        },
+        {
+          "path": "scripts/office/helpers/pptx_theme.py",
+          "size": 3510
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+          "size": 74984
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+          "size": 6956
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+          "size": 51302
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+          "size": 624
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+          "size": 152039
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+          "size": 1231
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+          "size": 8862
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+          "size": 14795
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+          "size": 83612
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+          "size": 1269
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+          "size": 7328
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+          "size": 6382
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+          "size": 1248
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+          "size": 880
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+          "size": 2608
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+          "size": 3507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+          "size": 7507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+          "size": 23313
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+          "size": 1367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+          "size": 242277
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+          "size": 26148
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+          "size": 25279
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+          "size": 535
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+          "size": 5712
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+          "size": 4010
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+          "size": 171367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+          "size": 4646
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+          "size": 1963
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+          "size": 2515
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+          "size": 2856
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+          "size": 1344
+        },
+        {
+          "path": "scripts/office/schemas/mce/mc.xsd",
+          "size": 3127
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2010.xsd",
+          "size": 26549
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2012.xsd",
+          "size": 3745
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2018.xsd",
+          "size": 901
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+          "size": 1778
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+          "size": 1002
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+          "size": 600
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+          "size": 745
+        },
+        {
+          "path": "scripts/office/soffice.py",
+          "size": 5927
+        },
+        {
+          "path": "scripts/office/validate.py",
+          "size": 6142
+        },
+        {
+          "path": "scripts/office/validators/__init__.py",
+          "size": 336
+        },
+        {
+          "path": "scripts/office/validators/base.py",
+          "size": 33756
+        },
+        {
+          "path": "scripts/office/validators/docx.py",
+          "size": 17482
+        },
+        {
+          "path": "scripts/office/validators/pptx.py",
+          "size": 15966
+        },
+        {
+          "path": "scripts/office/validators/redlining.py",
+          "size": 11231
+        },
+        {
+          "path": "scripts/thumbnail.py",
+          "size": 9802
+        }
+      ],
+      "needsKey": false
+    },
+    {
+      "id": "pre-align",
+      "name": "pre-align",
+      "description": "任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests.",
+      "version": "1.0.0",
+      "category": "需求梳理",
+      "tags": [
+        "对齐",
+        "需求澄清",
+        "动手前确认",
+        "对齐简报",
+        "访谈",
+        "验收标准"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-28T03:24:11.000Z",
+      "files": [
+        {
           "path": "SKILL.md",
-          "size": 20735
+          "size": 7172
         }
       ],
       "needsKey": false
@@ -1361,16 +1524,16 @@
       "updatedAt": "2026-09-19T17:40:00.000Z",
       "files": [
         {
+          "path": "SKILL.md",
+          "size": 8271
+        },
+        {
           "path": "scripts/gif-trim.py",
-          "size": 3352
+          "size": 3251
         },
         {
           "path": "scripts/vhs-record.sh",
-          "size": 1950
-        },
-        {
-          "path": "SKILL.md",
-          "size": 8421
+          "size": 1903
         }
       ],
       "needsKey": false
@@ -1393,15 +1556,15 @@
       "files": [
         {
           "path": "INSTALL.md",
-          "size": 653
+          "size": 631
         },
         {
           "path": "README.md",
-          "size": 653
+          "size": 631
         },
         {
           "path": "SKILL.md",
-          "size": 9689
+          "size": 9529
         }
       ],
       "needsKey": false
@@ -1417,12 +1580,16 @@
       "updatedAt": null,
       "files": [
         {
-          "path": "scripts/install.md",
-          "size": 1072
+          "path": "SKILL.md",
+          "size": 2265
         },
         {
           "path": "scripts/README.md",
-          "size": 1618
+          "size": 1589
+        },
+        {
+          "path": "scripts/install.md",
+          "size": 1046
         },
         {
           "path": "scripts/searx-settings.yml",
@@ -1439,10 +1606,6 @@
         {
           "path": "scripts/windows-pwd-stub.py",
           "size": 500
-        },
-        {
-          "path": "SKILL.md",
-          "size": 2310
         }
       ],
       "needsKey": false
@@ -1467,7 +1630,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 3321
+          "size": 3232
         }
       ],
       "needsKey": false
@@ -1490,76 +1653,76 @@
       "updatedAt": "2026-09-10T13:59:55.000Z",
       "files": [
         {
+          "path": "LICENSE.txt",
+          "size": 11345
+        },
+        {
+          "path": "SKILL.md",
+          "size": 33168
+        },
+        {
           "path": "agents/analyzer.md",
-          "size": 10650
+          "size": 10376
         },
         {
           "path": "agents/comparator.md",
-          "size": 7489
+          "size": 7287
         },
         {
           "path": "agents/grader.md",
-          "size": 9272
+          "size": 9049
         },
         {
           "path": "assets/eval_review.html",
-          "size": 7204
+          "size": 7058
         },
         {
           "path": "eval-viewer/generate_review.py",
-          "size": 16836
+          "size": 16365
         },
         {
           "path": "eval-viewer/viewer.html",
-          "size": 46323
-        },
-        {
-          "path": "LICENSE.txt",
-          "size": 11546
+          "size": 44998
         },
         {
           "path": "references/schemas.md",
-          "size": 12491
-        },
-        {
-          "path": "scripts/aggregate_benchmark.py",
-          "size": 14787
-        },
-        {
-          "path": "scripts/generate_report.py",
-          "size": 13173
-        },
-        {
-          "path": "scripts/improve_description.py",
-          "size": 11363
-        },
-        {
-          "path": "scripts/package_skill.py",
-          "size": 4370
-        },
-        {
-          "path": "scripts/quick_validate.py",
-          "size": 4074
-        },
-        {
-          "path": "scripts/run_eval.py",
-          "size": 11774
-        },
-        {
-          "path": "scripts/run_loop.py",
-          "size": 13933
-        },
-        {
-          "path": "scripts/utils.py",
-          "size": 1708
+          "size": 12061
         },
         {
           "path": "scripts/__init__.py",
           "size": 0
         },
         {
-          "path": "SKILL.md",
-          "size": 33654
+          "path": "scripts/aggregate_benchmark.py",
+          "size": 14386
+        },
+        {
+          "path": "scripts/generate_report.py",
+          "size": 12847
+        },
+        {
+          "path": "scripts/improve_description.py",
+          "size": 11116
+        },
+        {
+          "path": "scripts/package_skill.py",
+          "size": 4234
+        },
+        {
+          "path": "scripts/quick_validate.py",
+          "size": 3972
+        },
+        {
+          "path": "scripts/run_eval.py",
+          "size": 11464
+        },
+        {
+          "path": "scripts/run_loop.py",
+          "size": 13605
+        },
+        {
+          "path": "scripts/utils.py",
+          "size": 1661
         }
       ],
       "needsKey": false
@@ -1584,63 +1747,63 @@
       "files": [
         {
           "path": "LICENSE",
-          "size": 1261
-        },
-        {
-          "path": "references/autoskill_core.md",
-          "size": 3610
-        },
-        {
-          "path": "references/skill_spec.md",
-          "size": 2328
-        },
-        {
-          "path": "requirements.txt",
-          "size": 26
-        },
-        {
-          "path": "scripts/config.yaml",
-          "size": 866
-        },
-        {
-          "path": "scripts/evolve.py",
-          "size": 24283
-        },
-        {
-          "path": "scripts/skillevo/config.py",
-          "size": 4137
-        },
-        {
-          "path": "scripts/skillevo/evals.py",
-          "size": 13986
-        },
-        {
-          "path": "scripts/skillevo/io_utils.py",
-          "size": 1945
-        },
-        {
-          "path": "scripts/skillevo/models.py",
-          "size": 4136
-        },
-        {
-          "path": "scripts/skillevo/mutators.py",
-          "size": 8410
-        },
-        {
-          "path": "scripts/skillevo/NOTICE.md",
-          "size": 787
-        },
-        {
-          "path": "scripts/skillevo/registry.py",
-          "size": 2853
-        },
-        {
-          "path": "scripts/skillevo/__init__.py",
-          "size": 362
+          "size": 1237
         },
         {
           "path": "SKILL.md",
-          "size": 4178
+          "size": 4095
+        },
+        {
+          "path": "references/autoskill_core.md",
+          "size": 3551
+        },
+        {
+          "path": "references/skill_spec.md",
+          "size": 2276
+        },
+        {
+          "path": "requirements.txt",
+          "size": 24
+        },
+        {
+          "path": "scripts/config.yaml",
+          "size": 842
+        },
+        {
+          "path": "scripts/evolve.py",
+          "size": 23753
+        },
+        {
+          "path": "scripts/skillevo/NOTICE.md",
+          "size": 774
+        },
+        {
+          "path": "scripts/skillevo/__init__.py",
+          "size": 349
+        },
+        {
+          "path": "scripts/skillevo/config.py",
+          "size": 4018
+        },
+        {
+          "path": "scripts/skillevo/evals.py",
+          "size": 13635
+        },
+        {
+          "path": "scripts/skillevo/io_utils.py",
+          "size": 1879
+        },
+        {
+          "path": "scripts/skillevo/models.py",
+          "size": 3981
+        },
+        {
+          "path": "scripts/skillevo/mutators.py",
+          "size": 8196
+        },
+        {
+          "path": "scripts/skillevo/registry.py",
+          "size": 2766
         }
       ],
       "needsKey": true
@@ -1661,12 +1824,12 @@
       "updatedAt": "2026-09-26T15:30:00.000Z",
       "files": [
         {
-          "path": "scripts/skillmanager.py",
-          "size": 29727
-        },
-        {
           "path": "SKILL.md",
           "size": 4774
+        },
+        {
+          "path": "scripts/skillmanager.py",
+          "size": 29727
         }
       ],
       "needsKey": false
@@ -1688,556 +1851,593 @@
       "updatedAt": "2026-09-18T08:00:00.000Z",
       "files": [
         {
-          "path": "agents/arbiter.md",
-          "size": 12150
-        },
-        {
-          "path": "agents/asset-prep.md",
-          "size": 8057
-        },
-        {
-          "path": "agents/blind-reader.md",
-          "size": 5821
-        },
-        {
-          "path": "agents/content-planner.md",
-          "size": 74580
-        },
-        {
-          "path": "agents/critic.md",
-          "size": 99000
-        },
-        {
-          "path": "agents/openai.yaml",
-          "size": 309
-        },
-        {
-          "path": "agents/slide-design.md",
-          "size": 104145
-        },
-        {
           "path": "README.md",
-          "size": 3996
-        },
-        {
-          "path": "references/animation.md",
-          "size": 23501
-        },
-        {
-          "path": "references/asset-production.md",
-          "size": 28107
-        },
-        {
-          "path": "references/auto-delegation-quality-gates.md",
-          "size": 11718
-        },
-        {
-          "path": "references/bespoke-registers.md",
-          "size": 9599
-        },
-        {
-          "path": "references/canvas-formats.md",
-          "size": 12674
-        },
-        {
-          "path": "references/checkpoint-convention.md",
-          "size": 20033
-        },
-        {
-          "path": "references/codex-runtime.md",
-          "size": 47346
-        },
-        {
-          "path": "references/collaborative-mode.md",
-          "size": 19274
-        },
-        {
-          "path": "references/content-plan-spec.md",
-          "size": 9982
-        },
-        {
-          "path": "references/critic-panel.md",
-          "size": 22188
-        },
-        {
-          "path": "references/data-viz.md",
-          "size": 25109
-        },
-        {
-          "path": "references/deck-setup.md",
-          "size": 8958
-        },
-        {
-          "path": "references/design-by-purpose.md",
-          "size": 25763
-        },
-        {
-          "path": "references/design-by-topic.md",
-          "size": 12747
-        },
-        {
-          "path": "references/design-gallery.md",
-          "size": 22191
-        },
-        {
-          "path": "references/design-intelligence-addendum.md",
-          "size": 33650
-        },
-        {
-          "path": "references/design-principles.md",
-          "size": 78595
-        },
-        {
-          "path": "references/east-asian-aesthetic.md",
-          "size": 5851
-        },
-        {
-          "path": "references/examples/build_example_generic.py",
-          "size": 17914
-        },
-        {
-          "path": "references/examples/section_example.py",
-          "size": 4592
-        },
-        {
-          "path": "references/examples/style_example.py",
-          "size": 5324
-        },
-        {
-          "path": "references/file-inventory.md",
-          "size": 61329
-        },
-        {
-          "path": "references/font-guidance.md",
-          "size": 11893
-        },
-        {
-          "path": "references/form-selection.md",
-          "size": 25275
-        },
-        {
-          "path": "references/generated-template.md",
-          "size": 56056
-        },
-        {
-          "path": "references/handoff-and-iteration.md",
-          "size": 15330
-        },
-        {
-          "path": "references/handoff-checklist.md",
-          "size": 9663
-        },
-        {
-          "path": "references/icons.md",
-          "size": 25066
-        },
-        {
-          "path": "references/image-generation.md",
-          "size": 49848
-        },
-        {
-          "path": "references/interview-protocol.md",
-          "size": 51105
-        },
-        {
-          "path": "references/large-deck-orchestration.md",
-          "size": 12379
-        },
-        {
-          "path": "references/maintenance-boundaries.md",
-          "size": 11956
-        },
-        {
-          "path": "references/multilingual.md",
-          "size": 22516
-        },
-        {
-          "path": "references/redesign-existing-deck.md",
-          "size": 11448
-        },
-        {
-          "path": "references/review-rubrics.md",
-          "size": 72179
-        },
-        {
-          "path": "references/runtime-routing.md",
-          "size": 2634
-        },
-        {
-          "path": "references/schematic-diagrams.md",
-          "size": 22056
-        },
-        {
-          "path": "references/security-and-capabilities.md",
-          "size": 7420
-        },
-        {
-          "path": "references/semantic-color-contract.md",
-          "size": 4463
-        },
-        {
-          "path": "references/style-analysis.md",
-          "size": 6192
-        },
-        {
-          "path": "references/troubleshooting-faq.md",
-          "size": 55915
-        },
-        {
-          "path": "references/user-taste.md",
-          "size": 11775
-        },
-        {
-          "path": "requirements.txt",
-          "size": 897
-        },
-        {
-          "path": "scripts/.deck-cycle-state.json",
-          "size": 105
-        },
-        {
-          "path": "scripts/anchor_proof.py",
-          "size": 9850
-        },
-        {
-          "path": "scripts/anim.py",
-          "size": 10564
-        },
-        {
-          "path": "scripts/archetypes.py",
-          "size": 7379
-        },
-        {
-          "path": "scripts/archetypes_html.py",
-          "size": 54615
-        },
-        {
-          "path": "scripts/arc_divergence.py",
-          "size": 26548
-        },
-        {
-          "path": "scripts/assemble.py",
-          "size": 7096
-        },
-        {
-          "path": "scripts/audience_brief.py",
-          "size": 7606
-        },
-        {
-          "path": "scripts/bespoke_kits.py",
-          "size": 16892
-        },
-        {
-          "path": "scripts/blind_read.py",
-          "size": 64433
-        },
-        {
-          "path": "scripts/canon_probe.py",
-          "size": 14733
-        },
-        {
-          "path": "scripts/check_design_contracts.py",
-          "size": 17935
-        },
-        {
-          "path": "scripts/check_direction_applied.py",
-          "size": 20622
-        },
-        {
-          "path": "scripts/check_env.py",
-          "size": 14524
-        },
-        {
-          "path": "scripts/check_env.sh",
-          "size": 459
-        },
-        {
-          "path": "scripts/check_gate_parity.py",
-          "size": 5577
-        },
-        {
-          "path": "scripts/check_image_provenance.py",
-          "size": 23990
-        },
-        {
-          "path": "scripts/check_inventory.py",
-          "size": 4910
-        },
-        {
-          "path": "scripts/check_param_reach.py",
-          "size": 7807
-        },
-        {
-          "path": "scripts/check_reason_width.py",
-          "size": 4840
-        },
-        {
-          "path": "scripts/check_reference_code.py",
-          "size": 9671
-        },
-        {
-          "path": "scripts/check_register_guard.py",
-          "size": 24915
-        },
-        {
-          "path": "scripts/check_register_pixels.py",
-          "size": 38712
-        },
-        {
-          "path": "scripts/check_skill_lossless.py",
-          "size": 11762
-        },
-        {
-          "path": "scripts/check_style_applied.py",
-          "size": 15035
-        },
-        {
-          "path": "scripts/check_surface.py",
-          "size": 38548
-        },
-        {
-          "path": "scripts/check_tests_wired.py",
-          "size": 4066
-        },
-        {
-          "path": "scripts/check_version.py",
-          "size": 15851
-        },
-        {
-          "path": "scripts/codex_delivery_gate.py",
-          "size": 136962
-        },
-        {
-          "path": "scripts/codex_handoff_guard.py",
-          "size": 2225
-        },
-        {
-          "path": "scripts/codex_visual_contract.py",
-          "size": 12957
-        },
-        {
-          "path": "scripts/component_audit.py",
-          "size": 22175
-        },
-        {
-          "path": "scripts/composition_cues.py",
-          "size": 13170
-        },
-        {
-          "path": "scripts/composition_probe.py",
-          "size": 36649
-        },
-        {
-          "path": "scripts/contact_sheet.py",
-          "size": 4614
-        },
-        {
-          "path": "scripts/crop_helper.py",
-          "size": 12957
-        },
-        {
-          "path": "scripts/deckkit.py",
-          "size": 638989
-        },
-        {
-          "path": "scripts/deck_cycle.py",
-          "size": 21934
-        },
-        {
-          "path": "scripts/deck_gates.py",
-          "size": 43472
-        },
-        {
-          "path": "scripts/delegated_picks.py",
-          "size": 16523
-        },
-        {
-          "path": "scripts/designed_charts.py",
-          "size": 43274
-        },
-        {
-          "path": "scripts/directions_diversity.py",
-          "size": 16393
-        },
-        {
-          "path": "scripts/dispatch_brief.py",
-          "size": 13380
-        },
-        {
-          "path": "scripts/export_notes.py",
-          "size": 3666
-        },
-        {
-          "path": "scripts/extract_deck.py",
-          "size": 9299
-        },
-        {
-          "path": "scripts/extract_pdf.py",
-          "size": 62531
-        },
-        {
-          "path": "scripts/fanout_record.py",
-          "size": 8769
-        },
-        {
-          "path": "scripts/fetch_images.py",
-          "size": 40796
-        },
-        {
-          "path": "scripts/formats.py",
-          "size": 18038
-        },
-        {
-          "path": "scripts/generate_images_codex.py",
-          "size": 26635
-        },
-        {
-          "path": "scripts/generate_images_openai.py",
-          "size": 8777
-        },
-        {
-          "path": "scripts/icons.py",
-          "size": 24958
-        },
-        {
-          "path": "scripts/image_fx.py",
-          "size": 5794
-        },
-        {
-          "path": "scripts/image_prompts.py",
-          "size": 9062
-        },
-        {
-          "path": "scripts/image_qc.py",
-          "size": 29337
-        },
-        {
-          "path": "scripts/ingest.py",
-          "size": 18145
-        },
-        {
-          "path": "scripts/inspect_template.py",
-          "size": 2528
-        },
-        {
-          "path": "scripts/install_skill.py",
-          "size": 11249
-        },
-        {
-          "path": "scripts/lint_deck.py",
-          "size": 235404
-        },
-        {
-          "path": "scripts/maps.py",
-          "size": 16024
-        },
-        {
-          "path": "scripts/material_probe.py",
-          "size": 4728
-        },
-        {
-          "path": "scripts/palette_audit.py",
-          "size": 15823
-        },
-        {
-          "path": "scripts/plan_rhythm.py",
-          "size": 21110
-        },
-        {
-          "path": "scripts/plan_wordcount.py",
-          "size": 3854
-        },
-        {
-          "path": "scripts/preflight_check.py",
-          "size": 39114
-        },
-        {
-          "path": "scripts/presets.py",
-          "size": 36325
-        },
-        {
-          "path": "scripts/register_surface.py",
-          "size": 65514
-        },
-        {
-          "path": "scripts/registry.py",
-          "size": 9532
-        },
-        {
-          "path": "scripts/render_deck.py",
-          "size": 275616
-        },
-        {
-          "path": "scripts/render_deck.sh",
-          "size": 603
-        },
-        {
-          "path": "scripts/roundtrip_budget.py",
-          "size": 12005
-        },
-        {
-          "path": "scripts/roundtrip_report.py",
-          "size": 7388
-        },
-        {
-          "path": "scripts/run_eval.py",
-          "size": 16741
-        },
-        {
-          "path": "scripts/save_register.py",
-          "size": 27094
-        },
-        {
-          "path": "scripts/sigs.py",
-          "size": 26360
-        },
-        {
-          "path": "scripts/skill_fingerprint.py",
-          "size": 6148
-        },
-        {
-          "path": "scripts/slide_index.py",
-          "size": 5305
-        },
-        {
-          "path": "scripts/smoke_component_audit.py",
-          "size": 10103
-        },
-        {
-          "path": "scripts/smoke_deckkit.py",
-          "size": 82726
-        },
-        {
-          "path": "scripts/smoke_directions.py",
-          "size": 21571
-        },
-        {
-          "path": "scripts/smoke_render_slides.py",
-          "size": 5620
-        },
-        {
-          "path": "scripts/taste_ledger.py",
-          "size": 17521
-        },
-        {
-          "path": "scripts/trace_composed.py",
-          "size": 7240
-        },
-        {
-          "path": "scripts/validate_review.py",
-          "size": 48247
-        },
-        {
-          "path": "scripts/written_reason.py",
-          "size": 2988
-        },
-        {
-          "path": "scripts/_console.py",
-          "size": 2430
+          "size": 3909
         },
         {
           "path": "SKILL.md",
-          "size": 299735
+          "size": 296827
+        },
+        {
+          "path": "agents/arbiter.md",
+          "size": 11979
+        },
+        {
+          "path": "agents/asset-prep.md",
+          "size": 7957
+        },
+        {
+          "path": "agents/blind-reader.md",
+          "size": 5737
+        },
+        {
+          "path": "agents/content-planner.md",
+          "size": 73720
+        },
+        {
+          "path": "agents/critic.md",
+          "size": 97977
+        },
+        {
+          "path": "agents/openai.yaml",
+          "size": 301
+        },
+        {
+          "path": "agents/slide-design.md",
+          "size": 103033
+        },
+        {
+          "path": "references/animation.md",
+          "size": 23185
+        },
+        {
+          "path": "references/asset-production.md",
+          "size": 27802
+        },
+        {
+          "path": "references/auto-delegation-quality-gates.md",
+          "size": 11478
+        },
+        {
+          "path": "references/bespoke-registers.md",
+          "size": 9478
+        },
+        {
+          "path": "references/canvas-formats.md",
+          "size": 12527
+        },
+        {
+          "path": "references/checkpoint-convention.md",
+          "size": 19828
+        },
+        {
+          "path": "references/codex-runtime.md",
+          "size": 46813
+        },
+        {
+          "path": "references/collaborative-mode.md",
+          "size": 19045
+        },
+        {
+          "path": "references/content-plan-spec.md",
+          "size": 9857
+        },
+        {
+          "path": "references/critic-panel.md",
+          "size": 21918
+        },
+        {
+          "path": "references/data-viz.md",
+          "size": 24859
+        },
+        {
+          "path": "references/deck-setup.md",
+          "size": 8847
+        },
+        {
+          "path": "references/design-by-purpose.md",
+          "size": 25439
+        },
+        {
+          "path": "references/design-by-topic.md",
+          "size": 12623
+        },
+        {
+          "path": "references/design-gallery.md",
+          "size": 21944
+        },
+        {
+          "path": "references/design-intelligence-addendum.md",
+          "size": 33191
+        },
+        {
+          "path": "references/design-principles.md",
+          "size": 77713
+        },
+        {
+          "path": "references/east-asian-aesthetic.md",
+          "size": 5778
+        },
+        {
+          "path": "references/examples/build_example_generic.py",
+          "size": 17638
+        },
+        {
+          "path": "references/examples/section_example.py",
+          "size": 4506
+        },
+        {
+          "path": "references/examples/style_example.py",
+          "size": 5227
+        },
+        {
+          "path": "references/file-inventory.md",
+          "size": 60744
+        },
+        {
+          "path": "references/font-guidance.md",
+          "size": 11756
+        },
+        {
+          "path": "references/form-selection.md",
+          "size": 25147
+        },
+        {
+          "path": "references/generated-template.md",
+          "size": 55440
+        },
+        {
+          "path": "references/handoff-and-iteration.md",
+          "size": 15128
+        },
+        {
+          "path": "references/handoff-checklist.md",
+          "size": 9564
+        },
+        {
+          "path": "references/icons.md",
+          "size": 24768
+        },
+        {
+          "path": "references/image-generation.md",
+          "size": 49163
+        },
+        {
+          "path": "references/interview-protocol.md",
+          "size": 50548
+        },
+        {
+          "path": "references/large-deck-orchestration.md",
+          "size": 12213
+        },
+        {
+          "path": "references/maintenance-boundaries.md",
+          "size": 11916
+        },
+        {
+          "path": "references/multilingual.md",
+          "size": 22225
+        },
+        {
+          "path": "references/redesign-existing-deck.md",
+          "size": 11306
+        },
+        {
+          "path": "references/review-rubrics.md",
+          "size": 71351
+        },
+        {
+          "path": "references/runtime-routing.md",
+          "size": 2601
+        },
+        {
+          "path": "references/schematic-diagrams.md",
+          "size": 21754
+        },
+        {
+          "path": "references/security-and-capabilities.md",
+          "size": 7336
+        },
+        {
+          "path": "references/semantic-color-contract.md",
+          "size": 4404
+        },
+        {
+          "path": "references/style-analysis.md",
+          "size": 6120
+        },
+        {
+          "path": "references/troubleshooting-faq.md",
+          "size": 55548
+        },
+        {
+          "path": "references/user-taste.md",
+          "size": 11616
+        },
+        {
+          "path": "requirements.txt",
+          "size": 882
+        },
+        {
+          "path": "scripts/.deck-cycle-state.json",
+          "size": 99
+        },
+        {
+          "path": "scripts/_console.py",
+          "size": 2382
+        },
+        {
+          "path": "scripts/anchor_proof.py",
+          "size": 9685
+        },
+        {
+          "path": "scripts/anim.py",
+          "size": 10353
+        },
+        {
+          "path": "scripts/arc_divergence.py",
+          "size": 26108
+        },
+        {
+          "path": "scripts/archetypes.py",
+          "size": 7238
+        },
+        {
+          "path": "scripts/archetypes_html.py",
+          "size": 53675
+        },
+        {
+          "path": "scripts/assemble.py",
+          "size": 6951
+        },
+        {
+          "path": "scripts/audience_brief.py",
+          "size": 7469
+        },
+        {
+          "path": "scripts/bespoke_kits.py",
+          "size": 16547
+        },
+        {
+          "path": "scripts/blind_read.py",
+          "size": 63357
+        },
+        {
+          "path": "scripts/canon_probe.py",
+          "size": 14480
+        },
+        {
+          "path": "scripts/check_design_contracts.py",
+          "size": 17554
+        },
+        {
+          "path": "scripts/check_direction_applied.py",
+          "size": 20211
+        },
+        {
+          "path": "scripts/check_env.py",
+          "size": 14217
+        },
+        {
+          "path": "scripts/check_env.sh",
+          "size": 450
+        },
+        {
+          "path": "scripts/check_gate_parity.py",
+          "size": 5459
+        },
+        {
+          "path": "scripts/check_image_provenance.py",
+          "size": 23531
+        },
+        {
+          "path": "scripts/check_inventory.py",
+          "size": 4802
+        },
+        {
+          "path": "scripts/check_param_reach.py",
+          "size": 7644
+        },
+        {
+          "path": "scripts/check_reason_width.py",
+          "size": 4736
+        },
+        {
+          "path": "scripts/check_reference_code.py",
+          "size": 9442
+        },
+        {
+          "path": "scripts/check_register_guard.py",
+          "size": 24418
+        },
+        {
+          "path": "scripts/check_register_pixels.py",
+          "size": 38019
+        },
+        {
+          "path": "scripts/check_skill_lossless.py",
+          "size": 11505
+        },
+        {
+          "path": "scripts/check_style_applied.py",
+          "size": 14743
+        },
+        {
+          "path": "scripts/check_surface.py",
+          "size": 37884
+        },
+        {
+          "path": "scripts/check_tests_wired.py",
+          "size": 3971
+        },
+        {
+          "path": "scripts/check_version.py",
+          "size": 15538
+        },
+        {
+          "path": "scripts/codex_delivery_gate.py",
+          "size": 134495
+        },
+        {
+          "path": "scripts/codex_handoff_guard.py",
+          "size": 2159
+        },
+        {
+          "path": "scripts/codex_visual_contract.py",
+          "size": 12645
+        },
+        {
+          "path": "scripts/component_audit.py",
+          "size": 21777
+        },
+        {
+          "path": "scripts/composition_cues.py",
+          "size": 12899
+        },
+        {
+          "path": "scripts/composition_probe.py",
+          "size": 35970
+        },
+        {
+          "path": "scripts/contact_sheet.py",
+          "size": 4505
+        },
+        {
+          "path": "scripts/crop_helper.py",
+          "size": 12689
+        },
+        {
+          "path": "scripts/deck_cycle.py",
+          "size": 21520
+        },
+        {
+          "path": "scripts/deck_gates.py",
+          "size": 42716
+        },
+        {
+          "path": "scripts/deckkit.py",
+          "size": 628204
+        },
+        {
+          "path": "scripts/delegated_picks.py",
+          "size": 16203
+        },
+        {
+          "path": "scripts/designed_charts.py",
+          "size": 42550
+        },
+        {
+          "path": "scripts/directions_diversity.py",
+          "size": 16109
+        },
+        {
+          "path": "scripts/dispatch_brief.py",
+          "size": 13134
+        },
+        {
+          "path": "scripts/export_notes.py",
+          "size": 3583
+        },
+        {
+          "path": "scripts/extract_deck.py",
+          "size": 9100
+        },
+        {
+          "path": "scripts/extract_pdf.py",
+          "size": 61338
+        },
+        {
+          "path": "scripts/fanout_record.py",
+          "size": 8561
+        },
+        {
+          "path": "scripts/fetch_images.py",
+          "size": 39923
+        },
+        {
+          "path": "scripts/formats.py",
+          "size": 17749
+        },
+        {
+          "path": "scripts/generate_images_codex.py",
+          "size": 26143
+        },
+        {
+          "path": "scripts/generate_images_openai.py",
+          "size": 8570
+        },
+        {
+          "path": "scripts/icons.py",
+          "size": 24515
+        },
+        {
+          "path": "scripts/image_fx.py",
+          "size": 5683
+        },
+        {
+          "path": "scripts/image_prompts.py",
+          "size": 8869
+        },
+        {
+          "path": "scripts/image_qc.py",
+          "size": 28662
+        },
+        {
+          "path": "scripts/ingest.py",
+          "size": 17789
+        },
+        {
+          "path": "scripts/inspect_template.py",
+          "size": 2472
+        },
+        {
+          "path": "scripts/install_skill.py",
+          "size": 10999
+        },
+        {
+          "path": "scripts/lint_deck.py",
+          "size": 231714
+        },
+        {
+          "path": "scripts/maps.py",
+          "size": 15688
+        },
+        {
+          "path": "scripts/material_probe.py",
+          "size": 4644
+        },
+        {
+          "path": "scripts/palette_audit.py",
+          "size": 15501
+        },
+        {
+          "path": "scripts/plan_rhythm.py",
+          "size": 20724
+        },
+        {
+          "path": "scripts/plan_wordcount.py",
+          "size": 3774
+        },
+        {
+          "path": "scripts/preflight_check.py",
+          "size": 38371
+        },
+        {
+          "path": "scripts/presets.py",
+          "size": 35808
+        },
+        {
+          "path": "scripts/register_surface.py",
+          "size": 64183
+        },
+        {
+          "path": "scripts/registry.py",
+          "size": 9330
+        },
+        {
+          "path": "scripts/render_deck.py",
+          "size": 271206
+        },
+        {
+          "path": "scripts/render_deck.sh",
+          "size": 592
+        },
+        {
+          "path": "scripts/roundtrip_budget.py",
+          "size": 11758
+        },
+        {
+          "path": "scripts/roundtrip_report.py",
+          "size": 7219
+        },
+        {
+          "path": "scripts/run_eval.py",
+          "size": 16370
+        },
+        {
+          "path": "scripts/save_register.py",
+          "size": 26538
+        },
+        {
+          "path": "scripts/sigs.py",
+          "size": 25949
+        },
+        {
+          "path": "scripts/skill_fingerprint.py",
+          "size": 6010
+        },
+        {
+          "path": "scripts/slide_index.py",
+          "size": 5179
+        },
+        {
+          "path": "scripts/smoke_component_audit.py",
+          "size": 9925
+        },
+        {
+          "path": "scripts/smoke_deckkit.py",
+          "size": 81350
+        },
+        {
+          "path": "scripts/smoke_directions.py",
+          "size": 21217
+        },
+        {
+          "path": "scripts/smoke_render_slides.py",
+          "size": 5486
+        },
+        {
+          "path": "scripts/taste_ledger.py",
+          "size": 17165
+        },
+        {
+          "path": "scripts/trace_composed.py",
+          "size": 7076
+        },
+        {
+          "path": "scripts/validate_review.py",
+          "size": 47375
+        },
+        {
+          "path": "scripts/written_reason.py",
+          "size": 2932
+        }
+      ],
+      "needsKey": false
+    },
+    {
+      "id": "ste-zh-writing",
+      "name": "ste-zh-writing",
+      "description": "按 STE（简化技术英语）中文落地版生成与改写中文长文档：12 条写作铁律、长文档骨架、术语表纪律，自带 check.js 评分门禁（得分>=90 且 0 错误级才交付）。Use when writing Chinese technical documents: 说明书, 操作手册, 用户指南, SOP, 维保手册, README, 帮助中心长文.",
+      "version": "1.0.0",
+      "category": "写作工具",
+      "tags": [
+        "技术写作",
+        "STE",
+        "简化技术英语",
+        "中文文档",
+        "写作规范",
+        "文档生成",
+        "质量门禁"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-02T00:00:00.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 5026
+        },
+        {
+          "path": "check.js",
+          "size": 1902
+        },
+        {
+          "path": "engine.js",
+          "size": 16845
+        },
+        {
+          "path": "package.json",
+          "size": 148
         }
       ],
       "needsKey": false
@@ -2264,7 +2464,15 @@
       "files": [
         {
           "path": ".gitignore",
-          "size": 74
+          "size": 70
+        },
+        {
+          "path": "README.md",
+          "size": 2140
+        },
+        {
+          "path": "SKILL.md",
+          "size": 8674
         },
         {
           "path": "demo/workflow-v2.png",
@@ -2272,11 +2480,11 @@
         },
         {
           "path": "demo/workflow.d2",
-          "size": 983
+          "size": 945
         },
         {
           "path": "demo/workflow.json",
-          "size": 2939
+          "size": 2767
         },
         {
           "path": "demo/workflow.png",
@@ -2284,67 +2492,59 @@
         },
         {
           "path": "demo/workflow.ttg.json",
-          "size": 2430
+          "size": 2393
         },
         {
           "path": "package-lock.json",
-          "size": 604
+          "size": 582
         },
         {
           "path": "package.json",
-          "size": 283
-        },
-        {
-          "path": "README.md",
-          "size": 2203
+          "size": 268
         },
         {
           "path": "scripts/build_preview.mjs",
-          "size": 2643
+          "size": 2589
         },
         {
           "path": "scripts/check_d2.mjs",
-          "size": 1741
+          "size": 1698
         },
         {
           "path": "scripts/generate.mjs",
-          "size": 3730
+          "size": 3634
         },
         {
           "path": "scripts/json_to_d2.mjs",
-          "size": 3706
+          "size": 3622
         },
         {
           "path": "scripts/ttg_to_spec.mjs",
-          "size": 10209
+          "size": 9987
         },
         {
           "path": "scripts/validate_spec.mjs",
-          "size": 7047
-        },
-        {
-          "path": "SKILL.md",
-          "size": 8796
+          "size": 6899
         },
         {
           "path": "test/json_to_d2.test.mjs",
-          "size": 4029
+          "size": 3921
         },
         {
           "path": "test/ttg_to_spec.test.mjs",
-          "size": 5546
+          "size": 5406
         },
         {
           "path": "test/validate_spec.test.mjs",
-          "size": 5086
+          "size": 4949
         },
         {
           "path": "vendor/d2.browser.js",
-          "size": 8196890
+          "size": 8194866
         },
         {
           "path": "web/index.html",
-          "size": 10436
+          "size": 10208
         }
       ],
       "needsKey": false
@@ -2365,7 +2565,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 11118
+          "size": 10909
         }
       ],
       "needsKey": false
@@ -2391,7 +2591,276 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 2592
+          "size": 2545
+        }
+      ],
+      "needsKey": false
+    },
+    {
+      "id": "toutiao-mcp",
+      "name": "toutiao-mcp",
+      "description": "今日头条内容管理 MCP server——自动登录、图文/微头条发布、数据分析、报告生成。基于 TypeScript + MCP SDK，支持 Cookie 持久化。来源: freedom2022/toutiao-mcp (GitHub)。",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "files": [
+        {
+          "path": "README.md",
+          "size": 7327
+        },
+        {
+          "path": "SKILL.md",
+          "size": 1457
+        },
+        {
+          "path": "dist/index.d.ts",
+          "size": 113
+        },
+        {
+          "path": "dist/index.d.ts.map",
+          "size": 115
+        },
+        {
+          "path": "dist/index.js",
+          "size": 11234
+        },
+        {
+          "path": "dist/index.js.map",
+          "size": 7941
+        },
+        {
+          "path": "dist/lib/analytics.d.ts",
+          "size": 686
+        },
+        {
+          "path": "dist/lib/analytics.d.ts.map",
+          "size": 549
+        },
+        {
+          "path": "dist/lib/analytics.js",
+          "size": 4535
+        },
+        {
+          "path": "dist/lib/analytics.js.map",
+          "size": 3407
+        },
+        {
+          "path": "dist/lib/auth.d.ts",
+          "size": 1200
+        },
+        {
+          "path": "dist/lib/auth.d.ts.map",
+          "size": 775
+        },
+        {
+          "path": "dist/lib/auth.js",
+          "size": 11909
+        },
+        {
+          "path": "dist/lib/auth.js.map",
+          "size": 7473
+        },
+        {
+          "path": "dist/lib/config.d.ts",
+          "size": 1236
+        },
+        {
+          "path": "dist/lib/config.d.ts.map",
+          "size": 432
+        },
+        {
+          "path": "dist/lib/config.js",
+          "size": 4221
+        },
+        {
+          "path": "dist/lib/config.js.map",
+          "size": 1600
+        },
+        {
+          "path": "dist/lib/publisher.d.ts",
+          "size": 1034
+        },
+        {
+          "path": "dist/lib/publisher.d.ts.map",
+          "size": 712
+        },
+        {
+          "path": "dist/lib/publisher.js",
+          "size": 21842
+        },
+        {
+          "path": "dist/lib/publisher.js.map",
+          "size": 14712
+        },
+        {
+          "path": "dist/lib/wenyan-converter.d.ts",
+          "size": 1894
+        },
+        {
+          "path": "dist/lib/wenyan-converter.d.ts.map",
+          "size": 1099
+        },
+        {
+          "path": "dist/lib/wenyan-converter.js",
+          "size": 3466
+        },
+        {
+          "path": "dist/lib/wenyan-converter.js.map",
+          "size": 1219
+        },
+        {
+          "path": "dist/scripts/auto-publish-knowledge.d.ts",
+          "size": 702
+        },
+        {
+          "path": "dist/scripts/auto-publish-knowledge.d.ts.map",
+          "size": 514
+        },
+        {
+          "path": "dist/scripts/auto-publish-knowledge.js",
+          "size": 37295
+        },
+        {
+          "path": "dist/scripts/auto-publish-knowledge.js.map",
+          "size": 24484
+        },
+        {
+          "path": "dist/scripts/auto-publish-news.d.ts",
+          "size": 1153
+        },
+        {
+          "path": "dist/scripts/auto-publish-news.d.ts.map",
+          "size": 872
+        },
+        {
+          "path": "dist/scripts/auto-publish-news.js",
+          "size": 12168
+        },
+        {
+          "path": "dist/scripts/auto-publish-news.js.map",
+          "size": 9803
+        },
+        {
+          "path": "dist/scripts/auto-publish-with-ai.d.ts",
+          "size": 401
+        },
+        {
+          "path": "dist/scripts/auto-publish-with-ai.d.ts.map",
+          "size": 230
+        },
+        {
+          "path": "dist/scripts/auto-publish-with-ai.js",
+          "size": 11400
+        },
+        {
+          "path": "dist/scripts/auto-publish-with-ai.js.map",
+          "size": 8168
+        },
+        {
+          "path": "dist/scripts/login.d.ts",
+          "size": 101
+        },
+        {
+          "path": "dist/scripts/login.d.ts.map",
+          "size": 126
+        },
+        {
+          "path": "dist/scripts/login.js",
+          "size": 1413
+        },
+        {
+          "path": "dist/scripts/login.js.map",
+          "size": 1411
+        },
+        {
+          "path": "dist/scripts/test-publish.d.ts",
+          "size": 114
+        },
+        {
+          "path": "dist/scripts/test-publish.d.ts.map",
+          "size": 140
+        },
+        {
+          "path": "dist/scripts/test-publish.js",
+          "size": 6091
+        },
+        {
+          "path": "dist/scripts/test-publish.js.map",
+          "size": 5054
+        },
+        {
+          "path": "dist/types/index.d.ts",
+          "size": 2486
+        },
+        {
+          "path": "dist/types/index.d.ts.map",
+          "size": 2815
+        },
+        {
+          "path": "dist/types/index.js",
+          "size": 160
+        },
+        {
+          "path": "dist/types/index.js.map",
+          "size": 122
+        },
+        {
+          "path": "package.json",
+          "size": 1280
+        },
+        {
+          "path": "src/index.ts",
+          "size": 9922
+        },
+        {
+          "path": "src/lib/analytics.ts",
+          "size": 3934
+        },
+        {
+          "path": "src/lib/auth.ts",
+          "size": 9356
+        },
+        {
+          "path": "src/lib/config.ts",
+          "size": 2578
+        },
+        {
+          "path": "src/lib/publisher.ts",
+          "size": 17878
+        },
+        {
+          "path": "src/lib/wenyan-converter.ts",
+          "size": 3147
+        },
+        {
+          "path": "src/scripts/auto-publish-knowledge.ts",
+          "size": 35288
+        },
+        {
+          "path": "src/scripts/auto-publish-news.ts",
+          "size": 12225
+        },
+        {
+          "path": "src/scripts/auto-publish-with-ai.ts",
+          "size": 11603
+        },
+        {
+          "path": "src/scripts/login.ts",
+          "size": 1266
+        },
+        {
+          "path": "src/scripts/test-publish.ts",
+          "size": 4298
+        },
+        {
+          "path": "src/types/index.ts",
+          "size": 2426
+        },
+        {
+          "path": "tsconfig.json",
+          "size": 497
         }
       ],
       "needsKey": false
@@ -2415,11 +2884,11 @@
       "files": [
         {
           "path": "LICENSE",
-          "size": 1089
+          "size": 1068
         },
         {
           "path": "SKILL.md",
-          "size": 10140
+          "size": 9997
         }
       ],
       "needsKey": false
@@ -2439,220 +2908,220 @@
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "files": [
         {
+          "path": "SKILL.md",
+          "size": 6448
+        },
+        {
           "path": "assets/examples/before-after-article.md",
-          "size": 7145
+          "size": 7027
         },
         {
           "path": "assets/examples/before-after-linkedin.md",
-          "size": 6868
+          "size": 6650
         },
         {
           "path": "assets/examples/before-after-sales.md",
-          "size": 6850
+          "size": 6636
         },
         {
           "path": "presets/crisp-human.md",
-          "size": 1131
+          "size": 1104
         },
         {
           "path": "presets/expert-human.md",
-          "size": 4061
+          "size": 3941
         },
         {
           "path": "presets/story-lean.md",
-          "size": 4418
+          "size": 4282
         },
         {
           "path": "presets/warm-human.md",
-          "size": 3900
+          "size": 3779
         },
         {
           "path": "references/calibrate.md",
-          "size": 7584
+          "size": 7462
         },
         {
           "path": "references/commands/cleanup.md",
-          "size": 2695
+          "size": 2636
         },
         {
           "path": "references/commands/contribute.md",
-          "size": 2579
+          "size": 2528
         },
         {
           "path": "references/commands/mimic.md",
-          "size": 3211
+          "size": 3145
         },
         {
           "path": "references/commands/rewrite.md",
-          "size": 2159
+          "size": 2110
         },
         {
           "path": "references/commands/teach.md",
-          "size": 3799
+          "size": 3722
         },
         {
           "path": "references/contribute.md",
-          "size": 3772
+          "size": 3666
         },
         {
           "path": "references/core-contract.md",
-          "size": 4958
+          "size": 4863
         },
         {
           "path": "references/edit-library.md",
-          "size": 14529
+          "size": 14114
         },
         {
           "path": "references/fact-preservation.md",
-          "size": 5058
+          "size": 4889
         },
         {
           "path": "references/harvest.md",
-          "size": 2586
+          "size": 2545
         },
         {
           "path": "references/maintenance.md",
-          "size": 4403
+          "size": 4312
         },
         {
           "path": "references/mimic.md",
-          "size": 10873
+          "size": 10679
         },
         {
           "path": "references/packs/manifest.json",
-          "size": 1901
+          "size": 1826
         },
         {
           "path": "references/packs/pack-facts.md",
-          "size": 1400
+          "size": 1372
         },
         {
           "path": "references/packs/pack-phrases-core.md",
-          "size": 1685
+          "size": 1655
         },
         {
           "path": "references/packs/pack-register-guards.md",
-          "size": 1899
+          "size": 1869
         },
         {
           "path": "references/packs/pack-structure.md",
-          "size": 2513
+          "size": 2482
         },
         {
           "path": "references/packs/pack-voice.md",
-          "size": 3244
+          "size": 3211
         },
         {
           "path": "references/personality-guide.md",
-          "size": 5773
+          "size": 5663
         },
         {
           "path": "references/pipeline.md",
-          "size": 23067
+          "size": 22702
         },
         {
           "path": "references/refresh.md",
-          "size": 3815
+          "size": 3725
         },
         {
           "path": "references/rewrite-examples.md",
-          "size": 794
+          "size": 777
         },
         {
           "path": "references/rubric.md",
-          "size": 7158
+          "size": 6987
         },
         {
           "path": "references/taboo-phrases.md",
-          "size": 51539
-        },
-        {
-          "path": "scripts/banned_phrase_scan.py",
-          "size": 33634
-        },
-        {
-          "path": "scripts/calibrate_pairs.py",
-          "size": 24407
-        },
-        {
-          "path": "scripts/calibrate_score.py",
-          "size": 9550
-        },
-        {
-          "path": "scripts/check_packs.py",
-          "size": 2781
-        },
-        {
-          "path": "scripts/check_suggestions.py",
-          "size": 8467
-        },
-        {
-          "path": "scripts/contribute.py",
-          "size": 14578
-        },
-        {
-          "path": "scripts/diff_check.py",
-          "size": 4534
-        },
-        {
-          "path": "scripts/extract_constraints.py",
-          "size": 7177
-        },
-        {
-          "path": "scripts/harvest_classify.py",
-          "size": 8053
-        },
-        {
-          "path": "scripts/harvest_samples.py",
-          "size": 19300
-        },
-        {
-          "path": "scripts/readability_metrics.py",
-          "size": 10067
-        },
-        {
-          "path": "scripts/refresh_status.py",
-          "size": 4920
-        },
-        {
-          "path": "scripts/silhouette_scan.py",
-          "size": 14632
-        },
-        {
-          "path": "scripts/structure_scan.py",
-          "size": 13479
-        },
-        {
-          "path": "scripts/suggest.py",
-          "size": 8043
-        },
-        {
-          "path": "scripts/validate_preservation.py",
-          "size": 14882
-        },
-        {
-          "path": "scripts/voice_card.py",
-          "size": 19044
-        },
-        {
-          "path": "scripts/voice_profile.py",
-          "size": 7277
-        },
-        {
-          "path": "scripts/voice_score.py",
-          "size": 10406
-        },
-        {
-          "path": "scripts/wiki_sync.py",
-          "size": 16103
+          "size": 50356
         },
         {
           "path": "scripts/_lang.py",
-          "size": 4705
+          "size": 4599
         },
         {
-          "path": "SKILL.md",
-          "size": 6579
+          "path": "scripts/banned_phrase_scan.py",
+          "size": 32850
+        },
+        {
+          "path": "scripts/calibrate_pairs.py",
+          "size": 23827
+        },
+        {
+          "path": "scripts/calibrate_score.py",
+          "size": 9277
+        },
+        {
+          "path": "scripts/check_packs.py",
+          "size": 2701
+        },
+        {
+          "path": "scripts/check_suggestions.py",
+          "size": 8242
+        },
+        {
+          "path": "scripts/contribute.py",
+          "size": 14205
+        },
+        {
+          "path": "scripts/diff_check.py",
+          "size": 4395
+        },
+        {
+          "path": "scripts/extract_constraints.py",
+          "size": 6976
+        },
+        {
+          "path": "scripts/harvest_classify.py",
+          "size": 7830
+        },
+        {
+          "path": "scripts/harvest_samples.py",
+          "size": 18766
+        },
+        {
+          "path": "scripts/readability_metrics.py",
+          "size": 9772
+        },
+        {
+          "path": "scripts/refresh_status.py",
+          "size": 4766
+        },
+        {
+          "path": "scripts/silhouette_scan.py",
+          "size": 14242
+        },
+        {
+          "path": "scripts/structure_scan.py",
+          "size": 13157
+        },
+        {
+          "path": "scripts/suggest.py",
+          "size": 7832
+        },
+        {
+          "path": "scripts/validate_preservation.py",
+          "size": 14473
+        },
+        {
+          "path": "scripts/voice_card.py",
+          "size": 18548
+        },
+        {
+          "path": "scripts/voice_profile.py",
+          "size": 7083
+        },
+        {
+          "path": "scripts/voice_score.py",
+          "size": 10135
+        },
+        {
+          "path": "scripts/wiki_sync.py",
+          "size": 15624
         }
       ],
       "needsKey": false
@@ -2673,7 +3142,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 8222
+          "size": 8006
         }
       ],
       "needsKey": true
@@ -2695,56 +3164,56 @@
       "updatedAt": "2026-09-18T08:00:00.000Z",
       "files": [
         {
+          "path": "SKILL.md",
+          "size": 32749
+        },
+        {
           "path": "content-playbook.md",
-          "size": 7418
+          "size": 7261
         },
         {
           "path": "scripts/assets/fontconfig.conf",
-          "size": 370
+          "size": 362
         },
         {
           "path": "scripts/bili_login.mjs",
-          "size": 5254
+          "size": 5142
         },
         {
           "path": "scripts/build.sh",
-          "size": 974
+          "size": 940
         },
         {
           "path": "scripts/cards.mjs",
-          "size": 19905
+          "size": 19558
         },
         {
           "path": "scripts/compose.js",
-          "size": 7782
+          "size": 7621
         },
         {
           "path": "scripts/gen-storyboard.mjs",
-          "size": 4619
+          "size": 4540
         },
         {
           "path": "scripts/post.mjs",
-          "size": 2409
+          "size": 2367
         },
         {
           "path": "scripts/record.js",
-          "size": 11539
+          "size": 11266
         },
         {
           "path": "scripts/storyboard.json",
-          "size": 6455
+          "size": 6196
         },
         {
           "path": "scripts/tts.js",
-          "size": 1256
+          "size": 1227
         },
         {
           "path": "scripts/tts.mjs",
-          "size": 9175
-        },
-        {
-          "path": "SKILL.md",
-          "size": 33129
+          "size": 8985
         }
       ],
       "needsKey": true
@@ -2767,7 +3236,7 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 6455
+          "size": 6342
         }
       ],
       "needsKey": false
@@ -2791,143 +3260,155 @@
       "files": [
         {
           "path": ".gitignore",
-          "size": 185
+          "size": 177
+        },
+        {
+          "path": "LICENSE",
+          "size": 1085
+        },
+        {
+          "path": "README.md",
+          "size": 4399
+        },
+        {
+          "path": "SKILL.md",
+          "size": 26664
         },
         {
           "path": "engine/assets/bench_v1/asset.js",
-          "size": 1705
+          "size": 1657
         },
         {
           "path": "engine/assets/bench_v1/definition.json",
-          "size": 1199
+          "size": 1144
         },
         {
           "path": "engine/assets/bicycle_v1/asset.js",
-          "size": 5611
+          "size": 5475
         },
         {
           "path": "engine/assets/bicycle_v1/definition.json",
-          "size": 1088
+          "size": 1039
         },
         {
           "path": "engine/assets/building_tower_v1/asset.js",
-          "size": 2619
+          "size": 2543
         },
         {
           "path": "engine/assets/building_tower_v1/definition.json",
-          "size": 1427
+          "size": 1364
         },
         {
           "path": "engine/assets/car_sedan_v1/asset.js",
-          "size": 2576
+          "size": 2516
         },
         {
           "path": "engine/assets/car_sedan_v1/definition.json",
-          "size": 1231
+          "size": 1176
         },
         {
           "path": "engine/assets/chair_v1/asset.js",
-          "size": 1138
-        },
-        {
-          "path": "engine/assets/chair_v1/definition.json",
-          "size": 820
-        },
-        {
-          "path": "engine/assets/hedge_bush_v1/asset.js",
-          "size": 2223
-        },
-        {
-          "path": "engine/assets/hedge_bush_v1/definition.json",
-          "size": 971
-        },
-        {
-          "path": "engine/assets/hut_cabin_v1/asset.js",
-          "size": 1897
-        },
-        {
-          "path": "engine/assets/hut_cabin_v1/definition.json",
-          "size": 1355
-        },
-        {
-          "path": "engine/assets/patio_umbrella_v1/asset.js",
-          "size": 1084
-        },
-        {
-          "path": "engine/assets/patio_umbrella_v1/definition.json",
-          "size": 1028
-        },
-        {
-          "path": "engine/assets/pier_v1/asset.js",
-          "size": 5061901
-        },
-        {
-          "path": "engine/assets/pier_v1/definition.json",
-          "size": 536
-        },
-        {
-          "path": "engine/assets/pool_v1/asset.js",
-          "size": 1482
-        },
-        {
-          "path": "engine/assets/pool_v1/definition.json",
-          "size": 1084
-        },
-        {
-          "path": "engine/assets/rock_boulder_v1/asset.js",
-          "size": 1142
-        },
-        {
-          "path": "engine/assets/rock_boulder_v1/definition.json",
-          "size": 1156
-        },
-        {
-          "path": "engine/assets/street_lamp_v1/asset.js",
           "size": 1101
         },
         {
+          "path": "engine/assets/chair_v1/definition.json",
+          "size": 780
+        },
+        {
+          "path": "engine/assets/hedge_bush_v1/asset.js",
+          "size": 2161
+        },
+        {
+          "path": "engine/assets/hedge_bush_v1/definition.json",
+          "size": 925
+        },
+        {
+          "path": "engine/assets/hut_cabin_v1/asset.js",
+          "size": 1844
+        },
+        {
+          "path": "engine/assets/hut_cabin_v1/definition.json",
+          "size": 1293
+        },
+        {
+          "path": "engine/assets/patio_umbrella_v1/asset.js",
+          "size": 1048
+        },
+        {
+          "path": "engine/assets/patio_umbrella_v1/definition.json",
+          "size": 981
+        },
+        {
+          "path": "engine/assets/pier_v1/asset.js",
+          "size": 5061747
+        },
+        {
+          "path": "engine/assets/pier_v1/definition.json",
+          "size": 510
+        },
+        {
+          "path": "engine/assets/pool_v1/asset.js",
+          "size": 1435
+        },
+        {
+          "path": "engine/assets/pool_v1/definition.json",
+          "size": 1032
+        },
+        {
+          "path": "engine/assets/rock_boulder_v1/asset.js",
+          "size": 1108
+        },
+        {
+          "path": "engine/assets/rock_boulder_v1/definition.json",
+          "size": 1103
+        },
+        {
+          "path": "engine/assets/street_lamp_v1/asset.js",
+          "size": 1060
+        },
+        {
           "path": "engine/assets/street_lamp_v1/definition.json",
-          "size": 1003
+          "size": 956
         },
         {
           "path": "engine/assets/sun_lounger_v1/asset.js",
-          "size": 2047
+          "size": 1989
         },
         {
           "path": "engine/assets/sun_lounger_v1/definition.json",
-          "size": 1222
+          "size": 1166
         },
         {
           "path": "engine/assets/table_desk_v1/asset.js",
-          "size": 805
+          "size": 778
         },
         {
           "path": "engine/assets/table_desk_v1/definition.json",
-          "size": 1031
+          "size": 982
         },
         {
           "path": "engine/assets/tree_conifer_v1/asset.js",
-          "size": 1076
+          "size": 1044
         },
         {
           "path": "engine/assets/tree_conifer_v1/definition.json",
-          "size": 1340
+          "size": 1281
         },
         {
           "path": "engine/assets/tree_round_v1/asset.js",
-          "size": 1919
+          "size": 1863
         },
         {
           "path": "engine/assets/tree_round_v1/definition.json",
-          "size": 1178
+          "size": 1126
         },
         {
           "path": "engine/assets/villa_modern_v1/asset.js",
-          "size": 3183
+          "size": 3102
         },
         {
           "path": "engine/assets/villa_modern_v1/definition.json",
-          "size": 1451
+          "size": 1386
         },
         {
           "path": "engine/assets-bin/hdri/day_partly_cloudy_1k.hdr",
@@ -2939,7 +3420,7 @@
         },
         {
           "path": "engine/assets-bin/manifest.json",
-          "size": 8185
+          "size": 7744
         },
         {
           "path": "engine/assets-bin/packs/asphalt/color.jpg",
@@ -3123,171 +3604,159 @@
         },
         {
           "path": "engine/edit-server.mjs",
-          "size": 3875
+          "size": 3787
         },
         {
           "path": "engine/index.mjs",
-          "size": 30405
+          "size": 29755
         },
         {
           "path": "engine/lib/elevation.mjs",
-          "size": 1795
+          "size": 1745
         },
         {
           "path": "engine/lib/expand.mjs",
-          "size": 5057
+          "size": 4938
         },
         {
           "path": "engine/lib/geom.mjs",
-          "size": 2357
+          "size": 2281
         },
         {
           "path": "engine/lib/plan-lint.mjs",
-          "size": 4397
+          "size": 4304
         },
         {
           "path": "engine/lib/registry.mjs",
-          "size": 1462
+          "size": 1423
         },
         {
           "path": "engine/lib/rng.mjs",
-          "size": 652
+          "size": 625
         },
         {
           "path": "engine/lib/schema-rules.mjs",
-          "size": 8196
+          "size": 7968
         },
         {
           "path": "engine/lib/solve.mjs",
-          "size": 12204
+          "size": 11905
         },
         {
           "path": "engine/lib/validate-assets.mjs",
-          "size": 4395
+          "size": 4293
         },
         {
           "path": "engine/night-glb-probe.mjs",
-          "size": 2300
+          "size": 2249
         },
         {
           "path": "engine/packer.mjs",
-          "size": 8628
+          "size": 8440
         },
         {
           "path": "engine/probe-props.mjs",
-          "size": 2805
+          "size": 2747
         },
         {
           "path": "engine/props-library.json",
-          "size": 6662
+          "size": 6496
         },
         {
           "path": "engine/screenshot.mjs",
-          "size": 2598
+          "size": 2539
         },
         {
           "path": "engine/test-edit-flow.mjs",
-          "size": 5783
+          "size": 5678
         },
         {
           "path": "engine/tools/build-texture-packs.py",
-          "size": 6247
+          "size": 6060
         },
         {
           "path": "engine/tools/glb-to-asset.py",
-          "size": 20866
+          "size": 20354
         },
         {
           "path": "engine/viewer-template.html",
-          "size": 63386
+          "size": 61957
         },
         {
           "path": "engine/visual-check.mjs",
-          "size": 4798
-        },
-        {
-          "path": "LICENSE",
-          "size": 1106
+          "size": 4692
         },
         {
           "path": "package.json",
-          "size": 643
-        },
-        {
-          "path": "README.md",
-          "size": 4492
+          "size": 625
         },
         {
           "path": "scenes/bicycle/scene-plan.json",
-          "size": 931
+          "size": 896
         },
         {
           "path": "scenes/bicycle/validation-report.md",
-          "size": 852
+          "size": 820
         },
         {
           "path": "scenes/campus/patch-1.json",
-          "size": 698
+          "size": 682
         },
         {
           "path": "scenes/campus/refine-1.json",
-          "size": 3628
+          "size": 3553
         },
         {
           "path": "scenes/campus/refine-2.json",
-          "size": 884
+          "size": 855
         },
         {
           "path": "scenes/campus/scene-plan.json",
-          "size": 3593
+          "size": 3481
         },
         {
           "path": "scenes/campus/validation-report.md",
-          "size": 850
+          "size": 818
         },
         {
           "path": "scenes/demo/scene-plan.json",
-          "size": 3603
+          "size": 3485
         },
         {
           "path": "scenes/demo/validation-report.md",
-          "size": 846
+          "size": 814
         },
         {
           "path": "scenes/forest/scene-plan.json",
-          "size": 4460
+          "size": 4255
         },
         {
           "path": "scenes/forest/validation-report.md",
-          "size": 850
+          "size": 818
         },
         {
           "path": "scenes/villa/instance-list.json",
-          "size": 19191
+          "size": 18489
         },
         {
           "path": "scenes/villa/patch-1.json",
-          "size": 1050
+          "size": 1003
         },
         {
           "path": "scenes/villa/patch-props.json",
-          "size": 1842
+          "size": 1771
         },
         {
           "path": "scenes/villa/refine-1.json",
-          "size": 3435
+          "size": 3324
         },
         {
           "path": "scenes/villa/scene-plan.json",
-          "size": 15477
+          "size": 14768
         },
         {
           "path": "scenes/villa/validation-report.md",
-          "size": 1029
-        },
-        {
-          "path": "SKILL.md",
-          "size": 26946
+          "size": 994
         }
       ],
       "needsKey": false
@@ -3308,215 +3777,215 @@
       "files": [
         {
           "path": "LICENSE.txt",
-          "size": 1497
-        },
-        {
-          "path": "scripts/office/helpers/pptx_chart.py",
-          "size": 6032
-        },
-        {
-          "path": "scripts/office/helpers/pptx_slide.py",
-          "size": 1735
-        },
-        {
-          "path": "scripts/office/helpers/pptx_theme.py",
-          "size": 3624
-        },
-        {
-          "path": "scripts/office/helpers/__init__.py",
-          "size": 3469
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
-          "size": 2005
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
-          "size": 2565
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
-          "size": 2905
-        },
-        {
-          "path": "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
-          "size": 1377
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
-          "size": 76483
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
-          "size": 7102
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
-          "size": 52387
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
-          "size": 635
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
-          "size": 155120
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
-          "size": 1254
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
-          "size": 9047
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
-          "size": 15082
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
-          "size": 85288
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
-          "size": 1297
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
-          "size": 7472
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
-          "size": 6556
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
-          "size": 1273
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
-          "size": 898
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
-          "size": 2667
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
-          "size": 3563
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
-          "size": 7702
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
-          "size": 23895
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
-          "size": 1392
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
-          "size": 246716
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
-          "size": 26718
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
-          "size": 25788
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
-          "size": 547
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
-          "size": 5820
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
-          "size": 4106
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
-          "size": 175013
-        },
-        {
-          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
-          "size": 4762
-        },
-        {
-          "path": "scripts/office/schemas/mce/mc.xsd",
-          "size": 3202
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-2010.xsd",
-          "size": 27109
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-2012.xsd",
-          "size": 3812
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-2018.xsd",
-          "size": 915
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
-          "size": 1798
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
-          "size": 1015
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
-          "size": 604
-        },
-        {
-          "path": "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
-          "size": 753
-        },
-        {
-          "path": "scripts/office/soffice.py",
-          "size": 6119
-        },
-        {
-          "path": "scripts/office/validate.py",
-          "size": 6315
-        },
-        {
-          "path": "scripts/office/validators/base.py",
-          "size": 34631
-        },
-        {
-          "path": "scripts/office/validators/docx.py",
-          "size": 17948
-        },
-        {
-          "path": "scripts/office/validators/pptx.py",
-          "size": 16407
-        },
-        {
-          "path": "scripts/office/validators/redlining.py",
-          "size": 11530
-        },
-        {
-          "path": "scripts/office/validators/__init__.py",
-          "size": 351
-        },
-        {
-          "path": "scripts/recalc.py",
-          "size": 10978
+          "size": 1467
         },
         {
           "path": "SKILL.md",
-          "size": 8273
+          "size": 8174
+        },
+        {
+          "path": "scripts/office/helpers/__init__.py",
+          "size": 3358
+        },
+        {
+          "path": "scripts/office/helpers/pptx_chart.py",
+          "size": 5862
+        },
+        {
+          "path": "scripts/office/helpers/pptx_slide.py",
+          "size": 1675
+        },
+        {
+          "path": "scripts/office/helpers/pptx_theme.py",
+          "size": 3510
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chart.xsd",
+          "size": 74984
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-chartDrawing.xsd",
+          "size": 6956
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-diagram.xsd",
+          "size": 51302
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-lockedCanvas.xsd",
+          "size": 624
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-main.xsd",
+          "size": 152039
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-picture.xsd",
+          "size": 1231
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-spreadsheetDrawing.xsd",
+          "size": 8862
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/dml-wordprocessingDrawing.xsd",
+          "size": 14795
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/pml.xsd",
+          "size": 83612
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-additionalCharacteristics.xsd",
+          "size": 1269
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-bibliography.xsd",
+          "size": 7328
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-commonSimpleTypes.xsd",
+          "size": 6382
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlDataProperties.xsd",
+          "size": 1248
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-customXmlSchemaProperties.xsd",
+          "size": 880
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesCustom.xsd",
+          "size": 2608
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesExtended.xsd",
+          "size": 3507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-documentPropertiesVariantTypes.xsd",
+          "size": 7507
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-math.xsd",
+          "size": 23313
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/shared-relationshipReference.xsd",
+          "size": 1367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/sml.xsd",
+          "size": 242277
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-main.xsd",
+          "size": 26148
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-officeDrawing.xsd",
+          "size": 25279
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-presentationDrawing.xsd",
+          "size": 535
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-spreadsheetDrawing.xsd",
+          "size": 5712
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/vml-wordprocessingDrawing.xsd",
+          "size": 4010
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/wml.xsd",
+          "size": 171367
+        },
+        {
+          "path": "scripts/office/schemas/ISO-IEC29500-4_2016/xml.xsd",
+          "size": 4646
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-contentTypes.xsd",
+          "size": 1963
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-coreProperties.xsd",
+          "size": 2515
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-digSig.xsd",
+          "size": 2856
+        },
+        {
+          "path": "scripts/office/schemas/ecma/fouth-edition/opc-relationships.xsd",
+          "size": 1344
+        },
+        {
+          "path": "scripts/office/schemas/mce/mc.xsd",
+          "size": 3127
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2010.xsd",
+          "size": 26549
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2012.xsd",
+          "size": 3745
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-2018.xsd",
+          "size": 901
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cex-2018.xsd",
+          "size": 1778
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-cid-2016.xsd",
+          "size": 1002
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-sdtdatahash-2020.xsd",
+          "size": 600
+        },
+        {
+          "path": "scripts/office/schemas/microsoft/wml-symex-2015.xsd",
+          "size": 745
+        },
+        {
+          "path": "scripts/office/soffice.py",
+          "size": 5927
+        },
+        {
+          "path": "scripts/office/validate.py",
+          "size": 6142
+        },
+        {
+          "path": "scripts/office/validators/__init__.py",
+          "size": 336
+        },
+        {
+          "path": "scripts/office/validators/base.py",
+          "size": 33756
+        },
+        {
+          "path": "scripts/office/validators/docx.py",
+          "size": 17482
+        },
+        {
+          "path": "scripts/office/validators/pptx.py",
+          "size": 15966
+        },
+        {
+          "path": "scripts/office/validators/redlining.py",
+          "size": 11231
+        },
+        {
+          "path": "scripts/recalc.py",
+          "size": 10670
         }
       ],
       "needsKey": false

@@ -1,9 +1,226 @@
 {
-  "total": 1,
+  "total": 13,
   "categories": [
+    "MCP Server",
     "开发工具"
   ],
   "items": [
+    {
+      "id": "4everland-hosting",
+      "name": "4EVERLAND 托管",
+      "description": "去中心化网站托管",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "4everland-hosting",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {
+        "4EVERLAND_TOKEN": "${4EVERLAND_TOKEN}"
+      }
+    },
+    {
+      "id": "allyson-svg",
+      "name": "Allyson SVG 动画",
+      "description": "静态图转SVG动画",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "allyson-svg",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {
+        "ALLYSON_API_KEY": "${ALLYSON_API_KEY}"
+      }
+    },
+    {
+      "id": "antv-chart-mcp",
+      "name": "AntV 图表生成",
+      "description": "文字描述生成可视化图表",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "antv-chart-mcp",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {}
+    },
+    {
+      "id": "browserbase-mcp",
+      "name": "云端浏览器",
+      "description": "Serverless 无头浏览器池",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "browserbase-mcp",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {
+        "BROWSERBASE_API_KEY": "${BROWSERBASE_API_KEY}"
+      }
+    },
+    {
+      "id": "cloudflare-mcp",
+      "name": "Cloudflare",
+      "description": "Workers/KV/R2 管理",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "cloudflare-mcp",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {
+        "CLOUDFLARE_API_TOKEN": "${CLOUDFLARE_API_TOKEN}"
+      }
+    },
+    {
+      "id": "context7-docs",
+      "name": "Context7 文档",
+      "description": "最新库文档实时注入",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "context7-docs",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {}
+    },
+    {
+      "id": "cua-desktop",
+      "name": "Cua 电脑操作",
+      "description": "Agent 操作完整桌面",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "cua-desktop",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {}
+    },
+    {
+      "id": "github-mcp-server",
+      "name": "GitHub 官方",
+      "description": "仓库/Issue/PR 全操作",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "github-mcp-server",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {}
+    },
+    {
+      "id": "harness-mcp",
+      "name": "Harness CI/CD",
+      "description": "部署流水线操作",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "harness-mcp",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {
+        "HARNESS_API_KEY": "${HARNESS_API_KEY}"
+      }
+    },
+    {
+      "id": "latex-compile",
+      "name": "LaTeX 编译",
+      "description": "生成并编译LaTeX",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "latex-compile",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {}
+    },
+    {
+      "id": "octagon-research",
+      "name": "Octagon 深度调研",
+      "description": "多步深度网络调研",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "octagon-research",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {
+        "OCTAGON_API_KEY": "${OCTAGON_API_KEY}"
+      }
+    },
+    {
+      "id": "playwright-mcp",
+      "name": "Playwright 浏览器",
+      "description": "驱动真实浏览器",
+      "version": "1.0.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "playwright-mcp",
+        "node"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-09-27T00:00:00.000Z",
+      "runtime": "node",
+      "entry": "scripts/server.js",
+      "env": {}
+    },
     {
       "id": "weather-mcp",
       "name": "weather-mcp",
