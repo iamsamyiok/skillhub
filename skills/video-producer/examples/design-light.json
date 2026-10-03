@@ -1,0 +1,12 @@
+{
+  "$comment": "浅色页面令牌覆写：默认 overlay 白字是为深色场景设计的，白底页面必须换深色墨水",
+  "overlay": {
+    "ink": "#1a1710",
+    "shadowColor": "rgba(255,255,255,0)",
+    "accent": "#b07500",
+    "lowerThird": {
+      "bg": "rgba(26,23,16,.85)",
+      "barColor": "#ffbe3c"
+    }
+  }
+}

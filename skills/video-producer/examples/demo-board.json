@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "title": "云笔记 · 3 分钟上手",
+    "resolution": [
+      1280,
+      720
+    ],
+    "fps": 30,
+    "endCard": [
+      "云笔记 · 让记录更轻",
+      "感谢观看"
+    ],
+    "bgmVolume": 0.35
+  },
+  "shots": [
+    {
+      "id": "editor-intro",
+      "name": "编辑器总览",
+      "narration": "打开云笔记，页面即是一块干净的书写区。左侧是大纲，右侧正文随手可写。",
+      "minSec": 7,
+      "speed": 1,
+      "actions": [
+        {
+          "type": "goto",
+          "url": "http://localhost:8765"
+        },
+        {
+          "type": "click",
+          "sel": "#ovCancel",
+          "optional": true
+        },
+        {
+          "type": "wait",
+          "ms": 6000
+        }
+      ],
+      "overlays": [
+        {
+          "template": "title.html",
+          "start": 0,
+          "duration": 3.5,
+          "vars": {
+            "title": "云笔记编辑器",
+            "sub": "3 分钟上手"
+          }
+        }
+      ]
+    },
+    {
+      "id": "quick-type",
+      "name": "随手记录",
+      "narration": "点击正文区域，直接开始输入。所有内容实时保存，无需手动操作。",
+      "minSec": 7,
+      "speed": 1,
+      "actions": [
+        {
+          "type": "goto",
+          "url": "http://localhost:8765"
+        },
+        {
+          "type": "click",
+          "sel": "#ovCancel",
+          "optional": true
+        },
+        {
+          "type": "fill",
+          "sel": "#editor",
+          "text": "这是一段演示文字，展示实时输入效果。"
+        },
+        {
+          "type": "wait",
+          "ms": 3500
+        }
+      ],
+      "overlays": [
+        {
+          "template": "lower-third.html",
+          "start": 1,
+          "duration": 3,
+          "vars": {
+            "title": "随手记录",
+            "sub": "内容实时保存"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cut-section",
+      "name": "章节分隔",
+      "narration": "写完一段，点一下分隔按钮，大纲自动生成新章节，长文从此条理清晰。",
+      "minSec": 7,
+      "speed": 1,
+      "actions": [
+        {
+          "type": "goto",
+          "url": "http://localhost:8765"
+        },
+        {
+          "type": "click",
+          "sel": "#ovCancel",
+          "optional": true
+        },
+        {
+          "type": "fill",
+          "sel": "#editor",
+          "text": "第一章 开端。这是第一节的内容。"
+        },
+        {
+          "type": "click",
+          "sel": "#cutBtn"
+        },
+        {
+          "type": "fill",
+          "sel": "#editor",
+          "text": "第二章 展开。分隔之后继续书写。"
+        },
+        {
+          "type": "wait",
+          "ms": 2500
+        }
+      ],
+      "overlays": [
+        {
+          "template": "lower-third.html",
+          "start": 1.5,
+          "duration": 3,
+          "vars": {
+            "title": "一键分隔",
+            "sub": "大纲自动更新"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "total": 43,
+  "total": 44,
   "categories": [
     "写作工具",
     "前端开发",
@@ -3143,6 +3143,81 @@
         {
           "path": "SKILL.md",
           "size": 8006
+        }
+      ],
+      "needsKey": true
+    },
+    {
+      "id": "video-producer",
+      "name": "video-producer",
+      "description": "从分镜板（storyboard.json）批量生产 App 演示/教学视频。五步回路 lint → 配音 → 录制 → 合成 → 质检，设计令牌化字幕/片尾，bgm 自动闪避。适用词：视频、配音、录制、分镜、demo 视频、教学视频、成片。",
+      "version": "1.0.0",
+      "category": "视频创作",
+      "tags": [
+        "视频",
+        "配音",
+        "录屏",
+        "分镜",
+        "demo视频",
+        "教学视频",
+        "字幕",
+        "ffmpeg",
+        "playwright"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-03T02:40:00.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 9078
+        },
+        {
+          "path": "assets/design.json",
+          "size": 990
+        },
+        {
+          "path": "assets/templates/lower-third.html",
+          "size": 1156
+        },
+        {
+          "path": "assets/templates/title.html",
+          "size": 1090
+        },
+        {
+          "path": "examples/demo-board.json",
+          "size": 3041
+        },
+        {
+          "path": "examples/design-light.json",
+          "size": 329
+        },
+        {
+          "path": "package.json",
+          "size": 200
+        },
+        {
+          "path": "scripts/compose.mjs",
+          "size": 13445
+        },
+        {
+          "path": "scripts/lint.mjs",
+          "size": 7457
+        },
+        {
+          "path": "scripts/qc.mjs",
+          "size": 6763
+        },
+        {
+          "path": "scripts/record.mjs",
+          "size": 15851
+        },
+        {
+          "path": "scripts/snapshot.mjs",
+          "size": 5735
+        },
+        {
+          "path": "scripts/tts.mjs",
+          "size": 9156
         }
       ],
       "needsKey": true

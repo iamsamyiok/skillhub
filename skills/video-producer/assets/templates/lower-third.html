@@ -1,0 +1,46 @@
+<div class="vpx-lower3 vpx-l3-in">
+  <div class="vpx-l3-bar"></div>
+  <div class="vpx-l3-text">
+    <div class="vpx-l3-title">{{title}}</div>
+    {{#sub}}<div class="vpx-l3-sub">{{sub}}</div>{{/sub}}
+  </div>
+</div>
+<style>
+  .vpx-lower3 {
+    position: absolute;
+    left: 56px;
+    bottom: 120px;
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+    font-family: var(--vpx-font, 'WenQuanYi Zen Hei', sans-serif);
+    background: var(--vpx-l3-bg, rgba(26, 23, 16, 0.78));
+    border-radius: 10px;
+    padding: 14px 26px 14px 0;
+    overflow: hidden;
+  }
+  .vpx-l3-bar {
+    width: 6px;
+    background: var(--vpx-l3-bar, #ffbe3c);
+  }
+  .vpx-l3-text {
+    color: var(--vpx-overlay-ink, #fff);
+  }
+  .vpx-l3-title {
+    font-size: var(--vpx-l3-title-size, 34px);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .vpx-l3-sub {
+    margin-top: 4px;
+    font-size: var(--vpx-l3-sub-size, 20px);
+    opacity: 0.85;
+  }
+  .vpx-l3-in {
+    animation: vpx-l3-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes vpx-l3-in {
+    from { opacity: 0; transform: translateX(-36px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+</style>

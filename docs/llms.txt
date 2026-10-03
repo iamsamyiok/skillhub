@@ -82,6 +82,8 @@
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/unslop.zip
 - [use-tinyfish](https://iamsamyiok.github.io/skillhub/skills-md/use-tinyfish.md): 使用 TinyFish 执行网页搜索、抓取 URL、读取页面、获取最新信息、来源可溯的问答、调研、查文档、看价格与产品页、数据提取、爬取与浏览器自动化。当用户要求搜索、查找、对比、从网页获取信息、总结某个 URL 或自动化网站操作时使用。
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.zip
+- [video-producer](https://iamsamyiok.github.io/skillhub/skills-md/video-producer.md): 从分镜板（storyboard.json）批量生产 App 演示/教学视频。五步回路 lint → 配音 → 录制 → 合成 → 质检，设计令牌化字幕/片尾，bgm 自动闪避。适用词：视频、配音、录制、分镜、demo 视频、教学视频、成片。
+  - 下载: https://iamsamyiok.github.io/skillhub/downloads/video-producer.zip
 - [video-publish](https://iamsamyiok.github.io/skillhub/skills-md/video-publish.md): 为项目/产品制作宣传或解说视频并发布到 B 站，三种模式：①卡片模式（HTML卡片+配音+推镜，零录屏，最快）②录屏模式（Playwright CDP 真实录屏，支持真实 LLM 执行画面）③LLM 一键成稿（一句话主题→分镜表草稿）。TTS 供应商链（SiliconFlow CosyVoice2 自然女声→edge-
   - 下载: https://iamsamyiok.github.io/skillhub/downloads/video-publish.zip
 - [vision-for-dev](https://iamsamyiok.github.io/skillhub/skills-md/vision-for-dev.md): 视觉辅助开发技能：用「识图模型审查 + 像素级测量 + 源码交叉验证」三轨闭环排障 GUI 程序界面问题（豆腐块乱码、按钮重叠、布局错位、黑边阴影、字体渲染等），覆盖交叉编译 + Wine/Xvfb 虚拟显示运行 + 自动化交互截图 + 网页交付的全流程。当用户想"界面显示不对/截图看看效果/识图检查界面/修复显示问题

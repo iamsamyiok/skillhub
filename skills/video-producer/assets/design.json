@@ -1,0 +1,40 @@
+{
+  "$comment": "设计令牌 —— frame.md 思想的落地：把视觉决策从代码里搬出来，ASS 字幕与 overlay 模板共用同一份令牌。颜色一律 CSS 十六进制 #RRGGBB，compose 自动转 ASS 的 &HBBGGRR&。",
+  "palette": {
+    "bg": "#1a1710",
+    "ink": "#ffffff",
+    "sub": "#ffffff",
+    "accent": "#ffbe3c",
+    "shadow": "#4a2a1a"
+  },
+  "subtitle": {
+    "font": "WenQuanYi Zen Hei",
+    "size": 46,
+    "color": "#ffffff",
+    "outline": 1.6,
+    "shadow": 0.8,
+    "border": "#aa1a2a4a",
+    "back": "#7a000000",
+    "marginV": 52,
+    "marginX": 70
+  },
+  "endCard": {
+    "titleSize": 64,
+    "subSize": 30,
+    "at": 0.42,
+    "titleColor": "#ffffff",
+    "subColor": "#bfd8ff"
+  },
+  "overlay": {
+    "accent": "#ffbe3c",
+    "ink": "#ffffff",
+    "shadowColor": "rgba(26,23,16,.55)",
+    "titleIn": "fade-up",
+    "lowerThird": {
+      "bg": "rgba(26,23,16,.78)",
+      "barColor": "#ffbe3c",
+      "titleSize": 34,
+      "subSize": 20
+    }
+  }
+}

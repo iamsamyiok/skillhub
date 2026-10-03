@@ -1,0 +1,7 @@
+{
+  "name": "video-producer",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "分镜驱动网页演示视频生产管线：lint → record → tts → compose → qc",
+  "private": true
+}
