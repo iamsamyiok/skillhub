@@ -1,0 +1,5 @@
+{
+  "_hint": "可选配置。token 留 REPLACE_ME 时脚本会改读环境变量 GEOGPT_TOKEN；申请密钥见 https://geogpt.zero2x.org.cn/cn/developer/api-keys",
+  "token": "REPLACE_ME",
+  "base": "https://geogpt.zero2x.org.cn"
+}

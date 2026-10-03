@@ -534,6 +534,21 @@
       "downloads": 0,
       "createdAt": "2026-10-03T02:40:00.000Z",
       "updatedAt": "2026-10-03T02:40:00.000Z"
+    },
+    "geogpt": {
+      "version": "1.0.0",
+      "category": "研究分析",
+      "tags": [
+        "地球科学",
+        "地质学",
+        "文献检索",
+        "RAG",
+        "科研问答",
+        "GeoGPT"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-10-03T03:30:27.000Z",
+      "updatedAt": "2026-10-03T03:30:27.000Z"
     }
   },
   "mcps": {
