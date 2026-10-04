@@ -1,7 +1,7 @@
 ---
 name: geogpt
-description: 调用 GeoGPT 科研开发者平台 API 做地理/地质/地球科学研究，提供地学问答、多轮会话、文献知识库检索（公共库/个人库/团队库）和带文献引用的证据增强回答。当用户提出地球科学问题、要查地学文献、做地学科研调研、搭建地质类 RAG 流水线，或明确提到 GeoGPT 时使用。
-version: 1.0.0
+description: 调用 GeoGPT 科研开发者平台 API 做地理/地质/地球科学研究，提供地学问答、多轮会话、文献知识库检索（公共库/个人库/团队库）、本地论文或报告作为材料的证据增强，以及带文献引用的回答。当用户提出地球科学问题、要查地学文献、针对自己手上的论文/报告/数据文件做地学问答、做地学科研调研、搭建地质类 RAG 流水线，或明确提到 GeoGPT 时使用。
+version: 1.1.0
 category: 研究分析
 tags: [地球科学, 地质学, 文献检索, RAG, 科研问答, GeoGPT]
 authors:
@@ -17,7 +17,7 @@ credentials:
 
 ## Overview
 
-GeoGPT 是之江实验室主导的地理科学大模型平台（`https://geogpt.zero2x.org.cn`），本技能封装其 4 个实测可用能力：创建会话、流式问答（3 个模型）、公共库文献检索、个人/团队库检索。
+GeoGPT 是之江实验室主导的地理科学大模型平台（`https://geogpt.zero2x.org.cn`），本技能封装其 4 个实测可用能力：创建会话、流式问答（3 个模型）、公共库文献检索、个人/团队库检索，外加本地论文/报告作为材料的证据增强。
 
 脚本已按线上真实格式调通并做过全量回归。**直接用脚本，不要现写 curl/请求代码** —— 官方文档的响应格式已过期，照抄必然解析失败（详见「已知坑」）。
 
@@ -54,7 +54,7 @@ node scripts/doctor.mjs
 
 ## 脚本
 
-先 `cd` 到本技能目录。三个脚本都支持 `-h` 看完整选项。
+先 `cd` 到本技能目录。三个可执行脚本（`ask.mjs` / `rag.mjs` / `doctor.mjs`）都支持 `-h` 看完整选项。
 
 ### ask.mjs —— 问答
 
@@ -72,6 +72,13 @@ node scripts/ask.mjs "问题" --module Qwen2.5-72B-GeoGPT   # 或 GeoGPT-R1-Prev
 node scripts/ask.mjs "稀有气体同位素为什么能作地幔源区示踪剂？" \
   --ground "noble gas isotopes mantle source tracers" --ground-k 3
 
+# 本地文档当材料：直接针对用户手上的论文/报告/数据说明问答
+node scripts/ask.mjs "这篇论文的锆石年龄和样品产地是什么？" --file paper.md
+
+# 多个文件一起喂，或与公共库文献混用（引用编号分别是 [本地N] / [文献N]）
+node scripts/ask.mjs "综合本地材料和已发表文献给出构造解释" \
+  --file survey.md --file field-notes.txt --ground "subduction zone western Pacific basin"
+
 # 批量：文件一行一问，结果写 markdown
 node scripts/ask.mjs --batch questions.txt --out results.md --delay 400
 ```
@@ -81,9 +88,18 @@ node scripts/ask.mjs --batch questions.txt --out results.md --delay 400
 | `--show-reasoning` | 一并打印思考链（`reasoning_content` 与正式回答是分开的两个字段） |
 | `--no-context` | 只输出答案，便于程序化取用 |
 | `--personal` | `--ground` 改查个人库（中英文均可） |
+| `--file <路径>` | 本地论文/报告当材料，可重复传；见下方"本地文档行为细节" |
+| `--file-k` / `--max-chars` | 本地文档最多注入几段 / 材料总字数预算（默认 6 段 / 12000 字） |
+| `--allow-ungrounded` | 材料零命中时也照答（默认中止） |
 | `--ground-k` / `--min-score` / `--min-distance` | 召回条数与相关度阈值 |
 | `--shared-session` | 批量模式共用一个会话（默认每行独立，避免上下文串味） |
 | `--timeout <秒>` | 单次问答超时，默认 300 |
+
+**本地文档（`--file`）的行为细节**，用之前必须知道：
+
+- 只吃文本（`.md`/`.txt`/`.csv`/`.json`…，UTF-8 或 GBK 都能读）。**PDF/Word 会拒绝并提示先转 Markdown** —— 用 `markitdown` 或 `convert-documents-to-markdown` 技能转出 `.md` 再喂，不要绕过去硬解二进制。
+- 文档按 ~500 字切片（标题处必断开），然后**按问题相关度挑段**：整篇不超 `--max-chars`（默认 12000，含标签开销）且不超过 12 段时全量注入，否则取 `--file-k`（默认 6）段。批量模式每问重新挑段。
+- 这是本地挑段，不上传、不建索引，也不经过 GeoGPT 的向量库。
 
 ### rag.mjs —— 文献检索
 
@@ -102,13 +118,16 @@ node scripts/rag.mjs "关键词" --json        # 原始 JSON，接管道
 
 需要自定义编排时 import 它（`newSession` / `ask` / `streamAsk` / `ragCommon` / `ragPersonal` / `authHeaders` / `BASE`），别重写流解析和信封判错逻辑。
 
+`localdoc.mjs` 是 `--file` 的实现（`loadDocs` / `chunkText` / `selectChunks` / `terms`），纯本地无网络；要改切片粒度或相关度算法就动它，别在 `ask.mjs` 里塞。
+
 ## 推荐工作流
 
 1. 用户给地学问题 → 先 `rag.mjs`（英文检索词）确认能召回到相关文献。
-2. 有相关文献 → `ask.mjs --ground` 出带编号引用的答案；召回 0 段时脚本会提示"已退化为无依据问答"，此时应显式告诉用户这是模型自身知识、无文献支撑。
-3. 需要深挖 → 保留 `sessionId` 连续追问，比一次性拼长 prompt 省 token 也不易挂死。
-4. 交付时附上文献标题 + `document_id`，并说明 `year`/`journal`/`authors` 平台不返回，规范引用需人工补。
-5. 综述类任务分批喂材料（每批几千字），不要把整篇文献一次塞进 prompt。
+2. 有相关文献 → `ask.mjs --ground` 出带编号引用的答案。**材料零命中时脚本直接中止**（退出码 1），不会偷偷改用模型记忆作答；确实想无材料问答就别带 `--ground`/`--file`，或显式加 `--allow-ungrounded` 并承担说明责任。
+3. 用户甩来一份论文/报告要"就这份材料回答" → 转成 Markdown 后 `ask.mjs --file`。这比查个人库可靠：平台个人库要网页端手动上传、小库检索质量不稳，本地挑段则完全可控。
+4. 需要深挖 → 保留 `sessionId` 连续追问，比一次性拼长 prompt 省 token 也不易挂死。
+5. 交付时附上文献标题 + `document_id`，并说明 `year`/`journal`/`authors` 平台不返回，规范引用需人工补。
+6. 综述类任务分批喂材料（每批几千字），不要把整篇文献一次塞进 prompt。
 
 ## 已知坑（实测结论，违背会静默出错）
 
@@ -120,6 +139,7 @@ node scripts/rag.mjs "关键词" --json        # 原始 JSON，接管道
 - **两库结构不同**：公共库是扁平对象 + `score`；个人库是 `[文档, 分数]` 二元组且外层分数恒 0；团队库为空时 `data` 直接是 `[]`。
 - **别塞超长 prompt**：1.8 万字正常（约 24s），18 万字服务端不返回也不报错，一路挂到客户端超时。
 - **个人库前置条件**：文档需先在网页端 MyLibrary 上传；空库检索只会拿到无关结果。
+- **开发者密钥不能往个人库上传文档**：上传接口挂在 `portal-api`（`/geoCopilot/oss/uploadInfo`、`/geoCopilot/documents`、`/geoCopilot/folder/tree` 等，前端逆向所得），要的是网页登录 JWT；`sk-` 密钥访问一律 HTTP 401 `{"code":"0001","error":"Unauthorized"}`，而同密钥访问 `service/api` 正常 200。需要"喂自己的资料"就用 `--file`，别去找上传接口。
 - 地学细节仍需人工核对，模型会自我怀疑（实测出现过"郯庐断裂带是否属于俯冲带"的犹豫推理）。
 
 ## 配额与性能
@@ -130,10 +150,10 @@ RPM 1000 / RPD 30 万 / TPM 100 万 / TPD 1 亿。真正的约束是 **RPD**（�
 
 ## 能力边界
 
-适合 —— 地学概念解释、文献片段召回与综述、私有资料问答、批量抽取（矿物名、元素比值、年龄、构造背景）、带思考链的可解释回答、嵌进自己的 SSE 后端。
+适合 —— 地学概念解释、文献片段召回与综述、本地论文/报告问答（`--file`）、批量抽取（矿物名、元素比值、年龄、构造背景）、带思考链的可解释回答、嵌进自己的 SSE 后端。
 
-不适合 —— 当通用 OpenAI 替代（`/model/v1/chat/completions` 目前服务端不可用且模型不可指定）、对事实精度零容忍的场景、依赖返回元数据自动生成规范引用。
+不适合 —— 当通用 OpenAI 替代（`/model/v1/chat/completions` 目前服务端不可用且模型不可指定）、对事实精度零容忍的场景、依赖返回元数据自动生成规范引用、把文档自动上传进平台个人库（接口存在但密钥无权限，只能网页端手动）。
 
 ## Resources
 
-- `references/api.md` —— 完整接口文档：6 个接口逐字段规格、curl/Python 示例、配额解读、官方文档勘误表（15.1 文字错误 / 15.2 结构性偏差 / 15.4 两轮全量复测数据）、能力清单（第 16 节）。需要确切字段名或响应结构时 grep 这里，不要凭记忆猜。
+- `references/api.md` —— 完整接口文档：6 个接口逐字段规格、curl/Python 示例、配额解读、官方文档勘误表（15.1 文字错误 / 15.2 结构性偏差 / 15.4 两轮全量复测数据 / 15.5 未文档化的上传接口与鉴权边界）、能力清单（第 16 节）。需要确切字段名或响应结构时 grep 这里，不要凭记忆猜。

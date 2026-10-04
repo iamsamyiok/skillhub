@@ -1219,6 +1219,16 @@ print(r.json()["choices"][0]["message"]["content"])
 | 团队库 `isTeam:true` | 未说明 | 无团队时 `data` 直接是空数组 `[]`，而非 `{vector_time, final}` 对象 |
 | 大模型服务 / 模型列表 | 正常可用 | 上游网关 `401 Unauthorized`，两接口均不可用 |
 
+### 15.3 实践建议
+
+- **务必设置超时**：`sendMsg` 为长流式响应，读取超时应放宽到分钟级（如 `timeout=(10, 300)`）；实测一次短问答约 33KB / 282 块。
+- **流结束判定**：`sendMsg` 与 `chat/completions` 实测都以 `[DONE]` 结束，**不是** 官方文档写的 `<end></end>`。
+- **错误处理分层**：先判 HTTP 状态码（401/403/404/500），再判业务 `code` 是否为 `"00000"`；注意上游故障会以 `code: "0001"` + `data` 里塞错误串的形式返回（HTTP 仍是 200）。
+- **RAG 结果必须自卡阈值**：接口不会因为不相关而返回空，见第 10 节警告。
+- **`traceId` 留痕**：失败时记录 `traceId`，向 support.geogpt@zhejianglab.org 报障时附上（本文 15.2 表最后一条即可凭此报障）。
+- **知识库前置条件**：`/rag/top_k` 依赖已在 GeoGPT 网页端 **MyLibrary** 上传的文档，`pathList` 需从该库中取路径；空数组为全库检索。
+- **Token 保密**：`{access_token}` 不要写进前端代码或提交到仓库，改用环境变量注入，详见 6.3。
+
 ### 15.4 第二轮全量复测补充（2026-10-03）
 
 | 项目 | 实测结果 |
@@ -1230,18 +1240,34 @@ print(r.json()["choices"][0]["message"]["content"])
 | 个人库 `distance` 分布 | 相关查询≈0.31；无关查询即使完全不相干也会满 `topK` 返回，`distance` 低至 0.02–0.04。默认阈值 0.3 卡在边界，小库容易被全滤掉，可用 `--min-distance 0` 先看原始召回 |
 | 超长输入 | 1.8 万字中文提问正常（23.7s，答案 464 字）；18 万字提问**不报错也不返回，一直挂到客户端超时**，务必自己限制 prompt 规模 |
 | 证据增强链路 | `--ground` + 英文检索词命中共识岩/水热锆石等真实文献，回答按"材料[1]/[2]/[3]"编号引用，且只使用材料内信息 |
+| 本地材料证据增强 | `--file` 走本地挑段注入，实测 202 段文档只注入相关 2 段（177 字），答案准确引用 `[本地1]`；材料未覆盖时明确拒答 |
 | 本账号知识库现状 | 个人库仅 1 篇文档（ALITA-G），团队库为空 —— 个人库检索**链路已验证、检索质量无从验证** |
 
+### 15.5 上传类接口存在，但开发者密钥无权访问（2026-10-04）
 
-### 15.3 实践建议
+从网页前端（`/cn` 的 53 个 JS chunk）逆向出一整套**官方未文档化**的 MyLibrary 接口，网关前缀是 `https://geogpt.zero2x.org.cn/be-api/portal-api`，与本文档的 `be-api/service/api` 不同源：
 
-- **务必设置超时**：`sendMsg` 为长流式响应，读取超时应放宽到分钟级（如 `timeout=(10, 300)`）；实测一次短问答约 33KB / 282 块。
-- **流结束判定**：`sendMsg` 与 `chat/completions` 实测都以 `[DONE]` 结束，**不是** 官方文档写的 `<end></end>`。
-- **错误处理分层**：先判 HTTP 状态码（401/403/404/500），再判业务 `code` 是否为 `"00000"`；注意上游故障会以 `code: "0001"` + `data` 里塞错误串的形式返回（HTTP 仍是 200）。
-- **RAG 结果必须自卡阈值**：接口不会因为不相关而返回空，见第 10 节警告。
-- **`traceId` 留痕**：失败时记录 `traceId`，向 support.geogpt@zhejianglab.org 报障时附上（本文 15.2 表最后一条即可凭此报障）。
-- **知识库前置条件**：`/rag/top_k` 依赖已在 GeoGPT 网页端 **MyLibrary** 上传的文档，`pathList` 需从该库中取路径；空数组为全库检索。
-- **Token 保密**：`{access_token}` 不要写进前端代码或提交到仓库，改用环境变量注入，详见 6.3。
+| 未公开接口 | 用途 |
+| --- | --- |
+| `GET /geoCopilot/oss/uploadInfo?fileName=&type=` | 取 OSS 上传凭证（配合分片 `CompleteMultipartUpload`） |
+| `POST /geoCopilot/documents`、`/files`、`/folderFiles` | 文档/文件入库、目录列表 |
+| `GET /geoCopilot/folder/tree?folderName=`、`/rag/folder/tree` | 目录树 |
+| `POST /geoCopilot/document/checkAndGetUploadInfo`、`/document/format`、`/document/readDocument/` | 上传前校验、格式化、读取 |
+| `POST /geoChat/saveDocument`、`/docPreHandle`、`/docParseProgress` | 保存与解析进度轮询 |
+| `POST /geoCopilot/documents/delete`、`/file/move`、`PUT /file/{id}`、`/recycle/files` | 删除、移动、回收站 |
+
+**鉴权边界（实测）**：同一把 `sk-` 开发者密钥——
+
+```
+GET portal-api/geoCopilot/folder/tree    → HTTP 401 {"code":"0001","error":"Unauthorized","status":401}
+GET portal-api/geoCopilot/oss/uploadInfo → HTTP 401 同上
+GET service/api/geoChat/generate         → HTTP 200 {"code":"00000", ...}   ← 对照组
+```
+
+即 `portal-api` 认的是**网页登录后的 session JWT**，开发者 API Key 只覆盖 `service/api` 那 6 个接口。注意这里的 401 是网关标准错误体（`error`/`status`），与官方文档描述的 `code:"2020"` 业务信封不是一回事。
+
+**结论**：想用 API 喂自己的资料，走本地文件注入（`ask.mjs --file`）；要进平台个人库只能在网页端手动上传，再用 `/rag/top_k` 检索。不要把浏览器登录态拿来调 `portal-api`。
+
 
 ---
 
@@ -1258,6 +1284,7 @@ print(r.json()["choices"][0]["message"]["content"])
 | 三模型切换 | `sendMsg` 的 `module` | `Qwen2.5-72B-GeoGPT` / `GeoGPT-R1-Preview` / `DeepSeekR1-GeoGPT` 全部可用，同一问题三者答案一致，耗时 7–12s |
 | 文献片段检索 + 引用 | `top_k_common` | 英文检索词命中《西菲律宾盆地消亡扩张中心玄武岩》《超高精度稀有气体同位素分析…》等真实论文，带 `document_id`/`chunk_index` 可回链 |
 | 自己上传文档的问答（私有知识库） | `top_k` + `sendMsg` | 账号 MyLibrary 中的 ALITA-G 论文被成功检索出表格块与正文块（`text_type` 区分 `table`/`text`）。注意该账号个人库只有这 1 篇文档、团队库为空，链路已验证但检索质量无从判断 |
+| 针对本地论文/报告问答 | `sendMsg`（材料由 `--file` 本地注入） | 202 段的长文档只注入相关 2 段（177 字）即答出 127.5 ± 1.2 Ma 与 εHf(t)=+8.3；问材料里没有的作者/期刊时明确拒答；与 `--ground` 混用时能区分 `[文献N]` 与 `[本地N]` 两类来源 |
 | 带思考链的可解释回答 | `sendMsg` 的 `reasoning_content` | 思考过程与正式回答分属两个字段，可只展示结论或同时展示推理 |
 
 ### 16.2 具体可以做的事
@@ -1265,7 +1292,7 @@ print(r.json()["choices"][0]["message"]["content"])
 **科研向**
 
 1. **文献调研助手**：英文关键词 → 公共库召回原文片段 → 喂给 `sendMsg` 做综述式归纳，比手动翻 PDF 快一个量级。
-2. **私有资料问答**：把课题组论文、报告、实验记录传进 MyLibrary，用 `top_k` 检索 + 问答，等于给团队资料库加了个自然语言入口。
+2. **私有资料问答**：课题组论文、报告、实验记录先转成 Markdown，用 `ask.mjs --file` 本地挑段注入即可（实测 202 段文档只喂相关 2 段，答案按 `[本地N]` 溯源、材料没有的会拒答）。要进平台 MyLibrary 只能在网页端手动上传，上传后再用 `top_k` 检索 —— 见 15.5，开发者密钥没有上传权限。
 3. **批量数据抽取**：从一批论文摘要/正文里抽矿物名称、元素比值（如 Fe/Si、Mg/Si）、构造背景、年龄数据，结构化成表格。RPM 1000 的配额适合跑几千条规模的批处理。
 4. **术语解释与教学**：地学概念的一句话到一段的分级解释，`reasoning_content` 可直接用作板书式的推导过程。
 5. **写作辅助**：摘要润色、审稿意见回复稿、图表说明文字初稿。
