@@ -1,15 +1,16 @@
 ---
 name: cad&svg-edit
-description: 融合「CAD 创建」与「SVG 精准编辑」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（cad 无头引擎，输出 SVG/PNG/CSV）走 CAD-CREATE；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans, OR editing/modifying existing SVG files (text, color, position, batch changes).
+description: 融合「CAD 创建」与「SVG 精准编辑」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（cad 无头引擎，输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export SVG/PNG/CSV/DXF), OR editing/modifying existing SVG files (text, color, position, batch changes).
 agent_created: true
+version: 2.1.0
 ---
 
 # CAD & SVG-Edit（融合技能）
 
 一个技能覆盖「从零创建」与「精准修改」两类需求，按用户意图**自动路由**到对应功能区，避免在两套 skill 间手动切换。
 
-- **技能根目录 `<skill>`**（下文命令中的 `<skill>` 均指代）：
-  `C:/Users/GSGS002/.workbuddy/skills/cad-svg-edit`
+- **技能根目录 `<skill>`**（下文命令中的 `<skill>` 均指代，用实际安装路径替换）：
+  任意放置目录均可，如 `~/.workbuddy/skills/cad-svg-edit`
 
 ---
 
@@ -20,6 +21,7 @@ agent_created: true
 | 从零画一张新图 / 零件 / 平面图 / 示意图；要生成 SVG / PNG / CSV | **A. CAD-CREATE** | cad 无头引擎 |
 | 修改一张**已存在**的 SVG（改字 / 改色 / 移位 / 增删 / 批量 / 空间点名） | **B. SVG-EDIT** | svg_toolkit 确定性修改 |
 | 要改的 SVG 恰由本技能 cad 引擎的生成脚本产出 | **B 的「源脚本路线」优先**：改脚本参数用 CAD-CREATE 重生成 | cad 引擎 |
+| 需要 3D 实体（STEP/STL）、工程图 PDF、可制造性检查、3D 打印 | **外部转介** → [text-to-cad](https://github.com/earthtojake/text-to-cad)（build123d 内核） | 生态互补 |
 
 判断要点：
 - 目标文件**已存在且要"改"** → SVG-EDIT。
@@ -28,12 +30,12 @@ agent_created: true
 
 ---
 
-## 共享环境依赖（路径固定）
+## 环境要求（跨平台，v2.1 起零硬编码路径）
 
-- 受管 Python venv（含 lxml）：
-  `C:/Users/GSGS002/.workbuddy/binaries/python/envs/default/Scripts/python.exe`
-- 受管 Node：`C:/Users/GSGS002/.workbuddy/binaries/node/versions/22.22.2-2/node.exe`
-- resvg（仅 PNG 渲染需要）：`C:/Users/GSGS002/.workbuddy/binaries/node/workspace/node_modules`
+- **Node ≥ 16**（CAD-CREATE 无头引擎唯一依赖）：`node` 在 PATH 中即可
+- **Python 3**（仅 SVG-EDIT 需要，含标准库即可，lxml 可选）：`python3` 在 PATH 中
+- resvg（仅 PNG 视觉复核需要，缺省自动跳过并提示）
+- 一键自检：`node <skill>/engine/cad-engine.js doctor` → 输出引擎版本 / Node / Python 状态 / 冒烟结果（Linux / Windows / macOS 通用）
 
 > 坐标约定：**X 右，Y 下**（SVG 系），原点(0,0)，角度用度，弧 `ccw:true`=逆时针。单位=像素(世界坐标)。
 
@@ -44,18 +46,20 @@ agent_created: true
 > 原 `cad-creat`（cad-driver）能力。无头引擎优先，浏览器可视化预览可选。
 
 把绘图运行时直接集成进 skill 目录，agent 无需浏览器即可精确驱动出图：
-- **主运行时（无头）**：`<skill>/engine/cad-engine.js` —— 纯 JS，零原生依赖，输出 **SVG / PNG / CSV** 三种格式，每条操作返回结构化 JSON ack，内置几何校验闭环。
+- **主运行时（无头）**：`<skill>/engine/cad-engine.js` —— 纯 JS，零原生依赖，输出 **SVG / PNG / CSV / DXF** 四种格式，每条操作返回结构化 JSON ack，内置几何校验闭环。
 - **可视化预览（可选）**：`<skill>/assets/cad-draw.html` —— 浏览器打开可看绘制结果、点按钮下载；供人查看/截图复核。
 
 ## 目录
 ```
 cad-svg-edit/
 ├── SKILL.md
-├── engine/cad-engine.js   # 无头引擎（cadAPI v2.0-headless）
+├── CHANGELOG.md            # 版本更新日志
+├── engine/cad-engine.js   # 无头引擎（cadAPI v2.1-headless，含 doctor 自检）
 ├── assets/cad-draw.html   # 可选可视化预览页
 ├── assets/preview.html    # SVG-EDIT 点选编辑页
 ├── examples/              # 示例 draw 脚本
-│   ├── gear.js  house.js  nut.js  bad.js
+│   ├── gear.js  house.js  nut.js  flange.js  bad.js
+├── test/run-tests.js      # 回归测试（doctor + 全部示例 + 负例）
 ├── scripts/               # SVG-EDIT 编辑工具
 │   ├── svg_toolkit.py  daemon.mjs  next_name.mjs  render_png.mjs
 └── references/            # SVG-EDIT 参考文档
@@ -66,30 +70,29 @@ cad-svg-edit/
 
 | 模式 | 入口 | 浏览器 | 输出 | 适用 |
 |------|------|--------|------|------|
-| **无头（推荐）** | `node engine/cad-engine.js draw.js` | 不需要 | SVG+PNG+CSV 文件 + JSON 摘要 | agent 自动出图、批量、CI |
+| **无头（推荐）** | `node engine/cad-engine.js draw.js` | 不需要 | SVG+PNG+CSV+DXF 文件 + JSON 摘要 | agent 自动出图、批量、CI |
 | 可视化 | 浏览器打开 `assets/cad-draw.html` | 需要 | 页面按钮下载 SVG/PNG | 人查看、截图复核 |
 
 ## 无头模式（核心）
 
 ### 调用方式
-用受管 Node 运行一个 **draw 脚本**，脚本里直接用全局 `cadAPI`（与浏览器同名同签名）：
+用 Node 运行一个 **draw 脚本**（`node` 需在 PATH 中，Windows/macOS/Linux 相同），脚本里直接用全局 `cadAPI`（与浏览器同名同签名）：
 
 ```bash
-# 受管 Node 路径（Windows）
-NODE="C:/Users/GSGS002/.workbuddy/binaries/node/versions/22.22.2-2/node.exe"
-SKILL="C:/Users/GSGS002/.workbuddy/skills/cad-svg-edit"
-$NODE "$SKILL/engine/cad-engine.js" \
-      "$SKILL/examples/gear.js" \
-      --all --out "D:/out" --name gear
+# <skill> 替换为本技能实际目录；先跑 doctor 确认环境
+node <skill>/engine/cad-engine.js doctor
+node <skill>/engine/cad-engine.js \
+      <skill>/examples/gear.js \
+      --all --out "./out" --name gear
 ```
 
 参数：
 - `<draw.js>`：必填，绘图脚本（用 `cadAPI.*` 调用）。
-- `--svg` / `--png` / `--csv`：分别导出；`--all` 或省略则三项全导。
+- `--svg` / `--png` / `--csv` / `--dxf`：分别导出；`--all` 或省略则四项全导。
 - `--out DIR`：输出目录（默认 `.`）。
 - `--name NAME`：文件名前缀（默认 `cad-drawing`）。
 
-运行后打印 JSON 摘要：`{name, count, svg, csv, png:{path,bytes,width,height}}`。
+运行后打印 JSON 摘要：`{name, count, svg, csv, dxf, png:{path,bytes,width,height}}`。
 
 ### draw 脚本写法（与浏览器完全一致）
 ```js
@@ -101,9 +104,10 @@ return JSON.stringify({id: r.id, bbox: r.bbox});  // 可选：回传信息
 
 ### 也可 require 作为模块
 ```js
-const { api, toCSV } = require("C:/.../cad-svg-edit/engine/cad-engine.js");
+const { api, toCSV, toDXF } = require("<skill>/engine/cad-engine.js");
 api.clear(); api.rect(0,0,100,60);
 require("fs").writeFileSync("a.csv", toCSV());
+require("fs").writeFileSync("a.dxf", toDXF());
 ```
 
 ## 输出格式
@@ -113,6 +117,7 @@ require("fs").writeFileSync("a.csv", toCSV());
 | **SVG** | 矢量，几何/标注/文字精确 | 出版、再编辑、网页嵌入 |
 | **PNG** | 软件光栅化（纯 JS 编码器，无原生依赖），白底线稿，含尺寸标注数值与文字 | 快速预览、贴图、不支持矢量的场景 |
 | **CSV** | 每个图形的结构化几何表（见下） | agent/用户读取坐标、做数据校验、进表格 |
+| **DXF** | R12 ASCII 实体（LINE/CIRCLE/ARC/POLYLINE/TEXT 等），Y 轴已翻转为 CAD 惯例（Y 向上） | 激光切割下料、导入 AutoCAD/Fusion/SolidWorks 等 CAD 软件 |
 
 ### CSV 表结构
 表头：`id,type,layer,stroke,strokeW,fill,geometry,length,area`
@@ -130,7 +135,7 @@ require("fs").writeFileSync("a.csv", toCSV());
 3. 变换/阵列（用 id）
 4. cadAPI.verify()  → {count, validate, issues, dims, bbox, snapshot(SVG dataURL)}
 5. 校验闭环：validate 失败 → diagnose().suggestions → deleteShape → 复检
-6. 导出：运行 CLI 得到 SVG/PNG/CSV（或脚本内 api.exportSVG() 等）
+6. 导出：运行 CLI 得到 SVG/PNG/CSV/DXF（或脚本内 api.exportSVG() / api.exportDXF() 等）
 7. 返回 JSON 摘要（count/bbox/文件路径）给调用方
 ```
 
@@ -153,7 +158,7 @@ require("fs").writeFileSync("a.csv", toCSV());
 `checkParallel(id1,id2,tol?)` · `checkPerpendicular(...)` · `checkTangent(...)` · `findIntersections(...)` · `containsPoint(id,x,y)` · `distance(id1,id2)` · `validate()` · `diagnose()` · `autoDim(ids?,opts?)` · `verify(ids?)`
 
 ### 视图/导出/批量
-`fit()` · `snapshot()`(SVG dataURL) · `exportSVG()` · `exportSVGDataUrl()` · `exportPNGDataUrl()`(Promise→PNG dataURL) · `loadJSON({shapes})` · `clear()` · `undo()`/`redo()` · `setDisplay({bgColor?})` · `help()` · `version()`
+`fit()` · `snapshot()`(SVG dataURL) · `exportSVG()` · `exportDXF()`(R12 ASCII, Y 轴已翻转) · `exportSVGDataUrl()` · `exportPNGDataUrl()`(Promise→PNG dataURL) · `loadJSON({shapes})` · `clear()` · `undo()`/`redo()` · `setDisplay({bgColor?})` · `help()` · `version()`
 
 ### keyPoints 特征点（防坐标重算）
 circle→圆心+4象限点；arc→圆心+起终点；ellipse→圆心+4端；rect→9点；line/dimLine→端点1/2+中点；polyline/polygon/spline→P0…Pn+首末中点。
@@ -253,7 +258,17 @@ return JSON.stringify({count:cadAPI.count(), validate:v.ok});
 1. 数据层：`count()` / `bbox()` / `list()` 统计类型。
 2. 几何层：`validate()` / `diagnose()`。
 3. 关系层（按需）：`distance()` / `checkParallel()` / `checkTangent()`。
-三层通过后再导出。无头模式下 `verify()` 返回的 `snapshot` 是 SVG dataURL，可存文件复核；PNG/CSV 即最终交付物。
+三层通过后再导出。无头模式下 `verify()` 返回的 `snapshot` 是 SVG dataURL，可存文件复核；PNG/CSV/DXF 即最终交付物。
+
+## 自检与回归（v2.1 新增）
+
+```bash
+# 环境自检：引擎版本 / Node / Python / 冒烟绘图
+node <skill>/engine/cad-engine.js doctor
+
+# 回归测试：doctor + 4 个正例示例（gear/house/nut/flange 全格式导出）+ bad.js 负例
+node <skill>/test/run-tests.js   # 期望输出 ALL_PASS
+```
 
 ---
 
@@ -288,7 +303,7 @@ return JSON.stringify({count:cadAPI.count(), validate:v.ok});
 1. 启动守护进程（唯一后台任务）：`node <skill>/scripts/daemon.mjs` → `http://127.0.0.1:8620/`；
    它同时负责：托管编辑页（`?file=` 注入开页）+ 接收提交 + 回传结果 + 1 秒轮询 pending_edits
    （见新请求自行退出，日志 `[wake] req_*.json`，借后台任务通知唤醒 agent）；
-2. 确保目标 SVG 在工作区根 `D:/d/2026-09-28-10-43-46/`（不在则先拷贝进来）；
+2. 确保目标 SVG 在工作区根目录（用户项目根，即 agent 的当前工作目录；不在则先拷贝进来）；
 3. agent 打开编辑页：present_files `http://127.0.0.1:8620/?file=<文件名>.svg`；
 4. 用户：点选组件（可多选，橙色高亮 + id 徽标）→ 底部输入框写要求 → 回车；
 5. 页面 POST `/submit` → 落盘 `pending_edits/req_<reqid>.json`（含 reqid/file/ids/instruction/svgText）；

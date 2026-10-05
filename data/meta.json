@@ -452,19 +452,20 @@
     },
     "cad-svg-edit": {
       "category": "开发工具",
-      "description": "融合 CAD 创建与 SVG 精准编辑：从零绘图（cad 无头引擎，输出 SVG/PNG/CSV）与修改已有 SVG（持久 id 寻址、空间/文本过滤、可视化点选、批量、版本化保存）按意图自动路由。",
+      "description": "融合 CAD 创建与 SVG 精准编辑：从零绘图（cad 无头引擎，输出 SVG/PNG/CSV/DXF）与修改已有 SVG（持久 id 寻址、空间/文本过滤、可视化点选、批量、版本化保存）按意图自动路由。",
       "tags": [
         "cad",
         "svg",
         "绘图",
         "矢量图",
         "编辑",
-        "绘图引擎"
+        "绘图引擎",
+        "dxf"
       ],
       "downloads": 0,
-      "version": "1.0.0",
+      "version": "2.1.0",
       "createdAt": "2026-09-28T02:58:59.000Z",
-      "updatedAt": "2026-09-28T02:58:59.000Z"
+      "updatedAt": "2026-10-05T00:00:00.000Z"
     },
     "3d-edit": {
       "category": "前端开发",

@@ -8,7 +8,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const PORT = 8620;
-const WS = 'D:/d/2026-09-24-09-57-39';           // 工作区根（原件与版本文件都在这里）
+// 工作区根（原件与版本文件都在这里）：优先 SVG_EDIT_WS 环境变量，缺省为当前工作目录
+const WS = process.env.SVG_EDIT_WS || process.cwd();
 const BASE = path.join(WS, 'pending_edits');
 const OUT = path.join(BASE, 'outputs');
 const DONE = path.join(BASE, 'done');

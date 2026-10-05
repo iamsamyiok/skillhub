@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // svg-edit: SVG -> PNG 渲染（可选能力，支撑 VLM 视觉定位）
-// 依赖：@resvg/resvg-js（已装于受管 node workspace）。缺失时给出安装提示并退出非 0。
+// 依赖：@resvg/resvg-js（可选，从 cwd/node_modules 或 WORKBUDDY_NODE_MODULES 解析）。缺失时给出安装提示并退出非 0。
 //
 // 用法：
 //   node render_png.mjs <input.svg> [output.png] [--bg "#ffffff" | --transparent] [--zoom 2]
@@ -39,8 +39,8 @@ try {
   // ESM 的 import() 不认 NODE_PATH，改用 createRequire 从候选目录解析 CJS 包
   const candidates = [
     process.env.WORKBUDDY_NODE_MODULES,
-    "C:/Users/GSGS002/.workbuddy/binaries/node/workspace/node_modules",
     path.join(process.cwd(), "node_modules"),
+    path.join(path.dirname(new URL(import.meta.url).pathname), "..", "node_modules"),
   ].filter(Boolean);
   let mod = null;
   let lastErr = null;
@@ -58,8 +58,7 @@ try {
   if (!Resvg) throw new Error("@resvg/resvg-js 未导出 Resvg");
 } catch (e) {
   console.error("ERR 未找到 @resvg/resvg-js。请先安装：");
-  console.error('  cd "C:/Users/GSGS002/.workbuddy/binaries/node/workspace"');
-  console.error('  npm install @resvg/resvg-js');
+  console.error('  cd <任意工作目录> && npm install @resvg/resvg-js');
   console.error("  或设置环境变量 WORKBUDDY_NODE_MODULES 指向含该包的 node_modules 目录");
   process.exit(2);
 }

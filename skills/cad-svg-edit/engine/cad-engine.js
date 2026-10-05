@@ -5,7 +5,8 @@
  * 新增：
  *   - 软件光栅化 PNG 导出（零原生依赖，纯 JS，生成真实位图）
  *   - CSV 几何数据导出（每个图形的结构化坐标表）
- *   - Node CLI：node cad-engine.js <draw.js> [--svg] [--png] [--csv] [--out DIR] [--name NAME]
+ *   - Node CLI：node cad-engine.js <draw.js> [--svg] [--png] [--csv] [--dxf] [--all] [--out DIR] [--name NAME]
+ *   - 自检：node cad-engine.js doctor
  *   - CommonJS 导出：require('./cad-engine.js').api / toCSV / ...
  */
 const fs = require('fs');
@@ -652,7 +653,7 @@ api.undo = () => { if (state.histIdx > 0) { state.histIdx--; state.shapes = clon
 api.redo = () => { if (state.histIdx < state.history.length - 1) { state.histIdx++; state.shapes = clone(state.history[state.histIdx]); render(); } };
 api.setDisplay = (opts) => { Object.assign(state.display, opts); render(); };
 api.help = () => Object.keys(api).join(", ");
-api.version = () => "cadAPI-2.0-headless";
+api.version = () => "cadAPI-2.1-headless";
 
 if (typeof window !== 'undefined') window.cadAPI = api;
 
@@ -1016,18 +1017,135 @@ function exportPNGFile(path) {
 function exportCSVFile(path) { fs.writeFileSync(path, toCSV()); return { path }; }
 function exportSVGFile(path) { fs.writeFileSync(path, api.exportSVG()); return { path }; }
 
+// ==================== DXF 导出（R12 ASCII，Y 轴翻转为 CAD 惯例） ====================
+function dxfPair(code, value) { return code + "\n" + value + "\n"; }
+function dxfNum(v) { const n = +(+v).toFixed(4); return Object.is(n, -0) ? "0" : String(n); }
+function dxfY(y) { return dxfNum(-y); }
+
+function splineSamplePoints(pts, closed) {
+  const src = closed ? pts.concat([pts[0]]) : pts;
+  const samples = [];
+  for (let i = 0; i < src.length - 1; i++) {
+    const p0 = src[i - 1] || src[i], p1 = src[i], p2 = src[i + 1], p3 = src[i + 2] || p2;
+    for (let t = 0; t < 1; t += 0.1) {
+      const t2 = t * t, t3 = t2 * t;
+      samples.push({
+        x: 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3),
+        y: 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3)
+      });
+    }
+  }
+  samples.push(src[src.length - 1]);
+  return samples;
+}
+
+function shapeToDXF(s, out) {
+  const P = (c, v) => out.push(dxfPair(c, v));
+  const line = (x1, y1, x2, y2) => {
+    P(0, "LINE"); P(8, "0"); P(10, dxfNum(x1)); P(20, dxfY(y1)); P(11, dxfNum(x2)); P(21, dxfY(y2));
+  };
+  const polyline = (pts, closed) => {
+    P(0, "POLYLINE"); P(8, "0"); P(66, 1); P(70, closed ? 1 : 0);
+    pts.forEach(p => { P(0, "VERTEX"); P(8, "0"); P(10, dxfNum(p.x)); P(20, dxfY(p.y)); });
+    P(0, "SEQEND");
+  };
+  const text = (x, y, str, size) => {
+    P(0, "TEXT"); P(8, "0"); P(10, dxfNum(x)); P(20, dxfY(y)); P(40, dxfNum(size || 14)); P(1, String(str));
+  };
+  switch (s.type) {
+    case "line": line(s.p1.x, s.p1.y, s.p2.x, s.p2.y); break;
+    case "circle": P(0, "CIRCLE"); P(8, "0"); P(10, dxfNum(s.c.x)); P(20, dxfY(s.c.y)); P(40, dxfNum(s.r)); break;
+    case "arc": {
+      let a1 = R2D(s.a1), a2 = R2D(s.a2);
+      if (s.ccw === false) { const t = a1; a1 = a2; a2 = t; }
+      if (a2 <= a1) a2 += 360;
+      P(0, "ARC"); P(8, "0"); P(10, dxfNum(s.c.x)); P(20, dxfY(s.c.y)); P(40, dxfNum(s.r)); P(50, dxfNum(a1)); P(51, dxfNum(a2));
+      break;
+    }
+    case "rect":
+      line(s.x, s.y, s.x + s.w, s.y);
+      line(s.x + s.w, s.y, s.x + s.w, s.y + s.h);
+      line(s.x + s.w, s.y + s.h, s.x, s.y + s.h);
+      line(s.x, s.y + s.h, s.x, s.y);
+      break;
+    case "polyline": polyline(s.points, false); break;
+    case "polygon": polyline(s.points, true); break;
+    case "ellipse": {
+      const pts = [];
+      for (let i = 0; i <= 48; i++) {
+        const t = (i / 48) * Math.PI * 2;
+        const px = s.rx * Math.cos(t), py = s.ry * Math.sin(t);
+        pts.push({ x: s.c.x + px * Math.cos(s.rot) - py * Math.sin(s.rot), y: s.c.y + px * Math.sin(s.rot) + py * Math.cos(s.rot) });
+      }
+      polyline(pts, true);
+      break;
+    }
+    case "spline": polyline(splineSamplePoints(s.points, s.closed), !!s.closed); break;
+    case "text": text(s.x, s.y, s.text, s.size); break;
+    case "point": P(0, "POINT"); P(8, "0"); P(10, dxfNum(s.x)); P(20, dxfY(s.y)); break;
+    case "dimLine": {
+      const dx = s.p2.x - s.p1.x, dy = s.p2.y - s.p1.y;
+      const len = Math.hypot(dx, dy); const ang = Math.atan2(dy, dx);
+      const off = 20; const ox = -Math.sin(ang) * off, oy = Math.cos(ang) * off;
+      line(s.p1.x, s.p1.y, s.p1.x + ox, s.p1.y + oy);
+      line(s.p2.x, s.p2.y, s.p2.x + ox, s.p2.y + oy);
+      line(s.p1.x + ox, s.p1.y + oy, s.p2.x + ox, s.p2.y + oy);
+      text((s.p1.x + s.p2.x) / 2 + ox, (s.p1.y + s.p2.y) / 2 + oy, len.toFixed(1), 12);
+      break;
+    }
+    case "dimRadius": {
+      const ang = Math.atan2(s.p2.y - s.c.y, s.p2.x - s.c.x);
+      const ex = s.c.x + Math.cos(ang) * s.r, ey = s.c.y + Math.sin(ang) * s.r;
+      line(s.c.x, s.c.y, ex, ey);
+      text((s.c.x + ex) / 2, (s.c.y + ey) / 2, "R" + s.r.toFixed(0), 12);
+      break;
+    }
+    default: break;
+  }
+}
+
+function toDXF() {
+  const out = [dxfPair(0, "SECTION"), dxfPair(2, "ENTITIES")];
+  state.shapes.forEach(s => shapeToDXF(s, out));
+  out.push(dxfPair(0, "ENDSEC"), dxfPair(0, "EOF"));
+  return out.join("");
+}
+api.exportDXF = () => toDXF();
+function exportDXFFile(path) { fs.writeFileSync(path, toDXF()); return { path }; }
+
 // ==================== 暴露接口 ====================
-const engine = { api, state, toCSV, exportPNGFile, exportCSVFile, exportSVGFile, version: api.version };
+const engine = { api, state, toCSV, toDXF, exportPNGFile, exportCSVFile, exportSVGFile, exportDXFFile, version: api.version };
 if (typeof module !== 'undefined' && module.exports) module.exports = engine;
 
 // ==================== CLI ====================
 if (require.main === module) {
   (async () => {
     const argv = process.argv.slice(2);
+
+    if (argv[0] === 'doctor') {
+      const cp = require('child_process');
+      const py = cp.spawnSync('python3', ['--version'], { encoding: 'utf8' });
+      global.cadAPI = api;
+      global.window = global;
+      api.clear();
+      api.circle(0, 0, 5);
+      const v = api.validate();
+      const report = {
+        engine: api.version(),
+        node: process.version,
+        platform: process.platform,
+        smoke: v && v.ok ? 'OK' : 'FAIL',
+        python3: py.status === 0 ? (py.stdout || py.stderr).trim() : 'MISSING (仅 SVG-EDIT 需要)',
+        note: 'CAD-CREATE 仅需 Node; SVG-EDIT 另需 python3'
+      };
+      console.log(JSON.stringify(report, null, 2));
+      process.exit(report.smoke === 'OK' ? 0 : 1);
+    }
+
     let scriptPath = null;
     let outDir = '.';
     let name = 'cad-drawing';
-    let doSvg = false, doPng = false, doCsv = false;
+    let doSvg = false, doPng = false, doCsv = false, doDxf = false;
     for (let i = 0; i < argv.length; i++) {
       const a = argv[i];
       if (a === '--out') outDir = argv[++i];
@@ -1035,14 +1153,16 @@ if (require.main === module) {
       else if (a === '--svg') doSvg = true;
       else if (a === '--png') doPng = true;
       else if (a === '--csv') doCsv = true;
-      else if (a === '--all') { doSvg = doPng = doCsv = true; }
+      else if (a === '--dxf') doDxf = true;
+      else if (a === '--all') { doSvg = doPng = doCsv = doDxf = true; }
       else if (!a.startsWith('--') && !scriptPath) scriptPath = a;
     }
     if (!scriptPath) {
-      console.error('用法: node cad-engine.js <draw.js> [--svg] [--png] [--csv] [--all] [--out DIR] [--name NAME]');
+      console.error('用法: node cad-engine.js <draw.js> [--svg] [--png] [--csv] [--dxf] [--all] [--out DIR] [--name NAME]');
+      console.error('自检: node cad-engine.js doctor');
       process.exit(2);
     }
-    if (!doSvg && !doPng && !doCsv) { doSvg = doPng = doCsv = true; } // 默认全导出
+    if (!doSvg && !doPng && !doCsv && !doDxf) { doSvg = doPng = doCsv = doDxf = true; } // 默认全导出
     global.cadAPI = api;
     global.window = global;
     const code = fs.readFileSync(scriptPath, 'utf8');
@@ -1052,6 +1172,7 @@ if (require.main === module) {
     const out = { name, count: api.count() };
     if (doSvg) { const r = exportSVGFile(require('path').join(outDir, name + '.svg')); out.svg = r.path; }
     if (doCsv) { const r = exportCSVFile(require('path').join(outDir, name + '.csv')); out.csv = r.path; }
+    if (doDxf) { const r = exportDXFFile(require('path').join(outDir, name + '.dxf')); out.dxf = r.path; }
     if (doPng) {
       const r = await exportPNGFile(require('path').join(outDir, name + '.png'));
       const buf = fs.readFileSync(r.path);
