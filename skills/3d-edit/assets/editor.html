@@ -99,7 +99,15 @@
     const btn = (t, f) => { const b = mk('span', 'b', t); b.onclick = f; bar.appendChild(b); };
     btn('↶ 撤销', () => { const u = C.undo(); u ? (upd(), toast('已撤销 ' + (u.undid || ''))) : toast('没有可撤销'); });
     btn('↷ 重做', () => { C.redo() ? upd() : toast('没有可重做'); });
-    btn('💾 保存 Ctrl+S', save); btn('⬇ 导出', dl); btn('📋 复制给AI', cp);
+    btn('💾 保存 Ctrl+S', save); btn('⬇ 导出', dl);
+    btn('⬇ GLB', async () => {
+      if (!C.saveGlb) return toast('此场景无 GLB 导出（需 v1.1 模板）');
+      toast('GLB 导出中…');
+      try { const r = await C.saveGlb((S.meta && S.meta.name) || 'scene');
+            toast('GLB ' + (r.bytes / 1024).toFixed(0) + ' KB 已下载'); }
+      catch (e) { toast('GLB 导出失败: ' + (e.message || e)); }
+    });
+    btn('📋 复制给AI', cp);
     btn('⟲ 出厂', () => { if (confirm('丢弃全部编辑？（只清页面状态，点保存才写回文件）')) { C.ungiz(); C.reset(); upd(); toast('已回出厂状态'); } });
     pan.appendChild(bar);
     show(tab);

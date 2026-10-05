@@ -1,9 +1,9 @@
 ---
 name: 3d-edit
-version: 1.0.0
+version: 1.1.0
 category: 前端开发
 tags: [3D, Three.js, 程序化生成, 场景生成, 局部编辑, 参数化, 人工编辑, 数字孪生, WebGL]
-description: 一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求"画一个3D城市/3D场景/三维可视化""像 Claude 一键生成 3D 城市""做个可交互的 3D 网页""水库/厂区/管线数字孪生 3D 展示""给我一个小盒子/设备/推车的 3D 图"、要求 3D 汇报页/截图/PNG；或者说"把那座塔改红""河往东弯""楼密一点""雾再浓点"、指着截图某处说"改那个""去掉那栋楼"；或说"我想自己手动编辑这个 3D 图""给我个能拖的界面""别每次都得找你"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页。
+description: 一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求"画一个3D城市/3D场景/三维可视化""像 Claude 一键生成 3D 城市""做个可交互的 3D 网页""水库/厂区/管线数字孪生 3D 展示""给我一个小盒子/设备/推车的 3D 图"、要求 3D 汇报页/截图/PNG；或者说"把那座塔改红""河往东弯""楼密一点""雾再浓点"、指着截图某处说"改那个""去掉那栋楼"；或说"我想自己手动编辑这个 3D 图""给我个能拖的界面""别每次都得找你"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页；v1.1 起一键导出 GLB 三维资产（G 键）与工程测量模式（M 键，比例尺/场地尺寸/perUnit 定标）。
 slug: 3d-edit
 displayName: 3D Edit — 3D 场景的生成与编辑
 summary: 单文件 HTML + Three.js 程序化生成可交互 3D 场景（城市/数字孪生/单物体产品图），并对已有场景做确定性局部修改与人工可视化编辑。
@@ -47,14 +47,15 @@ summary: 单文件 HTML + Three.js 程序化生成可交互 3D 场景（城市/�
 | 时间氛围 | 夜景(自发光+辉光, 最出彩) / 日景(汇报用) / 黄昏(折中) | 夜景 |
 | 交互 | OrbitControls + 数字键预设机位 / 自动巡城 / 点击拾取标注 | 全含前两项 |
 | 尺度锚点 | 必须有 1~2 个地标（塔/桥/CBD群/大坝/穿楼轻轨），否则"宏大"无参照物（S 档不需要） | CBD+江+轻轨 |
-| 交付 | 单 HTML / 附截图 PNG / 两者 | 两者 |
+| 交付 | 单 HTML / 附截图 PNG / +GLB 三维资产 | HTML+PNG（+GLB 按需） |
 
 ### 第 1 步：从模板起步（不要从零写）
 
 复制 `assets/template.html` → 改 `CONFIG`（seed、gridN、fog、bloom、pal）。
 模板已含全部骨架：种子随机/fBm 噪声、渐变天空+星、指数雾、河道判定、水面实例、
 InstancedMesh 建筑(窗光 Canvas 贴图+setColorAt 冷色渐变)、车流运动光带、
-UnrealBloomPass、OrbitControls、1~6 预设机位 lerp、resize、`[3d-edit] OK` 自检日志。
+UnrealBloomPass、OrbitControls、1~6 预设机位 lerp、resize、`[3d-edit] OK` 自检日志、
+工程测量模式（M 键：动态比例尺 + 场地尺寸，`perUnit` 定标 1 单位=几米）与 GLB 导出（G 键 / `CITY.saveGlb()`，可进 Blender/Unity）。
 在模板上做**增量修改**，比重新生成少 90% 的几何 bug。
 
 **S 档（单物体：一个盒子/设备/推车/装置）不要背全城包袱**——走下面第 1.5 步的独立分支，
@@ -119,6 +120,8 @@ L 档同理 `city-1-hero.png`）。报告统计数字时**必须现测**：后�
 `CITY.stats.drawCalls` 是跨多次 render 的累计值（本例同一场景读到过 239/280/932，真值 122（标注关·出厂态）/ 126（标注开）），
 取真值的探针只有一句：`const t=SCENE.three; t.renderer.info.reset(); t.renderer.render(t.scene,t.camera);`
 然后读 `t.renderer.info.render.calls`，并注明"主渲染 pass，Bloom 合成另计"。
+需要三维资产交付时加导 GLB：浏览器按 G 键或 `CITY.saveGlb('场景名')`（capture 服务在跑则同时落盘 .glb）；
+导出前隐藏标注层与 gizmo——GLB 会把画面里的一切原样带出。InstancedMesh/CanvasTexture 均随模板导出。
 演示时现场换 seed（"再抽一座城"）是最有说服力的环节。
 
 
@@ -182,7 +185,7 @@ agent 改完 → 用户刷新页面看到同样的结果。交付时提醒"改�
 4. **调色类需求优先走 P1 参数**（`pal.*`），别用 P2 实体 `color`：实体色会在 rebuild 后盖住 CONFIG 色。
 5. **实例实体必须带 index**：一条 `scale` 补丁让整城消失，十有八九是实体登记成了"整体"而不是"实例"。
 6. 渲染复核要本地 http + 浏览器；纯离线只能静态校验（find/manifest/list），交付时如实说明"未做视觉复核"。
-7. 一次一个 HTML；不做 GLTF/其他引擎文件的编辑。
+7. 一次一个 HTML；GLB 只导出不回读（不做 GLTF/其他引擎文件的编辑）。
 
 ## 常见障碍速查（详见 checklist 故障表）
 
@@ -221,6 +224,13 @@ agent 改完 → 用户刷新页面看到同样的结果。交付时提醒"改�
 | P3 改完尺寸公式，某个预设机位糊成微距/物体出画 | 机位表是按旧外形算的：改 `@*-rule@` 里任何尺寸后，重算 `@presets@` 并 1~6 全机位重拍 |
 | 自验证跑完，用户打开页面弹"有 N 条草稿待恢复" | agent 探针里的 `CITY.set()` 会写 localStorage 草稿。交付前 `Object.keys(localStorage).forEach(k=>localStorage.removeItem(k))` 并重载确认 console 无 `pendingRestore` 警告 |
 
+## 自检与回归（v1.1 新增）
+
+```bash
+node scripts/edit3d.mjs doctor     # 技能环境自检：模板/kit 同步/编辑器/配方/GLB/测量 在位性（JSON 输出）
+node test/run-tests.js             # 回归：check 全绿 + patch 写入/撤销闭环 + kit 区零污染 → ALL_PASS
+```
+
 ## 版本与兼容（合并说明，别"顺手修"）
 
 - 本技能由 `3d-creat-v1.2s`（生成）与更早一代独立编辑层 `3d-edit`（已归档）合并而来，工具链一律取 v1.2s 的新版
@@ -243,8 +253,10 @@ agent 改完 → 用户刷新页面看到同样的结果。交付时提醒"改�
 - `assets/editkit.js` — 3d-edit kit v1.3 运行时源码（find/set/nudge/entity/patch/pick/select/gizmo/add/remove/history/undo/saveFile/surface，由 `edit3d.mjs sync` 注入模板）
 - `assets/editor.html` — 人工编辑宿主页（零 three 依赖，只调 `CITY.*`；`edit3d.mjs editor --install` 装到场景同目录，场景文件不增一字）
 - `scripts/edit3d.mjs` — 离线操作产物文件的命令行套件：find/manifest/entities/apply/undo/clear/**check**/sync/upgrade/**editor**/serve（serve 带 `POST /__save` 写回）
-- `scripts/capture.mjs` — 后台标签页的截图落盘服务：页内 `CITY.shot()` POST dataURL → PNG（自验证目检用）
+- `scripts/capture.mjs` — 后台标签页的截图/导出落盘服务：`CITY.shot()` PNG dataURL 与 `CITY.saveGlb()` 二进制 GLB 都 POST 到这里落盘（自验证目检 / 资产交付用）
 - `references/editor-enhance.md` — 人工编辑通道架构：三层职责、patch op 契约、撤销语义、ShadowEditor/three.js Editor/threepipe 借鉴与淘汰对照、已知边界
 - `references/edit-playbook.md` — 局部修改路由手册：P1/P2/P3 三级优先级、诉求→手术位置路由表、pick 定位流程、对照对复核规程
-- `references/recipes.md` — 配方库：按 `##` 标题 grep 取用（地形/水面/辉光/地标/性能/数字孪生改造/**产品·装置效果图（S 档）**）
+- `references/recipes.md` — 配方库：按 `##` 标题 grep 取用（地形/水面/辉光/地标/性能分级预算/数字孪生改造/**标准件参数注册表（桥/起重机/冷却塔/变压器/大坝）**/**产品·装置效果图（S 档）**）
+- `test/run-tests.js` — 回归测试：doctor + check + patch 写入/撤销闭环 + kit 区零污染（期望 ALL_PASS）
+- `CHANGELOG.md` — 版本更新日志
 - `references/checklist.md` — 自验证循环规程、视觉体检单、故障对照表、交付标准

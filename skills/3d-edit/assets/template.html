@@ -26,6 +26,11 @@
   #hud{position:fixed;left:16px;bottom:14px;color:#9db8d8;font:12px/1.7 Consolas,monospace;
        user-select:none;pointer-events:none;text-shadow:0 1px 4px #000}
   #hud b{color:#ffd9a0;font-size:14px;letter-spacing:2px}
+  #meas{position:fixed;right:16px;bottom:14px;color:#cfe3ff;font:12px/1.7 Consolas,monospace;
+        text-align:right;user-select:none;pointer-events:none;text-shadow:0 1px 4px #000;display:none}
+  #meas b{color:#ffd9a0;letter-spacing:2px}
+  #meas .bar{display:inline-block;height:3px;background:#cfe3ff;vertical-align:middle;
+             border-left:1px solid #cfe3ff;border-right:1px solid #cfe3ff}
 </style>
 <script type="importmap">
 { "imports": {
@@ -35,7 +40,8 @@
 </script>
 </head>
 <body>
-<div id="hud"><b>PROCEDURAL CITY</b><br>拖拽旋转 · 滚轮缩放 · 右键平移 · 按 1~6 切换预设机位<br><span id="edits"></span></div>
+<div id="hud"><b>PROCEDURAL CITY</b><br>拖拽旋转 · 滚轮缩放 · 右键平移 · 1~6 机位 · M 测量 · G 导出GLB<br><span id="edits"></span></div>
+<div id="meas"></div>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls }    from 'three/addons/controls/OrbitControls.js';
@@ -57,6 +63,8 @@ const CONFIG = {
   riverAmp: 90,          // 河道正弦振幅
   riverWidth: 3.5,       // 河道宽度（单元数）
   fog: 0.0016,           // 指数雾密度（远景层次的关键，宁大勿小）
+  perUnit: 1,            // 工程测量换算：1 场景单位 = perUnit 米（M 键测量模式用）
+  unitLabel: 'm',        // 测量单位显示名（数字孪生交付可改）
   carCount: 40,          // 每车道车辆数
   bloom: { strength: 0.9, radius: 0.6, threshold: 0.55 },
   pal: {                 // 冷暖对比：暖窗光 + 冷环境，"精美感"主要靠这套
@@ -274,6 +282,9 @@ const MANIFEST = [
     apply: v => scene.fog.density = v, aliases: ['雾', '朦胧', '层次', '远景', '看不清'], desc: '指数雾密度，远景层次关键' },
   { path: 'carCount', label: '每车道车辆数', min: 0, max: 120, step: 5, effect: 'rebuild',
     aliases: ['车', '车流', '生活感'], desc: '车流光带密度' },
+  { path: 'perUnit', label: '测量换算(米/单位)', min: 0.001, max: 1000, step: 0.001, effect: 'hot',
+    apply: v => { MEAS.perUnit = +v; if (window.CITY && CITY.syncState) CITY.syncState(); },
+    aliases: ['单位', '比例尺', '米', '尺度'], desc: '测量模式换算系数：1 场景单位 = 多少米' },
   { path: 'bloom.strength', label: '辉光强度', min: 0, max: 3, step: 0.1, effect: 'hot',
     apply: v => bloomPass.strength = v, aliases: ['辉光', '亮', '光晕', '刺眼', '暗'], desc: '夜景氛围，过亮会糊' },
   { path: 'bloom.radius', label: '辉光半径', min: 0, max: 2, step: 0.1, effect: 'hot',
@@ -314,6 +325,9 @@ function refreshPresets() {
 refreshPresets();
 let tween = null;
 addEventListener('keydown', e => {
+  if (e.key === 'm' || e.key === 'M') { window.CITY && CITY.measure && CITY.measure(); return; }
+  if ((e.key === 'g' || e.key === 'G') && window.CITY && CITY.saveGlb) {
+    CITY.saveGlb((window.SCENE && SCENE.meta && SCENE.meta.name) || 'scene'); return; }
   const k = +e.key - 1;
   if (k >= 0 && k < PRESETS.length)
     tween = { from: camera.position.clone(), ft: controls.target.clone(),
@@ -361,6 +375,25 @@ window.SCENE = {
 /* 首建必须在 SCENE 契约之后：build*() 会调 SCENE.reg() 登记实体 */
 rebuild();
 
+/* ============ 10b. 工程测量模式（数字孪生交付：测量值属于交付物，M 键开关） ============ */
+/*@meas-fn@*/  // 测量模式：比例尺 + 场地尺寸换算；改单位约定/覆盖钩子走这里
+const MEAS = { on: false, perUnit: CONFIG.perUnit || 1, unitLabel: CONFIG.unitLabel || 'm' };
+const measEl = document.getElementById('meas');
+function niceLen(v){ const p = Math.pow(10, Math.floor(Math.log10(v))), d = v / p;
+  return (d >= 5 ? 5 : d >= 2 ? 2 : 1) * p; }
+function fmtLen(v){ return v >= 10000 ? +(v / 1000).toFixed(1) + 'k' : +v.toFixed(1); }
+function updMeas(){
+  if (!MEAS.on || !measEl) return;
+  const d = camera.position.distanceTo(controls.target);
+  const mpp = 2 * d * Math.tan(camera.fov * Math.PI / 360) / (innerHeight || 800);  // 竖直向每像素的场景单位数
+  const len = niceLen(mpp * 120 * MEAS.perUnit);                                     // 取 1/2/5×10ⁿ 整刻度
+  const px = Math.max(24, Math.round(len / (mpp * MEAS.perUnit)));
+  let line2 = '';
+  try { const D = CITY.dims(); line2 = `场地 ${D.extent[0]}×${D.extent[1]} ${D.unit} · 最高 ${D.tallest} ${D.unit}`; } catch (e) {}
+  measEl.innerHTML = `<b>MEAS</b> 1 单位 = ${MEAS.perUnit} ${MEAS.unitLabel}<br>` +
+    `<span class="bar" style="width:${px}px"></span> ${fmtLen(len)} ${MEAS.unitLabel}` + (line2 ? `<br>${line2}` : '');
+}
+
 /* ============ 11. Agent 自检出口（无头/隐藏视口下也能取数据与截图） ============
    ⚠ 关键约束：内置浏览器后台标签页会暂停 requestAnimationFrame——
    一切依赖 rAF 的状态（tween 运镜、controls.update 的 lookAt）在 agent 调用时都不会执行。
@@ -369,7 +402,7 @@ rebuild();
 window.CITY = {
   CONFIG, get stats(){ return { buildings: PLAN.length, cars: CARS.length,
     drawCalls: renderer.info.render.calls, tris: renderer.info.render.triangles }; },
-  syncState(){ /* 只依赖相机/状态的场景同步逻辑放这里（如背面遮挡切换），loop 与 snap 共用 */ },
+  syncState(){ updMeas(); /* 只依赖相机/状态的场景同步逻辑放这里（如背面遮挡切换），loop 与 snap 共用 */ },
   go(k){ const pr = PRESETS[k-1]; if (pr) tween = { from: camera.position.clone(),
     ft: controls.target.clone(), to: new THREE.Vector3(...pr.p), tt: new THREE.Vector3(...pr.t), s: performance.now() }; },
   snap(k){ const pr = PRESETS[k-1]; if (!pr) return;
@@ -382,6 +415,25 @@ window.CITY = {
     camera.updateProjectionMatrix(); composer.setSize(w, h);
     this.syncState(); composer.render(); logOK();   // 后台标签页 rAF 暂停时，agent 走 shot 也能触发锚点日志
     return renderer.domElement.toDataURL('image/png'); },
+  measure(t){ MEAS.on = t === undefined ? !MEAS.on : !!t;
+    if (measEl) measEl.style.display = MEAS.on ? 'block' : 'none';
+    this.syncState(); return { on: MEAS.on }; },
+  dims(){ const u = MEAS.perUnit, L = MEAS.unitLabel;
+    if (typeof window.__DIM__ === 'function') return window.__DIM__(u, L);   // S 档等自定义场景的覆盖钩子
+    let w = 0, hMax = 0;
+    try { w = CONFIG.gridN * CONFIG.cell; for (const b of PLAN) if (b.h > hMax) hMax = b.h; } catch (e) {}
+    return { extent: [+(w * u).toFixed(1), +(w * u).toFixed(1)], tallest: +(hMax * u).toFixed(1), unit: L }; },
+  async glb(){ const { GLTFExporter } = await import('three/addons/exporters/GLTFExporter.js');
+    return await new Promise((res, rej) => new GLTFExporter().parse(scene, res, rej, { binary: true })); },
+  async saveGlb(name = 'scene'){ const buf = await this.glb();
+    const blob = new Blob([buf], { type: 'model/gltf-binary' });
+    try { await fetch('http://127.0.0.1:8941/', { method: 'POST',
+      headers: { 'x-name': name + '.glb', 'x-kind': 'raw' }, body: blob }); } catch (e) {}
+    const a = Object.assign(document.createElement('a'),
+      { href: URL.createObjectURL(blob), download: name + '.glb' });
+    a.click();
+    console.log('[3d-edit] GLB exported ' + buf.byteLength + ' bytes');
+    return { bytes: buf.byteLength, file: name + '.glb' }; },
 };
 
 /* ============ 12. 3d-edit kit（标记区，由 `edit3d.mjs sync` 维护，勿手改） ============ */

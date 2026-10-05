@@ -6,6 +6,7 @@
  *       本脚本只碰两处标记区：patches（编辑数据）和 kit（运行时，用 sync 维护）。
  *
  *   node edit3d.mjs check    <file>             结构体检：标记区/锚点唯一性/MANIFEST/kit 同步态
+ *   node edit3d.mjs doctor                     技能环境自检：模板/kit 同步/编辑器/配方 在位性（JSON）
  *   node edit3d.mjs find     <file> <词>        口语 → 可编辑地址（参数/实体）
  *   node edit3d.mjs manifest <file> [--json]    参数说明书
  *   node edit3d.mjs entities <file> [--like X]  场景注册的语义实体 id
@@ -180,6 +181,29 @@ const all = name => flags.reduce((a, f, i) => (f === '--' + name ? [...a, flags[
 if (!cmd || cmd === '--help' || cmd === '-h') {
   console.log(readFileSync(new URL(import.meta.url), 'utf8').split('=*=/')[0].replace(/^[\s\S]*?\/\*/, '').replace(/\*\/$/, ''));
   process.exit(0);
+}
+
+if (cmd === 'doctor') {
+  const rel = f => resolve(here, f);
+  const tpl = existsSync(rel('../assets/template.html')) ? readFileSync(rel('../assets/template.html'), 'utf8') : '';
+  const kit = existsSync(rel('../assets/editkit.js')) ? readFileSync(rel('../assets/editkit.js'), 'utf8') : '';
+  const kr = region(tpl, KIT_MARK_OPEN, KIT_MARK_CLOSE);
+  const anchors = [...tpl.matchAll(/\/\*@([a-z0-9][a-z0-9-]*)@\*\//g)].map(m => m[1]);
+  const r = {
+    skill: '3d-edit', tool: 'edit3d v1.1', node: process.version, platform: process.platform,
+    template: tpl ? 'OK' : 'MISSING',
+    kitSync: kr ? (kr.body.trim() === stripMarks(kit, 'kit').trim() ? 'OK' : 'DRIFT（跑 sync 修复）') : 'MISSING',
+    manifestParams: tpl ? manifest(tpl).length : 0,
+    anchors: anchors.length,
+    glbExport: /async glb\(\)/.test(tpl) ? 'OK' : 'MISSING（v1.1 模板才有，G 键 / CITY.saveGlb）',
+    measure: /measure\(t\)/.test(tpl) ? 'OK' : 'MISSING（v1.1 模板才有，M 键 / CITY.measure）',
+    editor: existsSync(rel('../assets/editor.html')) ? 'OK' : 'MISSING',
+    recipes: existsSync(rel('../assets/recipes.md')) ? 'OK' : 'MISSING',
+    note: '视觉复核另需浏览器 + three.js CDN；离线只能静态体检（check / doctor）'
+  };
+  console.log(JSON.stringify(r, null, 2));
+  const bad = r.template !== 'OK' || r.kitSync !== 'OK' || r.manifestParams === 0 || r.anchors === 0;
+  process.exit(bad ? 1 : 0);
 }
 
 if (cmd === 'serve') {
