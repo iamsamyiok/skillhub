@@ -198,7 +198,7 @@ if (cmd === 'doctor') {
     glbExport: /async glb\(\)/.test(tpl) ? 'OK' : 'MISSING（v1.1 模板才有，G 键 / CITY.saveGlb）',
     measure: /measure\(t\)/.test(tpl) ? 'OK' : 'MISSING（v1.1 模板才有，M 键 / CITY.measure）',
     editor: existsSync(rel('../assets/editor.html')) ? 'OK' : 'MISSING',
-    recipes: existsSync(rel('../assets/recipes.md')) ? 'OK' : 'MISSING',
+    recipes: existsSync(rel('../references/recipes.md')) ? 'OK' : 'MISSING',
     note: '视觉复核另需浏览器 + three.js CDN；离线只能静态体检（check / doctor）'
   };
   console.log(JSON.stringify(r, null, 2));

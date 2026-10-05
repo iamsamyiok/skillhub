@@ -24,7 +24,8 @@ const orig = readFileSync(tpl, 'utf8');
 writeFileSync(scene, orig);
 
 const d = run(['doctor']);
-check('doctor 自检', d.status === 0 && /"template": "OK"/.test(d.stdout) && /"glbExport": "OK"/.test(d.stdout), d.stdout + d.stderr);
+check('doctor 自检', d.status === 0 && /"template": "OK"/.test(d.stdout) && /"glbExport": "OK"/.test(d.stdout)
+  && /"kitSync": "OK"/.test(d.stdout) && /"recipes": "OK"/.test(d.stdout), d.stdout + d.stderr);
 
 const c0 = run(['check', scene]);
 check('模板结构体检 check 全绿', c0.status === 0 && c0.stdout.includes('✓ 全绿'), c0.stdout + c0.stderr);
