@@ -1,9 +1,9 @@
 ---
 name: pre-align
-version: 2.0.0
+version: 2.1.0
 category: 需求梳理
 tags: [对齐, 需求澄清, 动手前确认, 对齐简报, 对齐看板, 访谈, 验收标准]
-description: 任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户 不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests. V2 supports interactive web board (align-board) served locally: user clicks choices instead of typing replies.
+description: 任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户 不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests. V2 serves an interactive light-theme web board locally: user clicks choices, agent auto-resumes work the moment the board is submitted.
 ---
 
 # Pre-Align（任务前双向对齐）
@@ -35,12 +35,22 @@ description: 任务前双向对齐——把「用户知道而 AI 不知道」与
 
 ## 网页模式：align-board 交互看板
 
-**Agent 侧流程**（4 步，用户零打字）：
+**Agent 侧流程**（5 步，用户零打字）：
 
 1. 构造 `align-input.json`（协议见下），写在**工作区**（不放 skill 目录）。
 2. 后台任务启动守护：`node <skill>/scripts/align-daemon.mjs <align-input.json 的绝对路径> --port 8640`
 3. `present_files` 打开 `http://127.0.0.1:8640/`——用户在网页上点选/开关/填写，「按默认开工」= 回 OK，「提交我的选择」= 按编号回答。
-4. 提交后守护自动落盘 `align-output.json` 并退出（后台任务结束即唤醒 Agent）→ 读结果开工。**不要**轮询或提前关闭守护。
+4. **同步等待提交**（关键，用户提交后 Agent 自动接单，无需用户再说话）：
+   ```
+   # 等待 output 落盘，出现立即返回；600s 上限按任务缓急调整
+   timeout 600 bash -c 'until [ -f <align-output.json 绝对路径> ]; do sleep 2; done'
+   ```
+   在**同一条回复**里先输出看板链接和等待说明文字，再执行此等待命令。文件一出现即继续下一步——对用户而言就是「点完提交，Agent 直接开工」。
+5. 读 `align-output.json` 开工（读单规则见下）。
+
+**超时降级**（等待到时仍无 output）：转异步模式，明说：「看板保持可用，你提交后随时回一个字唤醒我」。之后任一用户消息触发时先检查 output 是否已落盘，落盘则直接按结果开工。不要重复发起新一轮对齐。
+
+注意：等待的是**文件出现**，与守护进程退出解耦——守护崩溃但文件已落盘时照样开工；文件与守护都没动静才走超时降级。
 
 **align-input.json 协议**（字段与文本简报一一对应，编号规则相同——跨段全局连续，契约不占号）：
 
@@ -63,7 +73,7 @@ description: 任务前双向对齐——把「用户知道而 AI 不知道」与
 
 - `type` 四种：`choice` 单选 chips / `yesno` 是否双按钮 / `text` 输入框 / `multi` 多选 chips。每题必给 `def` 默认值——默认值 = 文本简报里「回 OK 全按默认」的默认。
 - 问题数量、行宽预算沿用文本简报硬约束（问题 ≤22 字、理由 ≤28 字）。
-- 看板无 boot 数据时内置演示样例，可直接打开预览效果。
+- 看板为浅色主题（用户明确反馈不要深色）；无 boot 数据时内置演示样例，可直接打开预览效果。
 
 **align-output.json 语义**（Agent 读单规则）：
 

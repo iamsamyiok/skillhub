@@ -70,9 +70,10 @@ const server = http.createServer((req, res) => {
         writeFileSync(outPath, JSON.stringify(payload, null, 2));
         console.log('[align] saved: ' + outPath);
         console.log('[align] mode=' + (payload.mode || 'custom') + ' answers=' + Object.keys(payload.answers || {}).length);
+        console.log('[align] ROUND_COMPLETE');
         res.writeHead(200, { ...CORS, 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: true, saved: outPath }));
-        setTimeout(() => { console.log('[align] daemon exiting, agent should pick up the result'); server.close(() => process.exit(0)); }, 300);
+        setTimeout(() => { console.log('[align] daemon exiting, agent picks up result automatically'); server.close(() => process.exit(0)); }, 300);
       } catch (e) {
         res.writeHead(400, CORS);
         res.end(JSON.stringify({ ok: false, error: String(e) }));
