@@ -489,7 +489,7 @@
     },
     "pre-align": {
       "category": "需求梳理",
-      "description": "任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests. V2 serves an interactive light-theme web board locally: user clicks choices, agent auto-resumes work the moment the board is submitted.",
+      "description": "任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests. V2 serves an interactive light-theme web board locally: user clicks choices, agent auto-resumes work the moment the board is submitted. Every numbered item carries an optional note input; notes ride along in align-output.json.",
       "tags": [
         "对齐",
         "需求澄清",
@@ -500,7 +500,7 @@
         "对齐看板"
       ],
       "downloads": 0,
-      "version": "2.1.0",
+      "version": "2.2.0",
       "createdAt": "2026-09-28T03:24:11.000Z",
       "updatedAt": "2026-09-28T03:24:11.000Z",
       "updated_at": "2026-10-12"

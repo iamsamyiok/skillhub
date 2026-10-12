@@ -133,6 +133,13 @@ section{margin-top:26px}
 .tin:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
 .tin::placeholder{color:var(--tx3)}
 
+/* 条目级补充输入 */
+.notein{margin-top:8px;background:#fbfcfe;border:1.5px dashed var(--line2);border-radius:9px;
+  color:var(--tx);padding:8px 12px;font-size:12.5px;outline:none;font-family:inherit;
+  transition:border-color .2s,background .2s}
+.notein:focus{border-color:var(--blue);border-style:solid;background:#fff}
+.notein::placeholder{color:var(--tx3)}
+
 /* ── 底部操作栏 ── */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:60;backdrop-filter:blur(16px);
   background:rgba(255,255,255,.9);border-top:1px solid var(--line);box-shadow:0 -4px 24px rgba(30,50,90,.07)}
@@ -248,6 +255,7 @@ try { DATA = window.__ALIGN_BOOT__ || DEMO; } catch(e) { DATA = DEMO; }
 
 /* ============ 状态 ============ */
 const answers = {};      // id -> value（用户改过的才记）
+const notes = {};        // id -> 条目级补充文字（选填）
 const extraAcc = [];
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -264,7 +272,7 @@ function render() {
 
   if ((DATA.goal||[]).length) h += `
     <section id="sec-goal"><div class="shead"><span class="ico">🎯</span><h2>目标 · 我理解的</h2></div>
-    <div class="card"><ul class="goal">${DATA.goal.map((g,i)=>`<li><span class="n">${i+1}</span><span>${esc(g)}</span></li>`).join('')}</ul></div></section>`;
+    <div class="card"><ul class="goal">${DATA.goal.map((g,i)=>{const gid=parseInt(g)||i+1;return `<li style="flex-direction:column;align-items:stretch"><div style="display:flex"><span class="n">${i+1}</span><span>${esc(g)}</span></div><input class="notein" data-nid="${gid}" type="text" placeholder="对这条的补充 / 修正（选填）"></li>`;}).join('')}</ul></div></section>`;
 
   if ((DATA.decisions||[]).length) h += `
     <section id="sec-q"><div class="shead"><span class="ico">❓</span><h2>要你定</h2><span class="tag hot">回编号或点选</span></div>
@@ -273,10 +281,12 @@ function render() {
       if (d.type==='choice'||d.type==='multi'){
         ctr = `<div class="chips">${d.options.map((o,i)=>chip(
           `<span class="k">${String.fromCharCode(65+i)}</span>${esc(o)}`, i, false)).join('')}</div>
-          <div class="def">默认 · <b>${esc(String(d.options[d.def??0]))}</b></div>`;
+          <div class="def">默认 · <b>${esc(String(d.options[d.def??0]))}</b></div>
+          <input class="notein" data-nid="${d.id}" type="text" placeholder="自定义答案 / 补充说明（选填）">`;
       } else if (d.type==='yesno'){
         ctr = `<div class="chips">${chip('<span class="k">N</span>否',0,false)}${chip('<span class="k">Y</span>是',1,false,'warm')}</div>
-          <div class="def">默认 · <b>${d.def?'是':'否'}</b></div>`;
+          <div class="def">默认 · <b>${d.def?'是':'否'}</b></div>
+          <input class="notein" data-nid="${d.id}" type="text" placeholder="补充条件 / 说明（选填，如：先预览再上）">`;
       } else {
         ctr = `<input class="tin" type="text" data-tid="${d.id}" placeholder="${esc(d.placeholder||'选填…')}">
           ${d.def?`<div class="def">默认 · <b>${esc(String(d.def))}</b></div>`:''}`;
@@ -292,7 +302,8 @@ function render() {
     <div class="card">${DATA.assumptions.map(a=>`
       <div class="swrow ${a.on?'':'off'}" data-aid="${a.id}">
         <div class="txt"><span class="n">${a.id}</span>${esc(a.text)}
-          <div class="swlab">${a.on?'接受 · 保持开=同意':'已喊停'}</div></div>
+          <div class="swlab">${a.on?'接受 · 保持开=同意':'已喊停'}</div>
+          <input class="notein" data-nid="${a.id}" type="text" placeholder="想改就写怎么改（选填）"></div>
         <label class="sw"><input type="checkbox" data-swid="${a.id}" ${a.on?'checked':''}><span class="knob"></span></label>
       </div>`).join('')}</div></section>`;
 
@@ -301,12 +312,14 @@ function render() {
     <div class="bs">${DATA.blindspots.map(b=>`
       <div class="card ${b.level==='red'?'lvl-red':''}">
         <span class="lvl ${b.level==='red'?'red':'yel'}">${b.level==='red'?'🔴 阻断级':'🟡 建议级'}</span>
-        <p><span class="n">${b.id}</span>${esc(b.text)}</p></div>`).join('')}</div></section>`;
+        <p><span class="n">${b.id}</span>${esc(b.text)}</p>
+        <input class="notein" data-nid="${b.id}" type="text" placeholder="${b.level==='red'?'🔴 需要你的答复：怎么处理（选填）':'对这条的态度 / 追问（选填）'}"></div>`).join('')}</div></section>`;
 
   if ((DATA.acceptance||[]).length) h += `
     <section id="sec-ac"><div class="shead"><span class="ico">✅</span><h2>验收 · 我起草你确认</h2></div>
     <div class="card"><ul class="ac">${DATA.acceptance.map(a=>`
-      <li><span class="tick">✓</span><span><span class="n">${a.id}</span>${esc(a.text)}</span></li>`).join('')}</ul>
+      <li style="flex-direction:column;align-items:stretch"><div style="display:flex;align-items:flex-start"><span class="tick">✓</span><span><span class="n">${a.id}</span>${esc(a.text)}</span></div>
+      <input class="notein" data-nid="${a.id}" type="text" placeholder="补充细节 / 修改这条（选填）"></li>`).join('')}</ul>
       <div class="addac"><input type="text" id="addAcIn" placeholder="+ 补充一条验收标准（选填）"></div></div></section>`;
 
   if ((DATA.contract||[]).length) h += `
@@ -351,6 +364,9 @@ function bind(){
       updProgress();
     });
   });
+  document.querySelectorAll('.notein').forEach(ni=>{
+    ni.addEventListener('input', ()=>{ const v=ni.value; if(v.trim()) notes[ni.dataset.nid]=v; else delete notes[ni.dataset.nid]; });
+  });
   $('#addAcIn') && $('#addAcIn').addEventListener('change', e=>{
     if (e.target.value.trim()){ extraAcc.push(e.target.value.trim()); toast('已追加验收：'+e.target.value.trim()); }
   });
@@ -369,13 +385,14 @@ function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show')
 
 /* ============ 提交 ============ */
 function buildPayload(mode){
-  const out = { mode, task: DATA.task, ts: new Date().toISOString(), answers:{}, assumptions:{}, extraAcceptance: extraAcc };
+  const out = { mode, task: DATA.task, ts: new Date().toISOString(), answers:{}, assumptions:{}, notes:{}, extraAcceptance: extraAcc };
   for (const d of DATA.decisions||[]) {
     const k = String(d.id);
     if (k in answers) out.answers[k] = answers[k];
     else out.answers[k] = d.type==='yesno' ? !!d.def : d.type==='choice' ? (d.options[d.def??0] ?? d.def) : (d.def||'');
   }
   for (const a of DATA.assumptions||[]) out.assumptions[String(a.id)] = !!a.on;
+  for (const [k,v] of Object.entries(notes)) if (String(v).trim()) out.notes[k] = String(v).trim();
   return out;
 }
 async function submit(mode){
@@ -402,6 +419,7 @@ function showDone(payload, mode, fallback){
     for (const [k,v] of changed) lines.push(`${k} → <b>${esc(String(Array.isArray(v)?v.join('、'):v))}</b>`);
   }
   for (const [k,v] of Object.entries(payload.assumptions)) if (!v) lines.push(`假设 ${k} → <b>已喊停</b>`);
+  for (const [k,v] of Object.entries(payload.notes||{})) lines.push(`${k} 补充 · <b>${esc(String(v))}</b>`);
   for (const a of payload.extraAcceptance||[]) lines.push(`追加验收 · <b>${esc(a)}</b>`);
   $('#doneSum').innerHTML = lines.join('<br>') || '全部按默认执行。';
   if (fallback) $('#doneSum').innerHTML += `<br><br>—— 手动回传 ——<br>${esc(JSON.stringify(payload))}`;

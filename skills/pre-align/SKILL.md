@@ -1,9 +1,9 @@
 ---
 name: pre-align
-version: 2.1.0
+version: 2.2.0
 category: 需求梳理
 tags: [对齐, 需求澄清, 动手前确认, 对齐简报, 对齐看板, 访谈, 验收标准]
-description: 任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户 不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests. V2 serves an interactive light-theme web board locally: user clicks choices, agent auto-resumes work the moment the board is submitted.
+description: 任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户 不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests. V2 serves an interactive light-theme web board locally: user clicks choices, agent auto-resumes work the moment the board is submitted. Every numbered item carries an optional note input; notes ride along in align-output.json.
 ---
 
 # Pre-Align（任务前双向对齐）
@@ -79,6 +79,7 @@ description: 任务前双向对齐——把「用户知道而 AI 不知道」与
 
 - `mode: "ok-defaults"` = 用户点了「按默认开工」≡ 回 `OK`，直接开工。
 - `mode: "custom"`：`answers` 里每题都是终值（未点选的题自动落默认值）；`assumptions` 里 `false` = 用户喊停该假设，必须回应（改方案或追问一句，不展开访谈）；`extraAcceptance` = 用户追加的验收标准，并入 ✅ 段执行。
+- `notes`（条目级补充）：用户对任意编号条目亲笔写的输入框内容。语义按段落：目标/验收条目 = 修正或细化该条；决策题 = 自定义答案或附加约束，**优先于选项与默认值**；假设 = 修正意见；盲区 = 对提醒的答复（红色盲区有 notes 视为已确认，可开工）。notes 非空的条目一律按用户文字执行，含糊就按最直接解读并记入决策日志。
 - 收到结果即开工，不再二次确认；契约 R1-R3 照常自动履行。
 
 **降级链**：守护启动失败 / present_files 不可用 → 文本简报。网页提交失败时页面自动展示可复制的 JSON，用户贴回对话，Agent 手动解析，效果等同。
