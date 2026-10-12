@@ -80,10 +80,20 @@ section{margin-top:26px}
   box-shadow:0 1px 3px rgba(30,50,90,.05);
   transition:all .18s cubic-bezier(.3,1.2,.4,1)}
 .chip:hover{border-color:#a9bce2;color:var(--tx);transform:translateY(-1.5px)}
+.chip.isdef{box-shadow:0 0 0 2.5px #34d399}
+.chip.isdef:hover{box-shadow:0 0 0 2.5px #34d399,0 4px 10px rgba(52,211,153,.25)}
 .chip.on{background:var(--grad);border-color:transparent;color:#fff;
   box-shadow:0 5px 16px rgba(60,90,220,.3);transform:translateY(-1.5px)}
 .chip.on.warm{background:linear-gradient(135deg,#f59e0b,#f97316);box-shadow:0 5px 16px rgba(234,160,60,.35)}
 .chip .k{font:700 10px/1 var(--mono);opacity:.55;margin-right:7px;vertical-align:1px}
+
+/* 文本题默认值：绿色描边药丸，点击回填 */
+.defpill{display:inline-block;margin-top:9px;cursor:pointer;user-select:none;
+  border:2px solid #34d399;border-radius:10px;background:#f4fdf9;color:var(--tx);
+  padding:7px 13px;font-size:12.5px;font-weight:600;box-shadow:0 0 0 3.5px rgba(52,211,153,.14);
+  transition:transform .15s,box-shadow .15s}
+.defpill:hover{transform:translateY(-1px);box-shadow:0 0 0 3.5px rgba(52,211,153,.28)}
+.defpill::before{content:'⇩ ';color:#0da271}
 
 /* switch */
 .swrow{display:flex;align-items:flex-start;gap:12px;padding:11px 0}
@@ -261,8 +271,8 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ============ 渲染 ============ */
-function chip(label, key, on, warm) {
-  return `<span class="chip ${on?'on':''} ${warm?'warm':''}" data-k="${key}">${label}</span>`;
+function chip(label, key, on, warm, isdef) {
+  return `<span class="chip ${on?'on':''} ${warm?'warm':''} ${isdef?'isdef':''}" data-k="${key}">${label}</span>`;
 }
 function render() {
   $('#task').textContent = DATA.task || '任务对齐';
@@ -275,21 +285,24 @@ function render() {
     <div class="card"><ul class="goal">${DATA.goal.map((g,i)=>{const gid=parseInt(g)||i+1;return `<li style="flex-direction:column;align-items:stretch"><div style="display:flex"><span class="n">${i+1}</span><span>${esc(g)}</span></div><input class="notein" data-nid="${gid}" type="text" placeholder="对这条的补充 / 修正（选填）"></li>`;}).join('')}</ul></div></section>`;
 
   if ((DATA.decisions||[]).length) h += `
-    <section id="sec-q"><div class="shead"><span class="ico">❓</span><h2>要你定</h2><span class="tag hot">回编号或点选</span></div>
+    <section id="sec-q"><div class="shead"><span class="ico">❓</span><h2>要你定</h2><span class="tag hot">点选 · 绿框为默认</span></div>
     ${DATA.decisions.map(d=>{
       let ctr='';
+      const defIdx = d.type==='choice'
+        ? (typeof d.def==='number' ? d.def : d.options.indexOf(d.def))
+        : null;
       if (d.type==='choice'||d.type==='multi'){
+        const defSet = d.type==='multi' && Array.isArray(d.def) ? d.def : null;
         ctr = `<div class="chips">${d.options.map((o,i)=>chip(
-          `<span class="k">${String.fromCharCode(65+i)}</span>${esc(o)}`, i, false)).join('')}</div>
-          <div class="def">默认 · <b>${esc(String(d.options[d.def??0]))}</b></div>
+          `<span class="k">${String.fromCharCode(65+i)}</span>${esc(o)}`, i, false, false,
+          d.type==='choice' ? i===defIdx : (defSet ? defSet.includes(i) : false))).join('')}</div>
           <input class="notein" data-nid="${d.id}" type="text" placeholder="自定义答案 / 补充说明（选填）">`;
       } else if (d.type==='yesno'){
-        ctr = `<div class="chips">${chip('<span class="k">N</span>否',0,false)}${chip('<span class="k">Y</span>是',1,false,'warm')}</div>
-          <div class="def">默认 · <b>${d.def?'是':'否'}</b></div>
+        ctr = `<div class="chips">${chip('<span class="k">N</span>否',0,false,false,!d.def)}${chip('<span class="k">Y</span>是',1,false,'warm',!!d.def)}</div>
           <input class="notein" data-nid="${d.id}" type="text" placeholder="补充条件 / 说明（选填，如：先预览再上）">`;
       } else {
-        ctr = `<input class="tin" type="text" data-tid="${d.id}" placeholder="${esc(d.placeholder||'选填…')}">
-          ${d.def?`<div class="def">默认 · <b>${esc(String(d.def))}</b></div>`:''}`;
+        ctr = `<input class="tin" type="text" data-tid="${d.id}" placeholder="${esc(d.placeholder||'选填…')}">` +
+          (d.def ? `<span class="defpill" data-def="${esc(String(d.def))}">${esc(String(d.def))}</span>` : '');
       }
       return `<div class="qcard" data-qid="${d.id}">
         <div class="qrow"><span class="qid">${d.id}</span>
@@ -366,6 +379,12 @@ function bind(){
   });
   document.querySelectorAll('.notein').forEach(ni=>{
     ni.addEventListener('input', ()=>{ const v=ni.value; if(v.trim()) notes[ni.dataset.nid]=v; else delete notes[ni.dataset.nid]; });
+  });
+  document.querySelectorAll('.defpill').forEach(dp=>{
+    dp.addEventListener('click', ()=>{
+      const tin = dp.closest('.ctr') ? dp.closest('.ctr').querySelector('.tin') : null;
+      if (tin){ tin.value = dp.dataset.def; tin.dispatchEvent(new Event('input')); }
+    });
   });
   $('#addAcIn') && $('#addAcIn').addEventListener('change', e=>{
     if (e.target.value.trim()){ extraAcc.push(e.target.value.trim()); toast('已追加验收：'+e.target.value.trim()); }

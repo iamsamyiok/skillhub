@@ -1,6 +1,6 @@
 ---
 name: pre-align
-version: 2.3.0
+version: 2.4.0
 category: 需求梳理
 tags: [对齐, 需求澄清, 动手前确认, 对齐简报, 对齐看板, 访谈, 验收标准]
 description: 任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户 不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests. V2 serves an interactive light-theme web board locally: user clicks choices, agent auto-resumes work the moment the board is submitted. Every numbered item carries an optional note input; notes ride along in align-output.json.
@@ -75,6 +75,7 @@ description: 任务前双向对齐——把「用户知道而 AI 不知道」与
 
 - `type` 四种：`choice` 单选 chips / `yesno` 是否双按钮 / `text` 输入框 / `multi` 多选 chips。每题必给 `def` 默认值——默认值 = 文本简报里「回 OK 全按默认」的默认。
 - 题量按实际需要设置，**不设上限**：用户可跳过任意题（自动落默认），交互成本低，不为压缩题数牺牲对齐质量；每题仍守「会改变方案才问」。问题文字尽量一句话讲清（无硬性字数预算）。
+- 默认值标识：默认选项以绿色描边（chip 绿环）直接标在选项上，不单列文字；文本题默认值为绿色药丸，点击回填输入框；multi 的 def 为索引数组。
 - 看板为浅色主题（用户明确反馈不要深色）；无 boot 数据时内置演示样例，可直接打开预览效果。
 
 **align-output.json 语义**（Agent 读单规则）：
