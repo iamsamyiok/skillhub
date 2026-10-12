@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pre-Align · 对齐看板</title>
+<style>
+:root{
+  --bg:#0a0e17;--bg2:#0e1524;--card:#121a2c;--card2:#172036;--line:#22304e;
+  --tx:#dbe7ff;--tx2:#8fa3c8;--tx3:#5b6d92;
+  --gold:#ffb454;--blue:#5aa2ff;--violet:#b48cff;--red:#ff6b6b;--yellow:#ffd166;--green:#4ade80;
+  --grad:linear-gradient(135deg,#5aa2ff 0%,#b48cff 100%);
+  --r:14px;--mono:ui-monospace,'SF Mono',Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(1200px 600px at 80% -10%,#16223f 0%,var(--bg) 55%) fixed;
+  color:var(--tx);font:15px/1.65 system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  min-height:100vh;padding:0 0 96px}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+
+/* ── hero ── */
+.hero{padding:44px 0 18px}
+.kicker{display:inline-flex;align-items:center;gap:8px;font:600 11px/1 var(--mono);
+  letter-spacing:.18em;color:var(--blue);text-transform:uppercase}
+.kicker::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--grad);
+  animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(122,150,255,.5)}55%{box-shadow:0 0 0 7px rgba(122,150,255,0)}}
+h1{font-size:clamp(22px,3.6vw,30px);font-weight:750;margin:12px 0 6px;letter-spacing:.01em}
+.hero .sub{color:var(--tx2);font-size:14px}
+.hero .sub b{color:var(--gold);font-weight:650}
+
+/* ── progress ── */
+.pbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+  background:rgba(10,14,23,.78);border-bottom:1px solid var(--line);padding:10px 0}
+.pbar .row{display:flex;justify-content:space-between;font:600 11.5px/1 var(--mono);color:var(--tx2);margin-bottom:7px}
+.pbar .row b{color:var(--tx)}
+.track{height:5px;border-radius:99px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;border-radius:99px;background:var(--grad);transition:width .45s cubic-bezier(.22,1,.36,1)}
+
+/* ── sections ── */
+section{margin-top:26px}
+.shead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.shead .ico{font-size:19px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
+.shead h2{font-size:16.5px;font-weight:700;letter-spacing:.01em}
+.shead .tag{font:600 10.5px/1 var(--mono);letter-spacing:.08em;color:var(--tx3);
+  border:1px solid var(--line);border-radius:99px;padding:4px 9px;margin-left:2px}
+.shead .tag.hot{color:var(--gold);border-color:#3d3423}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:16px 18px;box-shadow:0 8px 28px rgba(0,0,0,.25)}
+.card+.card{margin-top:10px}
+
+/* goal */
+.goal li{list-style:none;display:flex;gap:10px;padding:7px 0;color:var(--tx);font-size:14.5px}
+.goal .n{flex:none;font:700 11.5px/1.7 var(--mono);color:var(--gold);min-width:20px}
+.goal .n::after{content:'·';margin-left:6px;color:var(--tx3)}
+
+/* decisions (核心交互) */
+.qcard{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:15px 18px 16px;transition:border-color .25s,transform .25s,box-shadow .25s}
+.qcard:hover{border-color:#2f4066}
+.qcard.done{border-color:#2c4a3f;background:linear-gradient(180deg,#12202b 0%,var(--card) 45%)}
+.qcard .qrow{display:flex;gap:12px;align-items:flex-start}
+.qcard .qid{flex:none;font:750 13px/1 var(--mono);color:var(--blue);
+  background:rgba(90,162,255,.12);border:1px solid rgba(90,162,255,.3);border-radius:8px;padding:6px 8px;margin-top:1px}
+.qcard.done .qid{color:var(--green);border-color:rgba(74,222,128,.35);background:rgba(74,222,128,.1)}
+.qcard .qtext{font-weight:650;font-size:15px}
+.qcard .why{color:var(--tx3);font-size:12.5px;margin-top:3px}
+.qcard .why::before{content:'↳ ';color:var(--tx3)}
+.qcard .ctr{margin-top:12px;padding-left:2px}
+.def{display:inline-block;font:600 10px/1 var(--mono);color:var(--tx3);border:1px dashed var(--line);
+  border-radius:6px;padding:3px 7px;margin-top:11px;margin-left:2px}
+.def b{color:var(--tx2)}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{cursor:pointer;user-select:none;border:1.5px solid var(--line);background:var(--bg2);
+  color:var(--tx2);border-radius:11px;padding:9px 15px;font-size:13.5px;font-weight:600;
+  transition:all .18s cubic-bezier(.3,1.2,.4,1)}
+.chip:hover{border-color:#3a4d78;color:var(--tx);transform:translateY(-1.5px)}
+.chip.on{background:var(--grad);border-color:transparent;color:#fff;
+  box-shadow:0 5px 18px rgba(102,132,255,.35);transform:translateY(-1.5px)}
+.chip.on.warm{background:linear-gradient(135deg,#ffb454,#ff8a5c);box-shadow:0 5px 18px rgba(255,170,84,.3)}
+.chip .k{font:700 10px/1 var(--mono);opacity:.55;margin-right:7px;vertical-align:1px}
+
+/* switch */
+.swrow{display:flex;align-items:flex-start;gap:12px;padding:11px 0}
+.swrow+.swrow{border-top:1px dashed var(--line)}
+.swrow .txt{flex:1;font-size:14.5px}
+.swrow .txt .n{font:700 11.5px/1.8 var(--mono);color:var(--violet);margin-right:8px}
+.sw{flex:none;position:relative;width:44px;height:24px;cursor:pointer;margin-top:2px}
+.sw input{opacity:0;position:absolute;inset:0;cursor:pointer;z-index:2}
+.sw .knob{position:absolute;inset:0;border-radius:99px;background:var(--line);transition:background .22s}
+.sw .knob::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+  background:#c8d6f2;transition:transform .22s cubic-bezier(.3,1.3,.5,1)}
+.sw input:checked+.knob{background:linear-gradient(135deg,#3fce8f,#4ade80)}
+.sw input:checked+.knob::after{transform:translateX(20px);background:#fff}
+.swrow.off .txt{opacity:.55;text-decoration:line-through;text-decoration-color:var(--red)}
+.swlab{font:600 10.5px/1 var(--mono);color:var(--tx3);margin-top:4px}
+
+/* blindspots */
+.bs .card{border-left:3px solid var(--yellow)}
+.bs .card.lvl-red{border-left-color:var(--red);background:linear-gradient(180deg,#1d1420 0%,var(--card) 60%)}
+.bs .lvl{font:700 10.5px/1 var(--mono);letter-spacing:.1em;border-radius:6px;padding:3px 8px;display:inline-block;margin-bottom:8px}
+.bs .lvl.red{color:var(--red);background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.3)}
+.bs .lvl.yel{color:var(--yellow);background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.28)}
+.bs p{font-size:14px;color:var(--tx)}
+.bs .n{font:700 11.5px/1.9 var(--mono);color:var(--yellow);margin-right:8px}
+
+/* acceptance */
+.ac li{list-style:none;display:flex;align-items:flex-start;gap:10px;padding:8px 0;font-size:14.5px}
+.ac li+li{border-top:1px dashed var(--line)}
+.ac .tick{flex:none;width:19px;height:19px;border-radius:6px;border:1.5px solid #2f4a3c;margin-top:3px;
+  display:grid;place-items:center;font-size:11px;color:var(--green)}
+.ac .n{font:700 11.5px/1.9 var(--mono);color:var(--green)}
+.addac{margin-top:11px}
+.addac input{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;
+  color:var(--tx);padding:10px 13px;font-size:13.5px;outline:none;transition:border-color .2s}
+.addac input:focus{border-color:var(--green)}
+
+/* contract */
+.contract{background:linear-gradient(135deg,#101828,#0d1420);border:1px solid var(--line);border-radius:var(--r);
+  padding:15px 18px;display:grid;gap:8px}
+.contract .r{display:flex;gap:11px;font-size:13px;color:var(--tx2)}
+.contract .r b{flex:none;font:700 11px/1.9 var(--mono);color:var(--blue)}
+
+/* text input */
+.tin{width:100%;background:var(--bg2);border:1.5px solid var(--line);border-radius:11px;color:var(--tx);
+  padding:11px 14px;font-size:14px;outline:none;transition:border-color .2s;font-family:inherit}
+.tin:focus{border-color:var(--blue)}
+.tin::placeholder{color:var(--tx3)}
+
+/* ── 底部操作栏 ── */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:60;backdrop-filter:blur(16px);
+  background:rgba(10,14,23,.82);border-top:1px solid var(--line)}
+.dock .in{max-width:860px;margin:0 auto;padding:13px 20px;display:flex;gap:12px;align-items:center}
+.btn{flex:none;cursor:pointer;border-radius:12px;font-weight:700;font-size:14.5px;padding:13px 24px;
+  transition:all .2s;border:1.5px solid var(--line);background:var(--bg2);color:var(--tx2)}
+.btn:hover{border-color:#3a4d78;color:var(--tx);transform:translateY(-1px)}
+.btn.primary{flex:1;background:var(--grad);border-color:transparent;color:#fff;
+  box-shadow:0 8px 26px rgba(110,140,255,.35)}
+.btn.primary:hover{box-shadow:0 10px 32px rgba(110,140,255,.5);transform:translateY(-1.5px)}
+.btn.primary:disabled{opacity:.55;cursor:wait;transform:none}
+.hint{font:600 11px/1.4 var(--mono);color:var(--tx3);text-align:right;min-width:110px}
+.hint b{color:var(--green)}
+
+/* ── 成功态 ── */
+#done{display:none;position:fixed;inset:0;z-index:100;background:var(--bg);
+  place-items:center;padding:24px}
+#done.show{display:grid;animation:fadein .4s ease}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.donecard{text-align:center;max-width:440px}
+.donecard .orb{width:86px;height:86px;margin:0 auto 22px;border-radius:50%;
+  background:radial-gradient(circle at 32% 28%,#6ee7a8,#22a06b);display:grid;place-items:center;
+  font-size:38px;color:#fff;box-shadow:0 0 0 10px rgba(74,222,128,.09),0 0 0 24px rgba(74,222,128,.04);
+  animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1)}}
+.donecard h2{font-size:21px;margin-bottom:9px}
+.donecard p{color:var(--tx2);font-size:14px}
+.donecard .sum{margin-top:20px;text-align:left;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:14px 16px;font:12.5px/1.8 var(--mono);color:var(--tx2);max-height:34vh;overflow:auto}
+.donecard .sum b{color:var(--gold)}
+
+/* toast */
+#toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-72px);z-index:120;
+  background:#1a2440;border:1px solid #3350a0;color:var(--tx);border-radius:11px;padding:11px 18px;
+  font-size:13.5px;font-weight:600;transition:transform .35s cubic-bezier(.3,1.3,.5,1);max-width:86vw}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:640px){
+  .dock .in{flex-direction:column;gap:9px}
+  .btn.primary{width:100%}
+  .hint{display:none}
+  body{padding-bottom:150px}
+}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="kicker">Pre-Align · 对齐看板</span>
+    <h1 id="task">加载中…</h1>
+    <p class="sub" id="sub"></p>
+  </header>
+
+  <div class="pbar"><div class="wrap">
+    <div class="row"><span>对齐进度</span><b id="pcount">0 / 0</b></div>
+    <div class="track"><div class="fill" id="pfill"></div></div>
+  </div></div>
+
+  <main id="main"></main>
+</div>
+
+<div class="dock"><div class="in">
+  <button class="btn" id="defaults">按默认开工</button>
+  <button class="btn primary" id="submit">提交我的选择</button>
+  <div class="hint">已答 <b id="dockN">0</b>/<span id="dockT">0</span> 项<br>未答按默认走</div>
+</div></div>
+
+<div id="done"><div class="donecard">
+  <div class="orb">✓</div>
+  <h2>已回传 Agent，正在开工</h2>
+  <p id="doneSub">你可以关闭这个页面。</p>
+  <div class="sum" id="doneSum"></div>
+</div></div>
+
+<script>
+/* ============ boot 数据（daemon 注入；无注入时用演示样例） ============ */
+const DEMO = {
+  task:"把 pre-align 对齐流程做成网页版",
+  goal:["梳理 pre-align 技能的交互网页化方案","交付可推送至 skillhub 的完整技能升级"],
+  decisions:[
+    {id:3,q:"部署到哪个平台",why:"决定我写哪套上传链路",type:"choice",
+      options:["GitHub Pages","Vercel","只打包不发"],def:0},
+    {id:4,q:"要不要先看预览再上线",why:"决定是否直接推 main",type:"yesno",def:true},
+    {id:5,q:"命名细节由我定还是你出名单",why:"影响交付节奏",type:"choice",
+      options:["你定，向后兼容","我出名单"],def:0},
+    {id:6,q:"其他备注",why:"有额外要求写在这里",type:"text",def:"",placeholder:"选填…"}
+  ],
+  assumptions:[
+    {id:7,text:"平台稍后告知，我先只打包不发",on:true},
+    {id:8,text:"沿用仓库现有 commit 风格",on:true}
+  ],
+  blindspots:[
+    {id:9,level:"red",text:"指令里说“部署”——当前仓库尚未配置发布流水线，首版先手动发布"},
+    {id:10,level:"yellow",text:"更省路径：直接复用 3d-edit 的 daemon 架构，坚持从零写也照做"}
+  ],
+  acceptance:[
+    {id:11,text:"回归测试输出全绿"},
+    {id:12,text:"线上页面可访问（200）"}
+  ],
+  contract:[
+    "R1 交付前自审最没把握的 3 处并当场验证",
+    "R2 任何“已完成”附本次真实验证输出，不通过就如实报失败",
+    "R3 决策日志随做随记，可回溯“当初为什么不选 X”"
+  ]
+};
+let DATA = null;
+try { DATA = window.__ALIGN_BOOT__ || DEMO; } catch(e) { DATA = DEMO; }
+
+/* ============ 状态 ============ */
+const answers = {};      // id -> value（用户改过的才记）
+const extraAcc = [];
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ============ 渲染 ============ */
+function chip(label, key, on, warm) {
+  return `<span class="chip ${on?'on':''} ${warm?'warm':''}" data-k="${key}">${label}</span>`;
+}
+function render() {
+  $('#task').textContent = DATA.task || '任务对齐';
+  const nQ = (DATA.decisions||[]).length + (DATA.assumptions||[]).length;
+  $('#sub').innerHTML = `<b>${(DATA.decisions||[]).length}</b> 个待你定 · <b>${(DATA.assumptions||[]).length}</b> 条假设 · 回答后 Agent 立即开工`;
+  let h = '';
+
+  if ((DATA.goal||[]).length) h += `
+    <section id="sec-goal"><div class="shead"><span class="ico">🎯</span><h2>目标 · 我理解的</h2></div>
+    <div class="card"><ul class="goal">${DATA.goal.map((g,i)=>`<li><span class="n">${i+1}</span><span>${esc(g)}</span></li>`).join('')}</ul></div></section>`;
+
+  if ((DATA.decisions||[]).length) h += `
+    <section id="sec-q"><div class="shead"><span class="ico">❓</span><h2>要你定</h2><span class="tag hot">回编号或点选</span></div>
+    ${DATA.decisions.map(d=>{
+      let ctr='';
+      if (d.type==='choice'||d.type==='multi'){
+        ctr = `<div class="chips">${d.options.map((o,i)=>chip(
+          `<span class="k">${String.fromCharCode(65+i)}</span>${esc(o)}`, i, false)).join('')}</div>
+          <div class="def">默认 · <b>${esc(String(d.options[d.def??0]))}</b></div>`;
+      } else if (d.type==='yesno'){
+        ctr = `<div class="chips">${chip('<span class="k">N</span>否',0,false)}${chip('<span class="k">Y</span>是',1,false,'warm')}</div>
+          <div class="def">默认 · <b>${d.def?'是':'否'}</b></div>`;
+      } else {
+        ctr = `<input class="tin" type="text" data-tid="${d.id}" placeholder="${esc(d.placeholder||'选填…')}">
+          ${d.def?`<div class="def">默认 · <b>${esc(String(d.def))}</b></div>`:''}`;
+      }
+      return `<div class="qcard" data-qid="${d.id}">
+        <div class="qrow"><span class="qid">${d.id}</span>
+        <div style="flex:1"><div class="qtext">${esc(d.q)}</div><div class="why">${esc(d.why||'')}</div></div></div>
+        <div class="ctr">${ctr}</div></div>`;
+    }).join('')}</section>`;
+
+  if ((DATA.assumptions||[]).length) h += `
+    <section id="sec-as"><div class="shead"><span class="ico">🧾</span><h2>假设 · 关掉即喊停</h2></div>
+    <div class="card">${DATA.assumptions.map(a=>`
+      <div class="swrow ${a.on?'':'off'}" data-aid="${a.id}">
+        <div class="txt"><span class="n">${a.id}</span>${esc(a.text)}
+          <div class="swlab">${a.on?'接受 · 保持开=同意':'已喊停'}</div></div>
+        <label class="sw"><input type="checkbox" data-swid="${a.id}" ${a.on?'checked':''}><span class="knob"></span></label>
+      </div>`).join('')}</div></section>`;
+
+  if ((DATA.blindspots||[]).length) h += `
+    <section id="sec-bs"><div class="shead"><span class="ico">⚡</span><h2>盲区提醒</h2></div>
+    <div class="bs">${DATA.blindspots.map(b=>`
+      <div class="card ${b.level==='red'?'lvl-red':''}">
+        <span class="lvl ${b.level==='red'?'red':'yel'}">${b.level==='red'?'🔴 阻断级':'🟡 建议级'}</span>
+        <p><span class="n">${b.id}</span>${esc(b.text)}</p></div>`).join('')}</div></section>`;
+
+  if ((DATA.acceptance||[]).length) h += `
+    <section id="sec-ac"><div class="shead"><span class="ico">✅</span><h2>验收 · 我起草你确认</h2></div>
+    <div class="card"><ul class="ac">${DATA.acceptance.map(a=>`
+      <li><span class="tick">✓</span><span><span class="n">${a.id}</span>${esc(a.text)}</span></li>`).join('')}</ul>
+      <div class="addac"><input type="text" id="addAcIn" placeholder="+ 补充一条验收标准（选填）"></div></div></section>`;
+
+  if ((DATA.contract||[]).length) h += `
+    <section id="sec-ct"><div class="shead"><span class="ico">🤝</span><h2>契约 · 自动履行无需回复</h2></div>
+    <div class="contract">${DATA.contract.map(r=>`<div class="r"><b>${r.slice(0,2)}</b><span>${esc(r)}</span></div>`).join('')}</div></section>`;
+
+  $('#main').innerHTML = h;
+  $('#dockT').textContent = nQ;
+  bind();
+  updProgress();
+}
+
+/* ============ 交互 ============ */
+function qById(id){ return DATA.decisions.find(d=>d.id===+id); }
+function markDone(id, ok){ const el=document.querySelector(`[data-qid="${id}"]`); if(el) el.classList.toggle('done', ok); }
+function bind(){
+  document.querySelectorAll('.qcard').forEach(card=>{
+    const id = card.dataset.qid, d = qById(id);
+    card.querySelectorAll('.chip').forEach(ch=>{
+      ch.addEventListener('click', ()=>{
+        if (d.type==='multi'){ ch.classList.toggle('on');
+          const sel=[...card.querySelectorAll('.chip.on')].map(c=>d.options[+c.dataset.k]);
+          answers[id]=sel; markDone(id, sel.length>0);
+        } else {
+          const was = ch.classList.contains('on');
+          card.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+          if (!was){ ch.classList.add('on'); answers[id]= d.type==='yesno' ? +ch.dataset.k===1 : d.options[+ch.dataset.k]; }
+          else delete answers[id];
+          markDone(id, !was);
+        }
+        updProgress();
+      });
+    });
+    const tin = card.querySelector('.tin');
+    if (tin) tin.addEventListener('input', ()=>{ answers[id]=tin.value; markDone(id, tin.value.trim().length>0); updProgress(); });
+  });
+  document.querySelectorAll('.sw input').forEach(sw=>{
+    sw.addEventListener('change', ()=>{
+      const row = sw.closest('.swrow'); row.classList.toggle('off', !sw.checked);
+      row.querySelector('.swlab').textContent = sw.checked ? '接受 · 保持开=同意' : '已喊停';
+      const a = DATA.assumptions.find(x=>x.id===+sw.dataset.swid); a.on = sw.checked;
+      updProgress();
+    });
+  });
+  $('#addAcIn') && $('#addAcIn').addEventListener('change', e=>{
+    if (e.target.value.trim()){ extraAcc.push(e.target.value.trim()); toast('已追加验收：'+e.target.value.trim()); }
+  });
+}
+function answeredN(){
+  const q = Object.keys(answers).filter(k=>{ const v=answers[k]; return Array.isArray(v)?v.length>0:String(v).trim().length>0; }).length;
+  return q;
+}
+function updProgress(){
+  const n = answeredN(), t = +$('#dockT').textContent || 0;
+  $('#pcount').textContent = `${n} / ${t}`;
+  $('#dockN').textContent = n;
+  $('#pfill').style.width = t ? (n/t*100)+'%' : '0%';
+}
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2400); }
+
+/* ============ 提交 ============ */
+function buildPayload(mode){
+  const out = { mode, task: DATA.task, ts: new Date().toISOString(), answers:{}, assumptions:{}, extraAcceptance: extraAcc };
+  for (const d of DATA.decisions||[]) {
+    const k = String(d.id);
+    if (k in answers) out.answers[k] = answers[k];
+    else out.answers[k] = d.type==='yesno' ? !!d.def : d.type==='choice' ? (d.options[d.def??0] ?? d.def) : (d.def||'');
+  }
+  for (const a of DATA.assumptions||[]) out.assumptions[String(a.id)] = !!a.on;
+  return out;
+}
+async function submit(mode){
+  const btn = $('#submit'); btn.disabled = true; btn.textContent = '回传中…';
+  const payload = buildPayload(mode);
+  try {
+    const r = await fetch('/submit', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    showDone(payload, mode);
+  } catch(e) {
+    btn.disabled = false; btn.textContent = '提交我的选择';
+    document.getElementById('doneSum');
+    toast('直连失败——请把下面的 JSON 复制回对话');
+    const sum = $('#doneSum');
+    $('#doneSub').textContent = '提交通道不可用，复制下面内容发回对话即可：';
+    showDone(payload, mode, true);
+  }
+}
+function showDone(payload, mode, fallback){
+  const lines = [];
+  if (mode==='ok-defaults') lines.push('模式 · <b>全部按默认开工（OK）</b>'); 
+  else {
+    const changed = Object.entries(payload.answers).filter(([k,v])=>JSON.stringify(v)!==JSON.stringify(buildDefaults()[k]));
+    lines.push('模式 · <b>按我的选择开工</b>');
+    for (const [k,v] of changed) { const d=(DATA.decisions||[]).find(x=>String(x.id)===k); lines.push(`${k} → <b>${esc(String(Array.isArray(v)?v.join('、'):v))}</b>`); }
+  }
+  for (const [k,v] of Object.entries(payload.assumptions)) if (!v) lines.push(`假设 ${k} → <b>已喊停</b>`);
+  for (const a of payload.extraAcceptance||[]) lines.push(`追加验收 · <b>${esc(a)}</b>`);
+  $('#doneSum').innerHTML = lines.join('<br>') || '全部按默认执行。';
+  if (fallback) $('#doneSum').innerHTML += `<br><br>—— 手动回传 ——<br>${esc(JSON.stringify(payload))}`;
+  $('#done').classList.add('show');
+}
+function buildDefaults(){
+  const d = {};
+  for (const q of DATA.decisions||[]) d[String(q.id)] = q.type==='yesno' ? !!q.def : q.type==='choice' ? (q.options[q.def??0] ?? q.def) : (q.def||'');
+  return d;
+}
+$('#submit').addEventListener('click', ()=>submit('custom'));
+$('#defaults').addEventListener('click', ()=>submit('ok-defaults'));
+render();
+</script>
+</body>
+</html>

@@ -1,9 +1,9 @@
 ---
 name: pre-align
-version: 1.0.0
+version: 2.0.0
 category: 需求梳理
-tags: [对齐, 需求澄清, 动手前确认, 对齐简报, 访谈, 验收标准]
-description: 任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests.
+tags: [对齐, 需求澄清, 动手前确认, 对齐简报, 对齐看板, 访谈, 验收标准]
+description: 任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户 不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests. V2 supports interactive web board (align-board) served locally: user clicks choices instead of typing replies.
 ---
 
 # Pre-Align（任务前双向对齐）
@@ -24,7 +24,56 @@ description: 任务前双向对齐——把「用户知道而 AI 不知道」与
 
 拿不准档位时，就低不就高：宁可简报也不访谈，宁可跳过也不打断。
 
-## 简报模式：对齐简报（一次性输出，固定视觉语法）
+## 呈现方式：网页看板（优先） / 文本简报（降级）
+
+判定为「简报」档后，先选呈现方式：
+
+- **网页看板**：环境有浏览器（可 present_files / 本地预览）且用户没说「直接文字」→ 用 align-board，用户点选提交，体验最好。
+- **文本简报**：无浏览器、纯终端、用户赶时间 → 输出 markdown 简报（原方式，作为降级链保留）。
+
+两种方式**内容同源**：同一套字段（目标/要你定/假设/盲区/验收/契约）、同一套全局编号规则，只是呈现载体不同。网页不可用时随时降级为文本，用户回答格式也互通。
+
+## 网页模式：align-board 交互看板
+
+**Agent 侧流程**（4 步，用户零打字）：
+
+1. 构造 `align-input.json`（协议见下），写在**工作区**（不放 skill 目录）。
+2. 后台任务启动守护：`node <skill>/scripts/align-daemon.mjs <align-input.json 的绝对路径> --port 8640`
+3. `present_files` 打开 `http://127.0.0.1:8640/`——用户在网页上点选/开关/填写，「按默认开工」= 回 OK，「提交我的选择」= 按编号回答。
+4. 提交后守护自动落盘 `align-output.json` 并退出（后台任务结束即唤醒 Agent）→ 读结果开工。**不要**轮询或提前关闭守护。
+
+**align-input.json 协议**（字段与文本简报一一对应，编号规则相同——跨段全局连续，契约不占号）：
+
+```json
+{
+  "task": "一句话任务名",
+  "goal": ["1 · 条目", "2 · 条目"],
+  "decisions": [
+    {"id":3,"q":"问题(≤22字)","why":"为什么必须先定(≤28字)","type":"choice","options":["A","B","C"],"def":0},
+    {"id":4,"q":"要不要预览","why":"决定是否直接推 main","type":"yesno","def":true},
+    {"id":5,"q":"备注","why":"自由输入","type":"text","def":"","placeholder":"选填…"},
+    {"id":6,"q":"包含哪些","why":"多选","type":"multi","options":["X","Y"],"def":null}
+  ],
+  "assumptions": [{"id":7,"text":"假设内容","on":true}],
+  "blindspots": [{"id":8,"level":"red|yellow","text":"提醒内容"}],
+  "acceptance": [{"id":9,"text":"验收标准"}],
+  "contract": ["R1 …","R2 …","R3 …"]
+}
+```
+
+- `type` 四种：`choice` 单选 chips / `yesno` 是否双按钮 / `text` 输入框 / `multi` 多选 chips。每题必给 `def` 默认值——默认值 = 文本简报里「回 OK 全按默认」的默认。
+- 问题数量、行宽预算沿用文本简报硬约束（问题 ≤22 字、理由 ≤28 字）。
+- 看板无 boot 数据时内置演示样例，可直接打开预览效果。
+
+**align-output.json 语义**（Agent 读单规则）：
+
+- `mode: "ok-defaults"` = 用户点了「按默认开工」≡ 回 `OK`，直接开工。
+- `mode: "custom"`：`answers` 里每题都是终值（未点选的题自动落默认值）；`assumptions` 里 `false` = 用户喊停该假设，必须回应（改方案或追问一句，不展开访谈）；`extraAcceptance` = 用户追加的验收标准，并入 ✅ 段执行。
+- 收到结果即开工，不再二次确认；契约 R1-R3 照常自动履行。
+
+**降级链**：守护启动失败 / present_files 不可用 → 文本简报。网页提交失败时页面自动展示可复制的 JSON，用户贴回对话，Agent 手动解析，效果等同。
+
+## 文本简报模式（降级路径，原方式保留）
 
 **排版硬约束（照抄结构，只换内容）**
 
@@ -91,6 +140,7 @@ R1 交付前自审最没把握的 3 处并当场验证 · R2 任何"已完成"�
 
 ## 反模式（硬约束）
 
+- ❌ 不强制网页：无浏览器环境、用户赶时间、或明确说「直接文字」时，直接走文本简报，不折腾守护进程。
 - ❌ 不问能自己查到的：代码、配置文件、文件系统、公开常识——先查，查不到才问。
 - ❌ 不连续多发简报：一轮任务只出一份对齐产物；用户回答后直接进入执行。
 - ❌ 不说教：盲区提醒陈述事实和影响，不教育用户「你应该知道……」。
@@ -104,3 +154,12 @@ R1 交付前自审最没把握的 3 处并当场验证 · R2 任何"已完成"�
 自动触发：「帮我把这个服务的配置迁移到新的部署方案」（缺口多）、「删掉这批旧数据」（不可逆）、「做个内部工具网站」（受众/形态不明）。
 不触发：「把变量 name 改成 userName」、「看一下这个文件有多少行」。
 显式触发：用户说「先对一下需求」「/pre-align」「动手前先问我问题」。
+网页模式触发：环境有浏览器且判「简报」档默认走看板；用户说「弹个页面让我选」「网页形式对齐一下」必走看板。
+
+## Resources
+
+| 文件 | 用途 |
+|---|---|
+| `assets/align-board.html` | 交互看板（单文件零依赖；无 boot 时自带演示样例） |
+| `scripts/align-daemon.mjs` | 看板守护：托管页面 + 落盘 align-output.json + 提交后自动退出唤醒 Agent |
+| 本 SKILL.md | 协议与流程（align-input.json / align-output.json 语义） |
