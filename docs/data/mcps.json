@@ -1,5 +1,5 @@
 {
-  "total": 13,
+  "total": 14,
   "categories": [
     "MCP Server",
     "开发工具"
@@ -184,6 +184,27 @@
       "runtime": "node",
       "entry": "scripts/server.js",
       "env": {}
+    },
+    {
+      "id": "multimodal-rag-mcp",
+      "name": "多模态 RAG 知识库",
+      "description": "文件夹即知识库·向量/全文/混合检索·证据回查",
+      "version": "0.1.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "multimodal-rag-mcp",
+        "python"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-13T00:00:00.000Z",
+      "runtime": "python",
+      "entry": "-m app",
+      "env": {
+        "RAG_EMBEDDING_API_KEY": "${RAG_EMBEDDING_API_KEY}",
+        "RAG_VISION_API_KEY": "${RAG_VISION_API_KEY}",
+        "RAG_ASR_API_KEY": "${RAG_ASR_API_KEY}"
+      }
     },
     {
       "id": "octagon-research",

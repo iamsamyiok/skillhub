@@ -1,0 +1,96 @@
+[server]
+name = "multimodal-rag-mcp"
+log_level = "INFO"              # DEBUG | INFO | WARNING | ERROR
+transport = "stdio"             # stdio | streamable-http
+default_library_id = "default"
+max_concurrent_jobs = 2
+max_file_size_mb = 500
+max_import_files = 500
+max_result_chars = 8000
+state_dir = "./data"            # resolved relative to this config file
+original_file_policy = "keep_in_place"
+show_absolute_paths = false
+
+[retrieval]
+default_mode = "hybrid"         # hybrid | vector | full_text
+vector_top_k = 20
+full_text_top_k = 20
+final_top_k = 8
+fusion = "rrf"
+reranker_enabled = false
+chunk_size = 1200
+chunk_overlap = 150
+
+[embedding]
+provider = "openai_compatible"  # empty provider string disables vector mode
+base_url = ""                   # e.g. https://api.example.com/v1
+api_key_env = "RAG_EMBEDDING_API_KEY"
+model = ""
+dimensions = 0                  # 0 = auto-detect from provider response
+batch_size = 32
+timeout_seconds = 60
+max_retries = 3
+
+[llm]
+provider = "openai_compatible"
+base_url = ""
+api_key_env = "RAG_LLM_API_KEY"
+model = ""
+timeout_seconds = 90
+max_retries = 3
+
+[vision]
+enabled = true
+provider = "openai_compatible"
+base_url = ""
+api_key_env = "RAG_VISION_API_KEY"
+model = ""
+timeout_seconds = 120
+max_retries = 3
+
+[asr]
+enabled = true
+mode = "cloud"
+provider = "openai_compatible"
+base_url = ""
+api_key_env = "RAG_ASR_API_KEY"
+model = "whisper-1"
+timeout_seconds = 300
+max_retries = 3
+
+[reranker]
+# optional cloud reranker applied after hybrid fusion (PRD 9.4)
+provider = ""                   # e.g. "openai_compatible" (SiliconFlow /rerank)
+base_url = ""
+api_key_env = "RAG_RERANKER_API_KEY"
+model = ""                      # e.g. BAAI/bge-reranker-v2-m3
+timeout_seconds = 30
+max_retries = 2
+
+[video]
+enabled = true
+ffmpeg_path = ""                # empty = look up ffmpeg on PATH
+scene_detection = true
+max_frames_per_minute = 6
+max_frames_per_video = 300
+max_video_minutes = 240
+
+[privacy]
+upload_original_files = false
+send_text_to_cloud = true
+send_images_to_vision_api = true
+send_audio_to_asr_api = true
+send_video_frames_to_vision_api = true
+redact_secrets_from_logs = true
+
+[[libraries]]
+id = "default"
+name = "默认知识库"
+root_path = "./knowledge"
+enabled = true
+recursive = true
+watch_mode = "manual"           # manual | periodic | filesystem (manual implemented)
+include_globs = ["**/*"]
+exclude_globs = ["**/.git/**", "**/node_modules/**", "**/~$*", "**/.DS_Store"]
+follow_symlinks = false
+external_file_policy = "copy_into_root"   # reject | copy_into_root | allow_reference
