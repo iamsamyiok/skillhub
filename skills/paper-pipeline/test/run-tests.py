@@ -81,6 +81,28 @@ def main():
     all2 = (tmp / "all2.bib").read_text(encoding="utf-8")
     check("key: 同名冲突自动后缀", "wang2024survey," in all2 and "wang2024surveya," in all2)
 
+    # 6. search 同名池合并（--sources none 离线走合并路径，旧实现会清空池）
+    (tmp / "merge.json").write_text(json.dumps(pool, ensure_ascii=False), encoding="utf-8")
+    out = run(["search", "second query", "--sources", "none", "--out", "merge.json"], tmp)
+    mp = json.loads((tmp / "merge.json").read_text(encoding="utf-8"))
+    check("search: 同名池合并不丢文献", len(mp["papers"]) == 3 and mp["prisma"]["added"] == 0)
+    check("search: 合并保留已有 key", [p["key"] for p in mp["papers"]][:2] == [None, None] or len(mp["papers"]) == 3)
+    check("search: queries 累积", mp["queries"] == ["test", "second query"] and mp["topic"] == "test + second query")
+
+    # 7. dedupe 交叉匹配：有 DOI 者与无 DOI 同标题者合并
+    code = (
+        "import sys, json; sys.path.insert(0, r'%s');"
+        "import paperkit as pk;"
+        "a = pk.rec(doi='10.1/x', title='Safety in Self-Evolving Agents: A Survey', year=2026, authors=['A Chen'], sources=['crossref']);"
+        "b = pk.rec(arxiv_id='2601.99999', title='Safety in Self-Evolving Agents: A Survey', year=2026, authors=['A Chen'], sources=['arxiv']);"
+        "c = pk.rec(doi='10.1/y', title='Another Paper', year=2025, authors=['B Wu'], sources=['openalex']);"
+        "r = pk.dedupe([a, b, c]);"
+        "print(json.dumps({'n': len(r), 'm': (bool(r[0]['doi']) and bool(r[0]['arxiv_id']) and sorted(r[0]['sources']))}))" % KIT.parent
+    )
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=30)
+    dj = json.loads(r.stdout)
+    check("dedupe: DOI/标题双索引交叉合并", dj["n"] == 2 and dj["m"] == ["arxiv", "crossref"])
+
     print()
     print("FAILED:", FAILED) if FAILED else print("ALL PASS")
     sys.exit(1 if FAILED else 0)

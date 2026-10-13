@@ -191,21 +191,31 @@ def q_s2(query, limit):
 
 
 def dedupe(papers):
-    seen, out = {}, []
+    seen_doi, seen_ti, out = {}, {}, []
     for p in papers:
-        k = ("doi:" + p["doi"]) if p["doi"] else ("t:" + norm_title(p["title"]))
-        if not k[2:]:
+        doi_k = ("doi:" + p["doi"]) if p["doi"] else None
+        ti_v = norm_title(p["title"])
+        ti_k = ("t:" + ti_v) if ti_v else None
+        if not (doi_k or ti_k):
             continue
-        if k in seen:
-            old = seen[k]
+        old = None
+        if doi_k and doi_k in seen_doi:
+            old = seen_doi[doi_k]
+        elif ti_k and ti_k in seen_ti:
+            old = seen_ti[ti_k]
+        if old:
             for f in ("abstract", "oa_url", "doi", "arxiv_id", "year", "venue"):
                 if not old.get(f) and p.get(f):
                     old[f] = p[f]
             old["sources"] = sorted(set(old["sources"]) | set(p["sources"]))
             old["citation_count"] = max(old["citation_count"], p["citation_count"])
         else:
-            seen[k] = p
+            old = p
             out.append(p)
+        if doi_k:
+            seen_doi[doi_k] = old
+        if ti_k:
+            seen_ti[ti_k] = old
     return out
 
 
@@ -479,13 +489,27 @@ def cmd_search(args):
         papers += q_arxiv(args.query, args.limit)
     if "s2" in args.sources:
         papers += q_s2(args.query, args.limit)
-    papers = score(dedupe(papers), args.query)[: args.limit]
-    assign_keys(papers)
-    pool = {"topic": args.query, "created": time.strftime("%Y-%m-%d %H:%M:%S"),
-            "papers": papers, "prisma": {"identified": len(papers)}}
+    new = score(dedupe(papers), args.query)[: args.limit]
+    existing, queries = [], []
+    if Path(args.out).exists():
+        try:
+            old = load_pool(args.out)
+            existing = old.get("papers", [])
+            queries = list(old.get("queries") or ([old["topic"]] if old.get("topic") else []))
+        except Exception:
+            pass
+    before = len(existing)
+    merged = dedupe(existing + new)
+    assign_keys(merged)
+    if args.query not in queries:
+        queries.append(args.query)
+    pool = {"topic": " + ".join(queries), "queries": queries,
+            "created": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "papers": merged, "prisma": {"identified": len(merged),
+                                         "added": len(merged) - before}}
     save_pool(pool, args.out)
-    print(f"{len(papers)} papers -> {args.out}")
-    for p in papers[:12]:
+    print(f"+{len(merged) - before} new, {len(merged)} total -> {args.out}")
+    for p in merged[:12]:
         oa = "*" if (p["oa_url"] or p["arxiv_id"]) else " "
         print(f"  [{p['key']}{oa}] ({p['year']}) {p['title'][:72]}  cites={p['citation_count']}")
 

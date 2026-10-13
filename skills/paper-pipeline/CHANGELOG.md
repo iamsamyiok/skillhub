@@ -1,5 +1,13 @@
 # paper-pipeline Changelog
 
+## 1.0.1 (2026-10-13)
+
+- 修复 search 同名池覆盖 bug：现在与已有 pool.json 合并去重（queries 累积、key 稳定、prisma 记 added）
+- dedupe 双索引交叉匹配：有 DOI 记录与无 DOI 同标题记录现在正确合并（修复同标题双胞胎 key）
+- 回归测试 12→16 项（新增同名池合并 3 项 + dedupe 交叉匹配 1 项）
+
+# paper-pipeline Changelog
+
 ## 1.0.0 (2026-10-12)
 
 首个版本：证据驱动的学术写作流水线，融合 Open Academic Paper Gen（证据先行、三层核验）与 Academic Research Skills（苏格拉底成题、评审团）的公开设计，代码为原创实现。

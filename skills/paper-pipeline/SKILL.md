@@ -1,6 +1,6 @@
 ---
 name: paper-pipeline
-version: 1.0.0
+version: 1.0.1
 category: 学术写作
 tags: [论文, 学术写作, 文献检索, 引用核验, 文献综述, 证据表, 同行评审, 参考文献]
 description: 证据驱动的学术写作流水线——多源真实检索、[cite:KEY] 逐段引用、三层引用核验、评审团审稿、cited-only 参考文献。Evidence-driven academic writing pipeline. Trigger on 写论文/写综述/开题报告/文献调研/论文修改/查引用/refs/文献池, or /paper-pipeline. Four-source live search (OpenAlex/Crossref/arXiv/Semantic Scholar), hallucination-proof citation via three-layer verification, reviewer-board critique, cited-only BibTeX/RIS export.
