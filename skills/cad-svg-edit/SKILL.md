@@ -1,8 +1,8 @@
 ---
 name: cad&svg-edit
-description: 融合「CAD 创建」与「SVG 精准编辑」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（cad 无头引擎，输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export SVG/PNG/CSV/DXF), OR editing/modifying existing SVG files (text, color, position, batch changes).
+description: 融合「CAD 创建」与「SVG 精准编辑」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（优先 CADCraft 真实 CAD 引擎，输出 DXF/SVG/PNG；缺二进制时落回内置 JS 无头引擎输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；读入已有 DXF/DWG 图纸走 CADCraft 后端 info/convert；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export DXF/SVG/PNG/CSV), reading DXF/DWG files, OR editing/modifying existing SVG files (text, color, position, batch changes).
 agent_created: true
-version: 2.1.0
+version: 3.0.0
 ---
 
 # CAD & SVG-Edit（融合技能）
@@ -18,15 +18,19 @@ version: 2.1.0
 
 | 用户意图 | 路由到 | 能力来源 |
 |---|---|---|
-| 从零画一张新图 / 零件 / 平面图 / 示意图；要生成 SVG / PNG / CSV | **A. CAD-CREATE** | cad 无头引擎 |
+| 精确工程图 / 机械零件 / 建筑平面；需要 **DXF 交付**、关联尺寸标注、图层、填充、OFFSET/TRIM/FILLET 真编辑几何 | **A+. CADCRAFT 后端**（首选，需二进制） | CADCraft 真实 CAD 引擎 |
+| 从零画简单示意图 / 示意图形；环境无 CADCraft 二进制 | **A. CAD-CREATE**（JS 无头引擎，零依赖兜底） | 内置 JS 引擎 |
+| **读入 / 转换 / 检查已有 DXF 或 DWG 图纸** | **A+. CADCRAFT 后端**（info + convert） | CADCraft（DWG 经 acadrust 桥） |
 | 修改一张**已存在**的 SVG（改字 / 改色 / 移位 / 增删 / 批量 / 空间点名） | **B. SVG-EDIT** | svg_toolkit 确定性修改 |
-| 要改的 SVG 恰由本技能 cad 引擎的生成脚本产出 | **B 的「源脚本路线」优先**：改脚本参数用 CAD-CREATE 重生成 | cad 引擎 |
+| 要改的 SVG 恰由本技能生成脚本产出 | **B 的「源脚本路线」优先**：改脚本参数重生成 | 对应引擎 |
 | 需要 3D 实体（STEP/STL）、工程图 PDF、可制造性检查、3D 打印 | **外部转介** → [text-to-cad](https://github.com/earthtojake/text-to-cad)（build123d 内核） | 生态互补 |
 
 判断要点：
+- 需要**精确几何编辑**（倒角/修剪/偏移/阵列/关联标注/图层/填充）或 **DXF/DWG** 进出 → A+。
 - 目标文件**已存在且要"改"** → SVG-EDIT。
-- 尚**无图形、要"造"** → CAD-CREATE。
-- 语义模糊（如"把平面图里那个房间放大"）：目标已存在 → 走 SVG-EDIT；若需结构性改动且原图由 cad 脚本生成 → 切 CAD-CREATE 重生成（精度更高、联动一致）。
+- 尚**无图形、要"造"** → A+（可用时）否则 A。
+- 语义模糊（如"把平面图里那个房间放大"）：目标已存在 → 走 SVG-EDIT；若需结构性改动且原图由生成脚本产出 → 切对应引擎重生成（精度更高、联动一致）。
+- **降级铁律**：A+ 的 `doctor` 返回 `found:false` 时静默落回 A 路 JS 引擎，任务照常完成，交付说明中提及一句即可。
 
 ---
 
@@ -38,6 +42,149 @@ version: 2.1.0
 - 一键自检：`node <skill>/engine/cad-engine.js doctor` → 输出引擎版本 / Node / Python 状态 / 冒烟结果（Linux / Windows / macOS 通用）
 
 > 坐标约定：**X 右，Y 下**（SVG 系），原点(0,0)，角度用度，弧 `ccw:true`=逆时针。单位=像素(世界坐标)。
+> A+ CADCraft 后端的坐标约定不同：**Y 向上**（CAD 惯例），角度度，单位毫米（公制模板）。
+
+---
+
+# A+. CADCRAFT 后端（精确工程图，v3.0 新增）
+
+> 真实 CAD 引擎（[CADCraft](https://github.com/storytold/cadcraft)，MIT OR Apache-2.0）：404 条命令、关联尺寸标注、图层/线型/填充/块、几何+尺寸约束、DXF R13-2018 读写、DWG 读。经 `scripts/cadcraft-bridge.mjs` 无头驱动，输出 **DXF + SVG + PNG**。
+
+## 环境检测与降级
+
+```bash
+node <skill>/scripts/cadcraft-bridge.mjs doctor
+```
+
+- 输出 `{found, path, version, smoke}`；冒烟通过即可用。
+- 二进制查找顺序：`CADCRAFT_CLI` 环境变量 → PATH → `/opt`、`/tmp/opencode`、`~` 下的 `cadcraft-*/bin/cadcraft-cli`（`CADCRAFT_SCAN=0` 关闭目录扫描）。
+- `found:false`（退出码 2）→ **静默落回 A 路 JS 引擎**，交付时提一句降级即可。
+- 安装：[GitHub Releases](https://github.com/storytold/cadcraft/releases/latest)（Linux tar.gz 解压即用；Windows MSI/portable；macOS dmg）。
+
+## job.json：一次绘图的完整描述
+
+```json
+{
+  "name": "plate",
+  "commands": [
+    {"cmd": "rectang", "params": {"p1": [0,0], "p2": [120,80]}},
+    {"cmd": "circle",  "params": {"center": [30,40], "radius": 10}},
+    {"cmd": "offset",  "params": {"handle": "HANDLE[3]", "distance": 5, "side": [24,40]}},
+    {"cmd": "dimlinear", "params": {"p1": [0,0], "p2": [120,0], "at": [60,-15]}}
+  ],
+  "save": {"dxf": true},
+  "export": {"png": true, "svg": true},
+  "window": [0, 0, 20000, 15000]
+}
+```
+
+```bash
+node <skill>/scripts/cadcraft-bridge.mjs run job.json
+# → {ok, files:{dxf,png,svg}, sizes, handles:[...], acks:[逐命令返回]}
+```
+
+**handle 占位协议**（编辑命令引用已画图元）：
+- `"HANDLE"` = 最近一条命令产出的图元
+- `"HANDLE[n]"` = 第 n 个收集到的 handle（1 起）
+- 遇到占位符时 bridge 自动分批：先执行之前的纯绘制批，收集 handle 后再解析执行该命令（跨会话 handle 稳定，DXF 重开不变）。
+- 也可用 `query` 子命令显式拿 handle：`node <skill>/scripts/cadcraft-bridge.mjs query plate.dxf --type Circle`
+
+## 命令词汇表（JSON 参数签名，精选）
+
+**坐标**：`[x,y]` 数组；Y 向上。**类型名**（verify/查询用）首字母大写：Circle/Line/Polyline/Arc/Ellipse/Dimension/MText/Hatch/Block Reference。
+
+### 绘制
+| 命令 | 参数 |
+|---|---|
+| `line` | `{points: [[x,y],...], closed?}` |
+| `pline` | `{vertices: [[x,y] \| {p, bulge, startWidth, endWidth}], closed?, width?}` |
+| `circle` | `{center, radius}` \| `{p1,p2}` \| `{p1,p2,p3}` |
+| `arc` | `{p1,p2,p3}` \| `{center, radius, start, end(度)}` |
+| `rectang` | `{p1, p2}` \| `{p1, dimensions:[长,宽]}`（+`fillet? chamfer? rotation?`） |
+| `polygon` | `{sides, center, radius, inscribed?}` \| `{sides, edge:[[x,y],[x,y]]}` |
+| `ellipse` | `{center, major:[dx,dy], ratio, start?, end?}` |
+| `spline` | `{fit: [[x,y],...], closed?}` \| `{control: [...], degree?}` |
+| `donut` | `{center, inside, outside}` |
+| `text` | `{at, text, height?, rotation?, justify?}` |
+| `mtext` | `{at, text, height?, width?, justify?}` |
+| `hatch` | `{points?: [[x,y]](内部点) \| handles?: [hex], pattern?:"ANSI31", scale?, angle?}` |
+| `insert` | `{name, file?(DXF/DWG 建块), at, scale?, rotation?}` |
+
+### 标注
+| 命令 | 参数 |
+|---|---|
+| `dimlinear` | `{p1, p2, at, rotation?}`（`at` 定尺寸线位置） |
+| `dimradius` | `{handle, at?}` \| `{center, point}` |
+| `dimdiameter` | `{handle, at?}` \| `{center, point}` |
+| `dimstyle` | `{name, current?, arrowSize?, textSize?, ...DIM* 变量}` |
+
+### 编辑（吃 handle）
+| 命令 | 参数 |
+|---|---|
+| `move` | `{handles?, delta:[dx,dy]}` \| `{from,to}` |
+| `copy` | `{handles?, delta, count?}` |
+| `rotate` | `{handles?, base:[x,y], angle(度), copy?}` |
+| `scale` | `{handles?, base:[x,y], factor}` |
+| `mirror` | `{handles?, p1, p2, erase?}` |
+| `offset` | `{handle, distance, side:[x,y]}`（圆的 offset=同心圆半径±d） |
+| `trim` | `{handle, pick:[x,y] \| fence:[[x,y],...], edges?:[hex]}` |
+| `extend` | `{handle, pick, edges?}` |
+| `fillet` | `{h1, p1, h2, p2, radius?, trim?}`（线/弧/圆） |
+| `chamfer` | `{h1, p1, h2, p2, d1?, d2?}` |
+| `arrayrect` | `{handles?, rows, cols, rowSpacing, colSpacing, associative?:false}` |
+| `arraypolar` | `{handles?, center, count, angle?(默认360), associative?:false}` |
+| `erase` | `{handles?}` |
+| `explode` | `{handles?}` |
+
+### 辅助
+`layer.new {name,color?,linetype?}` · `layer.set {name,on?,frozen?,color?}` · `layer.current {name}` · `zoom` 用 `view.set {center,height}` 或导出时用 `window` 取景。
+
+## 标准工作流（六步闭环）
+
+```
+1. doctor                → 二进制可用？（否则降级 A 路）
+2. 写 job.json           → 词汇表内命令；编辑类用 HANDLE 占位
+3. bridge run            → DXF + PNG + SVG 落盘，拿 handles/acks
+4. bridge verify --expect '{"Circle":3,"Dimension":1}'
+                         → 计数断言（fail 即回 job 修正，勿盲改）
+5. Read PNG 视觉复核     → 结构/标注/文字位置
+6. 交付                   → DXF(主交付物) + SVG/PNG(预览) + 文件清单
+```
+
+## 验证协议
+
+```bash
+node <skill>/scripts/cadcraft-bridge.mjs verify plate.dxf --expect '{"Circle":3,"Polyline":1,"Dimension":2}'
+# → {pass, counts, total, missing, extra, untracked}；fail 退出码 1
+node <skill>/scripts/cadcraft-bridge.mjs query plate.dxf --type Circle
+# → {count, entities:[{handle, geometry:{center,radius}, layer}]}
+```
+
+- 断言失败 → 回 job.json 修正重跑（生成式闭环，禁止直接改 DXF 文本）。
+- `untracked` 列出未断言类型——交付前扫一眼，防漏画。
+
+## 读入路由（DXF / DWG → 摘要 + 预览 + 编辑）
+
+```bash
+node <skill>/scripts/cadcraft-bridge.mjs info drawing.dxf     # counts/layers/dimStyles/extents
+node <skill>/scripts/cadcraft-bridge.mjs convert drawing.dwg --svg out.svg --png out.png --window 0,0,20000,15000
+```
+
+- 先 `info` 给用户实体摘要，再出 SVG/PNG 预览确认内容。
+- 编辑：把文件作为 job 起点（`run drawing.dxf` 形式的 bridge 分批自动以当前态续作），或 `query` 拿 handle 后写编辑 job。
+- **有损警告**：CADCraft 保存会丢弃其未建模的实体（3D 实体、proxy 对象等）。读入外部图纸再保存的交付件，必须附一句「基于 CADCraft 0.x 转换，未支持实体可能有损」。
+
+## 已知坑（词汇表使用注意）
+
+1. **associative array 吸收源实体**：`arrayrect/arraypolar` 默认 `associative:true`，源图元进 Block Reference，`counts` 里变 `Block Reference:1` 而非 N 个图元。计数断言要么 `"associative":false` 保持平面，要么按 Block Reference 断言。
+2. **圆的 offset 是同心圆**（半径±distance），`side` 只决定内/外方向。
+3. **`--script` 提示流勿用**：一次性脚本模式下交互式点输入会报 "Point or option keyword required"；全部用 JSON 命令（本 bridge 即如此）。
+4. Y 向上（CAD 惯例），与 A 路 JS 引擎（Y 向下）相反；两路产物不可直接叠坐标。
+5. SHX 字体未读，CJK 文字依赖系统字体（缺字时回退单笔划字体）。
+
+## Attribution
+
+- [CADCraft](https://github.com/storytold/cadcraft)（storytold 团队，MIT OR Apache-2.0）：引擎与命令协议。bridge 为本技能原创封装，可自由分发。
 
 ---
 
@@ -55,13 +202,13 @@ cad-svg-edit/
 ├── SKILL.md
 ├── CHANGELOG.md            # 版本更新日志
 ├── engine/cad-engine.js   # 无头引擎（cadAPI v2.1-headless，含 doctor 自检）
+├── scripts/
+│   ├── cadcraft-bridge.mjs # A+ CADCraft 后端桥（v3.0：doctor/run/query/verify/convert/info）
+│   ├── svg_toolkit.py  daemon.mjs  next_name.mjs  render_png.mjs   # SVG-EDIT 工具
 ├── assets/cad-draw.html   # 可选可视化预览页
 ├── assets/preview.html    # SVG-EDIT 点选编辑页
-├── examples/              # 示例 draw 脚本
-│   ├── gear.js  house.js  nut.js  flange.js  bad.js
-├── test/run-tests.js      # 回归测试（doctor + 全部示例 + 负例）
-├── scripts/               # SVG-EDIT 编辑工具
-│   ├── svg_toolkit.py  daemon.mjs  next_name.mjs  render_png.mjs
+├── examples/              # 示例（*.js 为 JS 引擎脚本，*.job.json 为 CADCraft job）
+├── test/run-tests.js      # 回归测试（doctor + 全部示例 + 负例 + bridge 测试）
 └── references/            # SVG-EDIT 参考文档
     ├── grounding.md  operations.md
 ```
@@ -260,13 +407,17 @@ return JSON.stringify({count:cadAPI.count(), validate:v.ok});
 3. 关系层（按需）：`distance()` / `checkParallel()` / `checkTangent()`。
 三层通过后再导出。无头模式下 `verify()` 返回的 `snapshot` 是 SVG dataURL，可存文件复核；PNG/CSV/DXF 即最终交付物。
 
-## 自检与回归（v2.1 新增）
+## 自检与回归（v2.1 新增，v3.0 扩展）
 
 ```bash
 # 环境自检：引擎版本 / Node / Python / 冒烟绘图
 node <skill>/engine/cad-engine.js doctor
 
+# CADCraft 后端自检（v3.0）：found:false 时 A 路兜底
+node <skill>/scripts/cadcraft-bridge.mjs doctor
+
 # 回归测试：doctor + 4 个正例示例（gear/house/nut/flange 全格式导出）+ bad.js 负例
+# + bridge 全子命令测试（无二进制时自动跳过，有二进制时端到端跑通）
 node <skill>/test/run-tests.js   # 期望输出 ALL_PASS
 ```
 

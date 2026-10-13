@@ -452,7 +452,7 @@
     },
     "cad-svg-edit": {
       "category": "开发工具",
-      "description": "融合 CAD 创建与 SVG 精准编辑：从零绘图（cad 无头引擎，输出 SVG/PNG/CSV/DXF）与修改已有 SVG（持久 id 寻址、空间/文本过滤、可视化点选、批量、版本化保存）按意图自动路由。",
+      "description": "融合 CAD 创建与 SVG 精准编辑，按意图自动路由：精确工程图/DXF/DWG 读写走 CADCraft 真实 CAD 引擎后端（404 命令、关联尺寸标注、OFFSET/TRIM/FILLET 真编辑几何、实体计数断言验证闭环；缺二进制自动落回内置 JS 无头引擎）；修改已有 SVG 走 svg_toolkit 确定性编辑（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）。",
       "tags": [
         "cad",
         "svg",
@@ -460,10 +460,14 @@
         "矢量图",
         "编辑",
         "绘图引擎",
-        "dxf"
+        "dxf",
+        "CADCraft",
+        "DXF",
+        "DWG",
+        "工程图"
       ],
       "downloads": 0,
-      "version": "2.1.0",
+      "version": "3.0.0",
       "createdAt": "2026-09-28T02:58:59.000Z",
       "updatedAt": "2026-10-05T00:00:00.000Z"
     },

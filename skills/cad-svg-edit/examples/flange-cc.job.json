@@ -1,0 +1,15 @@
+{
+  "name": "flange-cc",
+  "commands": [
+    {"cmd": "layer.new", "params": {"name": "outline", "color": 7, "current": true}},
+    {"cmd": "circle", "params": {"center": [0, 0], "radius": 150}},
+    {"cmd": "circle", "params": {"center": [0, 0], "radius": 130}},
+    {"cmd": "circle", "params": {"center": [0, 0], "radius": 40}},
+    {"cmd": "circle", "params": {"center": [100, 0], "radius": 12}},
+    {"cmd": "arraypolar", "params": {"handles": ["HANDLE[4]"], "center": [0, 0], "count": 8, "angle": 360, "associative": false}},
+    {"cmd": "dimradius", "params": {"handle": "HANDLE[1]", "at": [110, 110]}},
+    {"cmd": "mtext", "params": {"at": [-60, 190], "text": "FLANGE 8x R12", "height": 12}}
+  ],
+  "save": {"dxf": true},
+  "export": {"png": true, "svg": true}
+}

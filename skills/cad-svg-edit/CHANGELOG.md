@@ -1,15 +1,25 @@
-# 更新日志
+# cad&svg-edit Changelog
 
-## 2.1.0 - 2026-10-05
+## 3.0.0 (2026-10-13)
 
-- 跨平台便携化：移除全部硬编码个人路径（Node/Python/工作区目录），改为 PATH 探测 + `<skill>` 相对引用，Linux / Windows / macOS 通用
-- 新增 DXF 导出（R12 ASCII 实体）：CLI `--dxf`（并入 `--all`）、`api.exportDXF()`、`toDXF()`；Y 轴已翻转为 CAD 惯例（Y 向上），可直接用于激光切割下料或导入 AutoCAD/Fusion 等
-- 新增 `doctor` 自检子命令：一键输出引擎版本 / Node / Python 状态 / 冒烟绘图结果
-- 新增回归测试 `test/run-tests.js`：doctor + 全部正例示例（含新 flange）+ bad.js 负例，期望 ALL_PASS
-- 新增示例 `examples/flange.js`（法兰盘：多孔环阵 + 半径标注 + 文字标题）
-- SKILL.md 路由表新增 3D 转介规则：需要 STEP/STL 实体、工程图 PDF、可制造性检查时转 text-to-cad（生态互补）
-- 引擎版本号升至 cadAPI-2.1-headless
+新增 **A+ CADCRAFT 后端**：接入 [CADCraft](https://github.com/storytold/cadcraft)（storytold，MIT OR Apache-2.0）真实 CAD 引擎，精确工程图能力全面升级；二进制缺失时自动落回原 JS 引擎，v2 全部能力保留。
 
-## 1.0.0 - 2026-09-28
+- `scripts/cadcraft-bridge.mjs`（新增，零依赖 Node）：
+  - `doctor`：二进制探测（CADCRAFT_CLI → PATH → 常见目录扫描，CADCRAFT_SCAN=0 可关）+ circle→dxf 冒烟；缺失退出码 2 附安装指引
+  - `run <job.json>`：JSON 命令数组驱动绘图（贪心分批 + `--save` 链式会话），`HANDLE`/`HANDLE[n]` 占位符自动解析为已收集 handle；输出 DXF + SVG + PNG 三产物与逐命令 ack
+  - `verify <dxf> --expect`：实体计数断言（info counts 对比），输出 pass/missing/extra/untracked，失败退出码 1
+  - `query`：按类型/图层/窗口查实体（handle + geometry）
+  - `convert`：DXF→SVG/PNG，支持 `--window` 取景
+  - `info`：DXF/DWG 摘要（counts/layers/dimStyles/extents）
+- SKILL.md：路由表新增 A+ 行与降级铁律；新章节含命令词汇表（绘制/标注/编辑/辅助 ~35 条 JSON 签名）、handle 占位协议、六步工作流、验证协议、读入路由（DXF/DWG → info+convert+编辑）、已知坑（associative array 吸收源实体、圆 offset 同心、Y 向上坐标系差异、有损保存声明）
+- `examples/flange-cc.job.json`：法兰盘示例（同心圆 + 8 孔极坐标阵列 + 半径标注 + 文字），几何断言精确通过（孔均布 R100、45° 步进、r=12）
+- `test/run-tests.js`：新增 7 项 bridge 测试（降级路径/run/verify 正反/query/convert/坏占位符），二进制缺失时自动 SKIP；13 项全过
+- Attribution：CADCraft MIT OR Apache-2.0，bridge 为原创封装
 
-- 首版：CAD-CREATE（无头引擎 SVG/PNG/CSV）+ SVG-EDIT（id 寻址 / 过滤器 / 点选 / 版本化）融合技能
+## 2.1.0
+
+（见 git 历史：零硬编码路径、doctor 自检、回归测试）
+
+## 2.0.0
+
+（见 git 历史：cad-creat 与 svg-edit 融合，双路由）
