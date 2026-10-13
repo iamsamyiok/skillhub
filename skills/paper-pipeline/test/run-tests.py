@@ -103,6 +103,16 @@ def main():
     dj = json.loads(r.stdout)
     check("dedupe: DOI/标题双索引交叉合并", dj["n"] == 2 and dj["m"] == ["arxiv", "crossref"])
 
+    # 8. 空字符串作者不崩（authors=[""] 曾致 IndexError）
+    code2 = (
+        "import sys, json; sys.path.insert(0, r'%s');"
+        "import paperkit as pk;"
+        "p = pk.rec(title='Weird Paper', year=2026, authors=['']);"
+        "pk.assign_keys([p]); print(p['key'])" % KIT.parent
+    )
+    r2 = subprocess.run([sys.executable, "-c", code2], capture_output=True, text=True, timeout=30)
+    check("key: 空作者回退 anon 前缀", r2.returncode == 0 and r2.stdout.strip().startswith("anon2026"))
+
     print()
     print("FAILED:", FAILED) if FAILED else print("ALL PASS")
     sys.exit(1 if FAILED else 0)

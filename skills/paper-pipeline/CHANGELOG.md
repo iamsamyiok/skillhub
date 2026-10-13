@@ -1,5 +1,12 @@
 # paper-pipeline Changelog
 
+## 1.0.2 (2026-10-13)
+
+- 修复 assign_keys 对空字符串作者（authors=[""]）的 IndexError，回退 anon 前缀
+- 回归测试 16→17 项
+
+# paper-pipeline Changelog
+
 ## 1.0.1 (2026-10-13)
 
 - 修复 search 同名池覆盖 bug：现在与已有 pool.json 合并去重（queries 累积、key 稳定、prisma 记 added）

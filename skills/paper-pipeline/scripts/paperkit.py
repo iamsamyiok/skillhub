@@ -239,7 +239,9 @@ def assign_keys(papers):
         if p.get("key"):
             used[p["key"]] = p
             continue
-        last = (p["authors"][0].split()[-1] if p["authors"] else "anon").lower()
+        a0 = (p.get("authors") or [""])[0] or ""
+        parts = a0.split()
+        last = (parts[-1] if parts else "anon").lower()
         last = re.sub(r"[^a-z]", "", last) or "anon"
         tw = [w for w in re.findall(r"[a-z0-9]+", (p["title"] or "untitled").lower()) if w not in STOP]
         first = tw[0] if tw else "x"
