@@ -839,6 +839,28 @@
       "entry": "scripts/server.js",
       "args": [],
       "env": {}
+    },
+    "multimodal-rag-mcp": {
+      "name": "多模态 RAG 知识库",
+      "description": "文件夹即知识库的多模态 RAG MCP：向量/全文/混合检索，图片/音频/视频解析，证据可回查（页码/工作表/时间戳/行号）。",
+      "version": "0.1.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "rag",
+        "python"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-10-13T00:00:00.000Z",
+      "updatedAt": "2026-10-13T00:00:00.000Z",
+      "runtime": "python",
+      "entry": "-m app",
+      "args": [],
+      "env": {
+        "RAG_EMBEDDING_API_KEY": "${RAG_EMBEDDING_API_KEY}",
+        "RAG_VISION_API_KEY": "${RAG_VISION_API_KEY}",
+        "RAG_ASR_API_KEY": "${RAG_ASR_API_KEY}"
+      }
     }
   },
   "apis": {

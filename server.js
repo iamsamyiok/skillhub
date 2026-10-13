@@ -506,13 +506,21 @@ function mcpDetail(id) {
     deps = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.devDependencies || {}));
   } catch {}
   
-  // 列出 scripts 目录
+  // 递归列出项目文件（兼容 node 单文件与 Python 等多文件项目）
+  const EXCLUDES = new Set(['node_modules', '.git', '__pycache__', '.venv', 'venv', 'dist', 'build', '.pytest_cache', '.DS_Store', '.egg-info']);
+  const MAX_FILE_BYTES = 50 * 1024 * 1024;
   const files = [];
-  if (fs.existsSync(path.join(dir, 'scripts'))) {
-    for (const f of fs.readdirSync(path.join(dir, 'scripts'))) {
-      files.push({ path: `scripts/${f}`, size: fs.statSync(path.join(dir, 'scripts', f)).size });
+  (function walk(rel) {
+    for (const name of fs.readdirSync(path.join(dir, rel))) {
+      if (EXCLUDES.has(name) || /\.egg-info$/.test(name)) continue;
+      const relPath = rel ? `${rel}/${name}` : name;
+      const st = fs.statSync(path.join(dir, relPath));
+      if (st.isDirectory()) walk(relPath);
+      else if (st.isFile() && st.size <= MAX_FILE_BYTES) {
+        files.push({ path: relPath, size: st.size });
+      }
     }
-  }
+  })('');
   
   return {
     id,
