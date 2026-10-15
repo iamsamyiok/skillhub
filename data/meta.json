@@ -467,9 +467,9 @@
         "工程图"
       ],
       "downloads": 0,
-      "version": "3.0.0",
+      "version": "3.0.1",
       "createdAt": "2026-09-28T02:58:59.000Z",
-      "updatedAt": "2026-10-05T00:00:00.000Z"
+      "updatedAt": "2026-10-15T00:00:00.000Z"
     },
     "3d-edit": {
       "category": "前端开发",
@@ -487,9 +487,9 @@
         "glb"
       ],
       "downloads": 0,
-      "version": "1.1.0",
+      "version": "1.1.1",
       "createdAt": "2026-09-28T03:13:25.000Z",
-      "updatedAt": "2026-10-05T00:00:00.000Z"
+      "updatedAt": "2026-10-15T00:00:00.000Z"
     },
     "pre-align": {
       "category": "需求梳理",

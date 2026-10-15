@@ -2,7 +2,7 @@
 name: cad&svg-edit
 description: 融合「CAD 创建」与「SVG 精准编辑」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（优先 CADCraft 真实 CAD 引擎，输出 DXF/SVG/PNG；缺二进制时落回内置 JS 无头引擎输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；读入已有 DXF/DWG 图纸走 CADCraft 后端 info/convert；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export DXF/SVG/PNG/CSV), reading DXF/DWG files, OR editing/modifying existing SVG files (text, color, position, batch changes).
 agent_created: true
-version: 3.0.0
+version: 3.0.1
 ---
 
 # CAD & SVG-Edit（融合技能）
@@ -180,7 +180,9 @@ node <skill>/scripts/cadcraft-bridge.mjs convert drawing.dwg --svg out.svg --png
 2. **圆的 offset 是同心圆**（半径±distance），`side` 只决定内/外方向。
 3. **`--script` 提示流勿用**：一次性脚本模式下交互式点输入会报 "Point or option keyword required"；全部用 JSON 命令（本 bridge 即如此）。
 4. Y 向上（CAD 惯例），与 A 路 JS 引擎（Y 向下）相反；两路产物不可直接叠坐标。
-5. SHX 字体未读，CJK 文字依赖系统字体（缺字时回退单笔划字体）。
+5. SHX 字体未读，CJK 文字依赖系统字体（缺字时回退单笔划字体）；图内标注直接用英文/拼音最稳，中文放交付说明与图例文档。
+6. **verify 期望表的类型映射**：`rectang` 产出 **Polyline**（按 Line/Rect 断言必 fail）；`copy`/`array`/`offset` 每次复制/偏移都新增实体（楼梯 20 踢面 = Line +20，楼层 copy 会乘楼层系数）。写 `--expect` 前按"命令 → 产出实体类型与数量"推演；**首次 fail 先 `query --type X` 审计实际分布再修期望**——job 正确而期望预估错是常态，勿急着回改 job。
+7. **文字标注碰撞**：多处 text 的图纸（户型/机电/平面布置）在 PNG 复核时专查文字与邻近图元/其他文字的包围盒重叠；写 job 时标注插入点优先选图元间空白带，房间标签与家具文字上下错位排布（实证：户型 UNIT-A 标签压到 BED 标注，调 `at` 坐标重跑即愈）。
 
 ## Attribution
 
