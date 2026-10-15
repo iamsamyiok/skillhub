@@ -23,6 +23,29 @@ Agent 必须执行"写 → 跑 → 看 → 改"循环，禁止写完 HTML 直接
    - **编辑卫生**：手写/编辑代码后 grep 一遍关键赋值（如 `castShadow`、`receiveShadow`），确认没被上一行的行尾注释吞掉（`// 注释 ... key.castShadow = true;` 会让语句变注释的一部分，**静默失效无报错**）。给 HTML 加注释时，代码语句必须另起一行。
 5. **回归**：重跑确认，截图对比上一轮。至少完成 3 轮才能交付；用户说"不够精美"= 继续 2 轮审美专项（配色/雾/辉光/构图），不要空口答应。
 
+## 无浏览器环境：chromium 无头 CLI 渲染配方
+
+沙箱无内置浏览器时（capture.mjs 也没有宿主页面可挂），用 chromium CLI 跑同一套"跑→看→改"循环：
+
+1. **装环境**：`apt-get install -y chromium fonts-noto-cjk`（镜像源个别包 404 就先 `apt-get update` 再装；Noto CJK 是 Canvas 画中文贴图/招牌的前提，缺了渲染成 tofu）。
+2. **起本地 HTTP**：`python3 -m http.server 8000`，页面一律走 `http://localhost:PORT/xxx.html`（与 file:// 铁律同源：importmap/module 会被 file:// 拦）。
+3. **渲染截图**：
+   ```bash
+   chromium --headless=new --no-sandbox --disable-gpu-sandbox --enable-unsafe-swiftshader \
+     --use-angle=swiftshader --window-size=1600,1000 --virtual-time-budget=15000 \
+     --enable-logging=stderr --screenshot=shot.png "http://localhost:8000/xxx.html"
+   ```
+   stderr 里 dbus/GCM 报错全是噪音；`grep CONSOLE` 拿 `[3d-edit]` 锚点日志（kit ready / OK / surface 三行齐 = 通过）。
+4. **rAF 阈值**：swiftshader 软渲染一帧几十到几百 ms，budget 内可能跑不满模板默认的 30 帧阈值 → `[3d-edit] OK` 不出现。生成侧把 `if (++frames > 30) logOK()` 降为 `> 3`（3 帧足以证明主循环存活且拿到 drawCalls/tris 统计），或加大 budget。
+5. **无视觉输入时的目检替代**（read 工具读不了图片的环境）——PIL 像素统计做客观验证：
+   - 全图：平均 luma、近黑占比（luma<12）；
+   - 主体区（包围盒带内）：平均 luma，夜景楼体经验值 **35~45 为可读、<30 读作黑坨**；
+   - 冷暖：暖色像素（r>150,g>110,b<130）≈ 亮窗数、冷色像素计数，与 `lit=N` 日志交叉印证；
+   - **轮间对比**：每轮调参后同机位重拍看指标趋势（实证：提亮五连调，塔区 luma 27→40、近黑 89%→75% 即达标曲线）。
+   统计验证 + 锚点日志统计数双通道齐上；向用户如实说明"像素统计验证，非目检"，别假装看过图。
+6. **语法闸（生成脚本做模板手术后的强制步骤）**：任何脚本化替换锚点/区块后，先提取 `<script type="module">` 内容**存成 .mjs** 跑 `node --check`（.js 上 node 的 ESM 自动检测会假通过），过了再 `edit3d.mjs check`，再进无头渲染。三道闸顺序：**语法 → 结构 → 渲染**。
+   - 排查 "Unexpected end of input"（报错行= `</script>` 行，不给开启行号）：未闭合括号用状态机扫描器定位——必须处理 `'` `"` `` ` `` `/* */` `//` 五态与 `${}` 嵌套；裸括号计数会被字符串/注释/模板里的括号骗（实证：模板 shader 串里的 `(){}`、注释里的反引号各骗一次）。
+
 ## 视觉体检单（截图后逐项过）
 
 - [ ] 有东西：非纯黑/纯白/纯色（相机没在地平线下、物体没在 far 外）
@@ -62,6 +85,9 @@ Agent 必须执行"写 → 跑 → 看 → 改"循环，禁止写完 HTML 直接
 | 面板显示"某层关着"但画面里它还在（或反之） | `effect:'hot'` 的 `apply` 直改对象、绕过实体 props 记录 | 开关"一整层"的参数改用 `effect:'rebuild'`；注册时显式带 `props:{visible:…}`（见 edit-playbook） |
 | 用户一打开页面就弹"有 N 条草稿待恢复" | agent 自验证里的 `CITY.set()` 探针写了 localStorage 草稿 | 收尾 `Object.keys(localStorage).forEach(k=>localStorage.removeItem(k))` 并重载，确认 console 无 `pendingRestore` 警告 |
 | 特写机位突然只剩一个端盖/物体出画 | 上游 P3 改了尺寸公式，`@presets@` 还按旧外形算 | 改尺寸后重算机位表：距离 = 1.4~1.8× 主体最大外形，1~6 全机位重拍 |
+| 产物整页空白，console 报 Unexpected end of input | 生成脚本替换锚点区块时吞了切片内的闭合 `}`/`)` | 提取 module 存 .mjs 跑 node --check；未闭合符用五态状态机扫描器定位（见「无浏览器环境」第 6 条） |
+| node --check 通过、浏览器仍报语法错 | .js 上 node 的 ESM 自动检测假通过 | 一律拷 .mjs 再 check |
+| 夜景主体读作剪影/黑坨（只有窗光） | 可见立面背光 + 物理光照下强度不足 | 主光挪到相机象限、强度上探 1.5~1.6，加正面 fill，材质微 emissive 兜底；主体区 luma 判定（35~45 达标） |
 
 ## GLSL 专项
 
