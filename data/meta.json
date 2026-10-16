@@ -584,6 +584,22 @@
       "downloads": 0,
       "createdAt": "2026-10-13T14:05:42.904Z",
       "updatedAt": "2026-10-13T14:05:42.904Z"
+    },
+    "book-to-skill-oss": {
+      "version": "1.4.0",
+      "category": "知识转化",
+      "tags": [
+        "book-to-skill",
+        "文档转换",
+        "PDF",
+        "EPUB",
+        "分章技能",
+        "知识库",
+        "技能生成"
+      ],
+      "downloads": 0,
+      "createdAt": "2026-10-16T00:00:00.000Z",
+      "updatedAt": "2026-10-16T00:00:00.000Z"
     }
   },
   "mcps": {
