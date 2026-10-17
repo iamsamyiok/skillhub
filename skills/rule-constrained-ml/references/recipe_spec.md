@@ -11,6 +11,7 @@ description: <一句话>
 output:
   id: <因变量列名>        # CSV 中须同名
   floor: <数字|null>      # 硬地板: 最终输出 >= floor; null 关闭
+  cap: <数字|null>        # 硬上限: 最终输出 <= cap(安全约束); null 关闭
 inputs:
   - id: <特征id>
     label: <中文标签>
@@ -49,7 +50,18 @@ inputs:
 | negative | `-relu(raw)` | 只调幅度，恒 ≤ 0（受限可变） |
 | free | `raw` | 无约束（慎用，放弃可解释保障） |
 
-## 示例（完整可跑，见 scripts/recipe_example_deposit.yaml）
+## 输出约束（结构层冻结，训练不翻转）
+
+| 约束 | 实现 | 场景 |
+|------|------|------|
+| `floor` | `max(sum, floor)` | 非负、最低保障（如存款≥0、投加≥0） |
+| `cap` | `min(sum, cap)` | 安全/成本上限（如投加≤60mg/L、折扣≥地板价） |
+
+> 截断处内部梯度归零，模型不会"学会绕过"上限/地板。
+
+## 示例（完整可跑）
+
+**存款（仅地板，见 scripts/recipe_example_deposit.yaml）：**
 
 ```yaml
 name: deposit_estimator
@@ -62,6 +74,18 @@ inputs:
   - { id: cons,   label: 消费档,   type: ordinal, base: 1, levels: 3,   sign: negative }
 ```
 
-> 生成模型后：`python model_deposit_estimator.py --demo` 自测；
-> `python model_deposit_estimator.py --data x.csv --export-weights w.json` 真实训练；
-> `python rcml_validate.py recipe.yaml --weights w.json` 独立审计。
+**加药系统（地板 + 上限，见 scripts/recipe_water_dosing.yaml）：**
+
+```yaml
+name: water_dosing
+output: { id: pac_dose, floor: 0, cap: 60 }   # 投加恒在 [0, 60] mg/L
+inputs:
+  - { id: turbidity, label: 进水浊度, type: numeric, knee: 15,  range: [5,250],  sign: positive }
+  - { id: temp,      label: 水温,     type: numeric, range: [5,35],              sign: negative }
+  - { id: retrofit,  label: 新药剂批次, type: binary,                              sign: free }
+```
+
+> 生成模型后：`python model_xxx.py --demo` 自测（含约束审计）；
+> `python model_xxx.py --data x.csv --export-weights w.json` 真实训练并导出；
+> `python model_xxx.py --demo --export-weights w.json` 也可导出 demo 权重；
+> `python rcml_validate.py recipe.yaml --weights w.json` 独立审计（只看规则+系数）。
