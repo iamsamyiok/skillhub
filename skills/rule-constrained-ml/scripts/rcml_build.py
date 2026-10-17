@@ -53,6 +53,7 @@ RAW_KEYS = [inp["id"] for inp in RECIPE["inputs"]] + ["base"]
 NEG = {inp["id"] for inp in RECIPE["inputs"] if inp.get("sign") == "negative"}
 FREE = {inp["id"] for inp in RECIPE["inputs"] if inp.get("sign") == "free"}
 FLOOR = RECIPE["output"].get("floor", None)
+CAP = RECIPE["output"].get("cap", None)
 OUT_ID = RECIPE["output"]["id"]
 
 
@@ -99,13 +100,15 @@ def coef(r, k):
 
 
 def forward(r, f):
-    """前向：加权和 + 地板。结构(符号/膝点/地板)冻结, 只 r 里的幅度可训。"""
+    """前向：加权和 + 地板 + 上限。结构(符号/膝点/地板/上限)冻结, 只 r 里的幅度可训。"""
     d = r["base"]
     for inp in RECIPE["inputs"]:
         iid = inp["id"]
         d += coef(r, iid) * f[iid]
     if FLOOR is not None:
         d = max(d, float(FLOOR))
+    if CAP is not None:
+        d = min(d, float(CAP))
     return d
 
 
@@ -122,12 +125,12 @@ def train(samples, y, epochs=4000, lr=5e-4, init=1.0):
             for inp in RECIPE["inputs"]:
                 iid = inp["id"]
                 d += coef(r, iid) * f[iid]
-            if FLOOR is not None:
-                yh = max(d, float(FLOOR))
-                dd = (yh - yt) if d >= float(FLOOR) else 0.0
-            else:
-                yh = d
-                dd = (yh - yt)
+            yh = d
+            dd = (yh - yt)
+            if FLOOR is not None and d < float(FLOOR):
+                yh = float(FLOOR); dd = 0.0      # 地板截断, 内部梯度归零
+            if CAP is not None and d > float(CAP):
+                yh = float(CAP); dd = 0.0        # 上限截断, 内部梯度归零
             loss += 0.5 * (yh - yt) ** 2
             for k in RAW_KEYS:
                 wk = 1.0 if (k in FREE) else (1.0 if r[k] > 0 else 0.0)
@@ -155,6 +158,8 @@ def rules_report(r):
         print(f"  [{iid}] {inp.get('label', iid):>8} 系数 = {c:9.3f}  ({tag})")
     if FLOOR is not None:
         print(f"  [floor] 最终 = max(加权和, {FLOOR})  (硬地板, 冻结)")
+    if CAP is not None:
+        print(f"  [cap] 最终 = min(前述, {CAP})  (硬上限, 冻结)")
 
 
 def _default_sample():
@@ -195,8 +200,8 @@ def audit(r):
             prev = val
         print(f"    {iid:>8}: {'单调OK' if mono else 'FAIL(非单调)'}")
         ok_all &= mono
-    print("[3] 地板 / 越界扫描(极端外推组合):")
-    worst, worst_s = 1e9, None
+    print("[3] 地板 / 上限 / 越界扫描(极端外推组合):")
+    worst, best, worst_s = 1e9, -1e9, None
     endpoints = []
     for inp in RECIPE["inputs"]:
         lo, hi = _range(inp)
@@ -206,10 +211,15 @@ def audit(r):
         val = forward(r, encode(s))
         if val < worst:
             worst, worst_s = val, s
+        if val > best:
+            best = val
     floor_str = f">= {FLOOR}" if FLOOR is not None else "无"
+    cap_str = f"<= {CAP}" if CAP is not None else "无"
     floor_ok = (FLOOR is None) or (worst >= float(FLOOR) - 1e-9)
-    ok_all &= floor_ok
-    print(f"    最小预测={worst:.3f}  地板={floor_str}  {'OK' if floor_ok else 'FAIL(越界)'}")
+    cap_ok = (CAP is None) or (best <= float(CAP) + 1e-9)
+    ok_all &= (floor_ok and cap_ok)
+    print(f"    最小预测={worst:.3f}  地板{floor_str}  {'OK' if floor_ok else 'FAIL'}")
+    print(f"    最大预测={best:.3f}  上限{cap_str}  {'OK' if cap_ok else 'FAIL(越界)'}")
     print("=== 审计结论:", "全部通过" if ok_all else "存在违规(见上)", "===")
     return ok_all
 
@@ -272,6 +282,8 @@ def demo(epochs=4000, lr=5e-4, n=600, seed=7):
             d += coef(true_r, iid) * f[iid]
         if FLOOR is not None:
             d = max(d, float(FLOOR))
+        if CAP is not None:
+            d = min(d, float(CAP))
         y.append(d + random.gauss(0, 3))
     r = train(samples, y, epochs=epochs, lr=lr)
     rules_report(r)
@@ -297,7 +309,10 @@ def main():
             audit(r)
         return
     if args.demo:
-        demo(epochs=args.epochs, lr=args.lr)
+        r = demo(epochs=args.epochs, lr=args.lr)
+        if args.export_weights:
+            save_weights(r, args.export_weights)
+            print(f">>> 权重已导出: {args.export_weights}")
         return
     if args.data:
         samples, y = load_data_csv(args.data)
