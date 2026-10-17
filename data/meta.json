@@ -204,15 +204,23 @@
       "updatedAt": "2026-09-13T05:18:08.341Z"
     },
     "pdf": {
+      "version": "1.2.1",
       "category": "文档处理",
       "tags": [
         "PDF",
+        "Rust",
+        "极速",
+        "性能强",
+        "零依赖",
+        "OCR",
         "文档",
-        "OCR"
+        "表格提取",
+        "加密解密"
       ],
       "downloads": 0,
       "createdAt": "2026-09-13T05:18:08.341Z",
-      "updatedAt": "2026-09-13T05:18:08.341Z"
+      "updatedAt": "2026-10-17T21:25:00.000Z",
+      "description": "⚡极速 Rust 版 PDF 工具（pdfctl）：性能比官方 Python 版快 1.5x~399x，8/8 基准全胜。零依赖单二进制，合并/拆分/加密解密/文本表格提取/加水印/创建PDF/OCR/表单填写全覆盖。"
     },
     "docx": {
       "category": "文档处理",
