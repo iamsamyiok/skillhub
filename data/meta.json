@@ -621,7 +621,7 @@
       "description": "把领域专家的确定性明规则(结构+符号+地板+膝点)与少量配对标签数据结合，只训练不确定的幅度系数，产出既精确又数据校准、可读可解释、可独立审计的混合模型。思想源自 Cheng Lou 的 handwired。"
     },
     "hybrid-constrained-ml": {
-      "version": "\"1.0.0\"",
+      "version": "1.0.0",
       "category": "开发工具",
       "tags": [
         "融合建模",
