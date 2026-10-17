@@ -73,13 +73,15 @@ def encode(recipe, sample):
     return f
 
 
-def forward(recipe, r, f, floor):
+def forward(recipe, r, f, floor, cap):
     d = r["base"]
     for inp in recipe["inputs"]:
         iid = inp["id"]
         d += coef(r, iid, *derive(recipe)[:2]) * f[iid]
     if floor is not None:
         d = max(d, float(floor))
+    if cap is not None:
+        d = min(d, float(cap))
     return d
 
 
@@ -100,6 +102,7 @@ def _range(inp):
 
 def audit(recipe, r):
     neg, free, floor, out_id = derive(recipe)
+    cap = recipe["output"].get("cap", None)
     print("=== 独立合规审计 (recipe + weights, 不含训练代码) ===")
     ok = True
     print("[1] 符号域:")
@@ -122,22 +125,25 @@ def audit(recipe, r):
             s = {x["id"]: ((lo + hi) / 2.0 if x.get("type") != "binary" else 0.0)
                  for x in recipe["inputs"]}
             s[inp["id"]] = v
-            val = forward(recipe, r, encode(recipe, s), floor)
+            val = forward(recipe, r, encode(recipe, s), floor, cap)
             if prev is not None and val < prev - 1e-6:
                 mono = False
             prev = val
         ok &= mono
         print(f"    {inp['id']:>8}: {'单调OK' if mono else 'FAIL'}")
-    print("[3] 地板/越界扫描:")
-    worst = 1e9
+    print("[3] 地板/上限/越界扫描:")
+    worst, best = 1e9, -1e9
     ends = [_range(inp) for inp in recipe["inputs"]]
     for combo in itertools.product(*ends):
         s = {inp["id"]: v for inp, v in zip(recipe["inputs"], combo)}
-        val = forward(recipe, r, encode(recipe, s), floor)
+        val = forward(recipe, r, encode(recipe, s), floor, cap)
         worst = min(worst, val)
+        best = max(best, val)
     fok = (floor is None) or (worst >= float(floor) - 1e-9)
-    ok &= fok
-    print(f"    最小预测={worst:.3f} 地板>={floor} {'OK' if fok else 'FAIL(越界)'}")
+    cok = (cap is None) or (best <= float(cap) + 1e-9)
+    ok &= (fok and cok)
+    print(f"    最小预测={worst:.3f} 地板>={floor} {'OK' if fok else 'FAIL'}")
+    print(f"    最大预测={best:.3f} 上限<={cap} {'OK' if cok else 'FAIL(越界)'}")
     print("=== 审计结论:", "全部通过" if ok else "存在违规", "===")
     return ok
 
@@ -149,7 +155,8 @@ def mse_on_csv(recipe, r, csv_path):
         for row in csv.DictReader(fh):
             samples.append({i["id"]: float(row[i["id"]]) for i in recipe["inputs"]})
             y.append(float(row[out_id]))
-    err = sum((forward(recipe, r, encode(recipe, s), floor) - yt) ** 2
+    err = sum((forward(recipe, r, encode(recipe, s), floor,
+                       recipe["output"].get("cap", None)) - yt) ** 2
               for s, yt in zip(samples, y))
     m = err / max(1, len(y))
     print(f"    CSV {csv_path}: 样本 {len(y)} 条, MSE={m:.3f}")
