@@ -1,0 +1,62 @@
+# ============================================================================
+#  融合配方示例 A：公众可见信号 → 存款(万元)
+#  融合点: rcml 白盒先验冻结"什么涨/什么跌/永不负数"; XGBoost 残差补抓
+#          "收入×学历"等交互协同红利 (纯加性白盒骨架表达不了)。
+# ============================================================================
+name: deposit_hybrid
+output:
+  id: deposit          # 存款(万元)
+  floor: 0             # 硬地板: 存款恒 >= 0 (rcml 焊死)
+  # 此处不加 cap: 存款无安全上限, 仅保非负
+fusion:
+  residual_method: xgboost     # 残差学习器: xgboost / none(降级纯白盒)
+  xgb_params:
+    n_estimators: 300
+    learning_rate: 0.05
+    max_depth: 4
+inputs:
+  - id: occ
+    label: 职业能级
+    type: ordinal
+    base: 1
+    levels: 5
+    sign: positive        # 职业越好 → 存款越多
+  - id: region
+    label: 城市能级
+    type: ordinal
+    base: 1
+    levels: 4
+    sign: positive        # 一线 > 二线 ...
+  - id: edu
+    label: 学历能级
+    type: ordinal
+    base: 1
+    levels: 4
+    sign: positive        # 学历越高 → 存款越多
+  - id: age
+    label: 年龄
+    type: numeric
+    knee: 35              # 35 岁前不累计年龄红利 (膝点)
+    sign: positive
+  - id: house
+    label: 有房
+    type: binary
+    sign: positive        # 有房 → 资产多(此处把房产市值算进"存款类资产")
+  - id: car
+    label: 座驾数量
+    type: ordinal
+    base: 0
+    levels: 4
+    sign: negative        # 座驾是消费负债信号 → 反向
+  - id: child
+    label: 子女数量
+    type: ordinal
+    base: 0
+    levels: 2
+    sign: negative        # 育儿开销 → 反向
+  - id: cons
+    label: 消费能级
+    type: ordinal
+    base: 1
+    levels: 3
+    sign: negative        # 高消费 → 反向
