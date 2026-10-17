@@ -1,0 +1,46 @@
+# ============================================================================
+#  融合配方示例 B：水厂工艺可观测变量 → 混凝剂投加量(mg/L)
+#  融合点: rcml 白盒先验冻结"浊度/流量/COD 同向, 水温反向" + 硬上限 cap=60
+#          (投加绝不超量); XGBoost 残差补抓 低温×高浊度 等非线性耦合。
+#  这正是你加药系统 "pH>9 必停泵" 类硬约束的同构实现 —— cap 焊死安全红线。
+# ============================================================================
+name: water_dosing_hybrid
+output:
+  id: dose             # 混凝剂单位投加量(mg/L)
+  floor: 0             # 投加恒 >= 0
+  cap: 60              # 硬上限: 投加绝不超 60 mg/L (安全红线, rcml 焊死)
+fusion:
+  residual_method: xgboost
+  xgb_params:
+    n_estimators: 300
+    learning_rate: 0.05
+    max_depth: 4
+inputs:
+  - id: turbidity
+    label: 进水浊度
+    type: numeric
+    range: [0, 80]
+    sign: positive        # 浊度越高需药越多
+  - id: flow
+    label: 进水流量
+    type: numeric
+    range: [0, 1000]
+    sign: positive        # 流量越大需药越多
+  - id: temp
+    label: 水温
+    type: numeric
+    range: [2, 35]
+    sign: negative        # 低温絮凝差 → 需药多 (此处取负向: 温度低=需药多)
+  - id: cod
+    label: 进水COD
+    type: numeric
+    range: [0, 400]
+    sign: positive        # 有机负荷高 → 需药多
+  - id: cold
+    label: 低温工况
+    type: binary
+    sign: positive        # 低温工况叠加 → 需药多
+  - id: newbatch
+    label: 新药剂批次
+    type: binary
+    sign: free            # 方向未知: 交数据判定 (新批次药效波动)
