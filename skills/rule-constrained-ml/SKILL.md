@@ -83,12 +83,14 @@ rule-constrained-ml/
 ├── scripts/
 │   ├── rcml_build.py      # 配方 → 自包含模型生成器
 │   ├── rcml_validate.py   # 独立规则合规审计(只靠 recipe+weights)
-│   └── recipe_example_deposit.yaml  # 存款演示配方
+│   ├── recipe_example_deposit.yaml  # 存款演示配方(仅地板)
+│   └── recipe_water_dosing.yaml     # 加药系统演示配方(地板+安全上限)
 ├── templates/
 │   ├── recipe_template.yaml   # 配方模板
 │   └── report_template.md     # 交付报告模板
 └── examples/
-    └── model_deposit_estimator.py  # 由示例配方生成的可运行模型(演示)
+    ├── model_deposit_estimator.py  # 由示例配方生成的可运行模型(演示)
+    └── model_water_dosing.py       # 加药系统模型(安全上限 cap 演示)
 ```
 
 **每轮交付必须留存**：① `recipe.yaml`（明规则，冻结）② `w.json`（训练后幅度系数）③ `report.md`（含审计结论）。三者齐备方可独立复现与合规审计。
@@ -103,12 +105,18 @@ rule-constrained-ml/
 | 生成模型 | `python model_x.py --load-weights w.json --audit` | 载入权重审计 |
 | `rcml_validate.py` | `python scripts/rcml_validate.py recipe.yaml --weights w.json --csv x.csv` | 独立合规审计+CSV上MSE |
 
-## 七、最小示例（存款推导，已在 examples/ 落地）
+## 七、最小示例（已落地，见 examples/）
 
-`recipe_example_deposit.yaml` → `examples/model_deposit_estimator.py`：
+**示例 A — 存款推导**（`recipe_example_deposit.yaml` → `model_deposit_estimator.py`）：
 输入 8 个公众可见信号（收入/城市/学历能级、年龄、住房、座驾、子女、消费），输出存款(万元)。
 - **冻结**：存款≥0 地板；收入/城市/学历/住房/年龄(35岁后)同向；子女/消费/座驾反向。
 - **可训**：每个因素幅度系数。
 - **验证**：demo 自测恢复系数；极端外推扫描最小预测=0（地板受保）；无约束回归对照在同分布 MSE 略低但会在分布外给出负存款。
 
-> 明规则不含任何具体数字——只有"什么该涨、什么该跌、永不负数、35 岁前不算年龄红利"这四条结构。具体涨多少跌多少，是灰盒，交给数据。
+**示例 B — 加药系统**（`recipe_water_dosing.yaml` → `model_water_dosing.py`）：
+输入 6 个工艺可观测变量（进水浊度/流量/水温/COD/低温工况/新药剂批次），输出混凝剂单位投加量(mg/L)。
+- **冻结**：投加恒在 [0, 60]（地板≥0 + **安全上限 cap≤60**，对应"投加绝不超量"的硬约束）；浊度/流量/COD/低温工况同向、水温反向。
+- **受限/自由**：新药剂批次 `sign: free`（方向未知交数据判）。
+- **验证**：demo 自测恢复系数；越界扫描最大预测=60.000、最小=0.000，上限/地板均受保——**模型再怎么训也绕不过 60mg/L 安全红线**。
+
+> 明规则不含任何具体数字——只有"什么该涨、什么该跌、永不负数、绝不超过上限、35 岁前不算年龄红利"这些结构。具体涨多少跌多少，是灰盒，交给数据。示例 B 的 `cap` 正是你加药系统"pH>9 必停泵"那类硬约束的同构实现。
