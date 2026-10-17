@@ -1,0 +1,35 @@
+[package]
+name = "pdfctl"
+version = "0.1.0"
+edition = "2024"
+description = "Rust PDF 编辑工具集（info/merge/split/rotate/delete/extract/reorder/metadata/encrypt/decrypt/text/validate/watermark/table/create/ocr/images/forms）"
+license = "MIT"
+
+[[bin]]
+name = "pdfctl"
+path = "src/main.rs"
+
+[dependencies]
+lopdf = "0.45.0"
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rand = "0.10"
+# 表格提取：借鉴 pdfsink-rs（clark-labs-inc，pdfplumber 风格四策略，纯 Rust）
+# 锁 0.2.10：v0.2.17+ 需 Rust 1.97+，本机 1.93 不满足
+pdfsink-rs = "=0.2.10"
+# PDF 创建：借鉴 printpdf（Ops 向量 + PdfPage + save），内置字体仅拉丁，
+# 中文经 --font 指定 TTF 走 ParsedFont::from_bytes 嵌入
+printpdf = "=0.8.2"
+# OCR：MinerU 云 API 客户端。ureq 为阻塞式 HTTP（rustls，不引入 tokio 异步
+# 运行时）。免登录 agent 轻量版每日 1 万页/IP，标准版需 MINERU_TOKEN
+# （每日 2000 页）。
+# 注：zip crate 于 2026-10 遭批量 yank（135 版仅 9.0.3 存活），标准版结果包
+# 的解压改由 src/mineru.rs 内自研最小 zip 读取器完成（解析中央目录 + flate2
+# 解压），flate2 为 lopdf 既有传递依赖，显式声明以便直接使用。
+ureq = "2"
+flate2 = "1"
+
+[profile.release]
+opt-level = 2
+panic = "abort"

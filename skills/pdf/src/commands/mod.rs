@@ -1,0 +1,19 @@
+//! 子命令模块注册。
+pub mod create;
+pub mod decrypt;
+pub mod delete;
+pub mod encrypt;
+pub mod extract;
+pub mod forms;
+pub mod images;
+pub mod info;
+pub mod merge;
+pub mod metadata;
+pub mod ocr;
+pub mod reorder;
+pub mod rotate;
+pub mod split;
+pub mod table;
+pub mod text;
+pub mod validate;
+pub mod watermark;
