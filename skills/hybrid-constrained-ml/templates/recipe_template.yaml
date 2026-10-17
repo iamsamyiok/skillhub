@@ -1,0 +1,29 @@
+# 融合配方模板 —— 复制后按领域改写
+# 心法: 能确定的全冻结(sign/floor/cap/knee), 没把握的交出去(幅度/残差)
+name: my_hybrid_model
+output:
+  id: y                       # 因变量列名(CSV 也用它)
+  floor: 0                    # 硬地板(可选): 预测恒 >= floor
+  cap: null                   # 硬上限(可选): 预测恒 <= cap; 无则写 null 或删掉
+fusion:
+  residual_method: xgboost    # xgboost | none(纯白盒退化)
+  xgb_params:
+    n_estimators: 300
+    learning_rate: 0.05
+    max_depth: 4
+inputs:
+  - id: x1
+    label: 因素一
+    type: numeric
+    range: [0, 100]
+    sign: positive
+  - id: x2
+    label: 因素二
+    type: ordinal
+    base: 1
+    levels: 5
+    sign: negative
+  - id: x3
+    label: 因素三(方向未知)
+    type: binary
+    sign: free
