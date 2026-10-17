@@ -1,0 +1,46 @@
+# 示例配方：水厂混凝剂(如 PAC)单位投加量预测 (mg/L)
+# 落点: 用户 AI 加药系统 / 高企申报核心专利方向(三药剂耦合、边缘计算、中国水质模型)
+# 演示"规则约束下的机器学习"在工艺控制中的典型形态:
+#   - 安全上限(cap) 冻结: 投加绝不超过 60 mg/L (防止过量、铝残留、成本失控)
+#   - 硬地板(floor) 冻结: 投加恒 >= 0
+#   - 方向符号冻结: 浊度/流量/COD/低温季 -> 投加增; 水温 -> 投加减
+#   - free 项: 新药剂批次方向未知, 留给数据判定
+# 注意: 本配方为方法演示, 真值用合成数据; 真实落地需厂内长期运行数据作标签。
+name: water_dosing
+description: 根据进水浊度/流量/水温/COD/工况预测混凝剂单位投加量(mg/L)。安全上限与方向符号冻结, 幅度系数由运行数据训练。规则约束下的机器学习在加药系统的示范。
+output:
+  id: pac_dose
+  floor: 0                 # 硬地板: 投加恒 >= 0 (冻结结构)
+  cap: 60                  # 硬上限: 投加绝不超 60 mg/L (安全约束, 冻结结构)
+inputs:
+  - id: turbidity
+    label: 进水浊度
+    type: numeric
+    knee: 15               # 基线浊度 15NTU 以下几乎不加药 (膝点, 冻结)
+    range: [5, 250]
+    sign: positive         # 浊度越高投加越多 (冻结方向)
+  - id: flow
+    label: 进水流量
+    type: numeric
+    knee: 100              # 流量高于 100 m3/h 才显著增量 (膝点)
+    range: [50, 600]
+    sign: positive         # 大流量需更多药 (冻结方向)
+  - id: temp
+    label: 水温
+    type: numeric
+    range: [5, 35]
+    sign: negative         # 温度越高混凝越易, 投加越少 (冻结方向)
+  - id: cod_in
+    label: 进水COD
+    type: numeric
+    knee: 30               # 基线 COD 30 以下不加 (膝点)
+    range: [20, 400]
+    sign: positive         # 有机物多需更多混凝剂 (冻结方向)
+  - id: winter
+    label: 低温工况
+    type: binary           # 1=低温/冬季工况
+    sign: positive         # 低温混凝差, 需更多药 (冻结方向)
+  - id: retrofit
+    label: 新药剂批次
+    type: binary           # 1=新工艺/新批次药剂
+    sign: free             # 方向未知: 可能更高效(负)也可能不稳定(正), 交给数据
