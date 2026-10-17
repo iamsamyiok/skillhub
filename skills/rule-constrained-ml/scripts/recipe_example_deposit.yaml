@@ -1,0 +1,51 @@
+# 示例配方：公众可见现象 → 个人存款(万元)
+# 演示用。明规则(结构/符号/地板)在此声明, 幅度系数由数据训练。
+name: deposit_estimator
+description: 根据公众可见现象(收入能级/城市/学历/年龄/住房/座驾/子女/消费)推导存款数值(万元)。规则约束下的机器学习演示。
+output:
+  id: deposit_wan
+  floor: 0                 # 硬地板: 存款恒 >= 0 (冻结结构)
+inputs:
+  - id: occ
+    label: 收入能级
+    type: ordinal
+    base: 1                # 编码 max(x-1, 0)
+    levels: 5
+    sign: positive         # 收入越高存款越多 (冻结方向)
+  - id: region
+    label: 城市能级
+    type: ordinal
+    base: 1
+    levels: 4
+    sign: positive
+  - id: edu
+    label: 学历
+    type: ordinal
+    base: 1
+    levels: 4
+    sign: positive
+  - id: age
+    label: 年龄
+    type: numeric
+    knee: 35               # 35 岁后开始累积 (膝点, 冻结结构)
+    sign: positive
+  - id: house
+    label: 自有住房
+    type: binary
+    sign: positive
+  - id: car
+    label: 座驾档
+    type: ordinal
+    base: 0
+    levels: 4
+    sign: negative         # 受限: 系数 <= 0 (高消费拖累存款)
+  - id: child
+    label: 有子女
+    type: binary
+    sign: negative
+  - id: cons
+    label: 消费档
+    type: ordinal
+    base: 1
+    levels: 3
+    sign: negative
