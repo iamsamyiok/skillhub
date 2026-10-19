@@ -4,3 +4,4 @@ data/auth.json
 data/tokens.json
 node_modules/
 __pycache__/
+skills/cad-svg-edit/test/.tmp/
