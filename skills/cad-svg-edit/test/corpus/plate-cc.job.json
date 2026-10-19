@@ -1,0 +1,86 @@
+{
+ "name": "plate-cc",
+ "commands": [
+  {
+   "cmd": "layer.new",
+   "params": {
+    "name": "outline",
+    "color": 7,
+    "current": true
+   }
+  },
+  {
+   "cmd": "rectang",
+   "params": {
+    "p1": [
+     -60,
+     -40
+    ],
+    "p2": [
+     60,
+     40
+    ],
+    "fillet": 10
+   }
+  },
+  {
+   "cmd": "circle",
+   "params": {
+    "center": [
+     -50,
+     -30
+    ],
+    "radius": 4.5
+   }
+  },
+  {
+   "cmd": "arrayrect",
+   "params": {
+    "handles": [
+     "HANDLE"
+    ],
+    "rows": 2,
+    "cols": 2,
+    "rowSpacing": 60,
+    "colSpacing": 100,
+    "associative": false
+   }
+  },
+  {
+   "cmd": "dimlinear",
+   "params": {
+    "p1": [
+     -60,
+     40
+    ],
+    "p2": [
+     60,
+     40
+    ],
+    "at": [
+     0,
+     48
+    ]
+   }
+  },
+  {
+   "cmd": "mtext",
+   "params": {
+    "at": [
+     0,
+     -52
+    ],
+    "text": "PLATE 120x80 t=6  4x D9  R10",
+    "height": 6,
+    "justify": "MC"
+   }
+  }
+ ],
+ "save": {
+  "dxf": true
+ },
+ "export": {
+  "png": true,
+  "svg": true
+ }
+}

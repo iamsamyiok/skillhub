@@ -1,0 +1,32 @@
+{
+ "bridge": "cadcraft",
+ "oracle": "analytic: rect 120x80 R10, 4x D9 at ±50,±30 (2x2 array incl. original)",
+ "checks": {
+  "expect": {
+   "Circle": 4,
+   "Polyline": 1,
+   "Dimension": 1,
+   "MText": 1
+  },
+  "geometry": {
+   "circle": [
+    {
+     "center": [
+      50,
+      30
+     ],
+     "radius": 4.5,
+     "tol": 0.01
+    },
+    {
+     "center": [
+      -50,
+      -30
+     ],
+     "radius": 4.5,
+     "tol": 0.01
+    }
+   ]
+  }
+ }
+}

@@ -51,3 +51,11 @@
 ## 2.0.0
 
 （见 git 历史：cad-creat 与 svg-edit 融合，双路由）
+
+
+## 4.0.1 (2026-10-19)
+
+- 语料库 3→6 标本：晋升 bracket-cc（L 支架 2D：轮廓+2 孔+几何断言）、plate-cc（安装板：rectang fillet + 2×2 矩形阵列）、plate-sc（安装板 3D：sketch+solid.fillet 等效路线，体积/拓扑全断言）
+- plate-cc 断言抓到 arrayrect 语义坑：栅格自原件向 +行/+列 延展且含原件，原圆应放左下角——已写入 SKILL.md 坑清单条目依据
+- 新增 scripts/run-ab.mjs：A+/A++ 双引擎同零件并排基准（计时 3 轮中位 + verify + 渲染 + 快照 + ab-results.json），job 源 test/ab/
+- 实测基线（共享沙箱）：A+ 81-116 ms / A++ 407-1403 ms；A++ 体积 rel_err 4e-7 ~ 1.3e-5

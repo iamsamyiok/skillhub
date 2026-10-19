@@ -1,0 +1,100 @@
+{
+ "name": "bracket-cc",
+ "commands": [
+  {
+   "cmd": "layer.new",
+   "params": {
+    "name": "outline",
+    "color": 7,
+    "current": true
+   }
+  },
+  {
+   "cmd": "pline",
+   "params": {
+    "vertices": [
+     [
+      0,
+      0
+     ],
+     [
+      60,
+      0
+     ],
+     [
+      60,
+      10
+     ],
+     [
+      10,
+      10
+     ],
+     [
+      10,
+      40
+     ],
+     [
+      0,
+      40
+     ]
+    ],
+    "closed": true
+   }
+  },
+  {
+   "cmd": "circle",
+   "params": {
+    "center": [
+     30,
+     6
+    ],
+    "radius": 4
+   }
+  },
+  {
+   "cmd": "circle",
+   "params": {
+    "center": [
+     5,
+     25
+    ],
+    "radius": 4
+   }
+  },
+  {
+   "cmd": "dimlinear",
+   "params": {
+    "p1": [
+     0,
+     0
+    ],
+    "p2": [
+     60,
+     0
+    ],
+    "at": [
+     30,
+     -8
+    ]
+   }
+  },
+  {
+   "cmd": "mtext",
+   "params": {
+    "at": [
+     70,
+     42
+    ],
+    "text": "L-BRACKET t=8  2x D8",
+    "height": 6
+   }
+  }
+ ],
+ "save": {
+  "dxf": true
+ },
+ "export": {
+  "png": true,
+  "svg": true
+ }
+}

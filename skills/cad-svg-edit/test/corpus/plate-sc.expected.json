@@ -1,0 +1,12 @@
+{
+ "bridge": "solidcraft",
+ "oracle": "analytic: (120*80 - 4*pi*4.5^2 - 4*(10^2-pi*10^2/4))*6",
+ "checks": {
+  "volume": 55558.141,
+  "tol": 0.001,
+  "faces": 14,
+  "edges": 32,
+  "vertices": 24,
+  "bodies": 1
+ }
+}

@@ -1,0 +1,32 @@
+{
+ "bridge": "cadcraft",
+ "oracle": "analytic: L=60x10+10x30 wall, 2x D8",
+ "checks": {
+  "expect": {
+   "Circle": 2,
+   "Polyline": 1,
+   "Dimension": 1,
+   "MText": 1
+  },
+  "geometry": {
+   "circle": [
+    {
+     "center": [
+      30,
+      6
+     ],
+     "radius": 4,
+     "tol": 0.01
+    },
+    {
+     "center": [
+      5,
+      25
+     ],
+     "radius": 4,
+     "tol": 0.01
+    }
+   ]
+  }
+ }
+}

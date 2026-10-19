@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="340" height="370" viewBox="-170 -200 340 370">
+<rect x="-170" y="-200" width="340" height="370" fill="#ffffff"/>
+<circle cx="0" cy="0" r="150" stroke="#1a1a1a" stroke-width="3" fill="none"/>
+<circle cx="0" cy="0" r="130" stroke="#1a1a1a" stroke-width="1" fill="none"/>
+<circle cx="0" cy="0" r="40" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+<circle cx="100" cy="0" r="12" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+<circle cx="70.71067811865476" cy="70.71067811865474" r="12" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+<circle cx="6.123233995736766e-15" cy="100" r="12" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+<circle cx="-70.71067811865474" cy="70.71067811865476" r="12" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+<circle cx="-100" cy="1.2246467991473532e-14" r="12" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+<circle cx="-70.71067811865477" cy="-70.71067811865474" r="12" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+<circle cx="-1.8369701987210297e-14" cy="-100" r="12" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+<circle cx="70.71067811865474" cy="-70.71067811865477" r="12" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+<line x1="0" y1="0" x2="28.284271247461902" y2="-28.2842712474619" stroke="#1a1a1a" stroke-width="1"/><text x="14.142135623730951" y="-18.14213562373095" fill="#1a1a1a" font-size="12">R40</text>
+<text x="-60" y="-180" fill="#1a1a1a" font-size="16">FLANGE 8xR12</text>
+</svg>

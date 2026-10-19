@@ -2,7 +2,7 @@
 name: cad&svg-edit
 description: 融合「CAD 创建」「SVG 精准编辑」「3D 实体建模」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（优先 CADCraft 真实 CAD 引擎，输出 DXF/SVG/PNG；缺二进制时落回内置 JS 无头引擎输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；3D 实体零件/STEP/STL/参数化重建走 A++ SolidCraft 后端；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；读入已有 DXF/DWG 图纸走 CADCraft 后端 info/convert；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export DXF/SVG/PNG/CSV), 3D solid parts (STEP/STL export, parametric rebuild), reading DXF/DWG files, OR editing/modifying existing SVG files (text, color, position, batch changes).
 agent_created: true
-version: 4.0.0
+version: 4.0.1
 ---
 
 # CAD & SVG-Edit（融合技能）
@@ -197,6 +197,7 @@ node <skill>/scripts/cadcraft-bridge.mjs convert drawing.dwg --svg out.svg --png
 5. SHX 字体未读，CJK 文字依赖系统字体（缺字时回退单笔划字体）；图内标注直接用英文/拼音最稳，中文放交付说明与图例文档。
 6. **verify 期望表的类型映射**：`rectang` 产出 **Polyline**（按 Line/Rect 断言必 fail）；`copy`/`array`/`offset` 每次复制/偏移都新增实体（楼梯 20 踢面 = Line +20，楼层 copy 会乘楼层系数）。写 `--expect` 前按"命令 → 产出实体类型与数量"推演；**首次 fail 先 `query --type X` 审计实际分布再修期望**——job 正确而期望预估错是常态，勿急着回改 job。
 7. **文字标注碰撞**：多处 text 的图纸（户型/机电/平面布置）在 PNG 复核时专查文字与邻近图元/其他文字的包围盒重叠；写 job 时标注插入点优先选图元间空白带，房间标签与家具文字上下错位排布（实证：户型 UNIT-A 标签压到 BED 标注，调 `at` 坐标重跑即愈）。
+8. **arrayrect 栅格自原件向 +行/+列 延展且含原件**：想让 2×2 孔阵落在 (±50,±30)，源圆必须画在左下角 (-50,-30)，再 `rows:2, cols:2, rowSpacing:60, colSpacing:100`；源圆放 (50,30) 会得到 (50,30)(150,30)… 错位栅格。计数断言（Circle:4）抓不出这种错——**孔位类阵列必须配 `verify --geometry` 圆心断言**（实证：plate-cc 晋升时几何断言当场抓获）。
 
 ## Attribution
 
@@ -343,6 +344,10 @@ node <skill>/scripts/run-corpus.mjs [name...]   # 不选则全量
 ```
 
 新增条目纪律：实战图纸验证通过后，job + expected 落入 corpus；expected 的 oracle 字段写解析式或推导依据（如 `pi*10*(150^2-40^2-8*12^2)`），确保期望值可独立复算。
+
+当前 6 标本：flange-cc / flange3d / bracket-cc / bracket3d / plate-cc / plate-sc（plate 对 2026-10-19 双引擎实战对比晋升，几何断言抓出过 arrayrect 正向延展的孔位错标——计数校验会漏，几何断言不会）。
+
+配套 `scripts/run-ab.mjs`（v4.0.1）：同一零件跑 A+/A++ 双引擎并排对比（计时 3 轮取中位 + verify + 渲染 + 快照，产出 ab-results.json），job 源固定 `test/ab/`，用法 `node scripts/run-ab.mjs [输出根目录]`。引擎选型或性能回归时用它出数据。
 
 ## 两种模式对比
 

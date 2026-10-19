@@ -1,0 +1,125 @@
+{
+ "name": "plate-sc",
+ "commands": [
+  {
+   "command": "sketch.create",
+   "params": {
+    "plane": "XY"
+   }
+  },
+  {
+   "command": "sketch.line",
+   "params": {
+    "points": [
+     [
+      -60,
+      -40
+     ],
+     [
+      60,
+      -40
+     ],
+     [
+      60,
+      40
+     ],
+     [
+      -60,
+      40
+     ]
+    ],
+    "closed": true
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     50,
+     30
+    ],
+    "radius": 4.5
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     -50,
+     30
+    ],
+    "radius": 4.5
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     -50,
+     -30
+    ],
+    "radius": 4.5
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     50,
+     -30
+    ],
+    "radius": 4.5
+   }
+  },
+  {
+   "command": "solid.extrude",
+   "params": {
+    "distance": 6,
+    "profiles": [
+     {
+      "point": [
+       0,
+       0
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "command": "solid.fillet",
+   "params": {
+    "edges": [
+     [
+      60,
+      40,
+      3
+     ],
+     [
+      -60,
+      40,
+      3
+     ],
+     [
+      -60,
+      -40,
+      3
+     ],
+     [
+      60,
+      -40,
+      3
+     ]
+    ],
+    "radius": 10
+   }
+  }
+ ],
+ "save": {
+  "step": true,
+  "stl": true
+ },
+ "export": {
+  "png": true
+ },
+ "view": "iso"
+}
