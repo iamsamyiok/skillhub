@@ -1,8 +1,8 @@
 ---
 name: cad&svg-edit
-description: 融合「CAD 创建」与「SVG 精准编辑」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（优先 CADCraft 真实 CAD 引擎，输出 DXF/SVG/PNG；缺二进制时落回内置 JS 无头引擎输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；读入已有 DXF/DWG 图纸走 CADCraft 后端 info/convert；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export DXF/SVG/PNG/CSV), reading DXF/DWG files, OR editing/modifying existing SVG files (text, color, position, batch changes).
+description: 融合「CAD 创建」「SVG 精准编辑」「3D 实体建模」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（优先 CADCraft 真实 CAD 引擎，输出 DXF/SVG/PNG；缺二进制时落回内置 JS 无头引擎输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；3D 实体零件/STEP/STL/参数化重建走 A++ SolidCraft 后端；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；读入已有 DXF/DWG 图纸走 CADCraft 后端 info/convert；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export DXF/SVG/PNG/CSV), 3D solid parts (STEP/STL export, parametric rebuild), reading DXF/DWG files, OR editing/modifying existing SVG files (text, color, position, batch changes).
 agent_created: true
-version: 3.0.1
+version: 4.0.0
 ---
 
 # CAD & SVG-Edit（融合技能）
@@ -19,18 +19,20 @@ version: 3.0.1
 | 用户意图 | 路由到 | 能力来源 |
 |---|---|---|
 | 精确工程图 / 机械零件 / 建筑平面；需要 **DXF 交付**、关联尺寸标注、图层、填充、OFFSET/TRIM/FILLET 真编辑几何 | **A+. CADCRAFT 后端**（首选，需二进制） | CADCraft 真实 CAD 引擎 |
+| **3D 实体零件**：STEP/STL 交付、体积/质心校核、圆角/抽壳/阵列/倒角特征、参数化重建、STL 打印 | **A++. SOLIDCRAFT 后端**（需二进制） | SolidCraft 参数化 CAD 引擎 |
 | 从零画简单示意图 / 示意图形；环境无 CADCraft 二进制 | **A. CAD-CREATE**（JS 无头引擎，零依赖兜底） | 内置 JS 引擎 |
 | **读入 / 转换 / 检查已有 DXF 或 DWG 图纸** | **A+. CADCRAFT 后端**（info + convert） | CADCraft（DWG 经 acadrust 桥） |
 | 修改一张**已存在**的 SVG（改字 / 改色 / 移位 / 增删 / 批量 / 空间点名） | **B. SVG-EDIT** | svg_toolkit 确定性修改 |
 | 要改的 SVG 恰由本技能生成脚本产出 | **B 的「源脚本路线」优先**：改脚本参数重生成 | 对应引擎 |
-| 需要 3D 实体（STEP/STL）、工程图 PDF、可制造性检查、3D 打印 | **外部转介** → [text-to-cad](https://github.com/earthtojake/text-to-cad)（build123d 内核） | 生态互补 |
+| 读入 / 校核 / 转换已有 **STEP/STL/3MF 文件**（测体积、计数拓扑、转格式） | **A++. SOLIDCRAFT 后端**（eval） | SolidCraft（STEP AP203/214/242 导入） |
 
 判断要点：
 - 需要**精确几何编辑**（倒角/修剪/偏移/阵列/关联标注/图层/填充）或 **DXF/DWG** 进出 → A+。
+- 需要三维实体、体积/质量校核、STEP/STL → A++（缺二进制时降级建议见 A++ 节）。
 - 目标文件**已存在且要"改"** → SVG-EDIT。
-- 尚**无图形、要"造"** → A+（可用时）否则 A。
+- 尚**无图形、要"造"**（2D）→ A+（可用时）否则 A。
 - 语义模糊（如"把平面图里那个房间放大"）：目标已存在 → 走 SVG-EDIT；若需结构性改动且原图由生成脚本产出 → 切对应引擎重生成（精度更高、联动一致）。
-- **降级铁律**：A+ 的 `doctor` 返回 `found:false` 时静默落回 A 路 JS 引擎，任务照常完成，交付说明中提及一句即可。
+- **降级铁律**：A+ 的 `doctor` 返回 `found:false` 时静默落回 A 路 JS 引擎，任务照常完成，交付说明中提及一句即可；A++ 的 `doctor` 返回 `found:false` 时给出安装指引并询问用户是否改用 2D 交付或等待安装（3D 无法静默降级到 JS 引擎）。
 
 ---
 
@@ -79,9 +81,12 @@ node <skill>/scripts/cadcraft-bridge.mjs doctor
 ```
 
 ```bash
-node <skill>/scripts/cadcraft-bridge.mjs run job.json
-# → {ok, files:{dxf,png,svg}, sizes, handles:[...], acks:[逐命令返回]}
+node <skill>/scripts/cadcraft-bridge.mjs run job.json [--quiet]
+# → {ok, files:{dxf,png,svg}, sizes, handles:[...], ack:[逐命令返回]}
+# --quiet：大图省 token，省略逐命令 acks（保留 handles 与产物清单）
 ```
+
+**失败定位与回滚（v4.0）**：run 失败时 bridge 自动**二分探针**定位首条失败命令，报 `ERR 命令 #N (命令名) 失败: <详情>`；同时把最近成功状态保留为 `<name>.checkpoint.dxf`（回滚点=失败前状态），其余中间态清理。修正 job 后整体重跑（生成式闭环），checkpoint 仅供排查 diff。
 
 **handle 占位协议**（编辑命令引用已画图元）：
 - `"HANDLE"` = 最近一条命令产出的图元
@@ -156,12 +161,21 @@ node <skill>/scripts/cadcraft-bridge.mjs run job.json
 ```bash
 node <skill>/scripts/cadcraft-bridge.mjs verify plate.dxf --expect '{"Circle":3,"Polyline":1,"Dimension":2}'
 # → {pass, counts, total, missing, extra, untracked}；fail 退出码 1
+node <skill>/scripts/cadcraft-bridge.mjs verify plate.dxf \
+  --geometry '{"circle":[{"center":[0,0],"radius":40,"tol":0.01}],
+               "polar_pattern":[{"type":"Circle","ring_radius":100,"count":8,"step_deg":45,"tol":0.5}],
+               "distance":[{"from":[100,0],"to":[0,100],"expect":141.42,"tol":0.1}]}'
+# → rep.geometry 逐条 pass/fail（v4.0 几何断言）
 node <skill>/scripts/cadcraft-bridge.mjs query plate.dxf --type Circle
 # → {count, entities:[{handle, geometry:{center,radius}, layer}]}
 ```
 
 - 断言失败 → 回 job.json 修正重跑（生成式闭环，禁止直接改 DXF 文本）。
 - `untracked` 列出未断言类型——交付前扫一眼，防漏画。
+- **几何断言三种**（v4.0，比计数强一级的 oracle）：
+  - `circle`：命中一个圆心在 `center`±tol、半径 R±tol 的同型实体（返回 handle）；
+  - `polar_pattern`：环 `ring_radius`±tol 上恰有 `count` 个圆心，极角排序后相邻角差 ≈`step_deg`（法兰孔位专用）；
+  - `distance`：任意两点距断言（可用于圆心距/孔距）。
 
 ## 读入路由（DXF / DWG → 摘要 + 预览 + 编辑）
 
@@ -190,6 +204,107 @@ node <skill>/scripts/cadcraft-bridge.mjs convert drawing.dwg --svg out.svg --png
 
 ---
 
+# A++. SOLIDCRAFT 后端（3D 实体，v4.0 新增）
+
+> 真实参数化 3D CAD 引擎（[SolidCraft](https://github.com/tangency-labs/solidcraft)，MIT OR Apache-2.0，纯 Rust）：约束草图 + 特征时间线（拉伸/旋转/圆角/抽壳/阵列/镜像/倒角）、B-rep 实体、STEP AP242 / STL / 3MF / OBJ 导出、STEP 导入反测、无头渲染截图。经 `scripts/solidcraft-bridge.mjs` 驱动。**单位毫米，Z 向上。**
+
+## 环境检测
+
+```bash
+node <skill>/scripts/solidcraft-bridge.mjs doctor
+```
+
+- 输出 `{found, path, version, smoke}`；冒烟 = box 40×30×20 → 体积 24000（解析式）。
+- 二进制查找顺序：`SOLIDCRAFT_CLI` 环境变量 → PATH → `/opt`、`/tmp/opencode`、`~` 下的 `solidcraft-*/bin/solidcraft-cli`（`SOLIDCRAFT_SCAN=0` 关闭目录扫描）。
+- 安装：[GitHub Releases](https://github.com/tangency-labs/solidcraft/releases/latest)，Linux 下载 `solidcraft-<ver>-linux-x86_64.tar.gz` 解压即用（约 60MB）；Windows MSI / portable zip；macOS dmg。解压后目录名保持 `solidcraft-<版本>-linux-x86_64` 形态即可被扫描发现。
+- `found:false`（退出码 2）→ **3D 无静默降级**：向用户说明并给出安装指引，或改提 2D 交付（A+/A 路）。
+
+## job.json：一次 3D 建模的完整描述
+
+```json
+{
+  "name": "flange3d",
+  "commands": [
+    {"command": "sketch.create", "params": {"plane": "XY"}},
+    {"command": "sketch.circle.center", "params": {"center": [0,0], "radius": 150}},
+    {"command": "sketch.circle.center", "params": {"center": [0,0], "radius": 40}},
+    {"command": "sketch.circle.center", "params": {"center": [70.71,70.71], "radius": 12}},
+    {"command": "solid.extrude", "params": {"distance": 10, "profiles": [{"point": [80,0]}]}}
+  ],
+  "save": {"step": true, "stl": true, "design": true},
+  "export": {"png": true},
+  "view": "iso"
+}
+```
+
+- `save.step/stl/obj/3mf/igs` 走 `file.export`（主交付物 STEP 默认开，`"step": false` 可关）；`save.design` 落 `.solidcraft` 设计容器（含特征时间线，可重开继续编辑）。
+- `export.png` + `view`（iso/top/front/back/bottom/left/right）无头渲染一张复核图。
+- **run 失败即整脚本原子中止**（引擎语义），bridge 报告失败详情，无半成品状态。
+
+## 命令词汇表（精选，单位 mm；全量用 `commands` 子命令查）
+
+### 草图（画在 sketch.create 的平面上，2D 坐标）
+| 命令 | 参数 |
+|---|---|
+| `sketch.create` | `{plane: "XY"\|"XZ"\|"YZ"}` |
+| `sketch.rectangle.two_point` | `{p0:[x,y], p1:[x,y]}` |
+| `sketch.circle.center` | `{center:[x,y], radius: R}` 或 `{diameter: D}` |
+| `sketch.line` | `{points: [[x,y],...], closed?}`（闭合多边形轮廓） |
+| `sketch.arc.three_point` | `{p1, p2, p3}` |
+| `sketch.polygon.inscribed` | `{sides, center, radius}` |
+| `sketch.fillet` / `sketch.chamfer.*` | 草图内倒角 |
+| `sketch.pattern.circular` / `rectangular` | 草图内阵列 |
+
+### 实体特征
+| 命令 | 参数 |
+|---|---|
+| `solid.extrude` | `{distance \| through_all, operation?: "cut"\|"join"\|"new"\|"intersect", profiles?}` |
+| `solid.revolve` | 旋转体 |
+| `solid.fillet` | `{edges: [[x,y,z],...], radius}`（边用其上任意点寻址） |
+| `solid.chamfer` | `{edges, d1, d2?}` |
+| `solid.shell` | `{faces, thickness}`（抽壳） |
+| `solid.hole` | 孔特征（螺纹等） |
+| `solid.pattern.rectangular` / `circular` | 实体阵列 |
+| `solid.mirror` | 镜像 |
+| `solid.box` | `{corner, length, width, height, operation?, targets?}`（布尔工具体） |
+| `solid.move` | `{bodies, axis, angle}` 或平移 |
+| `file.export` | `{path: "<name>.step\|.stl\|.obj\|.3mf\|.igs"}`（bridge 自动追加） |
+| `file.save_as` | `{path: "<name>.solidcraft"}`（设计容器） |
+
+## 标准工作流（六步闭环，同 A+ 哲学）
+
+```
+1. doctor                → 二进制可用？（否则给指引/降级 2D）
+2. 写 job.json           → 词汇表内命令；带孔轮廓 extrude 必须显式 profiles:[{point}]
+3. bridge run            → step/stl(+design+png) 落盘，输出 measure{volume,area,faces,edges,vertices}
+4. bridge verify         → 解析式体积断言 + 拓扑计数（--volume V --tol 1e-3 --faces N）
+5. Read PNG 视觉复核     → 结构/倒角/孔位（无视觉环境用拓扑计数替代）
+6. 交付                   → STEP(主交付物) + STL(打印) + PNG(预览) + .solidcraft(可再编辑)
+```
+
+## 验证协议（oracle：能推导解析式就推导）
+
+```bash
+node <skill>/scripts/solidcraft-bridge.mjs verify flange3d.result.json \
+  --volume 620401.717 --tol 1e-3 --faces 12 --edges 20 --vertices 20 --bodies 1
+# 或对任意 STEP/STL 文件直接反测（含外部文件）：
+node <skill>/scripts/solidcraft-bridge.mjs eval part.step
+```
+
+- `--volume/--area` 用相对容差（SolidCraft 由显示网格测量，典型偏差 1e-6~1e-5，建议 tol 1e-3）；`--faces/--edges/--vertices/--bodies` 精确断言。
+- 解析式示例：法兰 = π·h·(R²−r²−n·r_hole²)；L 型支架 = 截面积×厚 − Σπ·r²·h。
+- 断言失败 → 回 job.json 修正重跑（生成式闭环，禁止手改 STEP 文本）。
+
+## 已知坑（A++ 使用注意）
+
+1. **extrude 默认忽略内圆当孔**：草图里外圆+内圆一起画后直接 `solid.extrude`，得到的是实心盘（内圆全被无视）。**必须**显式 `profiles: [{"point": [x,y]}]`，point 落在目标区域内（避开孔与边界），“islands inside are its holes”。
+2. **file.save 只存设计容器**（zip 格式，无视扩展名）；STEP/STL 导出必须 `file.export`（bridge 已代劳，手写脚本时注意）。
+3. 体积/面积为网格化测量值（rel 1e-6 量级偏差），断言用相对容差 ≥1e-3，勿用绝对相等。
+4. Z 向上、单位毫米、角度弧度（相机 camera 的 yaw/pitch/fov）——与 A 路 JS 引擎（像素、Y 向下）与 A+ CADCraft（Y 向上、度）三者互不通用，坐标换算要显式。
+5. `sketch.text` 字体路径与文件沙箱限制不影响 CLI；但 STEP 导入（eval 外部文件）后体积与原生建模同源可比。
+
+---
+
 # A. CAD-CREATE（创建）
 
 > 原 `cad-creat`（cad-driver）能力。无头引擎优先，浏览器可视化预览可选。
@@ -205,15 +320,29 @@ cad-svg-edit/
 ├── CHANGELOG.md            # 版本更新日志
 ├── engine/cad-engine.js   # 无头引擎（cadAPI v2.1-headless，含 doctor 自检）
 ├── scripts/
-│   ├── cadcraft-bridge.mjs # A+ CADCraft 后端桥（v3.0：doctor/run/query/verify/convert/info）
+│   ├── cadcraft-bridge.mjs    # A+ CADCraft 2D 后端桥（doctor/run/query/verify/convert/info；v4.0 失败二分+checkpoint+几何断言+--quiet）
+│   ├── solidcraft-bridge.mjs  # A++ SolidCraft 3D 后端桥（doctor/run/eval/verify/snapshot/commands）
+│   ├── run-corpus.mjs         # 语料库回归运行器（test/corpus 全量跑）
 │   ├── svg_toolkit.py  daemon.mjs  next_name.mjs  render_png.mjs   # SVG-EDIT 工具
 ├── assets/cad-draw.html   # 可选可视化预览页
 ├── assets/preview.html    # SVG-EDIT 点选编辑页
 ├── examples/              # 示例（*.js 为 JS 引擎脚本，*.job.json 为 CADCraft job）
 ├── test/run-tests.js      # 回归测试（doctor + 全部示例 + 负例 + bridge 测试）
+├── test/corpus/           # 图纸/零件语料库（*.job.json + *.expected.json，升级回归门禁）
 └── references/            # SVG-EDIT 参考文档
     ├── grounding.md  operations.md
 ```
+
+## 语料库回归（v4.0，抄 SolidCraft corpus 模式）
+
+`test/corpus/` 每对 `<name>.job.json + <name>.expected.json` 是一份"历史构建验证过"的图纸/零件标本：expected 锁死实体计数/几何断言（2D）或解析式体积+拓扑计数（3D）。用途：**CADCraft/SolidCraft 升版、bridge 改动、环境迁移后，一键全量回归**：
+
+```bash
+node <skill>/scripts/run-corpus.mjs [name...]   # 不选则全量
+# PASS/FAIL/SKIP（SKIP=对应引擎二进制缺失）表 + CORPUS_PASS/CORPUS_FAIL 汇总
+```
+
+新增条目纪律：实战图纸验证通过后，job + expected 落入 corpus；expected 的 oracle 字段写解析式或推导依据（如 `pi*10*(150^2-40^2-8*12^2)`），确保期望值可独立复算。
 
 ## 两种模式对比
 

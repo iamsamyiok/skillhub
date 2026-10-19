@@ -56,6 +56,12 @@ check('kit 区零污染', kitRegion(readFileSync(scene, 'utf8')) === kitRegion(o
 check('GLB 导出 API 在位', /async glb\(\)/.test(orig) && /saveGlb/.test(orig));
 check('测量模式 API 在位', /measure\(t\)/.test(orig) && /updMeas\(\)/.test(orig));
 
+// v1.2 相机 JSON / 剖切 / 命令通道
+check('相机 JSON 合同在位', /camera\(spec\)/.test(orig) && /cam\(\)\{/.test(orig) && /degToRad\(camera\.fov\)/.test(orig), 'camera/cam 或 fov 弧度合同缺失');
+check('命名机位在位', /saveView\(name\)/.test(orig) && /view\(name\)/.test(orig) && /views\(\)\{/.test(orig));
+check('剖切在位', /section\(spec\)/.test(orig) && /clippingPlanes/.test(orig));
+check('execute 命令通道在位', /execute\(cmd, params\)/.test(orig) && /commands\(\)\{/.test(orig));
+
 rmSync(tmp, { recursive: true, force: true });
 console.log(failed === 0 ? 'ALL_PASS' : failed + ' FAILED');
 process.exit(failed === 0 ? 0 : 1);

@@ -1,0 +1,134 @@
+{
+ "name": "flange3d",
+ "commands": [
+  {
+   "command": "sketch.create",
+   "params": {
+    "plane": "XY"
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     0,
+     0
+    ],
+    "radius": 150
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     0,
+     0
+    ],
+    "radius": 40
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     100.0,
+     0.0
+    ],
+    "radius": 12
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     70.710678,
+     70.710678
+    ],
+    "radius": 12
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     0.0,
+     100.0
+    ],
+    "radius": 12
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     -70.710678,
+     70.710678
+    ],
+    "radius": 12
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     -100.0,
+     0.0
+    ],
+    "radius": 12
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     -70.710678,
+     -70.710678
+    ],
+    "radius": 12
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     -0.0,
+     -100.0
+    ],
+    "radius": 12
+   }
+  },
+  {
+   "command": "sketch.circle.center",
+   "params": {
+    "center": [
+     70.710678,
+     -70.710678
+    ],
+    "radius": 12
+   }
+  },
+  {
+   "command": "solid.extrude",
+   "params": {
+    "distance": 10,
+    "profiles": [
+     {
+      "point": [
+       80,
+       0
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "save": {
+  "step": true,
+  "stl": true,
+  "design": true
+ },
+ "export": {
+  "png": true
+ },
+ "view": "iso"
+}

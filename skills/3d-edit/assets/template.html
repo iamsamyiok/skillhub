@@ -434,6 +434,96 @@ window.CITY = {
     a.click();
     console.log('[3d-edit] GLB exported ' + buf.byteLength + ' bytes');
     return { bytes: buf.byteLength, file: name + '.glb' }; },
+
+  /* ============ v1.2 相机 JSON / 命名机位 / 剖切 / 命令通道（借鉴 SolidCraft camera 合同） ============
+     camera(spec) —— spec: {target:[x,y,z], yaw, pitch, distance, fov?}（距离单位=场景单位，角=弧度）
+       yaw 0 = 正面（相机在 -Z 看向 +Z，+X 朝右）；yaw π/2 从 -X 看；pitch = 仰角，π/2 = 顶视
+       fov = 垂直视场(弧度)；0/缺省 = 正交观感（0.4×distance 半高），实现上用 2° 窄视场远距模拟
+     cam()    —— 读回当前 {target,yaw,pitch,distance,fov}（与 camera() 互逆，可存盘复现）
+     saveView(name) / view(name) / views() —— 命名机位（存 cam() 快照，独立于 1~6 预设）
+     section(spec) —— {axis:'x'|'y'|'z', at, flip?} 或 {origin:[x,y,z], normal:[x,y,z], flip?}；
+       保留法向指向的一侧（flip 反向）；section(null) 关闭剖切。全局裁剪面实现，rebuild 后仍有效 */
+  camera(spec){
+    const s = spec || {};
+    const t = s.target ? new THREE.Vector3(...s.target) : controls.target.clone();
+    const yaw = s.yaw ?? 0, pitch = s.pitch ?? 0;
+    let d = s.distance ?? Math.max(1, camera.position.distanceTo(t));
+    let fovDeg;
+    if (s.fov) { fovDeg = THREE.MathUtils.radToDeg(s.fov); }
+    else { fovDeg = 2; d = Math.max(1, 0.4 * d / Math.tan(THREE.MathUtils.degToRad(1))); }
+    const cp = Math.cos(pitch);
+    const eye = new THREE.Vector3(
+      t.x - d * Math.sin(yaw) * cp,
+      t.y + d * Math.sin(pitch),
+      t.z - d * Math.cos(yaw) * cp);
+    camera.fov = fovDeg;
+    camera.far = Math.max(camera.far, d * 10);
+    camera.updateProjectionMatrix();
+    this.setCam([eye.x, eye.y, eye.z], [t.x, t.y, t.z]);
+    return this.cam();
+  },
+  cam(){
+    const t = controls.target;
+    const o = camera.position.clone().sub(t);
+    const distance = o.length();
+    const pitch = Math.asin(THREE.MathUtils.clamp(o.y / (distance || 1), -1, 1));
+    const yaw = Math.atan2(-o.x, -o.z);
+    return { target: [+(t.x).toFixed(2), +(t.y).toFixed(2), +(t.z).toFixed(2)],
+      yaw: +yaw.toFixed(4), pitch: +pitch.toFixed(4), distance: +distance.toFixed(2),
+      fov: +THREE.MathUtils.degToRad(camera.fov).toFixed(4) };
+  },
+  saveView(name){
+    if (!name) return { ok: false, error: 'need name' };
+    (this._views || (this._views = {}))[name] = this.cam();
+    return { ok: true, saved: name, views: Object.keys(this._views) };
+  },
+  view(name){
+    const v = this._views && this._views[name];
+    if (!v) return { ok: false, error: 'no view named ' + name, views: Object.keys(this._views || {}) };
+    this.camera(v); return { ok: true, applied: name };
+  },
+  views(){ return { views: Object.keys(this._views || {}) }; },
+  section(spec){
+    if (!spec) { renderer.clippingPlanes = []; return { on: false }; }
+    let origin, normal;
+    if (spec.axis) {
+      const ax = { x: [1,0,0], y: [0,1,0], z: [0,0,1] }[spec.axis];
+      if (!ax) return { ok: false, error: 'axis must be x|y|z' };
+      origin = [0, spec.at ?? 0, 0]; normal = ax;
+      if (spec.axis === 'x') origin = [spec.at ?? 0, 0, 0];
+      if (spec.axis === 'z') origin = [0, 0, spec.at ?? 0];
+    } else { origin = spec.origin ?? [0,0,0]; normal = spec.normal ?? [0,1,0]; }
+    let n = new THREE.Vector3(...normal).normalize();
+    if (spec.flip) n = n.negate();
+    const o = new THREE.Vector3(...origin);
+    renderer.clippingPlanes = [new THREE.Plane(n, -n.dot(o))];
+    return { on: true, origin: [o.x, o.y, o.z], normal: [n.x, n.y, n.z], keeps: 'normal 指向侧' };
+  },
+  /* execute(cmd, params) —— window 命令通道（人机同源）：agent / editor.html / 控制台统一入口 */
+  execute(cmd, params){
+    const P = params || {};
+    try {
+      let r;
+      switch (cmd) {
+        case 'camera': r = this.camera(P); break;
+        case 'cam': r = this.cam(); break;
+        case 'view': r = this.view(P.name); break;
+        case 'saveView': r = this.saveView(P.name); break;
+        case 'views': r = this.views(); break;
+        case 'section': r = this.section(P.spec ?? P); break;
+        case 'set': r = this.set(P.path, P.value); break;
+        case 'snap': r = (this.snap(P.k || 1), { ok: true, k: P.k || 1 }); break;
+        case 'shot': r = { ok: true, dataUrl: this.shot(P.w || 1280, P.h || 800) }; break;
+        case 'stats': r = this.stats; break;
+        case 'measure': r = this.measure(P.on); break;
+        case 'dims': r = this.dims(); break;
+        case 'glb': r = this.saveGlb(P.name); break;
+        default: return { ok: false, error: 'unknown command', commands: this.commands().commands };
+      }
+      return { ok: true, cmd, result: r };
+    } catch (e) { return { ok: false, cmd, error: String(e && e.message || e) }; }
+  },
+  commands(){ return { commands: ['camera','cam','view','saveView','views','section','set','snap','shot','stats','measure','dims','glb'] }; },
 };
 
 /* ============ 12. 3d-edit kit（标记区，由 `edit3d.mjs sync` 维护，勿手改） ============ */

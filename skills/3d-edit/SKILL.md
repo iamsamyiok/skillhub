@@ -1,9 +1,9 @@
 ---
 name: 3d-edit
-version: 1.1.1
+version: 1.2.0
 category: 前端开发
 tags: [3D, Three.js, 程序化生成, 场景生成, 局部编辑, 参数化, 人工编辑, 数字孪生, WebGL]
-description: 一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求"画一个3D城市/3D场景/三维可视化""像 Claude 一键生成 3D 城市""做个可交互的 3D 网页""水库/厂区/管线数字孪生 3D 展示""给我一个小盒子/设备/推车的 3D 图"、要求 3D 汇报页/截图/PNG；或者说"把那座塔改红""河往东弯""楼密一点""雾再浓点"、指着截图某处说"改那个""去掉那栋楼"；或说"我想自己手动编辑这个 3D 图""给我个能拖的界面""别每次都得找你"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页；v1.1 起一键导出 GLB 三维资产（G 键）与工程测量模式（M 键，比例尺/场地尺寸/perUnit 定标）。
+description: 一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求"画一个3D城市/3D场景/三维可视化""像 Claude 一键生成 3D 城市""做个可交互的 3D 网页""水库/厂区/管线数字孪生 3D 展示""给我一个小盒子/设备/推车的 3D 图"、要求 3D 汇报页/截图/PNG；或者说"把那座塔改红""河往东弯""楼密一点""雾再浓点"、指着截图某处说"改那个""去掉那栋楼"；或说"我想自己手动编辑这个 3D 图""给我个能拖的界面""别每次都得找你"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页；v1.1 起一键导出 GLB 三维资产（G 键）与工程测量模式（M 键，比例尺/场地尺寸/perUnit 定标）；v1.2 起相机 JSON 合同（camera/cam/saveView/view，fov=0 正交）、剖切模式（section，看建筑/厂区内部）与 window.CITY.execute 统一命令通道（人机同源，agent 与 editor 同一入口）。
 slug: 3d-edit
 displayName: 3D Edit — 3D 场景的生成与编辑
 summary: 单文件 HTML + Three.js 程序化生成可交互 3D 场景（城市/数字孪生/单物体产品图），并对已有场景做确定性局部修改与人工可视化编辑。
@@ -126,6 +126,28 @@ L 档同理 `city-1-hero.png`）。报告统计数字时**必须现测**：后�
 需要三维资产交付时加导 GLB：浏览器按 G 键或 `CITY.saveGlb('场景名')`（capture 服务在跑则同时落盘 .glb）；
 导出前隐藏标注层与 gizmo——GLB 会把画面里的一切原样带出。InstancedMesh/CanvasTexture 均随模板导出。
 演示时现场换 seed（"再抽一座城"）是最有说服力的环节。
+
+### 相机 JSON / 命名机位 / 剖切 / window 命令通道（v1.2 新增，借鉴 SolidCraft camera 合同）
+
+拍特写、复现机位、看内部结构时用这套 API（与 1~6 预设机位并存；控制台/editor/agent 皆可调）：
+
+```js
+CITY.camera({ target:[0,20,0], yaw:0.6, pitch:0.35, distance:320, fov:1.0 })  // 立即到位（无 tween）
+// yaw 0 = 正面（相机在 -Z 看向 +Z，+X 朝右）；pitch=仰角，π/2=顶视；角一律弧度，距离=场景单位
+// fov=垂直视场(弧度)；0/缺省 = 正交观感（半高 0.4×distance，窄视场远距模拟），特写拍立面用它
+CITY.cam()              // 读回当前 {target,yaw,pitch,distance,fov}——与 camera() 互逆，可存盘复现
+CITY.saveView('hero')   // 存命名机位（存 cam() 快照）；CITY.view('hero') 回放；CITY.views() 列表
+CITY.section({ axis:'y', at:12 })            // 剖切：保留法向指向侧（看楼层内部用 axis:'y'+flip）
+CITY.section({ origin:[0,12,0], normal:[0,1,0], flip:true })
+CITY.section(null)                            // 关闭
+CITY.execute('camera', { yaw:0.6, pitch:0.35, distance:320, fov:1.0 })  // 统一命令通道（人机同源）
+CITY.commands()   // 目录：camera/cam/view/saveView/views/section/set/snap/shot/stats/measure/dims/glb
+```
+
+**特写/剖视配方**（SolidCraft close-up recipe 的移植）：`section` 开剖切 → `camera` 用 `fov:0` 正交 +
+`target` 对准剖面中心、`pitch` 压低 → `shot(1280,800)` 落图 → PIL/目检 → 微调 yaw/pitch 再拍。
+剖切面在 rebuild 后仍有效（全局裁剪面），改参数看内部结构不用重开。
+
 
 
 ## 工作流 B：编辑已有场景（B1→B4，禁止全文重写）

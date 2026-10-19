@@ -20,3 +20,15 @@
 ## 1.0.0 - 2026-09-28
 
 - 首版：3d-creat（生成）与 3d-edit（编辑）合并；单文件 HTML + Three.js 程序化生成，MANIFEST/实体/锚点三级局部编辑，kit v1.3，editor.html 人工编辑宿主页
+
+## 1.2.0 (2026-10-19)
+
+新增相机 JSON 合同 / 剖切 / window 命令通道（借鉴 SolidCraft MCP camera 与 close-up recipe）：
+
+- `CITY.camera({target,yaw,pitch,distance,fov})`：弧度合同（yaw 0=正面 -Z 看 +Z，pitch=仰角，π/2=顶视）；`fov:0`/缺省 = 正交观感（半高 0.4×distance，2° 窄视场远距模拟）；自动扩 far 平面
+- `CITY.cam()`：读回当前相机 JSON，与 camera() 互逆（fov 统一弧度，往返修复过单位 bug：曾度/弧度双转致 3283° 黑屏）
+- `CITY.saveView(name)/view(name)/views()`：命名机位，独立于 1~6 预设；存 cam() 快照可跨会话复现
+- `CITY.section({axis,at}|{origin,normal},flip?)`：全局裁剪面剖切，保留法向指向侧；rebuild 后仍有效；`section(null)` 关闭
+- `CITY.execute(cmd,params)` + `CITY.commands()`：13 命令统一通道（人机同源），未知命令返回命令目录
+- 模板自测锚点（e2e 注入验证）：roundtrip（yaw/pitch/distance/fov 四元互逆）、viewFovRoundtrip、section 开关、shot、stats、unknownCmd 拒绝；无头渲染 PIL 复核 mean=22.4 mid=19.3%（夜景城内容正常）
+- SKILL.md：新章节「相机 JSON / 命名机位 / 剖切 / window 命令通道」+ 特写/剖视配方（section→正交 camera→shot→微调）

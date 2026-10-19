@@ -1,0 +1,40 @@
+{
+ "bridge": "cadcraft",
+ "oracle": "analytic",
+ "checks": {
+  "expect": {
+   "Circle": 11,
+   "Dimension": 1,
+   "MText": 1
+  },
+  "geometry": {
+   "circle": [
+    {
+     "center": [
+      0,
+      0
+     ],
+     "radius": 40,
+     "tol": 0.01
+    },
+    {
+     "center": [
+      0,
+      0
+     ],
+     "radius": 150,
+     "tol": 0.01
+    }
+   ],
+   "polar_pattern": [
+    {
+     "type": "Circle",
+     "ring_radius": 100,
+     "count": 8,
+     "step_deg": 45,
+     "tol": 0.5
+    }
+   ]
+  }
+ }
+}

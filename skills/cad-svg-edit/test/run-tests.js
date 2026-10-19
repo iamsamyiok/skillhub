@@ -85,5 +85,47 @@ if (!ccAvail) {
   check('bridge run 坏占位符失败', rb.status === 1 && /无法解析/.test(rb.stderr), rb.stderr);
 }
 
+// ---------- v4.0 SolidCraft bridge + 语料库 ----------
+const scBridge = path.join(here, '..', 'scripts', 'solidcraft-bridge.mjs');
+
+// 无二进制路径：禁用扫描 → found:false + exit 2
+const scNo = spawnSync(node, [scBridge, 'doctor'], { encoding: 'utf8', env: { ...process.env, SOLIDCRAFT_SCAN: '0', SOLIDCRAFT_CLI: '' } });
+check('sc-bridge doctor 降级路径', scNo.status === 2 && /"found":false/.test(scNo.stdout), scNo.stdout + scNo.stderr);
+
+// verify 断言机（二进制无关：用 fixture result JSON）
+const fix = path.join(tmp, 'fixture.result.json');
+fs.writeFileSync(fix, JSON.stringify({ total: { volume_mm3: 24000.001, faces: 6, edges: 12, vertices: 8 }, bodies: [{}] }));
+const fv1 = spawnSync(node, [scBridge, 'verify', fix, '--volume', '24000', '--tol', '1e-3', '--faces', '6', '--bodies', '1'], { encoding: 'utf8' });
+check('sc-bridge verify fixture 通过', fv1.status === 0 && /"pass":true/.test(fv1.stdout), fv1.stdout + fv1.stderr);
+const fv2 = spawnSync(node, [scBridge, 'verify', fix, '--volume', '99999', '--tol', '1e-3'], { encoding: 'utf8' });
+check('sc-bridge verify fixture 失败退出 1', fv2.status === 1 && /"pass":false/.test(fv2.stdout), fv2.stdout + fv2.stderr);
+
+const scOk = spawnSync(node, [scBridge, 'doctor'], { encoding: 'utf8' });
+const scAvail = scOk.status === 0 && /"found":true/.test(scOk.stdout);
+if (!scAvail) {
+  console.log('SKIP  sc-bridge 端到端（未安装 solidcraft-cli，A++ 后端不可用）');
+} else {
+  const scTmp = path.join(tmp, 'sc');
+  fs.mkdirSync(scTmp, { recursive: true });
+  const job = JSON.parse(fs.readFileSync(path.join(here, 'corpus', 'bracket3d.job.json'), 'utf8'));
+  job.out = scTmp;
+  const jp = path.join(scTmp, 'job.json');
+  fs.writeFileSync(jp, JSON.stringify(job));
+  const r = spawnSync(node, [scBridge, 'run', jp], { encoding: 'utf8', timeout: 300000 });
+  let ack = null; try { ack = JSON.parse(r.stdout); } catch {}
+  const filesOk = ack && ack.files.step && fs.existsSync(ack.files.step) && fs.statSync(ack.files.step).size > 100;
+  check('sc-bridge run 支架示例', r.status === 0 && filesOk && Math.abs(ack.measure.volume_mm3 - 6395.752) / 6395.752 < 5e-3, (r.stderr || r.stdout).slice(0, 300));
+  const v = spawnSync(node, [scBridge, 'verify', path.join(scTmp, 'bracket3d.result.json'), '--volume', '6395.752', '--tol', '5e-3', '--faces', '10'], { encoding: 'utf8' });
+  check('sc-bridge verify 解析式断言', v.status === 0 && /"pass":true/.test(v.stdout), v.stdout + v.stderr);
+}
+
+// 语料库回归（两个引擎都缺时跳过）
+if (ccAvail || scAvail) {
+  const corpus = spawnSync(node, [path.join(here, '..', 'scripts', 'run-corpus.mjs')], { encoding: 'utf8', timeout: 600000 });
+  check('语料库回归', corpus.status === 0 && /CORPUS_PASS/.test(corpus.stdout), corpus.stdout + corpus.stderr);
+} else {
+  console.log('SKIP  语料库回归（两个引擎二进制均缺失）');
+}
+
 console.log(failed === 0 ? 'ALL_PASS' : failed + ' FAILED');
 process.exit(failed === 0 ? 0 : 1);
