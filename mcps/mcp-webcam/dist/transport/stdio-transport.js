@@ -1,0 +1,122 @@
+import { StatefulTransport } from './base-transport.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { Logger } from '../utils/logger.js';
+/**
+ * Implementation of STDIO transport
+ */
+export class StdioTransport extends StatefulTransport {
+    SESSION_ID = 'STDIO';
+    async initialize(_options) {
+        const transport = new StdioServerTransport();
+        // Create server instance using factory
+        const server = await this.serverFactory();
+        // Create session with metadata tracking
+        const session = {
+            transport,
+            server,
+            metadata: {
+                id: this.SESSION_ID,
+                connectedAt: new Date(),
+                lastActivity: new Date(),
+                capabilities: {},
+            },
+        };
+        // Store session in map
+        this.sessions.set(this.SESSION_ID, session);
+        try {
+            // Set up request/response interceptors for activity tracking
+            const originalSendMessage = transport.send.bind(transport);
+            transport.send = (message) => {
+                this.updateSessionActivity(this.SESSION_ID);
+                return originalSendMessage(message);
+            };
+            // Set up oninitialized callback to capture client info using base class helper
+            server.server.oninitialized = this.createClientInfoCapture(this.SESSION_ID);
+            // Set up error tracking
+            server.server.onerror = (error) => {
+                Logger.error('STDIO server error:', error);
+            };
+            // Handle transport closure
+            transport.onclose = () => {
+                Logger.info('STDIO transport closed');
+                void this.handleShutdown('transport closed');
+            };
+            await server.connect(transport);
+            Logger.info('STDIO transport initialized');
+        }
+        catch (error) {
+            Logger.error('Error connecting STDIO transport:', error);
+            // Clean up on error
+            this.sessions.delete(this.SESSION_ID);
+            throw error;
+        }
+    }
+    /**
+     * STDIO doesn't need stale session removal since there's only one persistent session
+     */
+    removeStaleSession(sessionId) {
+        // STDIO has only one session and it's not subject to staleness
+        Logger.debug(`STDIO session staleness check for ${sessionId} (no-op)`);
+        return Promise.resolve();
+    }
+    async cleanup() {
+        const session = this.sessions.get(this.SESSION_ID);
+        if (session) {
+            // Clear the onclose handler to prevent circular shutdown calls
+            if (session.transport && typeof session.transport.onclose !== 'undefined') {
+                session.transport.onclose = undefined;
+            }
+            try {
+                await session.transport.close();
+            }
+            catch (error) {
+                Logger.error('Error closing STDIO transport:', error);
+            }
+            try {
+                await session.server.close();
+            }
+            catch (error) {
+                Logger.error('Error closing STDIO server:', error);
+            }
+        }
+        this.sessions.clear();
+        Logger.info('STDIO transport cleaned up');
+    }
+    /**
+     * Get the STDIO session if it exists
+     */
+    getSession() {
+        return this.sessions.get(this.SESSION_ID);
+    }
+    /**
+     * Handle shutdown for STDIO
+     */
+    async handleShutdown(reason) {
+        // Guard against re-entrant shutdown cascades: closing the transport
+        // fires onclose, which would otherwise trigger handleShutdown again.
+        if (this.isShuttingDown) {
+            Logger.debug(`Shutdown already in progress (ignoring trigger: ${reason})`);
+            return;
+        }
+        this.isShuttingDown = true;
+        Logger.info(`Initiating shutdown (reason: ${reason})`);
+        try {
+            await this.cleanup();
+            process.exit(0);
+        }
+        catch (error) {
+            Logger.error('Error during shutdown:', error);
+            process.exit(1);
+        }
+    }
+    /**
+     * Set up stdin/stdout event handlers
+     */
+    setupStdioHandlers() {
+        // Handle stdin/stdout events
+        process.stdin.on('end', () => this.handleShutdown('stdin ended'));
+        process.stdin.on('close', () => this.handleShutdown('stdin closed'));
+        process.stdout.on('error', () => this.handleShutdown('stdout error'));
+        process.stdout.on('close', () => this.handleShutdown('stdout closed'));
+    }
+}
