@@ -962,7 +962,7 @@
       "updatedAt": "2026-10-23T15:28:17.000Z",
       "description": "mcp-webcam — 把电脑摄像头画面接入 AI Agent 的 MCP 服务器。浏览器即采集端(任意设备打开网页即可),Agent 通过 capture/screenshot 工具获取原生分辨率截图;支持摄像头最大分辨率自动检测、手动选择分辨率、画面冻结与多客户端采样。本收录版修复了截图降采样与 STDIO 退出日志刷屏问题。",
       "runtime": "node",
-      "entry": "dist/server.js",
+      "entry": "server/server.js",
       "args": [],
       "env": {}
     }
