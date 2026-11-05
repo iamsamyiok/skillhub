@@ -2,8 +2,8 @@
 // geom-boost.mjs — cad-svg-edit A 路增强引擎(基于 vendor 的 everything-cad 几何内核)
 //
 // 用途: 当 `node engine/geom-boost.mjs doctor` 报 ok 时, A 路(无 CADCraft 二进制)也能做
-// 真精确几何编辑: fillet/chamfer/trim/extend/offset/intersect/join/explode/measure,
-// 并提供独立于 CADCraft 的 DXF R2000 读写(dxf-write / dxf-read)。
+// 真精确几何编辑: fillet/chamfer/trim/extend/offset/intersect/join/explode/measure/
+// break/pfillet/pchamfer/hatch, 并提供独立于 CADCraft 的 DXF R2000 读写与 DWG 读取。
 //
 // CLI(无头, stdout 全 JSON, 退出码 0 成功 / 2 失败):
 //   node geom-boost.mjs doctor
@@ -15,9 +15,16 @@
 //   node geom-boost.mjs intersect <shapes.json> <id1> <id2>
 //   node geom-boost.mjs join     <shapes.json> <id1> <id2> [id3...]
 //   node geom-boost.mjs explode  <shapes.json> <id>
+//   node geom-boost.mjs break    <shapes.json> <id> <x1> <y1> <x2> <y2>   (两点断口; 同点=breakAtPoint)
+//   node geom-boost.mjs pfillet  <shapes.json> <id> <radius>               (整条闭合多段线全顶点倒圆)
+//   node geom-boost.mjs pchamfer <shapes.json> <id> <d1> [d2]              (整条倒角)
+//   node geom-boost.mjs hatch    <shapes.json> <ids,...> [pattern] [scale] [angleDeg]
+//            pattern='SOLID' 实心填充(输出边界多边形); 其余=图案名(patternNames() 查询,
+//            输出剖面线); ids 为闭环实体(circle/rect/polygon/闭合polyline), 最大者为外环
 //   node geom-boost.mjs measure  <shapes.json> <id>
 //   node geom-boost.mjs dxf-write <shapes.json> <out.dxf>
 //   node geom-boost.mjs dxf-read  <in.dxf> <out-shapes.json>
+//   node geom-boost.mjs dwg-read  <in.dwg> <out-shapes.json>   (R13-2018 导入)
 //
 // shapes.json 格式: {"shapes":[...老引擎 shape...]} 或裸数组 [...]
 // 输出: {"ok":true, "op":..., "shapes":[操作后全部 shape(老 schema)], ...op特有字段}
@@ -25,10 +32,14 @@
 import * as G from './everything-geom/core/geom/index.js';
 import { writeDxf } from './everything-geom/io/dxf/writer.js';
 import { parseDxf } from './everything-geom/io/dxf/reader.js';
+import { parseDwg } from './everything-geom/io/dwg/import.js';
+import { loopsToRings, solidPolygons, patternSegments } from './everything-geom/core/hatch/fill.js';
+import { patternNames } from './everything-geom/core/hatch/patterns.js';
 import fs from 'node:fs';
+import path from 'node:path';
 
 const TAU = Math.PI * 2;
-const VERSION = 'boost-1.0.0 (kernel 8a25746)';
+const VERSION = 'boost-1.1.0 (kernel 8a25746)';
 
 // ---------- schema 转换 ----------
 // 老引擎 shape → kernel entity; 不支持的类型返回 null(留在老引擎侧原样输出)
@@ -153,7 +164,7 @@ if (op === 'doctor') {
     smoke = r && r.arc && Math.abs(r.arc.r - 2) < 1e-9 ? 'ok' : 'fail';
   } catch (e) { smoke = 'fail: ' + String(e).slice(0, 80); }
   out({ ok: smoke === 'ok', engine: 'geom-boost', version: VERSION, kernel_smoke: smoke,
-        usage: 'fillet/chamfer/trim/extend/offset/intersect/join/explode/measure/dxf-write/dxf-read' });
+        usage: 'fillet/chamfer/trim/extend/offset/intersect/join/explode/break/pfillet/pchamfer/hatch/patterns/measure/dxf-write/dxf-read/dwg-read' });
 }
 
 try {
@@ -249,12 +260,122 @@ try {
     const b = G.entityBounds(k);
     out({ ok: true, op, length: G.lengthOf(k), area: (G.areaOf(k) || 0),
           bounds: { minX: b[0], minY: -b[3], maxX: b[2], maxY: -b[1] } });
+  } else if (op === 'break') {
+    const [file, id, x1, y1, x2, y2] = a;
+    const shapes = loadShapes(file);
+    const s = find(shapes, id);
+    if (!s) die(`找不到 id ${id}`);
+    const k = toKernel(s);
+    if (!k) die('break 仅支持 line/circle/arc/ellipse/polyline');
+    const sameP = String(x1) === String(x2) && String(y1) === String(y2);
+    const res = sameP
+      ? G.breakAtPoint(k, num(x1, 'x1'), -num(y1, 'y1'))
+      : G.breakEntity(k, num(x1, 'x1'), -num(y1, 'y1'), num(x2, 'x2'), -num(y2, 'y2'));
+    const pieces = (Array.isArray(res) ? res : (res && res.add) || [res]).filter(Boolean);
+    if (!pieces.length) die('break 失败(点不在实体上?)');
+    out(Object.assign({ ok: true, op }, merge(shapes, new Map([[String(s.id), pieces]]), [])));
+  } else if (op === 'pfillet' || op === 'pchamfer') {
+    const [file, id, d1, d2] = a;
+    const shapes = loadShapes(file);
+    const s = find(shapes, id);
+    if (!s) die(`找不到 id ${id}`);
+    const k = toKernel(s);
+    if (!k || k.type !== 'polyline') die('pfillet/pchamfer 仅支持 polyline/polygon/rect');
+    const res = op === 'pfillet'
+      ? G.filletPolyline(k, num(d1, 'radius'))
+      : G.chamferPolyline(k, num(d1, 'd1'), d2 !== undefined ? num(d2, 'd2') : undefined);
+    if (!res) die(op + ' 失败(半径/距离过大或非闭合?)');
+    // 老schema polyline 无 bulge → 倒圆结果炸成线+弧段交付(几何等价)
+    const hasBulge = (res.pts || []).some((v, i) => i % 3 === 2 && v);
+    const pieces = hasBulge ? (G.explodeEntity(res) || [res]) : [res];
+    out(Object.assign({ ok: true, op }, merge(shapes, new Map([[String(s.id), pieces]]), [])));
+  } else if (op === 'hatch') {
+    const [file, idList, patternIn = 'LINES', scaleS = '1', angleS = '0'] = a;
+    // 常用 ANSI 名映射到内核原生图案(内核用自研图案体系, 全名单见 patterns 操作)
+    const ANSI_MAP = { ANSI31: 'LINES', ANSI32: 'DASH', ANSI34: 'GRID', ANSI37: 'CROSS', ANSI38: 'DOTS' };
+    const pattern = ANSI_MAP[String(patternIn).toUpperCase()] || patternIn;
+    const shapes = loadShapes(file);
+    const ids = String(idList).split(',').map(x => x.trim()).filter(Boolean);
+    if (!ids.length) die('hatch 需要至少一个闭环实体 id');
+    // loop = 平铺 [x, y, bulge] 闭曲线(kernel 坐标)
+    const loops = [];
+    for (const id of ids) {
+      const s = find(shapes, id);
+      if (!s) die(`找不到 id ${id}`);
+      const k = toKernel(s);
+      if (!k) die(`id ${id} 类型不支持`);
+      if (k.type === 'circle') loops.push([k.cx - k.r, k.cy, 1, k.cx + k.r, k.cy, 1]);
+      else if (k.type === 'polyline' && k.closed) loops.push(k.pts.slice());
+      else die(`id ${id} 不支持 hatch(需 circle/rect/polygon/闭合polyline)`);
+    }
+    const rings = loopsToRings(loops);
+    if (!rings || !rings.length) die('hatch: 未能构成有效环');
+    // 方向在 ring 层做(bulge 环顶点面积退化, loop 层不可靠):
+    // |面积|最大=外环强制 CCW(正), 其余=岛强制 CW(负) — 翻转平铺坐标对
+    rings.sort((p, q) => Math.abs(G.signedAreaFlat(q)) - Math.abs(G.signedAreaFlat(p)));
+    rings.forEach((r, i) => {
+      const a = G.signedAreaFlat(r);
+      if ((i === 0 && a < 0) || (i > 0 && a > 0)) {
+        const pts = [];
+        for (let j = r.length - 2; j >= 0; j -= 2) pts.push(r[j], r[j + 1]);
+        rings[i] = pts;
+      }
+    });
+    const nid = nextId(shapes);
+    const added = [];
+    let truncated = false;
+    if (String(pattern).toUpperCase() === 'SOLID') {
+      // solidPolygons → [[外环, 岛...], ...] 每环输出为闭合边界多边形
+      const polys = solidPolygons(rings) || [];
+      let n = 0;
+      for (const poly of polys) {
+        for (const ring of poly || []) {
+          const pts = [];
+          for (let j = 0; j + 1 < ring.length; j += 2) pts.push({ x: ring[j], y: -ring[j + 1] });
+          added.push({ id: nid + (n++), type: 'polygon', points: pts, closed: true, style: {} });
+        }
+      }
+    } else {
+      const seg = patternSegments(rings, pattern, Number(scaleS), Number(angleS) * Math.PI / 180) || {};
+      truncated = !!seg.truncated;
+      const flat = seg.segs || [];
+      let lc = 0;
+      for (let j = 0; j + 3 < flat.length && lc < 3000; j += 4, lc++) {
+        added.push({ id: nid + lc, type: 'line',
+                     p1: { x: flat[j], y: -flat[j + 1] }, p2: { x: flat[j + 2], y: -flat[j + 3] }, style: {} });
+      }
+      const dots = seg.dots || [];
+      for (let j = 0; j + 1 < dots.length && lc < 3800; j += 2, lc++) {
+        added.push({ id: nid + lc, type: 'point', x: dots[j], y: -dots[j + 1], style: {} });
+      }
+      if (!lc) die('hatch: 图案「' + pattern + '」无线段产出(用 patterns 操作查名单)');
+    }
+    out({ ok: true, op, shapes: shapes.concat(added), addedN: added.length,
+          pattern, scale: Number(scaleS), angle: Number(angleS),
+          outerArea: Math.abs(G.signedAreaFlat(rings[0]))
+            .toFixed(2) * 1, netArea: Math.round(
+              rings.reduce((a, r) => a + G.signedAreaFlat(r), 0) * 100) / 100,
+          loops: loops.length, truncated });
+  } else if (op === 'dwg-read') {
+    const [inPath, outPath] = a;
+    const parsed = parseDwg(new Uint8Array(fs.readFileSync(inPath)));
+    const shapes = (parsed.drawing.entities || [])
+      .map(k => toOld(k, null)).filter(Boolean)
+      .map((s, i) => ({ ...s, id: i + 1 }));
+    if (outPath) {
+      fs.mkdirSync(path.dirname(outPath), { recursive: true });
+      fs.writeFileSync(outPath, JSON.stringify({ shapes }, null, 1));
+    }
+    out({ ok: true, op, shapes, version: parsed.version, release: parsed.release,
+          warnings: (parsed.warnings || []).slice(0, 5), stats: parsed.stats });
+  } else if (op === 'patterns') {
+    out({ ok: true, op, patterns: patternNames() });
   } else if (op === 'dxf-write') {
     const [file, outPath] = a;
     const shapes = loadShapes(file);
     const ents = shapes.map(toKernel).filter(Boolean);
     if (!ents.length) die('无可转换实体(全是 text/dim/spline?)');
-    fs.mkdirSync(outPath.replace(/[/\\][^/\\]+$/, ''), { recursive: true });
+    fs.mkdirSync(path.dirname(outPath), { recursive: true });
     fs.writeFileSync(outPath, writeDxf(kernelDrawing(ents)));
     out({ ok: true, op, written: outPath, entities: ents.length });
   } else if (op === 'dxf-read') {
@@ -264,7 +385,7 @@ try {
       .map(k => toOld(k, null)).filter(Boolean)
       .map((s, i) => ({ ...s, id: i + 1 }));
     if (outPath) {
-      fs.mkdirSync(outPath.replace(/[/\\][^/\\]+$/, ''), { recursive: true });
+      fs.mkdirSync(path.dirname(outPath), { recursive: true });
       fs.writeFileSync(outPath, JSON.stringify({ shapes }, null, 1));
     }
     out({ ok: true, op, shapes, warnings: (parsed.warnings || []).slice(0, 5), stats: parsed.stats });

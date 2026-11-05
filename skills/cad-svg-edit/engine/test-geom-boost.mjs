@@ -172,6 +172,63 @@ t('fillet 半径远超臂长(真不可行) → 优雅报错(退出码2)', () => 
   catch (e) { return e.status === 2; }
 });
 
+// ===== v1.1 新操作 =====
+t('break 线两点断口→2段', () => {
+  const s = [{ id: 1, type: 'line', p1: { x: 0, y: 0 }, p2: { x: 100, y: 0 }, style: {} }];
+  const f = jw('b1.json', { shapes: s });
+  const r = run('break', f, '1', '30', '0', '60', '0');
+  const lines = r.shapes.filter(x => x.type === 'line');
+  return r.ok && lines.length === 2 &&
+         Math.abs(lines[0].p2.x - 30) < 1e-6 && Math.abs(lines[1].p1.x - 60) < 1e-6;
+});
+t('breakAtPoint 矩形一点打断→1开polyline', () => {
+  const s = [{ id: 1, type: 'rect', x: 0, y: 0, w: 100, h: 50, style: {} }];
+  const f = jw('b2.json', { shapes: s });
+  const r = run('break', f, '1', '50', '0', '50', '0');
+  const pls = r.shapes.filter(x => x.type === 'polyline');
+  return r.ok && pls.length === 1 && pls[0].points.length >= 4;
+});
+t('pfillet 闭合矩形全顶点R=8→8实体(4线4弧)', () => {
+  const s = [{ id: 1, type: 'rect', x: 0, y: 0, w: 100, h: 60, style: {} }];
+  const f = jw('b3.json', { shapes: s });
+  const r = run('pfillet', f, '1', '8');
+  const arcs = r.shapes.filter(x => x.type === 'arc');
+  return r.ok && arcs.length === 4 && arcs.every(a => Math.abs(a.r - 8) < 1e-6);
+});
+t('hatch SOLID 圆→边界多边形', () => {
+  const s = [{ id: 1, type: 'circle', c: { x: 50, y: 50 }, r: 20, style: {} }];
+  const f = jw('b4.json', { shapes: s });
+  const r = run('hatch', f, '1', 'SOLID');
+  const polys = r.shapes.filter(x => x.type === 'polygon');
+  return r.ok && polys.length === 1 && polys[0].points.length >= 8 &&
+         Math.abs(r.outerArea - Math.PI * 400) < Math.PI * 400 * 0.01;
+});
+t('hatch ANSI31 矩形→剖面线组', () => {
+  const s = [{ id: 1, type: 'rect', x: 0, y: 0, w: 100, h: 60, style: {} }];
+  const f = jw('b5.json', { shapes: s });
+  const r = run('hatch', f, '1', 'ANSI31', '2', '45');  // ANSI 别名→LINES
+  const lines = r.shapes.filter(x => x.type === 'line');
+  return r.ok && lines.length >= 5 && Math.abs(r.outerArea - 6000) < 1e-6;
+});
+t('hatch 带岛(矩形+内部小圆)→面积扣除', () => {
+  const s = [{ id: 1, type: 'rect', x: 0, y: 0, w: 100, h: 60, style: {} },
+             { id: 2, type: 'circle', c: { x: 50, y: 30 }, r: 10, style: {} }];
+  const f = jw('b6.json', { shapes: s });
+  const r = run('hatch', f, '1,2', 'SOLID');
+  return r.ok && r.loops === 2 &&
+         Math.abs(r.outerArea - 6000) < 1 &&
+         Math.abs(r.netArea - (6000 - Math.PI * 100)) < 6000 * 0.02;  // 岛已扣除
+});
+t('dwg-read 非法文件→优雅报错退出码2', () => {
+  const bad = jw('bad.dwg', { x: 1 });
+  try { run('dwg-read', bad, ''); return false; }
+  catch (e) { return e.status === 2; }
+});
+t('patterns 图案清单≥20', () => {
+  const r = run('patterns');
+  return r.ok && r.patterns.length >= 20 && r.patterns.includes('SOLID');
+});
+
 fs.rmSync(TMP, { recursive: true, force: true });
 console.log(`\n===== geom-boost 适配层: ${pass} pass, ${fail} fail =====`);
 process.exit(fail ? 1 : 0);

@@ -2,7 +2,7 @@
 name: cad&svg-edit
 description: 融合「CAD 创建」「SVG 精准编辑」「3D 实体建模」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（优先 CADCraft 真实 CAD 引擎，输出 DXF/SVG/PNG；缺二进制时落回内置 JS 无头引擎输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；3D 实体零件/STEP/STL/参数化重建走 A++ SolidCraft 后端；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；读入已有 DXF/DWG 图纸走 CADCraft 后端 info/convert；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export DXF/SVG/PNG/CSV), 3D solid parts (STEP/STL export, parametric rebuild), reading DXF/DWG files, OR editing/modifying existing SVG files (text, color, position, batch changes).
 agent_created: true
-version: 4.1.0
+version: 4.0.1
 ---
 
 # CAD & SVG-Edit（融合技能）
@@ -322,7 +322,7 @@ cad-svg-edit/
 ├── CHANGELOG.md            # 版本更新日志
 ├── engine/cad-engine.js   # 无头引擎（cadAPI v2.1-headless，含 doctor 自检）
 ├── engine/geom-boost.mjs  # A± 增强引擎 CLI（everything-cad 内核：fillet/trim/offset/join/explode/measure + DXF 读写）
-├── engine/test-geom-boost.mjs  # A± 适配层回归（17 项，node 直接跑）
+├── engine/test-geom-boost.mjs  # A± 适配层回归（25 项，node 直接跑）
 ├── engine/everything-geom/     # vendor: HeyPuter/everything src/cad 的 core+io（MIT, 快照 8a25746）
 ├── scripts/
 │   ├── cadcraft-bridge.mjs    # A+ CADCraft 2D 后端桥（doctor/run/query/verify/convert/info；v4.0 失败二分+checkpoint+几何断言+--quiet）
@@ -575,7 +575,7 @@ node <skill>/test/run-tests.js   # 期望输出 ALL_PASS
 ```bash
 node <skill>/engine/geom-boost.mjs doctor
 # → {ok, engine:'geom-boost', version, kernel_smoke}  ok=true 即可用
-node <skill>/engine/test-geom-boost.mjs   # 17 项适配层回归（改内核/适配层后必跑）
+node <skill>/engine/test-geom-boost.mjs   # 25 项适配层回归（改内核/适配层后必跑）
 ```
 
 ## 操作（stdout 全 JSON，退出码 0 成功 2 失败）
@@ -591,9 +591,17 @@ $B offset    shapes.json <id> <dist> <sideX> <sideY>                    # dist=�
 $B intersect shapes.json <id1> <id2>                                    # → points:[{x,y}] 老系坐标
 $B join      shapes.json <id1> <id2> [...]                              # 共线/相邻合并, 源实体删除
 $B explode   shapes.json <id>                                           # polyline/polygon/rect → 线弧段
+$B break     shapes.json <id> <x1> <y1> <x2> <y2>                       # 两点断口; 两点相同=一点打断
+$B pfillet   shapes.json <id> <radius>                                  # 闭合多段线全顶点倒圆(结果炸成线+弧)
+$B pchamfer  shapes.json <id> <d1> [d2]                                 # 闭合多段线全顶点倒角
+$B hatch     shapes.json <ids,...> [pattern] [scale] [angleDeg]         # 填充: SOLID=边界多边形;
+            #   其余=剖面线(默认LINES; ANSI31/32/34/37/38 自动映射; 全名单 $B patterns)
+            #   → {shapes, outerArea, netArea(岛已扣), loops}
+$B patterns                                                             # 21种填充图案名单
 $B measure   shapes.json <id>                                           # → length/area/bounds
 $B dxf-write shapes.json out.dxf                                       # R2000, 独立于 CADCraft
 $B dxf-read  in.dxf out.json                                           # → {shapes:[老schema]} 供 SVG-EDIT 等复用
+$B dwg-read  in.dwg out.json                                           # DWG R13-2018 导入(同样出老schema)
 ```
 
 ## 输入输出契约

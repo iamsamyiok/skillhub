@@ -6,7 +6,7 @@
  * closed. Rings are flat [x, y, ...], implicitly closed, without a repeated
  * closing point.
  */
-import earcut from 'earcut';
+import earcut from '../../vendor/earcut.js';
 import { getPattern, dashPeriod } from './patterns.js';
 
 const D2R = Math.PI / 180;

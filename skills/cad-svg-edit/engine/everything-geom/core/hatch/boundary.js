@@ -7,7 +7,7 @@
  * half-edges. The smallest bounded face containing the pick point is the
  * outer boundary; closed components lying directly inside it are islands.
  */
-import RBush from 'rbush';
+import RBush from '../../vendor/rbush.js';
 import { pointInRing, ringArea } from './fill.js';
 
 /**

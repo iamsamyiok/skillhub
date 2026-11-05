@@ -1,15 +1,12 @@
 # cad&svg-edit Changelog
 
-## 4.1.0 (2026-11-06)
+## 4.2.0 (2026-11-06)
 
-新增 **A±. GEOM-BOOST 增强几何引擎**（vendor 自 HeyPuter/everything `src/cad` 纯 JS 内核，MIT）：
+A± GEOM-BOOST v1.1（完美度盘点补缺）：
 
-- `engine/everything-geom/`（vendor，core+io，快照 8a25746）：完整 2D CAD 几何内核 + DXF R2000 读写 + DWG R13-2018 导入
-- `engine/geom-boost.mjs`（适配层 CLI）：老 schema↔内核（Y 镜像/弧向翻转），11 个无头操作 fillet/chamfer/trim/extend/offset/intersect/join/explode/measure/dxf-write/dxf-read，text/dim/spline 原样保留
-- `engine/test-geom-boost.mjs`：17 项回归（镜像 roundtrip 精度/各操作/退化工况）
-- 意义：**无 CADCraft 二进制时也能真精确几何编辑 + 独立 DXF 进出**（此前 DXF 读绑死 CADCraft）
-- 验收：内核抽样 21/21 + DXF roundtrip 6/6 + 适配层 17/17
-
+- 新增 5 操作: `break`(两点断口/一点打断) `pfillet`/`pchamfer`(闭合多段线全顶点倒圆/角, bulge 结果炸成线+弧交付) `hatch`(SOLID 边界多边形 + 21 种剖面线图案, ANSI31/32/34/37/38 自动映射, 带 netArea 岛扣除) `dwg-read`(DWG R13-2018 导入→老 schema) `patterns`(图案名单)
+- vendor 增补: earcut/rbush/quickselect 单文件 MIT(hatch 依赖, 一切仍零 npm 安装)
+- 适配层回归 17→25 项全绿; ring 层定向(bulge 环顶点面积退化, loop 层不可靠)
 
 ## 4.0.0 (2026-10-19)
 
