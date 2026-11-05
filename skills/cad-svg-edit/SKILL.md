@@ -21,6 +21,7 @@ version: 4.0.1
 | 精确工程图 / 机械零件 / 建筑平面；需要 **DXF 交付**、关联尺寸标注、图层、填充、OFFSET/TRIM/FILLET 真编辑几何 | **A+. CADCRAFT 后端**（首选，需二进制） | CADCraft 真实 CAD 引擎 |
 | **3D 实体零件**：STEP/STL 交付、体积/质心校核、圆角/抽壳/阵列/倒角特征、参数化重建、STL 打印 | **A++. SOLIDCRAFT 后端**（需二进制） | SolidCraft 参数化 CAD 引擎 |
 | 从零画简单示意图 / 示意图形；环境无 CADCraft 二进制 | **A. CAD-CREATE**（JS 无头引擎，零依赖兜底） | 内置 JS 引擎 |
+| 无二进制但要**真精确几何编辑**（fillet/trim/extend/offset/join/explode/面积周长）或独立 DXF 读写 | **A±. GEOM-BOOST**（everything-cad 内核增强，Node≥16 零依赖） | vendor 内核 + geom-boost 适配层 |
 | **读入 / 转换 / 检查已有 DXF 或 DWG 图纸** | **A+. CADCRAFT 后端**（info + convert） | CADCraft（DWG 经 acadrust 桥） |
 | 修改一张**已存在**的 SVG（改字 / 改色 / 移位 / 增删 / 批量 / 空间点名） | **B. SVG-EDIT** | svg_toolkit 确定性修改 |
 | 要改的 SVG 恰由本技能生成脚本产出 | **B 的「源脚本路线」优先**：改脚本参数重生成 | 对应引擎 |
@@ -32,7 +33,7 @@ version: 4.0.1
 - 目标文件**已存在且要"改"** → SVG-EDIT。
 - 尚**无图形、要"造"**（2D）→ A+（可用时）否则 A。
 - 语义模糊（如"把平面图里那个房间放大"）：目标已存在 → 走 SVG-EDIT；若需结构性改动且原图由生成脚本产出 → 切对应引擎重生成（精度更高、联动一致）。
-- **降级铁律**：A+ 的 `doctor` 返回 `found:false` 时静默落回 A 路 JS 引擎，任务照常完成，交付说明中提及一句即可；A++ 的 `doctor` 返回 `found:false` 时给出安装指引并询问用户是否改用 2D 交付或等待安装（3D 无法静默降级到 JS 引擎）。
+- **降级铁律**：A+ 的 `doctor` 返回 `found:false` 时优先落回 **A± GEOM-BOOST**（`node engine/geom-boost.mjs doctor` 为 ok 则精确几何照做，仅关联标注/块/填充等高级特性受限），再退 A 路纯示意引擎；任务照常完成，交付说明中提及一句即可；A++ 的 `doctor` 返回 `found:false` 时给出安装指引并询问用户是否改用 2D 交付或等待安装（3D 无法静默降级到 JS 引擎）。
 
 ---
 
@@ -320,6 +321,9 @@ cad-svg-edit/
 ├── SKILL.md
 ├── CHANGELOG.md            # 版本更新日志
 ├── engine/cad-engine.js   # 无头引擎（cadAPI v2.1-headless，含 doctor 自检）
+├── engine/geom-boost.mjs  # A± 增强引擎 CLI（everything-cad 内核：fillet/trim/offset/join/explode/measure + DXF 读写）
+├── engine/test-geom-boost.mjs  # A± 适配层回归（17 项，node 直接跑）
+├── engine/everything-geom/     # vendor: HeyPuter/everything src/cad 的 core+io（MIT, 快照 8a25746）
 ├── scripts/
 │   ├── cadcraft-bridge.mjs    # A+ CADCraft 2D 后端桥（doctor/run/query/verify/convert/info；v4.0 失败二分+checkpoint+几何断言+--quiet）
 │   ├── solidcraft-bridge.mjs  # A++ SolidCraft 3D 后端桥（doctor/run/eval/verify/snapshot/commands）
@@ -558,6 +562,51 @@ node <skill>/test/run-tests.js   # 期望输出 ALL_PASS
 ```
 
 ---
+
+---
+
+# A±. GEOM-BOOST（增强几何内核，v4.1 新增）
+
+> vendor 自 [HeyPuter/everything](https://github.com/HeyPuter/everything) `src/cad` 的纯 JS CAD 内核（MIT）。
+> 作用：**没有 CADCraft 二进制时也能做真精确几何编辑**，并提供独立 DXF R2000 读写。与 A 路引擎同一实体模型对接。
+
+## 自检
+
+```bash
+node <skill>/engine/geom-boost.mjs doctor
+# → {ok, engine:'geom-boost', version, kernel_smoke}  ok=true 即可用
+node <skill>/engine/test-geom-boost.mjs   # 17 项适配层回归（改内核/适配层后必跑）
+```
+
+## 操作（stdout 全 JSON，退出码 0 成功 2 失败）
+
+```bash
+B="node <skill>/engine/geom-boost.mjs"
+$B doctor
+$B fillet    shapes.json <id1> <id2> <radius> <px1> <py1> <px2> <py2>   # L角倒圆, 拾取点定角侧
+$B chamfer   shapes.json <id1> <id2> <d1> <d2> <px1> <py1> <px2> <py2>  # 倒角
+$B trim      shapes.json <id> <px> <py> <cutterId,...>                  # AutoCAD 语义: 拾取段被删
+$B extend    shapes.json <id> <px> <py> <boundId,...>
+$B offset    shapes.json <id> <dist> <sideX> <sideY>                    # dist=幅值, side点在目标侧(老系坐标)
+$B intersect shapes.json <id1> <id2>                                    # → points:[{x,y}] 老系坐标
+$B join      shapes.json <id1> <id2> [...]                              # 共线/相邻合并, 源实体删除
+$B explode   shapes.json <id>                                           # polyline/polygon/rect → 线弧段
+$B measure   shapes.json <id>                                           # → length/area/bounds
+$B dxf-write shapes.json out.dxf                                       # R2000, 独立于 CADCraft
+$B dxf-read  in.dxf out.json                                           # → {shapes:[老schema]} 供 SVG-EDIT 等复用
+```
+
+## 输入输出契约
+
+- 输入 `shapes.json`：`{"shapes":[...老引擎 shape...]}` 或裸数组（`cad-engine.js` 保存格式一致）。
+- 输出：`{ok, op, shapes:[操作后全部 shape], replacedIds, addedN, ...}` —— text/dim/spline 等不支持类型**原样保留**，几何实体被替换/追加。
+- 支持类型：line / circle / arc / ellipse / polyline / polygon / rect / point；**平行线 fillet 会自动取间距一半成 U 形相切弧**（内核行为，非报错）。
+- 坐标：CLI 全部收**老引擎坐标**（SVG 系 Y 向下），适配层内部镜像转换——调用方无感。
+
+## 与其他路的关系
+
+- A+ 在场：仍优先 A+（关联标注/块/填充/约束更全）；A± 作为无二进制环境的精确编辑层。
+- dxf-read 产物直接喂 B 路 SVG-EDIT 或 A 路重渲染 → **DXF 进 ≈ 全链路打通**（此前 DXF 读必须 CADCraft）。
 
 # B. SVG-EDIT（编辑）
 
