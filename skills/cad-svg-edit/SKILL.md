@@ -2,7 +2,7 @@
 name: cad&svg-edit
 description: 融合「CAD 创建」「SVG 精准编辑」「3D 实体建模」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（优先 CADCraft 真实 CAD 引擎，输出 DXF/SVG/PNG；缺二进制时落回内置 JS 无头引擎输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；3D 实体零件/STEP/STL/参数化重建走 A++ SolidCraft 后端；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；读入已有 DXF/DWG 图纸走 CADCraft 后端 info/convert；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export DXF/SVG/PNG/CSV), 3D solid parts (STEP/STL export, parametric rebuild), reading DXF/DWG files, OR editing/modifying existing SVG files (text, color, position, batch changes).
 agent_created: true
-version: 4.0.1
+version: 4.1.0
 ---
 
 # CAD & SVG-Edit（融合技能）

@@ -1,5 +1,16 @@
 # cad&svg-edit Changelog
 
+## 4.1.0 (2026-11-06)
+
+新增 **A±. GEOM-BOOST 增强几何引擎**（vendor 自 HeyPuter/everything `src/cad` 纯 JS 内核，MIT）：
+
+- `engine/everything-geom/`（vendor，core+io，快照 8a25746）：完整 2D CAD 几何内核 + DXF R2000 读写 + DWG R13-2018 导入
+- `engine/geom-boost.mjs`（适配层 CLI）：老 schema↔内核（Y 镜像/弧向翻转），11 个无头操作 fillet/chamfer/trim/extend/offset/intersect/join/explode/measure/dxf-write/dxf-read，text/dim/spline 原样保留
+- `engine/test-geom-boost.mjs`：17 项回归（镜像 roundtrip 精度/各操作/退化工况）
+- 意义：**无 CADCraft 二进制时也能真精确几何编辑 + 独立 DXF 进出**（此前 DXF 读绑死 CADCraft）
+- 验收：内核抽样 21/21 + DXF roundtrip 6/6 + 适配层 17/17
+
+
 ## 4.0.0 (2026-10-19)
 
 新增 **A++. SOLIDCRAFT 3D 后端**（借鉴 SolidCraft 项目研究，tangency-labs/solidcraft v0.16.2 实测接入）：
