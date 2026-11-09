@@ -1,10 +1,11 @@
 {
-  "total": 44,
+  "total": 54,
   "categories": [
     "写作工具",
     "前端开发",
     "图像理解",
     "图像生成",
+    "学术写作",
     "工作流",
     "开发工具",
     "开发调试",
@@ -21,26 +22,64 @@
     {
       "id": "3d-edit",
       "name": "3d-edit",
-      "description": "一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求\"画一个3D城市/3D场景/三维可视化\"\"像 Claude 一键生成 3D 城市\"\"做个可交互的 3D 网页\"\"水库/厂区/管线数字孪生 3D 展示\"\"给我一个小盒子/设备/推车的 3D 图\"、要求 3D 汇报页/截图/PNG；或者说\"把那座塔改红\"\"河往东弯\"\"楼密一点\"\"雾再浓点\"、指着截图某处说\"改那个\"\"去掉那栋楼\"；或说\"我想自己手动编辑这个 3D 图\"\"给我个能拖的界面\"\"别每次都得找你\"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页。",
-      "version": "1.0.0",
+      "description": "一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求\"画一个3D城市/3D场景/三维可视化\"\"像 Claude 一键生成 3D 城市\"\"做个可交互的 3D 网页\"\"水库/厂区/管线数字孪生 3D 展示\"\"给我一个小盒子/设备/推车的 3D 图\"、要求 3D 汇报页/截图/PNG；或者说\"把那座塔改红\"\"河往东弯\"\"楼密一点\"\"雾再浓点\"、指着截图某处说\"改那个\"\"去掉那栋楼\"；或说\"我想自己手动编辑这个 3D 图\"\"给我个能拖的界面\"\"别每次都得找你\"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页；v1.1 起一键导出 GLB 三维资产（G 键）与工程测量模式（M 键，比例尺/场地尺寸/perUnit 定标）；v1.2 起相机 JSON 合同（camera/cam/saveView/view，fov=0 正交）、剖切模式（section，看建筑/厂区内部）与 window.CITY.execute 统一命令通道（人机同源，agent 与 editor 同一入口）；v1.3 起内置 SimReady 物体资产库 assetlib（2,595 个真实感日常物件 GLB，中英文检索+本地缓存，CC BY 4.0），日常物件先检索复用、程序化生成兜底。",
+      "version": "1.3.0",
       "category": "前端开发",
       "tags": [
         "3D",
+        "glb",
         "Three.js",
-        "程序化生成",
-        "场景生成",
-        "局部编辑",
-        "参数化",
+        "WebGL",
+        "SimReady",
         "人工编辑",
+        "剖切",
+        "参数化",
+        "命令通道",
+        "场景生成",
+        "资产库",
+        "局部编辑",
         "数字孪生",
-        "WebGL"
+        "相机JSON",
+        "程序化生成"
       ],
       "downloads": 0,
-      "updatedAt": "2026-09-28T03:13:25.000Z",
+      "updatedAt": "2026-11-09T00:00:00.000Z",
       "files": [
         {
+          "path": "CHANGELOG.md",
+          "size": 6440
+        },
+        {
           "path": "SKILL.md",
-          "size": 24123
+          "size": 32796
+        },
+        {
+          "path": "assetlib/.gitignore",
+          "size": 7
+        },
+        {
+          "path": "assetlib/README.md",
+          "size": 1023
+        },
+        {
+          "path": "assetlib/__pycache__/build_catalog.cpython-311.pyc",
+          "size": 28011
+        },
+        {
+          "path": "assetlib/build_catalog.py",
+          "size": 15086
+        },
+        {
+          "path": "assetlib/catalog.jsonl",
+          "size": 2220674
+        },
+        {
+          "path": "assetlib/fetch.py",
+          "size": 2654
+        },
+        {
+          "path": "assetlib/search.py",
+          "size": 4468
         },
         {
           "path": "assets/editkit.js",
@@ -48,15 +87,19 @@
         },
         {
           "path": "assets/editor.html",
-          "size": 24715
+          "size": 25097
         },
         {
           "path": "assets/template.html",
-          "size": 57614
+          "size": 66766
+        },
+        {
+          "path": "references/assetlib.md",
+          "size": 9608
         },
         {
           "path": "references/checklist.md",
-          "size": 11986
+          "size": 16595
         },
         {
           "path": "references/edit-playbook.md",
@@ -68,15 +111,19 @@
         },
         {
           "path": "references/recipes.md",
-          "size": 12706
+          "size": 16363
         },
         {
           "path": "scripts/capture.mjs",
-          "size": 1934
+          "size": 2831
         },
         {
           "path": "scripts/edit3d.mjs",
-          "size": 24816
+          "size": 26367
+        },
+        {
+          "path": "test/run-tests.js",
+          "size": 3463
         }
       ],
       "needsKey": false
@@ -196,25 +243,176 @@
       "needsKey": false
     },
     {
-      "id": "cad-svg-edit",
-      "name": "cad&svg-edit",
-      "description": "融合「CAD 创建」与「SVG 精准编辑」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（cad 无头引擎，输出 SVG/PNG/CSV）走 CAD-CREATE；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans, OR editing/modifying existing SVG files (text, color, position, batch changes).",
-      "version": "1.0.0",
-      "category": "开发工具",
+      "id": "book-to-skill-oss",
+      "name": "book-to-skill-oss",
+      "description": "把整本技术书或文档夹（PDF/EPUB/DOCX/HTML/Markdown/RTF/MOBI）转换成按需加载的结构化 agent 技能包：提取框架、思维模型、原则、技法与反模式，生成分章文件、术语表、模式库与速查表。当用户要求「把这本书转成技能」「用 SKILL 标准转换 PDF」「从文档夹构建知识库技能」或想在编码时套用某书作者的方法论时使用。Converts books and documents (PDF, EPUB, DOCX, HTML, Markdown, plain text, RTF, MOBI/AZW with Calibre) into structured agent skills with on-demand chapter files, extracting frameworks, mental models, principles, techniques, and anti-patterns.",
+      "version": "1.4.0",
+      "category": "知识转化",
       "tags": [
-        "cad",
-        "svg",
-        "绘图",
-        "矢量图",
-        "编辑",
-        "绘图引擎"
+        "book-to-skill",
+        "文档转换",
+        "PDF",
+        "EPUB",
+        "分章技能",
+        "知识库",
+        "技能生成"
       ],
       "downloads": 0,
-      "updatedAt": "2026-09-28T02:58:59.000Z",
+      "updatedAt": "2026-10-16T00:00:00.000Z",
       "files": [
         {
+          "path": "CHANGELOG.md",
+          "size": 15915
+        },
+        {
+          "path": "LICENSE.md",
+          "size": 1068
+        },
+        {
           "path": "SKILL.md",
-          "size": 22838
+          "size": 55854
+        },
+        {
+          "path": "UPSTREAM.md",
+          "size": 1887
+        },
+        {
+          "path": "book_to_skill/__init__.py",
+          "size": 217
+        },
+        {
+          "path": "book_to_skill/__main__.py",
+          "size": 74
+        },
+        {
+          "path": "book_to_skill/cli.py",
+          "size": 1336
+        },
+        {
+          "path": "book_to_skill/config.py",
+          "size": 2400
+        },
+        {
+          "path": "book_to_skill/dependencies.py",
+          "size": 12494
+        },
+        {
+          "path": "book_to_skill/exceptions.py",
+          "size": 117
+        },
+        {
+          "path": "book_to_skill/parsers/__init__.py",
+          "size": 18
+        },
+        {
+          "path": "book_to_skill/parsers/calibre.py",
+          "size": 2409
+        },
+        {
+          "path": "book_to_skill/parsers/docx.py",
+          "size": 7298
+        },
+        {
+          "path": "book_to_skill/parsers/epub.py",
+          "size": 7658
+        },
+        {
+          "path": "book_to_skill/parsers/html.py",
+          "size": 5757
+        },
+        {
+          "path": "book_to_skill/parsers/pdf.py",
+          "size": 8386
+        },
+        {
+          "path": "book_to_skill/parsers/rtf.py",
+          "size": 6832
+        },
+        {
+          "path": "book_to_skill/parsers/text.py",
+          "size": 1459
+        },
+        {
+          "path": "book_to_skill/pdf_inspector_integration.py",
+          "size": 10087
+        },
+        {
+          "path": "book_to_skill/sanitize.py",
+          "size": 11022
+        },
+        {
+          "path": "book_to_skill/utils.py",
+          "size": 77006
+        },
+        {
+          "path": "scripts/extract.py",
+          "size": 1333
+        },
+        {
+          "path": "tools/discovery_tax.py",
+          "size": 9177
+        },
+        {
+          "path": "tools/evals/manifest.py",
+          "size": 8255
+        },
+        {
+          "path": "tools/evals/paper_flat.py",
+          "size": 4263
+        },
+        {
+          "path": "tools/evals/replay.py",
+          "size": 1355
+        },
+        {
+          "path": "tools/evals/score.py",
+          "size": 4300
+        },
+        {
+          "path": "tools/scan_generated_skill.py",
+          "size": 14278
+        },
+        {
+          "path": "tools/validate_skill.py",
+          "size": 11707
+        }
+      ],
+      "needsKey": false
+    },
+    {
+      "id": "cad-svg-edit",
+      "name": "cad&svg-edit",
+      "description": "融合「CAD 创建」「SVG 精准编辑」「3D 实体建模」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（优先 CADCraft 真实 CAD 引擎，输出 DXF/SVG/PNG；缺二进制时落回内置 JS 无头引擎输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；3D 实体零件/STEP/STL/参数化重建走 A++ SolidCraft 后端；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；读入已有 DXF/DWG 图纸走 CADCraft 后端 info/convert；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export DXF/SVG/PNG/CSV), 3D solid parts (STEP/STL export, parametric rebuild), reading DXF/DWG files, OR editing/modifying existing SVG files (text, color, position, batch changes).",
+      "version": "4.0.1",
+      "category": "开发工具",
+      "tags": [
+        "3D",
+        "cad",
+        "CADCraft",
+        "DWG",
+        "DXF",
+        "dxf",
+        "SolidCraft",
+        "STEP",
+        "STL",
+        "svg",
+        "三维建模",
+        "工程图",
+        "矢量图",
+        "绘图",
+        "绘图引擎",
+        "编辑"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-15T00:00:00.000Z",
+      "files": [
+        {
+          "path": "CHANGELOG.md",
+          "size": 6583
+        },
+        {
+          "path": "SKILL.md",
+          "size": 48661
         },
         {
           "path": "assets/cad-draw.html",
@@ -226,11 +424,283 @@
         },
         {
           "path": "engine/cad-engine.js",
-          "size": 47910
+          "size": 53167
+        },
+        {
+          "path": "engine/everything-geom/LICENSE-everything-cad",
+          "size": 1103
+        },
+        {
+          "path": "engine/everything-geom/VENDOR.md",
+          "size": 1272
+        },
+        {
+          "path": "engine/everything-geom/core/colors.js",
+          "size": 3586
+        },
+        {
+          "path": "engine/everything-geom/core/dims.js",
+          "size": 17724
+        },
+        {
+          "path": "engine/everything-geom/core/display.js",
+          "size": 2567
+        },
+        {
+          "path": "engine/everything-geom/core/drawing.js",
+          "size": 12174
+        },
+        {
+          "path": "engine/everything-geom/core/geom/bounds.js",
+          "size": 5175
+        },
+        {
+          "path": "engine/everything-geom/core/geom/break.js",
+          "size": 2370
+        },
+        {
+          "path": "engine/everything-geom/core/geom/bulge.js",
+          "size": 2740
+        },
+        {
+          "path": "engine/everything-geom/core/geom/ellipse.js",
+          "size": 6116
+        },
+        {
+          "path": "engine/everything-geom/core/geom/entity.js",
+          "size": 1699
+        },
+        {
+          "path": "engine/everything-geom/core/geom/explode.js",
+          "size": 1331
+        },
+        {
+          "path": "engine/everything-geom/core/geom/fillet.js",
+          "size": 13118
+        },
+        {
+          "path": "engine/everything-geom/core/geom/index.js",
+          "size": 727
+        },
+        {
+          "path": "engine/everything-geom/core/geom/intersect.js",
+          "size": 14876
+        },
+        {
+          "path": "engine/everything-geom/core/geom/join.js",
+          "size": 10890
+        },
+        {
+          "path": "engine/everything-geom/core/geom/measure.js",
+          "size": 9368
+        },
+        {
+          "path": "engine/everything-geom/core/geom/nearest.js",
+          "size": 5630
+        },
+        {
+          "path": "engine/everything-geom/core/geom/offset.js",
+          "size": 9694
+        },
+        {
+          "path": "engine/everything-geom/core/geom/poly.js",
+          "size": 3090
+        },
+        {
+          "path": "engine/everything-geom/core/geom/prims.js",
+          "size": 5045
+        },
+        {
+          "path": "engine/everything-geom/core/geom/snaps.js",
+          "size": 9300
+        },
+        {
+          "path": "engine/everything-geom/core/geom/spline.js",
+          "size": 13523
+        },
+        {
+          "path": "engine/everything-geom/core/geom/tessellate.js",
+          "size": 4955
+        },
+        {
+          "path": "engine/everything-geom/core/geom/transform.js",
+          "size": 11880
+        },
+        {
+          "path": "engine/everything-geom/core/geom/trim.js",
+          "size": 12486
+        },
+        {
+          "path": "engine/everything-geom/core/geom/vec.js",
+          "size": 2759
+        },
+        {
+          "path": "engine/everything-geom/core/hatch/boundary.js",
+          "size": 16204
+        },
+        {
+          "path": "engine/everything-geom/core/hatch/fill.js",
+          "size": 15809
+        },
+        {
+          "path": "engine/everything-geom/core/hatch/patterns.js",
+          "size": 9485
+        },
+        {
+          "path": "engine/everything-geom/core/linetypes.js",
+          "size": 3298
+        },
+        {
+          "path": "engine/everything-geom/core/sample.js",
+          "size": 5928
+        },
+        {
+          "path": "engine/everything-geom/core/schema.js",
+          "size": 7670
+        },
+        {
+          "path": "engine/everything-geom/core/spatial.js",
+          "size": 4197
+        },
+        {
+          "path": "engine/everything-geom/core/styles.js",
+          "size": 978
+        },
+        {
+          "path": "engine/everything-geom/core/tessellate.js",
+          "size": 14549
+        },
+        {
+          "path": "engine/everything-geom/core/text/font.js",
+          "size": 14391
+        },
+        {
+          "path": "engine/everything-geom/core/text/layout.js",
+          "size": 9960
+        },
+        {
+          "path": "engine/everything-geom/core/units.js",
+          "size": 8357
+        },
+        {
+          "path": "engine/everything-geom/io/dwg/bits.js",
+          "size": 18938
+        },
+        {
+          "path": "engine/everything-geom/io/dwg/container.js",
+          "size": 11485
+        },
+        {
+          "path": "engine/everything-geom/io/dwg/database.js",
+          "size": 11074
+        },
+        {
+          "path": "engine/everything-geom/io/dwg/header.js",
+          "size": 12780
+        },
+        {
+          "path": "engine/everything-geom/io/dwg/import.js",
+          "size": 26980
+        },
+        {
+          "path": "engine/everything-geom/io/dwg/objects.js",
+          "size": 37612
+        },
+        {
+          "path": "engine/everything-geom/io/dwg/r2007.js",
+          "size": 9235
+        },
+        {
+          "path": "engine/everything-geom/io/dwg/spec.js",
+          "size": 6661
+        },
+        {
+          "path": "engine/everything-geom/io/dwg/writer.js",
+          "size": 55005
+        },
+        {
+          "path": "engine/everything-geom/io/dxf/geom.js",
+          "size": 8998
+        },
+        {
+          "path": "engine/everything-geom/io/dxf/reader.js",
+          "size": 71113
+        },
+        {
+          "path": "engine/everything-geom/io/dxf/worker.js",
+          "size": 2645
+        },
+        {
+          "path": "engine/everything-geom/io/dxf/writer.js",
+          "size": 40251
+        },
+        {
+          "path": "engine/everything-geom/io/dxf-client.js",
+          "size": 4137
+        },
+        {
+          "path": "engine/everything-geom/io/export/pdf.js",
+          "size": 10133
+        },
+        {
+          "path": "engine/everything-geom/io/export/plot.js",
+          "size": 10401
+        },
+        {
+          "path": "engine/everything-geom/io/export/raster.js",
+          "size": 6723
+        },
+        {
+          "path": "engine/everything-geom/io/export/svg.js",
+          "size": 8167
+        },
+        {
+          "path": "engine/everything-geom/io/native.js",
+          "size": 2503
+        },
+        {
+          "path": "engine/everything-geom/io/storage.js",
+          "size": 9276
+        },
+        {
+          "path": "engine/everything-geom/vendor/earcut.js",
+          "size": 21272
+        },
+        {
+          "path": "engine/everything-geom/vendor/quickselect.js",
+          "size": 2088
+        },
+        {
+          "path": "engine/everything-geom/vendor/rbush.js",
+          "size": 15633
+        },
+        {
+          "path": "engine/geom-boost.mjs",
+          "size": 21098
+        },
+        {
+          "path": "engine/test-geom-boost.mjs",
+          "size": 11478
         },
         {
           "path": "examples/bad.js",
           "size": 68
+        },
+        {
+          "path": "examples/bracket3d.job.json",
+          "size": 511
+        },
+        {
+          "path": "examples/flange-cc.job.json",
+          "size": 770
+        },
+        {
+          "path": "examples/flange.js",
+          "size": 492
+        },
+        {
+          "path": "examples/flange3d.job.json",
+          "size": 1708
         },
         {
           "path": "examples/gear.js",
@@ -253,8 +723,12 @@
           "size": 4700
         },
         {
+          "path": "scripts/cadcraft-bridge.mjs",
+          "size": 16727
+        },
+        {
           "path": "scripts/daemon.mjs",
-          "size": 5008
+          "size": 5076
         },
         {
           "path": "scripts/next_name.mjs",
@@ -262,11 +736,99 @@
         },
         {
           "path": "scripts/render_png.mjs",
-          "size": 2813
+          "size": 2808
+        },
+        {
+          "path": "scripts/run-ab.mjs",
+          "size": 4301
+        },
+        {
+          "path": "scripts/run-corpus.mjs",
+          "size": 4525
+        },
+        {
+          "path": "scripts/solidcraft-bridge.mjs",
+          "size": 12791
         },
         {
           "path": "scripts/svg_toolkit.py",
           "size": 32181
+        },
+        {
+          "path": "test/ab/bracket-cc.job.json",
+          "size": 1020
+        },
+        {
+          "path": "test/ab/bracket-sc.job.json",
+          "size": 917
+        },
+        {
+          "path": "test/ab/flange-cc.job.json",
+          "size": 1087
+        },
+        {
+          "path": "test/ab/flange-sc.job.json",
+          "size": 1723
+        },
+        {
+          "path": "test/ab/plate-cc.job.json",
+          "size": 991
+        },
+        {
+          "path": "test/ab/plate-sc.job.json",
+          "size": 1388
+        },
+        {
+          "path": "test/corpus/bracket-cc.expected.json",
+          "size": 399
+        },
+        {
+          "path": "test/corpus/bracket-cc.job.json",
+          "size": 1020
+        },
+        {
+          "path": "test/corpus/bracket3d.expected.json",
+          "size": 161
+        },
+        {
+          "path": "test/corpus/bracket3d.job.json",
+          "size": 511
+        },
+        {
+          "path": "test/corpus/flange-cc.expected.json",
+          "size": 498
+        },
+        {
+          "path": "test/corpus/flange-cc.job.json",
+          "size": 770
+        },
+        {
+          "path": "test/corpus/flange3d.expected.json",
+          "size": 196
+        },
+        {
+          "path": "test/corpus/flange3d.job.json",
+          "size": 1708
+        },
+        {
+          "path": "test/corpus/plate-cc.expected.json",
+          "size": 444
+        },
+        {
+          "path": "test/corpus/plate-cc.job.json",
+          "size": 991
+        },
+        {
+          "path": "test/corpus/plate-sc.expected.json",
+          "size": 214
+        },
+        {
+          "path": "test/corpus/plate-sc.job.json",
+          "size": 1388
+        },
+        {
+          "path": "test/run-tests.js",
+          "size": 7502
         }
       ],
       "needsKey": false
@@ -743,6 +1305,23 @@
       "needsKey": false
     },
     {
+      "id": "e2e-testing",
+      "name": "e2e-testing",
+      "description": "e2e(tester-army/e2e) AI原生回归测试技能 — 中文界面实测有效,",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 4157
+        }
+      ],
+      "needsKey": true
+    },
+    {
       "id": "find-skills",
       "name": "find-skills",
       "description": "帮助用户发现并安装 Agent 技能：当用户问「怎么做 X」「找一个能做 X 的技能」「有没有技能可以…」或想扩展 Agent 能力时使用。适用于用户需要的功能可能已存在为可安装技能的场景。",
@@ -788,6 +1367,58 @@
         {
           "path": "rules/security.md",
           "size": 1395
+        }
+      ],
+      "needsKey": true
+    },
+    {
+      "id": "geogpt",
+      "name": "geogpt",
+      "description": "调用 GeoGPT 科研开发者平台 API 做地理/地质/地球科学研究，提供地学问答、多轮会话、文献知识库检索（公共库/个人库/团队库）、本地论文或报告作为材料的证据增强，以及带文献引用的回答。当用户提出地球科学问题、要查地学文献、针对自己手上的论文/报告/数据文件做地学问答、做地学科研调研、搭建地质类 RAG 流水线，或明确提到 GeoGPT 时使用。",
+      "version": "1.1.0",
+      "category": "研究分析",
+      "tags": [
+        "地球科学",
+        "地质学",
+        "文献检索",
+        "RAG",
+        "科研问答",
+        "GeoGPT"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-04T03:58:01.000Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 10927
+        },
+        {
+          "path": "config.json",
+          "size": 233
+        },
+        {
+          "path": "references/api.md",
+          "size": 57472
+        },
+        {
+          "path": "scripts/ask.mjs",
+          "size": 9936
+        },
+        {
+          "path": "scripts/doctor.mjs",
+          "size": 2601
+        },
+        {
+          "path": "scripts/lib.mjs",
+          "size": 7705
+        },
+        {
+          "path": "scripts/localdoc.mjs",
+          "size": 5437
+        },
+        {
+          "path": "scripts/rag.mjs",
+          "size": 3656
         }
       ],
       "needsKey": true
@@ -850,6 +1481,82 @@
       "needsKey": false
     },
     {
+      "id": "hybrid-constrained-ml",
+      "name": "hybrid-constrained-ml",
+      "description": "把\"规则约束下的机器学习(rcml)白盒先验\"与\"XGBoost 残差\"融合——用同一份声明式配方，冻结你相信正确的结构(符号/膝点/地板/上限)并只训幅度系数，再用 XGBoost 拟合\"真实−先验\"的残差补抓交互/非线性，最终预测经 clip(floor,cap) 硬护栏。既保留 rcml 的可解释、可审计、安全约束永不翻转，又获得 XGBoost 的精度与灵活；小数据友好、分布外安全。触发词：\"融合建模\"、\"rcml+XGBoost\"、\"白盒+黑盒\"、\"规则约束机器学习融合\"、\"可解释+梯度提升\"、\"约束下回归带残差\"、\"安全约束建模\"、\"handwired+xgboost\"。覆盖 界定→写配方→标签→生成模型→训练→约束审计→交付 全链路，内置三道人工关卡。",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "融合建模",
+        "规则约束机器学习",
+        "XGBoost",
+        "可解释模型",
+        "白盒",
+        "handwired",
+        "约束建模",
+        "混合模型",
+        "残差学习",
+        "安全护栏"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-17T10:33:16.000Z",
+      "files": [
+        {
+          "path": "LICENSE.txt",
+          "size": 1067
+        },
+        {
+          "path": "SKILL.md",
+          "size": 9114
+        },
+        {
+          "path": "examples/model_deposit_hybrid.py",
+          "size": 16661
+        },
+        {
+          "path": "examples/model_water_dosing_hybrid.py",
+          "size": 16447
+        },
+        {
+          "path": "references/methodology.md",
+          "size": 2857
+        },
+        {
+          "path": "references/philosophy.md",
+          "size": 3259
+        },
+        {
+          "path": "references/pitfalls.md",
+          "size": 1668
+        },
+        {
+          "path": "references/recipe_spec.md",
+          "size": 2673
+        },
+        {
+          "path": "scripts/hybrid_build.py",
+          "size": 18654
+        },
+        {
+          "path": "scripts/recipe_deposit_hybrid.yaml",
+          "size": 1868
+        },
+        {
+          "path": "scripts/recipe_water_dosing_hybrid.yaml",
+          "size": 1689
+        },
+        {
+          "path": "templates/recipe_template.yaml",
+          "size": 820
+        },
+        {
+          "path": "templates/report_template.md",
+          "size": 1535
+        }
+      ],
+      "needsKey": false
+    },
+    {
       "id": "image-analysis",
       "name": "image-analysis",
       "description": "识图理解（图片分析）：描述图片内容、提取图中文字（OCR）、分析页面/设计稿布局、比较图片。当用户给出图片并要求分析、理解、识别、提取文字、描述、总结、审查布局时使用。支持公网图片 URL 与本地图片（先上传）。",
@@ -893,6 +1600,43 @@
         {
           "path": "SKILL.md",
           "size": 5673
+        }
+      ],
+      "needsKey": false
+    },
+    {
+      "id": "manim-3b1b",
+      "name": "manim-3b1b",
+      "description": "用 Manim（3Blue1Brown 官方动画引擎）制作 3b1b 风格的数学/概念讲解视频，支持中文 + 配音 + 字幕。当用户要求「做 3Blue1Brown 风格动画」「用 manim 做视频」「生成科普/教学动画视频」「把某个概念做成动画视频」「给讲解视频加配音/字幕」时触发。覆盖环境搭建、3b1b 美学规范、中文渲染、无 LaTeX 数学符号、场景编排、有声视频双轨制流程（edge-tts 配音 + ffmpeg 后期合成）、渲染与校验的全流程。",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 11924
+        },
+        {
+          "path": "examples/nepal.py",
+          "size": 14670
+        },
+        {
+          "path": "scripts/gen_audio.py",
+          "size": 2353
+        },
+        {
+          "path": "scripts/install.sh",
+          "size": 1555
+        },
+        {
+          "path": "scripts/synthesize.py",
+          "size": 2927
+        },
+        {
+          "path": "scripts/template.py",
+          "size": 6635
         }
       ],
       "needsKey": false
@@ -980,6 +1724,61 @@
       "needsKey": true
     },
     {
+      "id": "open2build",
+      "name": "open2build",
+      "description": "Large-program development by composing open source. Use when the user wants to decompose a program/feature into modules, find and evaluate open-source projects or libraries on GitHub, then legally integrate, improve, or combine them into their own codebase. Covers module decomposition, OSS discovery/evaluation, license compliance (GPL/AGPL/Apache etc.), integration strategy (dependency vs snippet-copy vs fork vs process-wrap vs rewrite), vendor/adapter architecture, SBOM/NOTICES/supply-chain compliance, and upstream maintenance. Triggers (CN/EN): 拆分模块、找开源项目、开源选型、组合开源、许可证合规、依赖治理、vendoring、fork 改造、站在巨人肩膀上、build with open source.",
+      "version": "0.1.0",
+      "category": "开发工具",
+      "tags": [
+        "开源",
+        "合规",
+        "架构",
+        "工作流",
+        "python"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-13T14:05:42.904Z",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 3590
+        },
+        {
+          "path": "assets/dependency-admission-checklist.md",
+          "size": 492
+        },
+        {
+          "path": "assets/module-card.md",
+          "size": 363
+        },
+        {
+          "path": "assets/third-party-notices-template.md",
+          "size": 561
+        },
+        {
+          "path": "references/compliance-automation.md",
+          "size": 1711
+        },
+        {
+          "path": "references/discovery-evaluation.md",
+          "size": 1750
+        },
+        {
+          "path": "references/integration-patterns.md",
+          "size": 2128
+        },
+        {
+          "path": "references/license-compliance.md",
+          "size": 2193
+        },
+        {
+          "path": "scripts/repo_health.py",
+          "size": 2669
+        }
+      ],
+      "needsKey": false
+    },
+    {
       "id": "oss-scout",
       "name": "oss-scout",
       "description": "智能选型 GitHub 开源项目：自然语言需求 → 搜索 → 深读 → 对比推荐报告。Use when 用户想找开源项目、开源替代品、选型对比、评估某个 repo 是否可用，或提到\"站在开源肩膀上\"\"找现成的库/框架/工具\"。",
@@ -1033,66 +1832,226 @@
       "needsKey": true
     },
     {
-      "id": "pdf",
-      "name": "pdf",
-      "description": "PDF 全能处理技能：读取或提取 PDF 中的文本与表格、合并多个 PDF、拆分 PDF、旋转页面、加水印、生成新 PDF、填写表单、加密解密、提取图片，以及对扫描件 OCR 使其可搜索。当用户提到 .pdf 文件或需要产出 PDF 时使用。",
-      "version": "1.0.0",
-      "category": "文档处理",
+      "id": "paper-pipeline",
+      "name": "paper-pipeline",
+      "description": "证据驱动的学术写作流水线——多源真实检索、[cite:KEY] 逐段引用、三层引用核验、评审团审稿、cited-only 参考文献。Evidence-driven academic writing pipeline. Trigger on 写论文/写综述/开题报告/文献调研/论文修改/查引用/refs/文献池, or /paper-pipeline. Four-source live search (OpenAlex/Crossref/arXiv/Semantic Scholar), hallucination-proof citation via three-layer verification, reviewer-board critique, cited-only BibTeX/RIS export.",
+      "version": "1.0.2",
+      "category": "学术写作",
       "tags": [
-        "PDF",
-        "文档",
-        "OCR"
+        "论文",
+        "学术写作",
+        "文献检索",
+        "引用核验",
+        "文献综述",
+        "证据表",
+        "同行评审",
+        "参考文献"
       ],
       "downloads": 0,
-      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": null,
       "files": [
         {
-          "path": "LICENSE.txt",
-          "size": 1467
+          "path": "CHANGELOG.md",
+          "size": 2423
         },
         {
           "path": "SKILL.md",
-          "size": 7924
+          "size": 10231
         },
         {
-          "path": "forms.md",
-          "size": 11854
+          "path": "scripts/paperkit.py",
+          "size": 22227
         },
         {
-          "path": "reference.md",
-          "size": 16692
+          "path": "test/run-tests.py",
+          "size": 6910
+        }
+      ],
+      "needsKey": false
+    },
+    {
+      "id": "pdf",
+      "name": "pdf-rust",
+      "description": "⚡极速 Rust 版 PDF 工具（性能比官方 Python 版快 1.5x~399x，8/8 基准全胜）。纯 Rust PDF 编辑工具集（pdfctl）。当用户需要处理 PDF 时使用：合并、拆分、提取页、删除页、重排、旋转、读取信息、元数据读写、加密/解密（RC4/AES）、文本提取、表格提取、结构校验、添加水印、从 JSON 规格创建 PDF、OCR 扫描件解析（MinerU 云 API）、提取内嵌图片、AcroForm 表单填写。触发词包括 \"PDF\"、\"合并 PDF\"、\"拆分 PDF\"、\"PDF 加密\"、\"PDF 解密\"、\"提取 PDF 页\"、\"PDF 水印\"、\"PDF 表格\"、\"提取表格\"、\"创建 PDF\"、\"生成 PDF\"、\"OCR\"、\"扫描件\"、\"识别 PDF 文字\"、\"提取图片\"、\"填表\"、\"表单\"、\"pdfctl\"、\"性能强\"、\"极速\"。本 skill 不依赖 Python/poppler，单二进制即开即用；OCR 经 MinerU 云 API（文件上传 mineru.net，stderr 有提示）；仅 PDF→图片渲染不在能力范围内（见「双轨路由」）。",
+      "version": "1.2.1",
+      "category": "文档处理",
+      "tags": [
+        "PDF",
+        "Rust",
+        "极速",
+        "性能强",
+        "零依赖",
+        "OCR",
+        "文档",
+        "表格提取",
+        "加密解密"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-17T21:25:00.000Z",
+      "files": [
+        {
+          "path": "Cargo.lock",
+          "size": 90899
         },
         {
-          "path": "scripts/check_bounding_boxes.py",
-          "size": 2774
+          "path": "Cargo.toml",
+          "size": 1372
         },
         {
-          "path": "scripts/check_fillable_fields.py",
-          "size": 268
+          "path": "LICENSE.txt",
+          "size": 1307
         },
         {
-          "path": "scripts/convert_pdf_to_images.py",
-          "size": 1008
+          "path": "README.md",
+          "size": 13264
         },
         {
-          "path": "scripts/create_validation_image.py",
-          "size": 1258
+          "path": "SKILL.md",
+          "size": 16920
         },
         {
-          "path": "scripts/extract_form_field_info.py",
-          "size": 4300
+          "path": "bin/pdfctl-linux-x86_64",
+          "size": 10388768
         },
         {
-          "path": "scripts/extract_form_structure.py",
-          "size": 3945
+          "path": "build.sh",
+          "size": 1630
         },
         {
-          "path": "scripts/fill_fillable_fields.py",
-          "size": 3819
+          "path": "src/commands/create.rs",
+          "size": 32731
         },
         {
-          "path": "scripts/fill_pdf_form_with_annotations.py",
-          "size": 3235
+          "path": "src/commands/decrypt.rs",
+          "size": 1007
+        },
+        {
+          "path": "src/commands/delete.rs",
+          "size": 1606
+        },
+        {
+          "path": "src/commands/encrypt.rs",
+          "size": 4799
+        },
+        {
+          "path": "src/commands/extract.rs",
+          "size": 1292
+        },
+        {
+          "path": "src/commands/forms.rs",
+          "size": 13039
+        },
+        {
+          "path": "src/commands/images.rs",
+          "size": 18474
+        },
+        {
+          "path": "src/commands/info.rs",
+          "size": 6160
+        },
+        {
+          "path": "src/commands/merge.rs",
+          "size": 1642
+        },
+        {
+          "path": "src/commands/metadata.rs",
+          "size": 4075
+        },
+        {
+          "path": "src/commands/mod.rs",
+          "size": 317
+        },
+        {
+          "path": "src/commands/ocr.rs",
+          "size": 9269
+        },
+        {
+          "path": "src/commands/reorder.rs",
+          "size": 1692
+        },
+        {
+          "path": "src/commands/rotate.rs",
+          "size": 2012
+        },
+        {
+          "path": "src/commands/split.rs",
+          "size": 3425
+        },
+        {
+          "path": "src/commands/table.rs",
+          "size": 7448
+        },
+        {
+          "path": "src/commands/text.rs",
+          "size": 3015
+        },
+        {
+          "path": "src/commands/validate.rs",
+          "size": 2692
+        },
+        {
+          "path": "src/commands/watermark.rs",
+          "size": 8573
+        },
+        {
+          "path": "src/common.rs",
+          "size": 24163
+        },
+        {
+          "path": "src/main.rs",
+          "size": 3722
+        },
+        {
+          "path": "src/mineru.rs",
+          "size": 25177
+        },
+        {
+          "path": "tests/benchmark.py",
+          "size": 6445
+        },
+        {
+          "path": "tests/fixtures/a.pdf",
+          "size": 3317
+        },
+        {
+          "path": "tests/fixtures/b.pdf",
+          "size": 2348
+        },
+        {
+          "path": "tests/fixtures/cn.pdf",
+          "size": 2897
+        },
+        {
+          "path": "tests/fixtures/forms.pdf",
+          "size": 7878
+        },
+        {
+          "path": "tests/fixtures/images.pdf",
+          "size": 4610
+        },
+        {
+          "path": "tests/fixtures/tables.pdf",
+          "size": 2288
+        },
+        {
+          "path": "tests/fixtures/tables_enc.pdf",
+          "size": 2687
+        },
+        {
+          "path": "tests/fixtures/toc.pdf",
+          "size": 2964
+        },
+        {
+          "path": "tests/make_fixtures.py",
+          "size": 8920
+        },
+        {
+          "path": "tests/run_tests.py",
+          "size": 34154
+        },
+        {
+          "path": "性能对比评估报告.md",
+          "size": 14115
         }
       ],
       "needsKey": false
@@ -1486,8 +2445,8 @@
     {
       "id": "pre-align",
       "name": "pre-align",
-      "description": "任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests.",
-      "version": "1.0.0",
+      "description": "任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户 不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests. V2 serves an interactive light-theme web board locally: user clicks choices, agent auto-resumes work the moment the board is submitted. Every numbered item carries an optional note input; notes ride along in align-output.json.",
+      "version": "2.5.0",
       "category": "需求梳理",
       "tags": [
         "对齐",
@@ -1495,14 +2454,28 @@
         "动手前确认",
         "对齐简报",
         "访谈",
-        "验收标准"
+        "验收标准",
+        "对齐看板",
+        "诘问法"
       ],
       "downloads": 0,
       "updatedAt": "2026-09-28T03:24:11.000Z",
       "files": [
         {
+          "path": "CHANGELOG.md",
+          "size": 4440
+        },
+        {
           "path": "SKILL.md",
-          "size": 7172
+          "size": 15484
+        },
+        {
+          "path": "assets/align-board.html",
+          "size": 25449
+        },
+        {
+          "path": "scripts/align-daemon.mjs",
+          "size": 3712
         }
       ],
       "needsKey": false
@@ -1565,6 +2538,88 @@
         {
           "path": "SKILL.md",
           "size": 9529
+        }
+      ],
+      "needsKey": false
+    },
+    {
+      "id": "rule-constrained-ml",
+      "name": "rule-constrained-ml",
+      "description": "把领域专家的确定性\"明规则\"(结构+符号+地板+膝点)与少量配对标签数据结合，只训练不确定的幅度系数，产出既精确又数据校准、可读可审计的混合模型。当用户有领域先验/安全约束、样本少、要可解释、不愿纯黑盒或纯规则时使用。触发词：\"规则约束机器学习\"、\"明规则+训练\"、\"白盒+标签数据\"、\"handwired\"、\"冻结规则训练\"、\"可解释模型\"、\"约束下回归\"、\"安全约束建模\"。覆盖 界定→写配方→标签→生成模型→训练→约束审计→交付 全链路，内置三道人工关卡。",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "规则约束机器学习",
+        "可解释模型",
+        "白盒",
+        "handwired",
+        "约束建模",
+        "梯度训练",
+        "明规则",
+        "混合模型"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-17T07:04:56.000Z",
+      "files": [
+        {
+          "path": "LICENSE.txt",
+          "size": 1056
+        },
+        {
+          "path": "SKILL.md",
+          "size": 8246
+        },
+        {
+          "path": "examples/model_deposit_estimator.py",
+          "size": 11177
+        },
+        {
+          "path": "examples/model_water_dosing.py",
+          "size": 11892
+        },
+        {
+          "path": "references/methodology.md",
+          "size": 3614
+        },
+        {
+          "path": "references/philosophy.md",
+          "size": 2900
+        },
+        {
+          "path": "references/pitfalls.md",
+          "size": 2621
+        },
+        {
+          "path": "references/recipe_spec.md",
+          "size": 3857
+        },
+        {
+          "path": "scripts/rcml_build.py",
+          "size": 13500
+        },
+        {
+          "path": "scripts/rcml_validate.py",
+          "size": 5836
+        },
+        {
+          "path": "scripts/recipe_example_deposit.yaml",
+          "size": 1361
+        },
+        {
+          "path": "scripts/recipe_water_dosing.yaml",
+          "size": 2297
+        },
+        {
+          "path": "templates/recipe_template.yaml",
+          "size": 1651
+        },
+        {
+          "path": "templates/report_template.md",
+          "size": 1477
+        },
+        {
+          "path": "高企申报论证-应用方向研究.md",
+          "size": 8453
         }
       ],
       "needsKey": false
@@ -2401,6 +3456,67 @@
         {
           "path": "scripts/written_reason.py",
           "size": 2932
+        }
+      ],
+      "needsKey": false
+    },
+    {
+      "id": "srt-whiteboard-animation",
+      "name": "srt-whiteboard-animation",
+      "description": "将 SRT 字幕做成暖米黄纸张底的白板手绘动画：读字幕→输出配图策略→确认后生成统一风格线稿→按叙事语义标注分区→预览台调整→渲染 MP4。编排沿用分区遮罩揭示（annotation.json / sequence / startMs / protectedRegions），但每个区域内的落墨换成 stream 的连续笔迹（骨架/网格 ink→color）。当用户提供 SRT 字幕并要求\"字幕做成白板手绘/流式笔迹视频\"\"SRT 生成白板动画\"\"按字幕分镜画手绘\"时触发。",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "files": [
+        {
+          "path": "LICENSE",
+          "size": 1096
+        },
+        {
+          "path": "LOCAL-NOTES.md",
+          "size": 1116
+        },
+        {
+          "path": "README.md",
+          "size": 6545
+        },
+        {
+          "path": "SKILL.md",
+          "size": 14248
+        },
+        {
+          "path": "assets/drawing-hand.png",
+          "size": 802812
+        },
+        {
+          "path": "assets/preview.html",
+          "size": 28889
+        },
+        {
+          "path": "scripts/merge_scenes.py",
+          "size": 3964
+        },
+        {
+          "path": "scripts/parse_srt.py",
+          "size": 5144
+        },
+        {
+          "path": "scripts/prepare_env.py",
+          "size": 3119
+        },
+        {
+          "path": "scripts/render_annotation_preview.py",
+          "size": 1972
+        },
+        {
+          "path": "scripts/render_stream_whiteboard.py",
+          "size": 25972
+        },
+        {
+          "path": "scripts/stream_render.py",
+          "size": 79022
         }
       ],
       "needsKey": false
@@ -4061,6 +5177,23 @@
         {
           "path": "scripts/recalc.py",
           "size": 10670
+        }
+      ],
+      "needsKey": false
+    },
+    {
+      "id": "zg-search",
+      "name": "zg-search",
+      "description": "zvec-grep(zg) 本地语义检索 — 语义+BM25+rg三合一混合搜索; 已作MCP接入ZCode(zg-search);",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 2462
         }
       ],
       "needsKey": false

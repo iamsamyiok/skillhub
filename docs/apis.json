@@ -11,7 +11,7 @@
     "混合",
     "限定额度"
   ],
-  "site": "https://iamsamyiok.github.io/skillhub",
+  "site": ".",
   "apis": [
     {
       "id": "60s",
@@ -34,9 +34,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/60s.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/60s.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/60s.tar.gz"
+      "md": "./apis-md/60s.md",
+      "zip": "./downloads/60s.zip",
+      "tgz": "./downloads/60s.tar.gz"
     },
     {
       "id": "awesome-free-llm-apis",
@@ -59,9 +59,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/awesome-free-llm-apis.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/awesome-free-llm-apis.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/awesome-free-llm-apis.tar.gz"
+      "md": "./apis-md/awesome-free-llm-apis.md",
+      "zip": "./downloads/awesome-free-llm-apis.zip",
+      "tgz": "./downloads/awesome-free-llm-apis.tar.gz"
     },
     {
       "id": "awesome-free-models",
@@ -83,9 +83,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/awesome-free-models.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/awesome-free-models.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/awesome-free-models.tar.gz"
+      "md": "./apis-md/awesome-free-models.md",
+      "zip": "./downloads/awesome-free-models.zip",
+      "tgz": "./downloads/awesome-free-models.tar.gz"
     },
     {
       "id": "awesome-freellm-apis",
@@ -107,9 +107,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/awesome-freellm-apis.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/awesome-freellm-apis.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/awesome-freellm-apis.tar.gz"
+      "md": "./apis-md/awesome-freellm-apis.md",
+      "zip": "./downloads/awesome-freellm-apis.zip",
+      "tgz": "./downloads/awesome-freellm-apis.tar.gz"
     },
     {
       "id": "free-api",
@@ -131,9 +131,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/free-api.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/free-api.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/free-api.tar.gz"
+      "md": "./apis-md/free-api.md",
+      "zip": "./downloads/free-api.zip",
+      "tgz": "./downloads/free-api.tar.gz"
     },
     {
       "id": "free-apis-site",
@@ -155,9 +155,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/free-apis-site.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/free-apis-site.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/free-apis-site.tar.gz"
+      "md": "./apis-md/free-apis-site.md",
+      "zip": "./downloads/free-apis-site.zip",
+      "tgz": "./downloads/free-apis-site.tar.gz"
     },
     {
       "id": "gpt-api-free",
@@ -180,9 +180,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/gpt-api-free.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/gpt-api-free.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/gpt-api-free.tar.gz"
+      "md": "./apis-md/gpt-api-free.md",
+      "zip": "./downloads/gpt-api-free.zip",
+      "tgz": "./downloads/gpt-api-free.tar.gz"
     },
     {
       "id": "ip-info-api",
@@ -204,9 +204,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/ip-info-api.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/ip-info-api.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/ip-info-api.tar.gz"
+      "md": "./apis-md/ip-info-api.md",
+      "zip": "./downloads/ip-info-api.zip",
+      "tgz": "./downloads/ip-info-api.tar.gz"
     },
     {
       "id": "public-api-lists",
@@ -228,9 +228,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/public-api-lists.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/public-api-lists.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/public-api-lists.tar.gz"
+      "md": "./apis-md/public-api-lists.md",
+      "zip": "./downloads/public-api-lists.zip",
+      "tgz": "./downloads/public-api-lists.tar.gz"
     },
     {
       "id": "public-apis",
@@ -252,9 +252,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/public-apis.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/public-apis.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/public-apis.tar.gz"
+      "md": "./apis-md/public-apis.md",
+      "zip": "./downloads/public-apis.zip",
+      "tgz": "./downloads/public-apis.tar.gz"
     },
     {
       "id": "public-apis-marcelscruz",
@@ -276,9 +276,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/public-apis-marcelscruz.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/public-apis-marcelscruz.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/public-apis-marcelscruz.tar.gz"
+      "md": "./apis-md/public-apis-marcelscruz.md",
+      "zip": "./downloads/public-apis-marcelscruz.zip",
+      "tgz": "./downloads/public-apis-marcelscruz.tar.gz"
     },
     {
       "id": "public-apis-n0shake",
@@ -299,9 +299,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "type": "api",
-      "md": "https://iamsamyiok.github.io/skillhub/apis-md/public-apis-n0shake.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/public-apis-n0shake.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/public-apis-n0shake.tar.gz"
+      "md": "./apis-md/public-apis-n0shake.md",
+      "zip": "./downloads/public-apis-n0shake.zip",
+      "tgz": "./downloads/public-apis-n0shake.tar.gz"
     }
   ]
 }

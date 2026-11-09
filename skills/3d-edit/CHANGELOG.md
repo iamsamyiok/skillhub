@@ -32,3 +32,16 @@
 - `CITY.execute(cmd,params)` + `CITY.commands()`：13 命令统一通道（人机同源），未知命令返回命令目录
 - 模板自测锚点（e2e 注入验证）：roundtrip（yaw/pitch/distance/fov 四元互逆）、viewFovRoundtrip、section 开关、shot、stats、unknownCmd 拒绝；无头渲染 PIL 复核 mean=22.4 mid=19.3%（夜景城内容正常）
 - SKILL.md：新章节「相机 JSON / 命名机位 / 剖切 / window 命令通道」+ 特写/剖视配方（section→正交 camera→shot→微调）
+
+## 1.3.0 (2026-11-09)
+
+新增 SimReady 物体资产库（assetlib）——日常物件"检索复用优先、程序化生成兜底"：
+
+- 内置 `assetlib/`：catalog.jsonl（2,595 个真实感 GLB，源自 NVIDIA SimReady Assets，CC BY 4.0；取 codepawl/simready-glb 的 glb 档）+ `search.py` 中英文检索（192 类别中文映射+物件别名表+IDF 加权，`--json` 机器可读）+ `fetch.py` 本地缓存下载（断点跳过/缩略图）+ `build_catalog.py` 目录再生（raw 元数据 3.5MB 不随包分发，再生方法见手册）
+- SKILL.md 新增第 1.6 步「日常物件先查库」：S 档主体/数字孪生设备件/场景配菜先 search → fetch 进 `assetlib/cache/` → GLTFLoader 挂 MeshoptDecoder 加载（库内 GLB required 扩展 EXT_meshopt_compression，不挂直接报错）→ Box3 归一化米制落地进实体表；查无或需参数化变体族再手搓
+- 铁律 1 增补例外：本地缓存 GLB（禁止运行时直连外网）与 base64 单文件内嵌；边界补"assetlib 首次 fetch 需联网，缓存后离线可用"
+- 新增 `references/assetlib.md` 手册：字段表、meshopt/量化/WebP 扩展加载要点、归一化落地配方、base64 内嵌、KTX2/lods 档位取舍、性能预算（triangles 选件）、CC BY 4.0 署名要求、目录再生
+- 障碍速查 +1 行（真实感日常物件→先查库）；Resources 同步收录
+- 手册新增「夜景打光与无头验证」节（别墅庭院 M 档实战反哺）：物理光单位点光量级表（decay=2 下室内 6/水下 9/柱灯 2.6——1.5 级强度在 PBR 上近乎不可见）、点光源封死实心壳的开口壳配方（泳池冷光 8 px→268 px 实证）、swiftshader virtual-time rAF 早停的补渲兜底、renderer.info 陈旧读数时机（7,020 vs 真值 361,536）、GLB drawCalls 估算（每件 2~4）、transmission 玻璃夜景慎选；base64 节补实测双分支代码路径（__GLB_B64__ 走 parse 否则 load，外链/单文件同码）；何时查库表补库覆盖弱项处置（庭院家具等两轮无果转程序化）；fetch 示例补 --dest 直下项目 assets
+- checklist：无浏览器配方新增第 7 条 GLB 专项（props loaded 后读统计、#p hash 多机位覆盖）；故障对照表 +3 行（GLB 截图消失/统计陈旧、点光封死实心壳、GLB 夜景打不亮的物理光单位）
+- template.html 新增 URL hash 机位直达（`#p1~#p6` 载入即 snap，无头多机位验证矩阵标准化；无 hash 零行为）；SKILL.md 1.6 步补夜景打光/无头验证四坑摘要与摘要行 hash 说明

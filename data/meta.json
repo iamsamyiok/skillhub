@@ -486,26 +486,28 @@
     },
     "3d-edit": {
       "category": "前端开发",
-      "description": "单文件 HTML + Three.js 程序化生成可交互 3D 场景（城市/数字孪生/单物体产品图），对已有场景做确定性局部修改与人工可视化编辑；v1.2 新增相机 JSON 合同（camera/cam 互逆、fov=0 正交、命名机位）、剖切模式（section 全局裁剪面，看建筑内部）与 window.CITY.execute 统一命令通道。",
+      "description": "单文件 HTML + Three.js 程序化生成可交互 3D 场景（城市/数字孪生/单物体产品图），对已有场景做确定性局部修改与人工可视化编辑；v1.2 新增相机 JSON 合同（camera/cam 互逆、fov=0 正交、命名机位）、剖切模式（section 全局裁剪面，看建筑内部）与 window.CITY.execute 统一命令通道；v1.3 内置 SimReady 物体资产库 assetlib（2,595 个真实感日常物件 GLB，中英检索+本地缓存），日常物件先检索复用、程序化生成兜底。",
       "tags": [
         "3D",
         "glb",
         "Three.js",
         "WebGL",
+        "SimReady",
         "人工编辑",
         "剖切",
         "参数化",
         "命令通道",
         "场景生成",
+        "资产库",
         "局部编辑",
         "数字孪生",
         "相机JSON",
         "程序化生成"
       ],
       "downloads": 0,
-      "version": "1.2.0",
+      "version": "1.3.0",
       "createdAt": "2026-09-28T03:13:25.000Z",
-      "updatedAt": "2026-10-15T00:00:00.000Z"
+      "updatedAt": "2026-11-09T00:00:00.000Z"
     },
     "pre-align": {
       "category": "需求梳理",

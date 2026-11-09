@@ -45,6 +45,7 @@ Agent 必须执行"写 → 跑 → 看 → 改"循环，禁止写完 HTML 直接
    统计验证 + 锚点日志统计数双通道齐上；向用户如实说明"像素统计验证，非目检"，别假装看过图。
 6. **语法闸（生成脚本做模板手术后的强制步骤）**：任何脚本化替换锚点/区块后，先提取 `<script type="module">` 内容**存成 .mjs** 跑 `node --check`（.js 上 node 的 ESM 自动检测会假通过），过了再 `edit3d.mjs check`，再进无头渲染。三道闸顺序：**语法 → 结构 → 渲染**。
    - 排查 "Unexpected end of input"（报错行= `</script>` 行，不给开启行号）：未闭合括号用状态机扫描器定位——必须处理 `'` `"` `` ` `` `/* */` `//` 五态与 `${}` 嵌套；裸括号计数会被字符串/注释/模板里的括号骗（实证：模板 shader 串里的 `(){}`、注释里的反引号各骗一次）。
+7. **GLB 配菜场景专项**：virtual-time 下 rAF 早停早于 GLB 异步加载完成 → 截图里物件集体消失、`renderer.info` 读到加载前旧值（实证：真值 36 万 tris 读成 7,020）。兜底：loadProps 全部 settle 后强制 `composer.render()` 补一帧；drawCalls/tris 核对以 `[3d-edit] props loaded` 之后的锚点日志为准。多机位覆盖矩阵用模板 URL hash `#p1~#p6` 直达（加载即 snap，rAF 早停下比 tween 可靠）。
 
 ## 视觉体检单（截图后逐项过）
 
@@ -88,6 +89,9 @@ Agent 必须执行"写 → 跑 → 看 → 改"循环，禁止写完 HTML 直接
 | 产物整页空白，console 报 Unexpected end of input | 生成脚本替换锚点区块时吞了切片内的闭合 `}`/`)` | 提取 module 存 .mjs 跑 node --check；未闭合符用五态状态机扫描器定位（见「无浏览器环境」第 6 条） |
 | node --check 通过、浏览器仍报语法错 | .js 上 node 的 ESM 自动检测假通过 | 一律拷 .mjs 再 check |
 | 夜景主体读作剪影/黑坨（只有窗光） | 可见立面背光 + 物理光照下强度不足 | 主光挪到相机象限、强度上探 1.5~1.6，加正面 fill，材质微 emissive 兜底；主体区 luma 判定（35~45 达标） |
+| GLB 物件截图里消失 / tris 远低于选件表合计 | swiftshader+virtual-time 下 rAF 早停于异步加载前；统计读到加载前旧值 | loadProps settle 后补 composer.render() 一帧；统计以 props loaded 日志后为准（无浏览器配方第 7 条） |
+| 点光强度拉满仍无光（水下灯/灯箱） | 光源封在实心几何体内，无任何报错 | 容器改开口壳（四壁片+底），光源内置贴水面/灯罩内侧（实证：封死 8 px → 开口壳 268 px 冷光） |
+| GLB 物件在夜景里打不亮 | r155+ 物理光单位 decay=2，1.5 级强度在 PBR 材质上近乎为零（程序化 emissive 会蒙混，GLB 不会） | 点光上探 4~6×（量级表：室内 6/水下 9/柱灯 2.6，见 assetlib.md「夜景打光与无头验证」） |
 
 ## GLSL 专项
 

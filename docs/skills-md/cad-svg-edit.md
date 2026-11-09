@@ -1,15 +1,16 @@
 ---
 name: cad&svg-edit
-description: 融合「CAD 创建」与「SVG 精准编辑」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（cad 无头引擎，输出 SVG/PNG/CSV）走 CAD-CREATE；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans, OR editing/modifying existing SVG files (text, color, position, batch changes).
+description: 融合「CAD 创建」「SVG 精准编辑」「3D 实体建模」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（优先 CADCraft 真实 CAD 引擎，输出 DXF/SVG/PNG；缺二进制时落回内置 JS 无头引擎输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；3D 实体零件/STEP/STL/参数化重建走 A++ SolidCraft 后端；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；读入已有 DXF/DWG 图纸走 CADCraft 后端 info/convert；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export DXF/SVG/PNG/CSV), 3D solid parts (STEP/STL export, parametric rebuild), reading DXF/DWG files, OR editing/modifying existing SVG files (text, color, position, batch changes).
 agent_created: true
+version: 4.0.1
 ---
 
 # CAD & SVG-Edit（融合技能）
 
 一个技能覆盖「从零创建」与「精准修改」两类需求，按用户意图**自动路由**到对应功能区，避免在两套 skill 间手动切换。
 
-- **技能根目录 `<skill>`**（下文命令中的 `<skill>` 均指代）：
-  `C:/Users/GSGS002/.workbuddy/skills/cad-svg-edit`
+- **技能根目录 `<skill>`**（下文命令中的 `<skill>` 均指代，用实际安装路径替换）：
+  任意放置目录均可，如 `~/.workbuddy/skills/cad-svg-edit`
 
 ---
 
@@ -17,25 +18,292 @@ agent_created: true
 
 | 用户意图 | 路由到 | 能力来源 |
 |---|---|---|
-| 从零画一张新图 / 零件 / 平面图 / 示意图；要生成 SVG / PNG / CSV | **A. CAD-CREATE** | cad 无头引擎 |
+| 精确工程图 / 机械零件 / 建筑平面；需要 **DXF 交付**、关联尺寸标注、图层、填充、OFFSET/TRIM/FILLET 真编辑几何 | **A+. CADCRAFT 后端**（首选，需二进制） | CADCraft 真实 CAD 引擎 |
+| **3D 实体零件**：STEP/STL 交付、体积/质心校核、圆角/抽壳/阵列/倒角特征、参数化重建、STL 打印 | **A++. SOLIDCRAFT 后端**（需二进制） | SolidCraft 参数化 CAD 引擎 |
+| 从零画简单示意图 / 示意图形；环境无 CADCraft 二进制 | **A. CAD-CREATE**（JS 无头引擎，零依赖兜底） | 内置 JS 引擎 |
+| 无二进制但要**真精确几何编辑**（fillet/trim/extend/offset/join/explode/面积周长）或独立 DXF 读写 | **A±. GEOM-BOOST**（everything-cad 内核增强，Node≥16 零依赖） | vendor 内核 + geom-boost 适配层 |
+| **读入 / 转换 / 检查已有 DXF 或 DWG 图纸** | **A+. CADCRAFT 后端**（info + convert） | CADCraft（DWG 经 acadrust 桥） |
 | 修改一张**已存在**的 SVG（改字 / 改色 / 移位 / 增删 / 批量 / 空间点名） | **B. SVG-EDIT** | svg_toolkit 确定性修改 |
-| 要改的 SVG 恰由本技能 cad 引擎的生成脚本产出 | **B 的「源脚本路线」优先**：改脚本参数用 CAD-CREATE 重生成 | cad 引擎 |
+| 要改的 SVG 恰由本技能生成脚本产出 | **B 的「源脚本路线」优先**：改脚本参数重生成 | 对应引擎 |
+| 读入 / 校核 / 转换已有 **STEP/STL/3MF 文件**（测体积、计数拓扑、转格式） | **A++. SOLIDCRAFT 后端**（eval） | SolidCraft（STEP AP203/214/242 导入） |
 
 判断要点：
+- 需要**精确几何编辑**（倒角/修剪/偏移/阵列/关联标注/图层/填充）或 **DXF/DWG** 进出 → A+。
+- 需要三维实体、体积/质量校核、STEP/STL → A++（缺二进制时降级建议见 A++ 节）。
 - 目标文件**已存在且要"改"** → SVG-EDIT。
-- 尚**无图形、要"造"** → CAD-CREATE。
-- 语义模糊（如"把平面图里那个房间放大"）：目标已存在 → 走 SVG-EDIT；若需结构性改动且原图由 cad 脚本生成 → 切 CAD-CREATE 重生成（精度更高、联动一致）。
+- 尚**无图形、要"造"**（2D）→ A+（可用时）否则 A。
+- 语义模糊（如"把平面图里那个房间放大"）：目标已存在 → 走 SVG-EDIT；若需结构性改动且原图由生成脚本产出 → 切对应引擎重生成（精度更高、联动一致）。
+- **降级铁律**：A+ 的 `doctor` 返回 `found:false` 时优先落回 **A± GEOM-BOOST**（`node engine/geom-boost.mjs doctor` 为 ok 则精确几何照做，仅关联标注/块/填充等高级特性受限），再退 A 路纯示意引擎；任务照常完成，交付说明中提及一句即可；A++ 的 `doctor` 返回 `found:false` 时给出安装指引并询问用户是否改用 2D 交付或等待安装（3D 无法静默降级到 JS 引擎）。
 
 ---
 
-## 共享环境依赖（路径固定）
+## 环境要求（跨平台，v2.1 起零硬编码路径）
 
-- 受管 Python venv（含 lxml）：
-  `C:/Users/GSGS002/.workbuddy/binaries/python/envs/default/Scripts/python.exe`
-- 受管 Node：`C:/Users/GSGS002/.workbuddy/binaries/node/versions/22.22.2-2/node.exe`
-- resvg（仅 PNG 渲染需要）：`C:/Users/GSGS002/.workbuddy/binaries/node/workspace/node_modules`
+- **Node ≥ 16**（CAD-CREATE 无头引擎唯一依赖）：`node` 在 PATH 中即可
+- **Python 3**（仅 SVG-EDIT 需要，含标准库即可，lxml 可选）：`python3` 在 PATH 中
+- resvg（仅 PNG 视觉复核需要，缺省自动跳过并提示）
+- 一键自检：`node <skill>/engine/cad-engine.js doctor` → 输出引擎版本 / Node / Python 状态 / 冒烟结果（Linux / Windows / macOS 通用）
 
 > 坐标约定：**X 右，Y 下**（SVG 系），原点(0,0)，角度用度，弧 `ccw:true`=逆时针。单位=像素(世界坐标)。
+> A+ CADCraft 后端的坐标约定不同：**Y 向上**（CAD 惯例），角度度，单位毫米（公制模板）。
+
+---
+
+# A+. CADCRAFT 后端（精确工程图，v3.0 新增）
+
+> 真实 CAD 引擎（[CADCraft](https://github.com/storytold/cadcraft)，MIT OR Apache-2.0）：404 条命令、关联尺寸标注、图层/线型/填充/块、几何+尺寸约束、DXF R13-2018 读写、DWG 读。经 `scripts/cadcraft-bridge.mjs` 无头驱动，输出 **DXF + SVG + PNG**。
+
+## 环境检测与降级
+
+```bash
+node <skill>/scripts/cadcraft-bridge.mjs doctor
+```
+
+- 输出 `{found, path, version, smoke}`；冒烟通过即可用。
+- 二进制查找顺序：`CADCRAFT_CLI` 环境变量 → PATH → `/opt`、`/tmp/opencode`、`~` 下的 `cadcraft-*/bin/cadcraft-cli`（`CADCRAFT_SCAN=0` 关闭目录扫描）。
+- `found:false`（退出码 2）→ **静默落回 A 路 JS 引擎**，交付时提一句降级即可。
+- 安装：[GitHub Releases](https://github.com/storytold/cadcraft/releases/latest)（Linux tar.gz 解压即用；Windows MSI/portable；macOS dmg）。
+
+## job.json：一次绘图的完整描述
+
+```json
+{
+  "name": "plate",
+  "commands": [
+    {"cmd": "rectang", "params": {"p1": [0,0], "p2": [120,80]}},
+    {"cmd": "circle",  "params": {"center": [30,40], "radius": 10}},
+    {"cmd": "offset",  "params": {"handle": "HANDLE[3]", "distance": 5, "side": [24,40]}},
+    {"cmd": "dimlinear", "params": {"p1": [0,0], "p2": [120,0], "at": [60,-15]}}
+  ],
+  "save": {"dxf": true},
+  "export": {"png": true, "svg": true},
+  "window": [0, 0, 20000, 15000]
+}
+```
+
+```bash
+node <skill>/scripts/cadcraft-bridge.mjs run job.json [--quiet]
+# → {ok, files:{dxf,png,svg}, sizes, handles:[...], ack:[逐命令返回]}
+# --quiet：大图省 token，省略逐命令 acks（保留 handles 与产物清单）
+```
+
+**失败定位与回滚（v4.0）**：run 失败时 bridge 自动**二分探针**定位首条失败命令，报 `ERR 命令 #N (命令名) 失败: <详情>`；同时把最近成功状态保留为 `<name>.checkpoint.dxf`（回滚点=失败前状态），其余中间态清理。修正 job 后整体重跑（生成式闭环），checkpoint 仅供排查 diff。
+
+**handle 占位协议**（编辑命令引用已画图元）：
+- `"HANDLE"` = 最近一条命令产出的图元
+- `"HANDLE[n]"` = 第 n 个收集到的 handle（1 起）
+- 遇到占位符时 bridge 自动分批：先执行之前的纯绘制批，收集 handle 后再解析执行该命令（跨会话 handle 稳定，DXF 重开不变）。
+- 也可用 `query` 子命令显式拿 handle：`node <skill>/scripts/cadcraft-bridge.mjs query plate.dxf --type Circle`
+
+## 命令词汇表（JSON 参数签名，精选）
+
+**坐标**：`[x,y]` 数组；Y 向上。**类型名**（verify/查询用）首字母大写：Circle/Line/Polyline/Arc/Ellipse/Dimension/MText/Hatch/Block Reference。
+
+### 绘制
+| 命令 | 参数 |
+|---|---|
+| `line` | `{points: [[x,y],...], closed?}` |
+| `pline` | `{vertices: [[x,y] \| {p, bulge, startWidth, endWidth}], closed?, width?}` |
+| `circle` | `{center, radius}` \| `{p1,p2}` \| `{p1,p2,p3}` |
+| `arc` | `{p1,p2,p3}` \| `{center, radius, start, end(度)}` |
+| `rectang` | `{p1, p2}` \| `{p1, dimensions:[长,宽]}`（+`fillet? chamfer? rotation?`） |
+| `polygon` | `{sides, center, radius, inscribed?}` \| `{sides, edge:[[x,y],[x,y]]}` |
+| `ellipse` | `{center, major:[dx,dy], ratio, start?, end?}` |
+| `spline` | `{fit: [[x,y],...], closed?}` \| `{control: [...], degree?}` |
+| `donut` | `{center, inside, outside}` |
+| `text` | `{at, text, height?, rotation?, justify?}` |
+| `mtext` | `{at, text, height?, width?, justify?}` |
+| `hatch` | `{points?: [[x,y]](内部点) \| handles?: [hex], pattern?:"ANSI31", scale?, angle?}` |
+| `insert` | `{name, file?(DXF/DWG 建块), at, scale?, rotation?}` |
+
+### 标注
+| 命令 | 参数 |
+|---|---|
+| `dimlinear` | `{p1, p2, at, rotation?}`（`at` 定尺寸线位置） |
+| `dimradius` | `{handle, at?}` \| `{center, point}` |
+| `dimdiameter` | `{handle, at?}` \| `{center, point}` |
+| `dimstyle` | `{name, current?, arrowSize?, textSize?, ...DIM* 变量}` |
+
+### 编辑（吃 handle）
+| 命令 | 参数 |
+|---|---|
+| `move` | `{handles?, delta:[dx,dy]}` \| `{from,to}` |
+| `copy` | `{handles?, delta, count?}` |
+| `rotate` | `{handles?, base:[x,y], angle(度), copy?}` |
+| `scale` | `{handles?, base:[x,y], factor}` |
+| `mirror` | `{handles?, p1, p2, erase?}` |
+| `offset` | `{handle, distance, side:[x,y]}`（圆的 offset=同心圆半径±d） |
+| `trim` | `{handle, pick:[x,y] \| fence:[[x,y],...], edges?:[hex]}` |
+| `extend` | `{handle, pick, edges?}` |
+| `fillet` | `{h1, p1, h2, p2, radius?, trim?}`（线/弧/圆） |
+| `chamfer` | `{h1, p1, h2, p2, d1?, d2?}` |
+| `arrayrect` | `{handles?, rows, cols, rowSpacing, colSpacing, associative?:false}` |
+| `arraypolar` | `{handles?, center, count, angle?(默认360), associative?:false}` |
+| `erase` | `{handles?}` |
+| `explode` | `{handles?}` |
+
+### 辅助
+`layer.new {name,color?,linetype?}` · `layer.set {name,on?,frozen?,color?}` · `layer.current {name}` · `zoom` 用 `view.set {center,height}` 或导出时用 `window` 取景。
+
+## 标准工作流（六步闭环）
+
+```
+1. doctor                → 二进制可用？（否则降级 A 路）
+2. 写 job.json           → 词汇表内命令；编辑类用 HANDLE 占位
+3. bridge run            → DXF + PNG + SVG 落盘，拿 handles/acks
+4. bridge verify --expect '{"Circle":3,"Dimension":1}'
+                         → 计数断言（fail 即回 job 修正，勿盲改）
+5. Read PNG 视觉复核     → 结构/标注/文字位置
+6. 交付                   → DXF(主交付物) + SVG/PNG(预览) + 文件清单
+```
+
+## 验证协议
+
+```bash
+node <skill>/scripts/cadcraft-bridge.mjs verify plate.dxf --expect '{"Circle":3,"Polyline":1,"Dimension":2}'
+# → {pass, counts, total, missing, extra, untracked}；fail 退出码 1
+node <skill>/scripts/cadcraft-bridge.mjs verify plate.dxf \
+  --geometry '{"circle":[{"center":[0,0],"radius":40,"tol":0.01}],
+               "polar_pattern":[{"type":"Circle","ring_radius":100,"count":8,"step_deg":45,"tol":0.5}],
+               "distance":[{"from":[100,0],"to":[0,100],"expect":141.42,"tol":0.1}]}'
+# → rep.geometry 逐条 pass/fail（v4.0 几何断言）
+node <skill>/scripts/cadcraft-bridge.mjs query plate.dxf --type Circle
+# → {count, entities:[{handle, geometry:{center,radius}, layer}]}
+```
+
+- 断言失败 → 回 job.json 修正重跑（生成式闭环，禁止直接改 DXF 文本）。
+- `untracked` 列出未断言类型——交付前扫一眼，防漏画。
+- **几何断言三种**（v4.0，比计数强一级的 oracle）：
+  - `circle`：命中一个圆心在 `center`±tol、半径 R±tol 的同型实体（返回 handle）；
+  - `polar_pattern`：环 `ring_radius`±tol 上恰有 `count` 个圆心，极角排序后相邻角差 ≈`step_deg`（法兰孔位专用）；
+  - `distance`：任意两点距断言（可用于圆心距/孔距）。
+
+## 读入路由（DXF / DWG → 摘要 + 预览 + 编辑）
+
+```bash
+node <skill>/scripts/cadcraft-bridge.mjs info drawing.dxf     # counts/layers/dimStyles/extents
+node <skill>/scripts/cadcraft-bridge.mjs convert drawing.dwg --svg out.svg --png out.png --window 0,0,20000,15000
+```
+
+- 先 `info` 给用户实体摘要，再出 SVG/PNG 预览确认内容。
+- 编辑：把文件作为 job 起点（`run drawing.dxf` 形式的 bridge 分批自动以当前态续作），或 `query` 拿 handle 后写编辑 job。
+- **有损警告**：CADCraft 保存会丢弃其未建模的实体（3D 实体、proxy 对象等）。读入外部图纸再保存的交付件，必须附一句「基于 CADCraft 0.x 转换，未支持实体可能有损」。
+
+## 已知坑（词汇表使用注意）
+
+1. **associative array 吸收源实体**：`arrayrect/arraypolar` 默认 `associative:true`，源图元进 Block Reference，`counts` 里变 `Block Reference:1` 而非 N 个图元。计数断言要么 `"associative":false` 保持平面，要么按 Block Reference 断言。
+2. **圆的 offset 是同心圆**（半径±distance），`side` 只决定内/外方向。
+3. **`--script` 提示流勿用**：一次性脚本模式下交互式点输入会报 "Point or option keyword required"；全部用 JSON 命令（本 bridge 即如此）。
+4. Y 向上（CAD 惯例），与 A 路 JS 引擎（Y 向下）相反；两路产物不可直接叠坐标。
+5. SHX 字体未读，CJK 文字依赖系统字体（缺字时回退单笔划字体）；图内标注直接用英文/拼音最稳，中文放交付说明与图例文档。
+6. **verify 期望表的类型映射**：`rectang` 产出 **Polyline**（按 Line/Rect 断言必 fail）；`copy`/`array`/`offset` 每次复制/偏移都新增实体（楼梯 20 踢面 = Line +20，楼层 copy 会乘楼层系数）。写 `--expect` 前按"命令 → 产出实体类型与数量"推演；**首次 fail 先 `query --type X` 审计实际分布再修期望**——job 正确而期望预估错是常态，勿急着回改 job。
+7. **文字标注碰撞**：多处 text 的图纸（户型/机电/平面布置）在 PNG 复核时专查文字与邻近图元/其他文字的包围盒重叠；写 job 时标注插入点优先选图元间空白带，房间标签与家具文字上下错位排布（实证：户型 UNIT-A 标签压到 BED 标注，调 `at` 坐标重跑即愈）。
+8. **arrayrect 栅格自原件向 +行/+列 延展且含原件**：想让 2×2 孔阵落在 (±50,±30)，源圆必须画在左下角 (-50,-30)，再 `rows:2, cols:2, rowSpacing:60, colSpacing:100`；源圆放 (50,30) 会得到 (50,30)(150,30)… 错位栅格。计数断言（Circle:4）抓不出这种错——**孔位类阵列必须配 `verify --geometry` 圆心断言**（实证：plate-cc 晋升时几何断言当场抓获）。
+
+## Attribution
+
+- [CADCraft](https://github.com/storytold/cadcraft)（storytold 团队，MIT OR Apache-2.0）：引擎与命令协议。bridge 为本技能原创封装，可自由分发。
+
+---
+
+# A++. SOLIDCRAFT 后端（3D 实体，v4.0 新增）
+
+> 真实参数化 3D CAD 引擎（[SolidCraft](https://github.com/tangency-labs/solidcraft)，MIT OR Apache-2.0，纯 Rust）：约束草图 + 特征时间线（拉伸/旋转/圆角/抽壳/阵列/镜像/倒角）、B-rep 实体、STEP AP242 / STL / 3MF / OBJ 导出、STEP 导入反测、无头渲染截图。经 `scripts/solidcraft-bridge.mjs` 驱动。**单位毫米，Z 向上。**
+
+## 环境检测
+
+```bash
+node <skill>/scripts/solidcraft-bridge.mjs doctor
+```
+
+- 输出 `{found, path, version, smoke}`；冒烟 = box 40×30×20 → 体积 24000（解析式）。
+- 二进制查找顺序：`SOLIDCRAFT_CLI` 环境变量 → PATH → `/opt`、`/tmp/opencode`、`~` 下的 `solidcraft-*/bin/solidcraft-cli`（`SOLIDCRAFT_SCAN=0` 关闭目录扫描）。
+- 安装：[GitHub Releases](https://github.com/tangency-labs/solidcraft/releases/latest)，Linux 下载 `solidcraft-<ver>-linux-x86_64.tar.gz` 解压即用（约 60MB）；Windows MSI / portable zip；macOS dmg。解压后目录名保持 `solidcraft-<版本>-linux-x86_64` 形态即可被扫描发现。
+- `found:false`（退出码 2）→ **3D 无静默降级**：向用户说明并给出安装指引，或改提 2D 交付（A+/A 路）。
+
+## job.json：一次 3D 建模的完整描述
+
+```json
+{
+  "name": "flange3d",
+  "commands": [
+    {"command": "sketch.create", "params": {"plane": "XY"}},
+    {"command": "sketch.circle.center", "params": {"center": [0,0], "radius": 150}},
+    {"command": "sketch.circle.center", "params": {"center": [0,0], "radius": 40}},
+    {"command": "sketch.circle.center", "params": {"center": [70.71,70.71], "radius": 12}},
+    {"command": "solid.extrude", "params": {"distance": 10, "profiles": [{"point": [80,0]}]}}
+  ],
+  "save": {"step": true, "stl": true, "design": true},
+  "export": {"png": true},
+  "view": "iso"
+}
+```
+
+- `save.step/stl/obj/3mf/igs` 走 `file.export`（主交付物 STEP 默认开，`"step": false` 可关）；`save.design` 落 `.solidcraft` 设计容器（含特征时间线，可重开继续编辑）。
+- `export.png` + `view`（iso/top/front/back/bottom/left/right）无头渲染一张复核图。
+- **run 失败即整脚本原子中止**（引擎语义），bridge 报告失败详情，无半成品状态。
+
+## 命令词汇表（精选，单位 mm；全量用 `commands` 子命令查）
+
+### 草图（画在 sketch.create 的平面上，2D 坐标）
+| 命令 | 参数 |
+|---|---|
+| `sketch.create` | `{plane: "XY"\|"XZ"\|"YZ"}` |
+| `sketch.rectangle.two_point` | `{p0:[x,y], p1:[x,y]}` |
+| `sketch.circle.center` | `{center:[x,y], radius: R}` 或 `{diameter: D}` |
+| `sketch.line` | `{points: [[x,y],...], closed?}`（闭合多边形轮廓） |
+| `sketch.arc.three_point` | `{p1, p2, p3}` |
+| `sketch.polygon.inscribed` | `{sides, center, radius}` |
+| `sketch.fillet` / `sketch.chamfer.*` | 草图内倒角 |
+| `sketch.pattern.circular` / `rectangular` | 草图内阵列 |
+
+### 实体特征
+| 命令 | 参数 |
+|---|---|
+| `solid.extrude` | `{distance \| through_all, operation?: "cut"\|"join"\|"new"\|"intersect", profiles?}` |
+| `solid.revolve` | 旋转体 |
+| `solid.fillet` | `{edges: [[x,y,z],...], radius}`（边用其上任意点寻址） |
+| `solid.chamfer` | `{edges, d1, d2?}` |
+| `solid.shell` | `{faces, thickness}`（抽壳） |
+| `solid.hole` | 孔特征（螺纹等） |
+| `solid.pattern.rectangular` / `circular` | 实体阵列 |
+| `solid.mirror` | 镜像 |
+| `solid.box` | `{corner, length, width, height, operation?, targets?}`（布尔工具体） |
+| `solid.move` | `{bodies, axis, angle}` 或平移 |
+| `file.export` | `{path: "<name>.step\|.stl\|.obj\|.3mf\|.igs"}`（bridge 自动追加） |
+| `file.save_as` | `{path: "<name>.solidcraft"}`（设计容器） |
+
+## 标准工作流（六步闭环，同 A+ 哲学）
+
+```
+1. doctor                → 二进制可用？（否则给指引/降级 2D）
+2. 写 job.json           → 词汇表内命令；带孔轮廓 extrude 必须显式 profiles:[{point}]
+3. bridge run            → step/stl(+design+png) 落盘，输出 measure{volume,area,faces,edges,vertices}
+4. bridge verify         → 解析式体积断言 + 拓扑计数（--volume V --tol 1e-3 --faces N）
+5. Read PNG 视觉复核     → 结构/倒角/孔位（无视觉环境用拓扑计数替代）
+6. 交付                   → STEP(主交付物) + STL(打印) + PNG(预览) + .solidcraft(可再编辑)
+```
+
+## 验证协议（oracle：能推导解析式就推导）
+
+```bash
+node <skill>/scripts/solidcraft-bridge.mjs verify flange3d.result.json \
+  --volume 620401.717 --tol 1e-3 --faces 12 --edges 20 --vertices 20 --bodies 1
+# 或对任意 STEP/STL 文件直接反测（含外部文件）：
+node <skill>/scripts/solidcraft-bridge.mjs eval part.step
+```
+
+- `--volume/--area` 用相对容差（SolidCraft 由显示网格测量，典型偏差 1e-6~1e-5，建议 tol 1e-3）；`--faces/--edges/--vertices/--bodies` 精确断言。
+- 解析式示例：法兰 = π·h·(R²−r²−n·r_hole²)；L 型支架 = 截面积×厚 − Σπ·r²·h。
+- 断言失败 → 回 job.json 修正重跑（生成式闭环，禁止手改 STEP 文本）。
+
+## 已知坑（A++ 使用注意）
+
+1. **extrude 默认忽略内圆当孔**：草图里外圆+内圆一起画后直接 `solid.extrude`，得到的是实心盘（内圆全被无视）。**必须**显式 `profiles: [{"point": [x,y]}]`，point 落在目标区域内（避开孔与边界），“islands inside are its holes”。
+2. **file.save 只存设计容器**（zip 格式，无视扩展名）；STEP/STL 导出必须 `file.export`（bridge 已代劳，手写脚本时注意）。
+3. 体积/面积为网格化测量值（rel 1e-6 量级偏差），断言用相对容差 ≥1e-3，勿用绝对相等。
+4. Z 向上、单位毫米、角度弧度（相机 camera 的 yaw/pitch/fov）——与 A 路 JS 引擎（像素、Y 向下）与 A+ CADCraft（Y 向上、度）三者互不通用，坐标换算要显式。
+5. `sketch.text` 字体路径与文件沙箱限制不影响 CLI；但 STEP 导入（eval 外部文件）后体积与原生建模同源可比。
 
 ---
 
@@ -44,52 +312,74 @@ agent_created: true
 > 原 `cad-creat`（cad-driver）能力。无头引擎优先，浏览器可视化预览可选。
 
 把绘图运行时直接集成进 skill 目录，agent 无需浏览器即可精确驱动出图：
-- **主运行时（无头）**：`<skill>/engine/cad-engine.js` —— 纯 JS，零原生依赖，输出 **SVG / PNG / CSV** 三种格式，每条操作返回结构化 JSON ack，内置几何校验闭环。
+- **主运行时（无头）**：`<skill>/engine/cad-engine.js` —— 纯 JS，零原生依赖，输出 **SVG / PNG / CSV / DXF** 四种格式，每条操作返回结构化 JSON ack，内置几何校验闭环。
 - **可视化预览（可选）**：`<skill>/assets/cad-draw.html` —— 浏览器打开可看绘制结果、点按钮下载；供人查看/截图复核。
 
 ## 目录
 ```
 cad-svg-edit/
 ├── SKILL.md
-├── engine/cad-engine.js   # 无头引擎（cadAPI v2.0-headless）
+├── CHANGELOG.md            # 版本更新日志
+├── engine/cad-engine.js   # 无头引擎（cadAPI v2.1-headless，含 doctor 自检）
+├── engine/geom-boost.mjs  # A± 增强引擎 CLI（everything-cad 内核：fillet/trim/offset/join/explode/measure + DXF 读写）
+├── engine/test-geom-boost.mjs  # A± 适配层回归（25 项，node 直接跑）
+├── engine/everything-geom/     # vendor: HeyPuter/everything src/cad 的 core+io（MIT, 快照 8a25746）
+├── scripts/
+│   ├── cadcraft-bridge.mjs    # A+ CADCraft 2D 后端桥（doctor/run/query/verify/convert/info；v4.0 失败二分+checkpoint+几何断言+--quiet）
+│   ├── solidcraft-bridge.mjs  # A++ SolidCraft 3D 后端桥（doctor/run/eval/verify/snapshot/commands）
+│   ├── run-corpus.mjs         # 语料库回归运行器（test/corpus 全量跑）
+│   ├── svg_toolkit.py  daemon.mjs  next_name.mjs  render_png.mjs   # SVG-EDIT 工具
 ├── assets/cad-draw.html   # 可选可视化预览页
 ├── assets/preview.html    # SVG-EDIT 点选编辑页
-├── examples/              # 示例 draw 脚本
-│   ├── gear.js  house.js  nut.js  bad.js
-├── scripts/               # SVG-EDIT 编辑工具
-│   ├── svg_toolkit.py  daemon.mjs  next_name.mjs  render_png.mjs
+├── examples/              # 示例（*.js 为 JS 引擎脚本，*.job.json 为 CADCraft job）
+├── test/run-tests.js      # 回归测试（doctor + 全部示例 + 负例 + bridge 测试）
+├── test/corpus/           # 图纸/零件语料库（*.job.json + *.expected.json，升级回归门禁）
 └── references/            # SVG-EDIT 参考文档
     ├── grounding.md  operations.md
 ```
+
+## 语料库回归（v4.0，抄 SolidCraft corpus 模式）
+
+`test/corpus/` 每对 `<name>.job.json + <name>.expected.json` 是一份"历史构建验证过"的图纸/零件标本：expected 锁死实体计数/几何断言（2D）或解析式体积+拓扑计数（3D）。用途：**CADCraft/SolidCraft 升版、bridge 改动、环境迁移后，一键全量回归**：
+
+```bash
+node <skill>/scripts/run-corpus.mjs [name...]   # 不选则全量
+# PASS/FAIL/SKIP（SKIP=对应引擎二进制缺失）表 + CORPUS_PASS/CORPUS_FAIL 汇总
+```
+
+新增条目纪律：实战图纸验证通过后，job + expected 落入 corpus；expected 的 oracle 字段写解析式或推导依据（如 `pi*10*(150^2-40^2-8*12^2)`），确保期望值可独立复算。
+
+当前 6 标本：flange-cc / flange3d / bracket-cc / bracket3d / plate-cc / plate-sc（plate 对 2026-10-19 双引擎实战对比晋升，几何断言抓出过 arrayrect 正向延展的孔位错标——计数校验会漏，几何断言不会）。
+
+配套 `scripts/run-ab.mjs`（v4.0.1）：同一零件跑 A+/A++ 双引擎并排对比（计时 3 轮取中位 + verify + 渲染 + 快照，产出 ab-results.json），job 源固定 `test/ab/`，用法 `node scripts/run-ab.mjs [输出根目录]`。引擎选型或性能回归时用它出数据。
 
 ## 两种模式对比
 
 | 模式 | 入口 | 浏览器 | 输出 | 适用 |
 |------|------|--------|------|------|
-| **无头（推荐）** | `node engine/cad-engine.js draw.js` | 不需要 | SVG+PNG+CSV 文件 + JSON 摘要 | agent 自动出图、批量、CI |
+| **无头（推荐）** | `node engine/cad-engine.js draw.js` | 不需要 | SVG+PNG+CSV+DXF 文件 + JSON 摘要 | agent 自动出图、批量、CI |
 | 可视化 | 浏览器打开 `assets/cad-draw.html` | 需要 | 页面按钮下载 SVG/PNG | 人查看、截图复核 |
 
 ## 无头模式（核心）
 
 ### 调用方式
-用受管 Node 运行一个 **draw 脚本**，脚本里直接用全局 `cadAPI`（与浏览器同名同签名）：
+用 Node 运行一个 **draw 脚本**（`node` 需在 PATH 中，Windows/macOS/Linux 相同），脚本里直接用全局 `cadAPI`（与浏览器同名同签名）：
 
 ```bash
-# 受管 Node 路径（Windows）
-NODE="C:/Users/GSGS002/.workbuddy/binaries/node/versions/22.22.2-2/node.exe"
-SKILL="C:/Users/GSGS002/.workbuddy/skills/cad-svg-edit"
-$NODE "$SKILL/engine/cad-engine.js" \
-      "$SKILL/examples/gear.js" \
-      --all --out "D:/out" --name gear
+# <skill> 替换为本技能实际目录；先跑 doctor 确认环境
+node <skill>/engine/cad-engine.js doctor
+node <skill>/engine/cad-engine.js \
+      <skill>/examples/gear.js \
+      --all --out "./out" --name gear
 ```
 
 参数：
 - `<draw.js>`：必填，绘图脚本（用 `cadAPI.*` 调用）。
-- `--svg` / `--png` / `--csv`：分别导出；`--all` 或省略则三项全导。
+- `--svg` / `--png` / `--csv` / `--dxf`：分别导出；`--all` 或省略则四项全导。
 - `--out DIR`：输出目录（默认 `.`）。
 - `--name NAME`：文件名前缀（默认 `cad-drawing`）。
 
-运行后打印 JSON 摘要：`{name, count, svg, csv, png:{path,bytes,width,height}}`。
+运行后打印 JSON 摘要：`{name, count, svg, csv, dxf, png:{path,bytes,width,height}}`。
 
 ### draw 脚本写法（与浏览器完全一致）
 ```js
@@ -101,9 +391,10 @@ return JSON.stringify({id: r.id, bbox: r.bbox});  // 可选：回传信息
 
 ### 也可 require 作为模块
 ```js
-const { api, toCSV } = require("C:/.../cad-svg-edit/engine/cad-engine.js");
+const { api, toCSV, toDXF } = require("<skill>/engine/cad-engine.js");
 api.clear(); api.rect(0,0,100,60);
 require("fs").writeFileSync("a.csv", toCSV());
+require("fs").writeFileSync("a.dxf", toDXF());
 ```
 
 ## 输出格式
@@ -113,6 +404,7 @@ require("fs").writeFileSync("a.csv", toCSV());
 | **SVG** | 矢量，几何/标注/文字精确 | 出版、再编辑、网页嵌入 |
 | **PNG** | 软件光栅化（纯 JS 编码器，无原生依赖），白底线稿，含尺寸标注数值与文字 | 快速预览、贴图、不支持矢量的场景 |
 | **CSV** | 每个图形的结构化几何表（见下） | agent/用户读取坐标、做数据校验、进表格 |
+| **DXF** | R12 ASCII 实体（LINE/CIRCLE/ARC/POLYLINE/TEXT 等），Y 轴已翻转为 CAD 惯例（Y 向上） | 激光切割下料、导入 AutoCAD/Fusion/SolidWorks 等 CAD 软件 |
 
 ### CSV 表结构
 表头：`id,type,layer,stroke,strokeW,fill,geometry,length,area`
@@ -130,7 +422,7 @@ require("fs").writeFileSync("a.csv", toCSV());
 3. 变换/阵列（用 id）
 4. cadAPI.verify()  → {count, validate, issues, dims, bbox, snapshot(SVG dataURL)}
 5. 校验闭环：validate 失败 → diagnose().suggestions → deleteShape → 复检
-6. 导出：运行 CLI 得到 SVG/PNG/CSV（或脚本内 api.exportSVG() 等）
+6. 导出：运行 CLI 得到 SVG/PNG/CSV/DXF（或脚本内 api.exportSVG() / api.exportDXF() 等）
 7. 返回 JSON 摘要（count/bbox/文件路径）给调用方
 ```
 
@@ -153,7 +445,7 @@ require("fs").writeFileSync("a.csv", toCSV());
 `checkParallel(id1,id2,tol?)` · `checkPerpendicular(...)` · `checkTangent(...)` · `findIntersections(...)` · `containsPoint(id,x,y)` · `distance(id1,id2)` · `validate()` · `diagnose()` · `autoDim(ids?,opts?)` · `verify(ids?)`
 
 ### 视图/导出/批量
-`fit()` · `snapshot()`(SVG dataURL) · `exportSVG()` · `exportSVGDataUrl()` · `exportPNGDataUrl()`(Promise→PNG dataURL) · `loadJSON({shapes})` · `clear()` · `undo()`/`redo()` · `setDisplay({bgColor?})` · `help()` · `version()`
+`fit()` · `snapshot()`(SVG dataURL) · `exportSVG()` · `exportDXF()`(R12 ASCII, Y 轴已翻转) · `exportSVGDataUrl()` · `exportPNGDataUrl()`(Promise→PNG dataURL) · `loadJSON({shapes})` · `clear()` · `undo()`/`redo()` · `setDisplay({bgColor?})` · `help()` · `version()`
 
 ### keyPoints 特征点（防坐标重算）
 circle→圆心+4象限点；arc→圆心+起终点；ellipse→圆心+4端；rect→9点；line/dimLine→端点1/2+中点；polyline/polygon/spline→P0…Pn+首末中点。
@@ -253,9 +545,76 @@ return JSON.stringify({count:cadAPI.count(), validate:v.ok});
 1. 数据层：`count()` / `bbox()` / `list()` 统计类型。
 2. 几何层：`validate()` / `diagnose()`。
 3. 关系层（按需）：`distance()` / `checkParallel()` / `checkTangent()`。
-三层通过后再导出。无头模式下 `verify()` 返回的 `snapshot` 是 SVG dataURL，可存文件复核；PNG/CSV 即最终交付物。
+三层通过后再导出。无头模式下 `verify()` 返回的 `snapshot` 是 SVG dataURL，可存文件复核；PNG/CSV/DXF 即最终交付物。
+
+## 自检与回归（v2.1 新增，v3.0 扩展）
+
+```bash
+# 环境自检：引擎版本 / Node / Python / 冒烟绘图
+node <skill>/engine/cad-engine.js doctor
+
+# CADCraft 后端自检（v3.0）：found:false 时 A 路兜底
+node <skill>/scripts/cadcraft-bridge.mjs doctor
+
+# 回归测试：doctor + 4 个正例示例（gear/house/nut/flange 全格式导出）+ bad.js 负例
+# + bridge 全子命令测试（无二进制时自动跳过，有二进制时端到端跑通）
+node <skill>/test/run-tests.js   # 期望输出 ALL_PASS
+```
 
 ---
+
+---
+
+# A±. GEOM-BOOST（增强几何内核，v4.1 新增）
+
+> vendor 自 [HeyPuter/everything](https://github.com/HeyPuter/everything) `src/cad` 的纯 JS CAD 内核（MIT）。
+> 作用：**没有 CADCraft 二进制时也能做真精确几何编辑**，并提供独立 DXF R2000 读写。与 A 路引擎同一实体模型对接。
+
+## 自检
+
+```bash
+node <skill>/engine/geom-boost.mjs doctor
+# → {ok, engine:'geom-boost', version, kernel_smoke}  ok=true 即可用
+node <skill>/engine/test-geom-boost.mjs   # 25 项适配层回归（改内核/适配层后必跑）
+```
+
+## 操作（stdout 全 JSON，退出码 0 成功 2 失败）
+
+```bash
+B="node <skill>/engine/geom-boost.mjs"
+$B doctor
+$B fillet    shapes.json <id1> <id2> <radius> <px1> <py1> <px2> <py2>   # L角倒圆, 拾取点定角侧
+$B chamfer   shapes.json <id1> <id2> <d1> <d2> <px1> <py1> <px2> <py2>  # 倒角
+$B trim      shapes.json <id> <px> <py> <cutterId,...>                  # AutoCAD 语义: 拾取段被删
+$B extend    shapes.json <id> <px> <py> <boundId,...>
+$B offset    shapes.json <id> <dist> <sideX> <sideY>                    # dist=幅值, side点在目标侧(老系坐标)
+$B intersect shapes.json <id1> <id2>                                    # → points:[{x,y}] 老系坐标
+$B join      shapes.json <id1> <id2> [...]                              # 共线/相邻合并, 源实体删除
+$B explode   shapes.json <id>                                           # polyline/polygon/rect → 线弧段
+$B break     shapes.json <id> <x1> <y1> <x2> <y2>                       # 两点断口; 两点相同=一点打断
+$B pfillet   shapes.json <id> <radius>                                  # 闭合多段线全顶点倒圆(结果炸成线+弧)
+$B pchamfer  shapes.json <id> <d1> [d2]                                 # 闭合多段线全顶点倒角
+$B hatch     shapes.json <ids,...> [pattern] [scale] [angleDeg]         # 填充: SOLID=边界多边形;
+            #   其余=剖面线(默认LINES; ANSI31/32/34/37/38 自动映射; 全名单 $B patterns)
+            #   → {shapes, outerArea, netArea(岛已扣), loops}
+$B patterns                                                             # 21种填充图案名单
+$B measure   shapes.json <id>                                           # → length/area/bounds
+$B dxf-write shapes.json out.dxf                                       # R2000, 独立于 CADCraft
+$B dxf-read  in.dxf out.json                                           # → {shapes:[老schema]} 供 SVG-EDIT 等复用
+$B dwg-read  in.dwg out.json                                           # DWG R13-2018 导入(同样出老schema)
+```
+
+## 输入输出契约
+
+- 输入 `shapes.json`：`{"shapes":[...老引擎 shape...]}` 或裸数组（`cad-engine.js` 保存格式一致）。
+- 输出：`{ok, op, shapes:[操作后全部 shape], replacedIds, addedN, ...}` —— text/dim/spline 等不支持类型**原样保留**，几何实体被替换/追加。
+- 支持类型：line / circle / arc / ellipse / polyline / polygon / rect / point；**平行线 fillet 会自动取间距一半成 U 形相切弧**（内核行为，非报错）。
+- 坐标：CLI 全部收**老引擎坐标**（SVG 系 Y 向下），适配层内部镜像转换——调用方无感。
+
+## 与其他路的关系
+
+- A+ 在场：仍优先 A+（关联标注/块/填充/约束更全）；A± 作为无二进制环境的精确编辑层。
+- dxf-read 产物直接喂 B 路 SVG-EDIT 或 A 路重渲染 → **DXF 进 ≈ 全链路打通**（此前 DXF 读必须 CADCraft）。
 
 # B. SVG-EDIT（编辑）
 
@@ -288,7 +647,7 @@ return JSON.stringify({count:cadAPI.count(), validate:v.ok});
 1. 启动守护进程（唯一后台任务）：`node <skill>/scripts/daemon.mjs` → `http://127.0.0.1:8620/`；
    它同时负责：托管编辑页（`?file=` 注入开页）+ 接收提交 + 回传结果 + 1 秒轮询 pending_edits
    （见新请求自行退出，日志 `[wake] req_*.json`，借后台任务通知唤醒 agent）；
-2. 确保目标 SVG 在工作区根 `D:/d/2026-09-28-10-43-46/`（不在则先拷贝进来）；
+2. 确保目标 SVG 在工作区根目录（用户项目根，即 agent 的当前工作目录；不在则先拷贝进来）；
 3. agent 打开编辑页：present_files `http://127.0.0.1:8620/?file=<文件名>.svg`；
 4. 用户：点选组件（可多选，橙色高亮 + id 徽标）→ 底部输入框写要求 → 回车；
 5. 页面 POST `/submit` → 落盘 `pending_edits/req_<reqid>.json`（含 reqid/file/ids/instruction/svgText）；

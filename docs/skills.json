@@ -1,10 +1,11 @@
 {
-  "total": 57,
+  "total": 69,
   "categories": [
     "写作工具",
     "前端开发",
     "图像理解",
     "图像生成",
+    "学术写作",
     "工作流",
     "开发工具",
     "开发调试",
@@ -17,31 +18,37 @@
     "视频创作",
     "需求梳理"
   ],
-  "site": "https://iamsamyiok.github.io/skillhub",
+  "site": ".",
   "skills": [
     {
       "id": "3d-edit",
       "name": "3d-edit",
-      "description": "一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求\"画一个3D城市/3D场景/三维可视化\"\"像 Claude 一键生成 3D 城市\"\"做个可交互的 3D 网页\"\"水库/厂区/管线数字孪生 3D 展示\"\"给我一个小盒子/设备/推车的 3D 图\"、要求 3D 汇报页/截图/PNG；或者说\"把那座塔改红\"\"河往东弯\"\"楼密一点\"\"雾再浓点\"、指着截图某处说\"改那个\"\"去掉那栋楼\"；或说\"我想自己手动编辑这个 3D 图\"\"给我个能拖的界面\"\"别每次都得找你\"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页。",
-      "version": "1.0.0",
+      "description": "一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求\"画一个3D城市/3D场景/三维可视化\"\"像 Claude 一键生成 3D 城市\"\"做个可交互的 3D 网页\"\"水库/厂区/管线数字孪生 3D 展示\"\"给我一个小盒子/设备/推车的 3D 图\"、要求 3D 汇报页/截图/PNG；或者说\"把那座塔改红\"\"河往东弯\"\"楼密一点\"\"雾再浓点\"、指着截图某处说\"改那个\"\"去掉那栋楼\"；或说\"我想自己手动编辑这个 3D 图\"\"给我个能拖的界面\"\"别每次都得找你\"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页；v1.1 起一键导出 GLB 三维资产（G 键）与工程测量模式（M 键，比例尺/场地尺寸/perUnit 定标）；v1.2 起相机 JSON 合同（camera/cam/saveView/view，fov=0 正交）、剖切模式（section，看建筑/厂区内部）与 window.CITY.execute 统一命令通道（人机同源，agent 与 editor 同一入口）；v1.3 起内置 SimReady 物体资产库 assetlib（2,595 个真实感日常物件 GLB，中英文检索+本地缓存，CC BY 4.0），日常物件先检索复用、程序化生成兜底。",
+      "version": "1.3.0",
       "category": "前端开发",
       "tags": [
         "3D",
+        "glb",
         "Three.js",
-        "程序化生成",
-        "场景生成",
-        "局部编辑",
-        "参数化",
+        "WebGL",
+        "SimReady",
         "人工编辑",
+        "剖切",
+        "参数化",
+        "命令通道",
+        "场景生成",
+        "资产库",
+        "局部编辑",
         "数字孪生",
-        "WebGL"
+        "相机JSON",
+        "程序化生成"
       ],
       "downloads": 0,
-      "updatedAt": "2026-09-28T03:13:25.000Z",
+      "updatedAt": "2026-11-09T00:00:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/3d-edit.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/3d-edit.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/3d-edit.tar.gz",
+      "md": "./skills-md/3d-edit.md",
+      "zip": "./downloads/3d-edit.zip",
+      "tgz": "./downloads/3d-edit.tar.gz",
       "type": "skill"
     },
     {
@@ -60,9 +67,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-18T10:00:00.000Z",
       "needsKey": true,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/anysearch.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/anysearch.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/anysearch.tar.gz",
+      "md": "./skills-md/anysearch.md",
+      "zip": "./downloads/anysearch.zip",
+      "tgz": "./downloads/anysearch.tar.gz",
       "type": "skill"
     },
     {
@@ -81,31 +88,64 @@
       "downloads": 0,
       "updatedAt": "2026-09-11T00:00:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/book-to-skill.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/book-to-skill.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/book-to-skill.tar.gz",
+      "md": "./skills-md/book-to-skill.md",
+      "zip": "./downloads/book-to-skill.zip",
+      "tgz": "./downloads/book-to-skill.tar.gz",
+      "type": "skill"
+    },
+    {
+      "id": "book-to-skill-oss",
+      "name": "book-to-skill-oss",
+      "description": "把整本技术书或文档夹（PDF/EPUB/DOCX/HTML/Markdown/RTF/MOBI）转换成按需加载的结构化 agent 技能包：提取框架、思维模型、原则、技法与反模式，生成分章文件、术语表、模式库与速查表。当用户要求「把这本书转成技能」「用 SKILL 标准转换 PDF」「从文档夹构建知识库技能」或想在编码时套用某书作者的方法论时使用。Converts books and documents (PDF, EPUB, DOCX, HTML, Markdown, plain text, RTF, MOBI/AZW with Calibre) into structured agent skills with on-demand chapter files, extracting frameworks, mental models, principles, techniques, and anti-patterns.",
+      "version": "1.4.0",
+      "category": "知识转化",
+      "tags": [
+        "book-to-skill",
+        "文档转换",
+        "PDF",
+        "EPUB",
+        "分章技能",
+        "知识库",
+        "技能生成"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-16T00:00:00.000Z",
+      "needsKey": false,
+      "md": "./skills-md/book-to-skill-oss.md",
+      "zip": "./downloads/book-to-skill-oss.zip",
+      "tgz": "./downloads/book-to-skill-oss.tar.gz",
       "type": "skill"
     },
     {
       "id": "cad-svg-edit",
       "name": "cad&svg-edit",
-      "description": "融合「CAD 创建」与「SVG 精准编辑」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（cad 无头引擎，输出 SVG/PNG/CSV）走 CAD-CREATE；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans, OR editing/modifying existing SVG files (text, color, position, batch changes).",
-      "version": "1.0.0",
+      "description": "融合「CAD 创建」「SVG 精准编辑」「3D 实体建模」的单一技能。根据用户意图自动路由：从零创建 CAD 图形（优先 CADCraft 真实 CAD 引擎，输出 DXF/SVG/PNG；缺二进制时落回内置 JS 无头引擎输出 SVG/PNG/CSV/DXF）走 CAD-CREATE；3D 实体零件/STEP/STL/参数化重建走 A++ SolidCraft 后端；修改已存在的 SVG（持久 id 寻址、空间/文本过滤、可视化点选、版本化保存）走 SVG-EDIT；读入已有 DXF/DWG 图纸走 CADCraft 后端 info/convert；若目标 SVG 由 cad 脚本生成，优先源脚本重生成。Use when drawing/plotting CAD graphics, mechanical parts, floor plans (export DXF/SVG/PNG/CSV), 3D solid parts (STEP/STL export, parametric rebuild), reading DXF/DWG files, OR editing/modifying existing SVG files (text, color, position, batch changes).",
+      "version": "4.0.1",
       "category": "开发工具",
       "tags": [
+        "3D",
         "cad",
+        "CADCraft",
+        "DWG",
+        "DXF",
+        "dxf",
+        "SolidCraft",
+        "STEP",
+        "STL",
         "svg",
-        "绘图",
+        "三维建模",
+        "工程图",
         "矢量图",
-        "编辑",
-        "绘图引擎"
+        "绘图",
+        "绘图引擎",
+        "编辑"
       ],
       "downloads": 0,
-      "updatedAt": "2026-09-28T02:58:59.000Z",
+      "updatedAt": "2026-10-15T00:00:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/cad-svg-edit.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/cad-svg-edit.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/cad-svg-edit.tar.gz",
+      "md": "./skills-md/cad-svg-edit.md",
+      "zip": "./downloads/cad-svg-edit.zip",
+      "tgz": "./downloads/cad-svg-edit.tar.gz",
       "type": "skill"
     },
     {
@@ -118,9 +158,9 @@
       "downloads": 0,
       "updatedAt": null,
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/coding-principles.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/coding-principles.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/coding-principles.tar.gz",
+      "md": "./skills-md/coding-principles.md",
+      "zip": "./downloads/coding-principles.zip",
+      "tgz": "./downloads/coding-principles.tar.gz",
       "type": "skill"
     },
     {
@@ -141,9 +181,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-12T17:23:44.984Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/d2-chart.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/d2-chart.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/d2-chart.tar.gz",
+      "md": "./skills-md/d2-chart.md",
+      "zip": "./downloads/d2-chart.zip",
+      "tgz": "./downloads/d2-chart.tar.gz",
       "type": "skill"
     },
     {
@@ -156,9 +196,9 @@
       "downloads": 0,
       "updatedAt": null,
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/doc-router-mcp.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/doc-router-mcp.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/doc-router-mcp.tar.gz",
+      "md": "./skills-md/doc-router-mcp.md",
+      "zip": "./downloads/doc-router-mcp.zip",
+      "tgz": "./downloads/doc-router-mcp.tar.gz",
       "type": "skill"
     },
     {
@@ -177,9 +217,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-15T09:26:58.000Z",
       "needsKey": true,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/doc-to-md.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/doc-to-md.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/doc-to-md.tar.gz",
+      "md": "./skills-md/doc-to-md.md",
+      "zip": "./downloads/doc-to-md.zip",
+      "tgz": "./downloads/doc-to-md.tar.gz",
       "type": "skill"
     },
     {
@@ -196,9 +236,24 @@
       "downloads": 0,
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/docx.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/docx.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/docx.tar.gz",
+      "md": "./skills-md/docx.md",
+      "zip": "./downloads/docx.zip",
+      "tgz": "./downloads/docx.tar.gz",
+      "type": "skill"
+    },
+    {
+      "id": "e2e-testing",
+      "name": "e2e-testing",
+      "description": "e2e(tester-army/e2e) AI原生回归测试技能 — 中文界面实测有效,",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "needsKey": true,
+      "md": "./skills-md/e2e-testing.md",
+      "zip": "./downloads/e2e-testing.zip",
+      "tgz": "./downloads/e2e-testing.tar.gz",
       "type": "skill"
     },
     {
@@ -215,9 +270,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/find-skills.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/find-skills.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/find-skills.tar.gz",
+      "md": "./skills-md/find-skills.md",
+      "zip": "./downloads/find-skills.zip",
+      "tgz": "./downloads/find-skills.tar.gz",
       "type": "skill"
     },
     {
@@ -234,9 +289,31 @@
       "downloads": 0,
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "needsKey": true,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/firecrawl.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/firecrawl.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/firecrawl.tar.gz",
+      "md": "./skills-md/firecrawl.md",
+      "zip": "./downloads/firecrawl.zip",
+      "tgz": "./downloads/firecrawl.tar.gz",
+      "type": "skill"
+    },
+    {
+      "id": "geogpt",
+      "name": "geogpt",
+      "description": "调用 GeoGPT 科研开发者平台 API 做地理/地质/地球科学研究，提供地学问答、多轮会话、文献知识库检索（公共库/个人库/团队库）、本地论文或报告作为材料的证据增强，以及带文献引用的回答。当用户提出地球科学问题、要查地学文献、针对自己手上的论文/报告/数据文件做地学问答、做地学科研调研、搭建地质类 RAG 流水线，或明确提到 GeoGPT 时使用。",
+      "version": "1.1.0",
+      "category": "研究分析",
+      "tags": [
+        "地球科学",
+        "地质学",
+        "文献检索",
+        "RAG",
+        "科研问答",
+        "GeoGPT"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-04T03:58:01.000Z",
+      "needsKey": true,
+      "md": "./skills-md/geogpt.md",
+      "zip": "./downloads/geogpt.zip",
+      "tgz": "./downloads/geogpt.tar.gz",
       "type": "skill"
     },
     {
@@ -257,9 +334,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-10T13:59:55.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/grilling.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/grilling.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/grilling.tar.gz",
+      "md": "./skills-md/grilling.md",
+      "zip": "./downloads/grilling.zip",
+      "tgz": "./downloads/grilling.tar.gz",
       "type": "skill"
     },
     {
@@ -279,9 +356,35 @@
       "downloads": 0,
       "updatedAt": "2026-09-21T00:00:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/handoff.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/handoff.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/handoff.tar.gz",
+      "md": "./skills-md/handoff.md",
+      "zip": "./downloads/handoff.zip",
+      "tgz": "./downloads/handoff.tar.gz",
+      "type": "skill"
+    },
+    {
+      "id": "hybrid-constrained-ml",
+      "name": "hybrid-constrained-ml",
+      "description": "把\"规则约束下的机器学习(rcml)白盒先验\"与\"XGBoost 残差\"融合——用同一份声明式配方，冻结你相信正确的结构(符号/膝点/地板/上限)并只训幅度系数，再用 XGBoost 拟合\"真实−先验\"的残差补抓交互/非线性，最终预测经 clip(floor,cap) 硬护栏。既保留 rcml 的可解释、可审计、安全约束永不翻转，又获得 XGBoost 的精度与灵活；小数据友好、分布外安全。触发词：\"融合建模\"、\"rcml+XGBoost\"、\"白盒+黑盒\"、\"规则约束机器学习融合\"、\"可解释+梯度提升\"、\"约束下回归带残差\"、\"安全约束建模\"、\"handwired+xgboost\"。覆盖 界定→写配方→标签→生成模型→训练→约束审计→交付 全链路，内置三道人工关卡。",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "融合建模",
+        "规则约束机器学习",
+        "XGBoost",
+        "可解释模型",
+        "白盒",
+        "handwired",
+        "约束建模",
+        "混合模型",
+        "残差学习",
+        "安全护栏"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-17T10:33:16.000Z",
+      "needsKey": false,
+      "md": "./skills-md/hybrid-constrained-ml.md",
+      "zip": "./downloads/hybrid-constrained-ml.zip",
+      "tgz": "./downloads/hybrid-constrained-ml.tar.gz",
       "type": "skill"
     },
     {
@@ -302,9 +405,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-10T13:14:39.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/image-analysis.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/image-analysis.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/image-analysis.tar.gz",
+      "md": "./skills-md/image-analysis.md",
+      "zip": "./downloads/image-analysis.zip",
+      "tgz": "./downloads/image-analysis.tar.gz",
       "type": "skill"
     },
     {
@@ -323,9 +426,24 @@
       "downloads": 0,
       "updatedAt": "2026-09-26T15:04:23.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/localtunnel-preview.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/localtunnel-preview.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/localtunnel-preview.tar.gz",
+      "md": "./skills-md/localtunnel-preview.md",
+      "zip": "./downloads/localtunnel-preview.zip",
+      "tgz": "./downloads/localtunnel-preview.tar.gz",
+      "type": "skill"
+    },
+    {
+      "id": "manim-3b1b",
+      "name": "manim-3b1b",
+      "description": "用 Manim（3Blue1Brown 官方动画引擎）制作 3b1b 风格的数学/概念讲解视频，支持中文 + 配音 + 字幕。当用户要求「做 3Blue1Brown 风格动画」「用 manim 做视频」「生成科普/教学动画视频」「把某个概念做成动画视频」「给讲解视频加配音/字幕」时触发。覆盖环境搭建、3b1b 美学规范、中文渲染、无 LaTeX 数学符号、场景编排、有声视频双轨制流程（edge-tts 配音 + ffmpeg 后期合成）、渲染与校验的全流程。",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "needsKey": false,
+      "md": "./skills-md/manim-3b1b.md",
+      "zip": "./downloads/manim-3b1b.zip",
+      "tgz": "./downloads/manim-3b1b.tar.gz",
       "type": "skill"
     },
     {
@@ -342,9 +460,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/mcp-builder.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/mcp-builder.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/mcp-builder.tar.gz",
+      "md": "./skills-md/mcp-builder.md",
+      "zip": "./downloads/mcp-builder.zip",
+      "tgz": "./downloads/mcp-builder.tar.gz",
       "type": "skill"
     },
     {
@@ -357,9 +475,30 @@
       "downloads": 0,
       "updatedAt": null,
       "needsKey": true,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/mcp-selected-pack.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/mcp-selected-pack.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/mcp-selected-pack.tar.gz",
+      "md": "./skills-md/mcp-selected-pack.md",
+      "zip": "./downloads/mcp-selected-pack.zip",
+      "tgz": "./downloads/mcp-selected-pack.tar.gz",
+      "type": "skill"
+    },
+    {
+      "id": "open2build",
+      "name": "open2build",
+      "description": "Large-program development by composing open source. Use when the user wants to decompose a program/feature into modules, find and evaluate open-source projects or libraries on GitHub, then legally integrate, improve, or combine them into their own codebase. Covers module decomposition, OSS discovery/evaluation, license compliance (GPL/AGPL/Apache etc.), integration strategy (dependency vs snippet-copy vs fork vs process-wrap vs rewrite), vendor/adapter architecture, SBOM/NOTICES/supply-chain compliance, and upstream maintenance. Triggers (CN/EN): 拆分模块、找开源项目、开源选型、组合开源、许可证合规、依赖治理、vendoring、fork 改造、站在巨人肩膀上、build with open source.",
+      "version": "0.1.0",
+      "category": "开发工具",
+      "tags": [
+        "开源",
+        "合规",
+        "架构",
+        "工作流",
+        "python"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-13T14:05:42.904Z",
+      "needsKey": false,
+      "md": "./skills-md/open2build.md",
+      "zip": "./downloads/open2build.zip",
+      "tgz": "./downloads/open2build.tar.gz",
       "type": "skill"
     },
     {
@@ -375,9 +514,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-09T14:10:50.547Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/oss-scout.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/oss-scout.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/oss-scout.tar.gz",
+      "md": "./skills-md/oss-scout.md",
+      "zip": "./downloads/oss-scout.zip",
+      "tgz": "./downloads/oss-scout.tar.gz",
       "type": "skill"
     },
     {
@@ -394,28 +533,58 @@
       "downloads": 5,
       "updatedAt": "2026-09-10T14:52:37.000Z",
       "needsKey": true,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/page-visual-review.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/page-visual-review.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/page-visual-review.tar.gz",
+      "md": "./skills-md/page-visual-review.md",
+      "zip": "./downloads/page-visual-review.zip",
+      "tgz": "./downloads/page-visual-review.tar.gz",
+      "type": "skill"
+    },
+    {
+      "id": "paper-pipeline",
+      "name": "paper-pipeline",
+      "description": "证据驱动的学术写作流水线——多源真实检索、[cite:KEY] 逐段引用、三层引用核验、评审团审稿、cited-only 参考文献。Evidence-driven academic writing pipeline. Trigger on 写论文/写综述/开题报告/文献调研/论文修改/查引用/refs/文献池, or /paper-pipeline. Four-source live search (OpenAlex/Crossref/arXiv/Semantic Scholar), hallucination-proof citation via three-layer verification, reviewer-board critique, cited-only BibTeX/RIS export.",
+      "version": "1.0.2",
+      "category": "学术写作",
+      "tags": [
+        "论文",
+        "学术写作",
+        "文献检索",
+        "引用核验",
+        "文献综述",
+        "证据表",
+        "同行评审",
+        "参考文献"
+      ],
+      "downloads": 0,
+      "updatedAt": null,
+      "needsKey": false,
+      "md": "./skills-md/paper-pipeline.md",
+      "zip": "./downloads/paper-pipeline.zip",
+      "tgz": "./downloads/paper-pipeline.tar.gz",
       "type": "skill"
     },
     {
       "id": "pdf",
-      "name": "pdf",
-      "description": "PDF 全能处理技能：读取或提取 PDF 中的文本与表格、合并多个 PDF、拆分 PDF、旋转页面、加水印、生成新 PDF、填写表单、加密解密、提取图片，以及对扫描件 OCR 使其可搜索。当用户提到 .pdf 文件或需要产出 PDF 时使用。",
-      "version": "1.0.0",
+      "name": "pdf-rust",
+      "description": "⚡极速 Rust 版 PDF 工具（性能比官方 Python 版快 1.5x~399x，8/8 基准全胜）。纯 Rust PDF 编辑工具集（pdfctl）。当用户需要处理 PDF 时使用：合并、拆分、提取页、删除页、重排、旋转、读取信息、元数据读写、加密/解密（RC4/AES）、文本提取、表格提取、结构校验、添加水印、从 JSON 规格创建 PDF、OCR 扫描件解析（MinerU 云 API）、提取内嵌图片、AcroForm 表单填写。触发词包括 \"PDF\"、\"合并 PDF\"、\"拆分 PDF\"、\"PDF 加密\"、\"PDF 解密\"、\"提取 PDF 页\"、\"PDF 水印\"、\"PDF 表格\"、\"提取表格\"、\"创建 PDF\"、\"生成 PDF\"、\"OCR\"、\"扫描件\"、\"识别 PDF 文字\"、\"提取图片\"、\"填表\"、\"表单\"、\"pdfctl\"、\"性能强\"、\"极速\"。本 skill 不依赖 Python/poppler，单二进制即开即用；OCR 经 MinerU 云 API（文件上传 mineru.net，stderr 有提示）；仅 PDF→图片渲染不在能力范围内（见「双轨路由」）。",
+      "version": "1.2.1",
       "category": "文档处理",
       "tags": [
         "PDF",
+        "Rust",
+        "极速",
+        "性能强",
+        "零依赖",
+        "OCR",
         "文档",
-        "OCR"
+        "表格提取",
+        "加密解密"
       ],
       "downloads": 0,
-      "updatedAt": "2026-09-13T05:18:08.341Z",
+      "updatedAt": "2026-10-17T21:25:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/pdf.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/pdf.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/pdf.tar.gz",
+      "md": "./skills-md/pdf.md",
+      "zip": "./downloads/pdf.zip",
+      "tgz": "./downloads/pdf.tar.gz",
       "type": "skill"
     },
     {
@@ -432,9 +601,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/planning-with-files.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/planning-with-files.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/planning-with-files.tar.gz",
+      "md": "./skills-md/planning-with-files.md",
+      "zip": "./downloads/planning-with-files.zip",
+      "tgz": "./downloads/planning-with-files.tar.gz",
       "type": "skill"
     },
     {
@@ -451,16 +620,16 @@
       "downloads": 0,
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/pptx.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/pptx.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/pptx.tar.gz",
+      "md": "./skills-md/pptx.md",
+      "zip": "./downloads/pptx.zip",
+      "tgz": "./downloads/pptx.tar.gz",
       "type": "skill"
     },
     {
       "id": "pre-align",
       "name": "pre-align",
-      "description": "任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests.",
-      "version": "1.0.0",
+      "description": "任务前双向对齐——把「用户知道而 AI 不知道」与「AI 知道而用户 不知道」变成共识后再开工。Bidirectional alignment before executing non-trivial tasks. Trigger automatically for multi-step/ambiguous/high-risk/irreversible tasks, or when the user says 对齐一下 / 先对需求 / 对一下信息 / 深度对齐 / /pre-align. Skip silently for trivial, low-risk, clearly-specified requests. V2 serves an interactive light-theme web board locally: user clicks choices, agent auto-resumes work the moment the board is submitted. Every numbered item carries an optional note input; notes ride along in align-output.json.",
+      "version": "2.5.0",
       "category": "需求梳理",
       "tags": [
         "对齐",
@@ -468,14 +637,16 @@
         "动手前确认",
         "对齐简报",
         "访谈",
-        "验收标准"
+        "验收标准",
+        "对齐看板",
+        "诘问法"
       ],
       "downloads": 0,
       "updatedAt": "2026-09-28T03:24:11.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/pre-align.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/pre-align.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/pre-align.tar.gz",
+      "md": "./skills-md/pre-align.md",
+      "zip": "./downloads/pre-align.zip",
+      "tgz": "./downloads/pre-align.tar.gz",
       "type": "skill"
     },
     {
@@ -494,9 +665,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-19T17:40:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/program-to-gif.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/program-to-gif.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/program-to-gif.tar.gz",
+      "md": "./skills-md/program-to-gif.md",
+      "zip": "./downloads/program-to-gif.zip",
+      "tgz": "./downloads/program-to-gif.tar.gz",
       "type": "skill"
     },
     {
@@ -515,9 +686,33 @@
       "downloads": 0,
       "updatedAt": "2026-09-15T15:30:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/recorder2skill.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/recorder2skill.tar.gz",
+      "md": "./skills-md/recorder2skill.md",
+      "zip": "./downloads/recorder2skill.zip",
+      "tgz": "./downloads/recorder2skill.tar.gz",
+      "type": "skill"
+    },
+    {
+      "id": "rule-constrained-ml",
+      "name": "rule-constrained-ml",
+      "description": "把领域专家的确定性\"明规则\"(结构+符号+地板+膝点)与少量配对标签数据结合，只训练不确定的幅度系数，产出既精确又数据校准、可读可审计的混合模型。当用户有领域先验/安全约束、样本少、要可解释、不愿纯黑盒或纯规则时使用。触发词：\"规则约束机器学习\"、\"明规则+训练\"、\"白盒+标签数据\"、\"handwired\"、\"冻结规则训练\"、\"可解释模型\"、\"约束下回归\"、\"安全约束建模\"。覆盖 界定→写配方→标签→生成模型→训练→约束审计→交付 全链路，内置三道人工关卡。",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "规则约束机器学习",
+        "可解释模型",
+        "白盒",
+        "handwired",
+        "约束建模",
+        "梯度训练",
+        "明规则",
+        "混合模型"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-17T07:04:56.000Z",
+      "needsKey": false,
+      "md": "./skills-md/rule-constrained-ml.md",
+      "zip": "./downloads/rule-constrained-ml.zip",
+      "tgz": "./downloads/rule-constrained-ml.tar.gz",
       "type": "skill"
     },
     {
@@ -530,9 +725,9 @@
       "downloads": 0,
       "updatedAt": null,
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/searxng-search-mcp.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/searxng-search-mcp.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/searxng-search-mcp.tar.gz",
+      "md": "./skills-md/searxng-search-mcp.md",
+      "zip": "./downloads/searxng-search-mcp.zip",
+      "tgz": "./downloads/searxng-search-mcp.tar.gz",
       "type": "skill"
     },
     {
@@ -553,9 +748,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-10T14:52:54.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/show-deploy.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/show-deploy.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/show-deploy.tar.gz",
+      "md": "./skills-md/show-deploy.md",
+      "zip": "./downloads/show-deploy.zip",
+      "tgz": "./downloads/show-deploy.tar.gz",
       "type": "skill"
     },
     {
@@ -575,9 +770,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-10T13:59:55.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/skill-creator.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/skill-creator.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skill-creator.tar.gz",
+      "md": "./skills-md/skill-creator.md",
+      "zip": "./downloads/skill-creator.zip",
+      "tgz": "./downloads/skill-creator.tar.gz",
       "type": "skill"
     },
     {
@@ -598,9 +793,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-10T14:33:19.000Z",
       "needsKey": true,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/skill-updater.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/skill-updater.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skill-updater.tar.gz",
+      "md": "./skills-md/skill-updater.md",
+      "zip": "./downloads/skill-updater.zip",
+      "tgz": "./downloads/skill-updater.tar.gz",
       "type": "skill"
     },
     {
@@ -618,9 +813,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-26T15:30:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/skillmanager.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/skillmanager.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/skillmanager.tar.gz",
+      "md": "./skills-md/skillmanager.md",
+      "zip": "./downloads/skillmanager.zip",
+      "tgz": "./downloads/skillmanager.tar.gz",
       "type": "skill"
     },
     {
@@ -639,9 +834,24 @@
       "downloads": 0,
       "updatedAt": "2026-09-18T08:00:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/slides-maker.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/slides-maker.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/slides-maker.tar.gz",
+      "md": "./skills-md/slides-maker.md",
+      "zip": "./downloads/slides-maker.zip",
+      "tgz": "./downloads/slides-maker.tar.gz",
+      "type": "skill"
+    },
+    {
+      "id": "srt-whiteboard-animation",
+      "name": "srt-whiteboard-animation",
+      "description": "将 SRT 字幕做成暖米黄纸张底的白板手绘动画：读字幕→输出配图策略→确认后生成统一风格线稿→按叙事语义标注分区→预览台调整→渲染 MP4。编排沿用分区遮罩揭示（annotation.json / sequence / startMs / protectedRegions），但每个区域内的落墨换成 stream 的连续笔迹（骨架/网格 ink→color）。当用户提供 SRT 字幕并要求\"字幕做成白板手绘/流式笔迹视频\"\"SRT 生成白板动画\"\"按字幕分镜画手绘\"时触发。",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "needsKey": false,
+      "md": "./skills-md/srt-whiteboard-animation.md",
+      "zip": "./downloads/srt-whiteboard-animation.zip",
+      "tgz": "./downloads/srt-whiteboard-animation.tar.gz",
       "type": "skill"
     },
     {
@@ -662,9 +872,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-02T00:00:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/ste-zh-writing.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/ste-zh-writing.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/ste-zh-writing.tar.gz",
+      "md": "./skills-md/ste-zh-writing.md",
+      "zip": "./downloads/ste-zh-writing.zip",
+      "tgz": "./downloads/ste-zh-writing.tar.gz",
       "type": "skill"
     },
     {
@@ -687,9 +897,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-12T17:54:12.772Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/text-to-d2.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/text-to-d2.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-d2.tar.gz",
+      "md": "./skills-md/text-to-d2.md",
+      "zip": "./downloads/text-to-d2.zip",
+      "tgz": "./downloads/text-to-d2.tar.gz",
       "type": "skill"
     },
     {
@@ -706,9 +916,9 @@
       "downloads": 1,
       "updatedAt": "2026-09-09T14:10:50.505Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/text-to-diagram.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/text-to-diagram.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-diagram.tar.gz",
+      "md": "./skills-md/text-to-diagram.md",
+      "zip": "./downloads/text-to-diagram.zip",
+      "tgz": "./downloads/text-to-diagram.tar.gz",
       "type": "skill"
     },
     {
@@ -730,9 +940,9 @@
       "downloads": 3,
       "updatedAt": "2026-09-09T14:45:26.676Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/text-to-image.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/text-to-image.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/text-to-image.tar.gz",
+      "md": "./skills-md/text-to-image.md",
+      "zip": "./downloads/text-to-image.zip",
+      "tgz": "./downloads/text-to-image.tar.gz",
       "type": "skill"
     },
     {
@@ -745,9 +955,9 @@
       "downloads": 0,
       "updatedAt": null,
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/toutiao-mcp.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/toutiao-mcp.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/toutiao-mcp.tar.gz",
+      "md": "./skills-md/toutiao-mcp.md",
+      "zip": "./downloads/toutiao-mcp.zip",
+      "tgz": "./downloads/toutiao-mcp.tar.gz",
       "type": "skill"
     },
     {
@@ -767,9 +977,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-20T02:00:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/typesafe-ai.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/typesafe-ai.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/typesafe-ai.tar.gz",
+      "md": "./skills-md/typesafe-ai.md",
+      "zip": "./downloads/typesafe-ai.zip",
+      "tgz": "./downloads/typesafe-ai.tar.gz",
       "type": "skill"
     },
     {
@@ -786,9 +996,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/unslop.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/unslop.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/unslop.tar.gz",
+      "md": "./skills-md/unslop.md",
+      "zip": "./downloads/unslop.zip",
+      "tgz": "./downloads/unslop.tar.gz",
       "type": "skill"
     },
     {
@@ -805,9 +1015,9 @@
       "downloads": 1,
       "updatedAt": "2026-09-09T14:10:50.548Z",
       "needsKey": true,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/use-tinyfish.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/use-tinyfish.tar.gz",
+      "md": "./skills-md/use-tinyfish.md",
+      "zip": "./downloads/use-tinyfish.zip",
+      "tgz": "./downloads/use-tinyfish.tar.gz",
       "type": "skill"
     },
     {
@@ -830,9 +1040,9 @@
       "downloads": 0,
       "updatedAt": "2026-10-03T02:40:00.000Z",
       "needsKey": true,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/video-producer.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/video-producer.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/video-producer.tar.gz",
+      "md": "./skills-md/video-producer.md",
+      "zip": "./downloads/video-producer.zip",
+      "tgz": "./downloads/video-producer.tar.gz",
       "type": "skill"
     },
     {
@@ -851,9 +1061,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-18T08:00:00.000Z",
       "needsKey": true,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/video-publish.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/video-publish.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/video-publish.tar.gz",
+      "md": "./skills-md/video-publish.md",
+      "zip": "./downloads/video-publish.zip",
+      "tgz": "./downloads/video-publish.tar.gz",
       "type": "skill"
     },
     {
@@ -872,9 +1082,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-18T22:52:50.932Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/vision-for-dev.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/vision-for-dev.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/vision-for-dev.tar.gz",
+      "md": "./skills-md/vision-for-dev.md",
+      "zip": "./downloads/vision-for-dev.zip",
+      "tgz": "./downloads/vision-for-dev.tar.gz",
       "type": "skill"
     },
     {
@@ -894,9 +1104,9 @@
       "downloads": 0,
       "updatedAt": "2026-09-26T00:00:00.000Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/world-generator.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/world-generator.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/world-generator.tar.gz",
+      "md": "./skills-md/world-generator.md",
+      "zip": "./downloads/world-generator.zip",
+      "tgz": "./downloads/world-generator.tar.gz",
       "type": "skill"
     },
     {
@@ -913,9 +1123,24 @@
       "downloads": 0,
       "updatedAt": "2026-09-13T05:18:08.341Z",
       "needsKey": false,
-      "md": "https://iamsamyiok.github.io/skillhub/skills-md/xlsx.md",
-      "zip": "https://iamsamyiok.github.io/skillhub/downloads/xlsx.zip",
-      "tgz": "https://iamsamyiok.github.io/skillhub/downloads/xlsx.tar.gz",
+      "md": "./skills-md/xlsx.md",
+      "zip": "./downloads/xlsx.zip",
+      "tgz": "./downloads/xlsx.tar.gz",
+      "type": "skill"
+    },
+    {
+      "id": "zg-search",
+      "name": "zg-search",
+      "description": "zvec-grep(zg) 本地语义检索 — 语义+BM25+rg三合一混合搜索; 已作MCP接入ZCode(zg-search);",
+      "version": "1.0.0",
+      "category": "未分类",
+      "tags": [],
+      "downloads": 0,
+      "updatedAt": null,
+      "needsKey": false,
+      "md": "./skills-md/zg-search.md",
+      "zip": "./downloads/zg-search.zip",
+      "tgz": "./downloads/zg-search.tar.gz",
       "type": "skill"
     },
     {
@@ -1106,6 +1331,48 @@
       "runtime": "node",
       "entry": "scripts/server.js",
       "env": {},
+      "type": "mcp"
+    },
+    {
+      "id": "mcp-webcam",
+      "name": "mcp-webcam",
+      "description": "mcp-webcam — 把电脑摄像头画面接入 AI Agent 的 MCP 服务器。浏览器即采集端(任意设备打开网页即可),Agent 通过 capture/screenshot 工具获取原生分辨率截图;支持摄像头最大分辨率自动检测、手动选择分辨率、画面冻结与多客户端采样。本收录版修复了截图降采样与 STDIO 退出日志刷屏问题。",
+      "version": "0.2.2",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "webcam",
+        "camera",
+        "vision",
+        "media"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-23T15:28:17.000Z",
+      "runtime": "node",
+      "entry": "server/server.js",
+      "env": {},
+      "type": "mcp"
+    },
+    {
+      "id": "multimodal-rag-mcp",
+      "name": "多模态 RAG 知识库",
+      "description": "文件夹即知识库的多模态 RAG MCP：向量/全文/混合检索，图片/音频/视频解析，证据可回查（页码/工作表/时间戳/行号）。",
+      "version": "0.1.0",
+      "category": "MCP Server",
+      "tags": [
+        "mcp",
+        "rag",
+        "python"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-10-13T00:00:00.000Z",
+      "runtime": "python",
+      "entry": "-m app",
+      "env": {
+        "RAG_EMBEDDING_API_KEY": "${RAG_EMBEDDING_API_KEY}",
+        "RAG_VISION_API_KEY": "${RAG_VISION_API_KEY}",
+        "RAG_ASR_API_KEY": "${RAG_ASR_API_KEY}"
+      },
       "type": "mcp"
     },
     {

@@ -334,6 +334,11 @@ addEventListener('keydown', e => {
               to: new THREE.Vector3(...PRESETS[k].p), tt: new THREE.Vector3(...PRESETS[k].t), s: performance.now() };
 });
 
+/* URL hash #p1~#p6 载入即切机位——无头验证多机位覆盖矩阵用（立即 snap，比 tween 在 rAF 早停下可靠）；无 hash 零行为 */
+{ const m = /^#p([1-9])$/.exec(location.hash);
+  if (m && +m[1] <= PRESETS.length) { const pr = PRESETS[+m[1] - 1];
+    camera.position.set(...pr.p); controls.target.set(...pr.t); controls.update(); } }
+
 /* ============ 9. 主循环 + 自适应 + 自检日志 ============ */
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;

@@ -1,12 +1,12 @@
 ---
 name: 3d-edit
-version: 1.0.0
+version: 1.3.0
 category: 前端开发
-tags: [3D, Three.js, 程序化生成, 场景生成, 局部编辑, 参数化, 人工编辑, 数字孪生, WebGL]
-description: 一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求"画一个3D城市/3D场景/三维可视化""像 Claude 一键生成 3D 城市""做个可交互的 3D 网页""水库/厂区/管线数字孪生 3D 展示""给我一个小盒子/设备/推车的 3D 图"、要求 3D 汇报页/截图/PNG；或者说"把那座塔改红""河往东弯""楼密一点""雾再浓点"、指着截图某处说"改那个""去掉那栋楼"；或说"我想自己手动编辑这个 3D 图""给我个能拖的界面""别每次都得找你"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页。
+tags: [3D, Three.js, 程序化生成, 场景生成, 局部编辑, 参数化, 人工编辑, 数字孪生, WebGL, 资产库, SimReady]
+description: 一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求"画一个3D城市/3D场景/三维可视化""像 Claude 一键生成 3D 城市""做个可交互的 3D 网页""水库/厂区/管线数字孪生 3D 展示""给我一个小盒子/设备/推车的 3D 图"、要求 3D 汇报页/截图/PNG；或者说"把那座塔改红""河往东弯""楼密一点""雾再浓点"、指着截图某处说"改那个""去掉那栋楼"；或说"我想自己手动编辑这个 3D 图""给我个能拖的界面""别每次都得找你"时使用。零美术资产（贴图/模型全部由代码生成），种子随机可复现，内置浏览器渲染自验证循环 + MANIFEST/实体/锚点三级局部编辑层 + 零依赖人工编辑宿主页；v1.1 起一键导出 GLB 三维资产（G 键）与工程测量模式（M 键，比例尺/场地尺寸/perUnit 定标）；v1.2 起相机 JSON 合同（camera/cam/saveView/view，fov=0 正交）、剖切模式（section，看建筑/厂区内部）与 window.CITY.execute 统一命令通道（人机同源，agent 与 editor 同一入口）；v1.3 起内置 SimReady 物体资产库 assetlib（2,595 个真实感日常物件 GLB，中英文检索+本地缓存，CC BY 4.0），日常物件先检索复用、程序化生成兜底。
 slug: 3d-edit
 displayName: 3D Edit — 3D 场景的生成与编辑
-summary: 单文件 HTML + Three.js 程序化生成可交互 3D 场景（城市/数字孪生/单物体产品图），并对已有场景做确定性局部修改与人工可视化编辑。
+summary: 单文件 HTML + Three.js 程序化生成可交互 3D 场景（城市/数字孪生/单物体产品图），对已有场景做确定性局部修改与人工可视化编辑；日常物件可检索复用 SimReady 资产库。
 ---
 
 # 3D Edit — 3D 场景的生成与编辑（新建 / 改局部 / 手动调 三合一）
@@ -31,7 +31,7 @@ summary: 单文件 HTML + Three.js 程序化生成可交互 3D 场景（城市/�
 > **宏大面积 × 精美画面 × 流畅交互 = 程序化生成配方（用算法代替枚举） × 审美先验（冷暖对比/雾/辉光/构图） × 自验证迭代循环（跑→看→改）**
 
 四条铁律：
-1. **一切皆代码**：不引用任何外部贴图/模型/音频；贴图用 Canvas 画，天空水面用 shader。零美术资产，永不缺素材（three.js 本体走 CDN importmap，是唯一外链，锁版本）。
+1. **一切皆代码**：不引用任何外部贴图/模型/音频；贴图用 Canvas 画，天空水面用 shader。零美术资产，永不缺素材（三个例外：three.js 本体走 CDN importmap 锁版本；v1.3 起日常物件可走 assetlib 本地缓存 GLB——先 fetch 进 `assetlib/cache/` 再加载，禁止运行时直连外网，见第 1.6 步；单文件交付可把 GLB base64 内嵌）。
 2. **种子确定性**：所有随机走 `mulberry32(seed)` 与噪声函数，禁止 `Math.random()`——保证每轮迭代画面可对比、演示可复现。
 3. **迭代出精品**：one-shot 只算原型。必须执行"写→跑→看→改"循环 ≥3 轮（见 references/checklist.md），这是 90 分钟出圈 demo 的真实工作方式。
 4. **局部修改不重写**：模板天生可编辑（MANIFEST 参数说明书 + 稳定实体 id + `/*@锚点@*/` 规则把手 + patches 数据区）。收到"改一小块"诉求时按 P1 参数 > P2 实体 > P3 锚点手术 三级路由（见 references/edit-playbook.md），禁止全文重写。
@@ -47,14 +47,15 @@ summary: 单文件 HTML + Three.js 程序化生成可交互 3D 场景（城市/�
 | 时间氛围 | 夜景(自发光+辉光, 最出彩) / 日景(汇报用) / 黄昏(折中) | 夜景 |
 | 交互 | OrbitControls + 数字键预设机位 / 自动巡城 / 点击拾取标注 | 全含前两项 |
 | 尺度锚点 | 必须有 1~2 个地标（塔/桥/CBD群/大坝/穿楼轻轨），否则"宏大"无参照物（S 档不需要） | CBD+江+轻轨 |
-| 交付 | 单 HTML / 附截图 PNG / 两者 | 两者 |
+| 交付 | 单 HTML / 附截图 PNG / +GLB 三维资产 | HTML+PNG（+GLB 按需） |
 
 ### 第 1 步：从模板起步（不要从零写）
 
 复制 `assets/template.html` → 改 `CONFIG`（seed、gridN、fog、bloom、pal）。
 模板已含全部骨架：种子随机/fBm 噪声、渐变天空+星、指数雾、河道判定、水面实例、
 InstancedMesh 建筑(窗光 Canvas 贴图+setColorAt 冷色渐变)、车流运动光带、
-UnrealBloomPass、OrbitControls、1~6 预设机位 lerp、resize、`[3d-edit] OK` 自检日志。
+UnrealBloomPass、OrbitControls、1~6 预设机位 lerp（URL hash `#p1~#p6` 载入即直达，无头多机位验证用）、resize、`[3d-edit] OK` 自检日志、
+工程测量模式（M 键：动态比例尺 + 场地尺寸，`perUnit` 定标 1 单位=几米）与 GLB 导出（G 键 / `CITY.saveGlb()`，可进 Blender/Unity）。
 在模板上做**增量修改**，比重新生成少 90% 的几何 bug。
 
 **S 档（单物体：一个盒子/设备/推车/装置）不要背全城包袱**——走下面第 1.5 步的独立分支，
@@ -96,6 +97,43 @@ gridN/river/建筑网格/车流；**MANIFEST、稳定实体 id、≥5 个 `/*@�
 否则会糊成端盖微距（实证见 edit-playbook 的"机位表跟尺寸走"）。
 
 
+### 第 1.6 步：日常物件先查库（assetlib，v1.3 新增）
+
+SimReady 资产库（`assetlib/`，2,595 个 CC BY 4.0 真实感 GLB）覆盖锅碗/工具/器械/家具/食品等日常物件。
+**S 档主体、数字孪生设备件、场景配菜（桌上的杯子/路边的灭火器）优先检索复用，手搓建模兜底**——
+真实感提升一个量级且省 token；查无（长尾物件）或需要参数化变体族时走程序化路线：
+
+```bash
+python3 assetlib/search.py 马克杯 -n 5 --json   # 中英文皆可；--url 附缩略图链接；--cat 按类别
+python3 assetlib/fetch.py kitchenware_mug_c01 --thumb   # 下载到 assetlib/cache/，断点跳过
+```
+
+加载三件套——库内 GLB 带 meshopt 压缩，**GLTFLoader 必须挂 MeshoptDecoder，否则直接报错**：
+
+```js
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+loader.load('assetlib/cache/glb/kitchenware_mug_c01.glb', gltf => {
+  const obj = gltf.scene;
+  const b = new THREE.Box3().setFromObject(obj), s = new THREE.Vector3(); b.getSize(s);
+  obj.scale.setScalar(TARGET_M / s.y);           // 归一到实物米制（S 档 1 单位=1 米）
+  b.setFromObject(obj); obj.position.set(X, -b.min.y, Z);   // min.y 归零落地
+  SCENE.reg('prop_mug', obj);                    // 照常进实体表，后续 P2 可改
+});
+```
+
+单文件交付用 base64 内嵌（体积 +33%，单件可接受；外链/内嵌同码的双分支配方见手册）。选件看
+`triangles` 字段过性能预算（每件另按 2~4 个 draw call 计入）；交付页署名 NVIDIA SimReady (CC BY 4.0)。
+
+GLB 配菜场景的夜景打光与无头验证有四个实测坑（量级表与完整配方见手册「夜景打光与无头验证」节）：
+物理光单位下 PointLight 强度上探 4~6×（decay=2，1.5 级强度在真实 PBR 材质上近乎不可见）；
+点光源放进实心几何体（池体/灯箱）= 完全封死且无报错，发光容器一律开口壳；
+swiftshader + virtual-time-budget 下 rAF 早停于 GLB 异步加载完成前 → 截图里物件消失，
+兜底 = loadProps 完成后强制 `composer.render()` 一帧；`renderer.info` 统计以 `props loaded` 日志之后为准。
+
+完整手册（字段表/打光与无头验证/KTX2 档位/再生/署名）：`references/assetlib.md`。
+
 ### 第 2 步：按需求取配方
 
 需要扩展什么，就去 `references/recipes.md` grep 对应节：
@@ -112,6 +150,9 @@ gridN/river/建筑网格/车流；**MANIFEST、稳定实体 id、≥5 个 `/*@�
 3. 一轮只修一类问题：报错 → 穿帮 → 性能 → 审美；
 4. 回归重跑。交付前至少 3 轮；用户嫌"不精美"→ 追加 2 轮纯审美专项（配色/雾/辉光/机位构图）。
 
+> 无浏览器/无视觉输入的沙箱：按 checklist「无浏览器环境」用 chromium 无头 CLI 渲染 + PIL 像素统计替代目检，
+> 验证强度等价（锚点日志统计数 + 分区 luma + 轮间趋势对比），并向用户如实说明验证方式。
+
 ### 第 4 步：交付
 
 单 HTML + 预设机位截图集，命名 `<场景名>-<序号>-<机位名>.png`（如 `trolley-4-低机位.png`；
@@ -119,7 +160,31 @@ L 档同理 `city-1-hero.png`）。报告统计数字时**必须现测**：后�
 `CITY.stats.drawCalls` 是跨多次 render 的累计值（本例同一场景读到过 239/280/932，真值 122（标注关·出厂态）/ 126（标注开）），
 取真值的探针只有一句：`const t=SCENE.three; t.renderer.info.reset(); t.renderer.render(t.scene,t.camera);`
 然后读 `t.renderer.info.render.calls`，并注明"主渲染 pass，Bloom 合成另计"。
+需要三维资产交付时加导 GLB：浏览器按 G 键或 `CITY.saveGlb('场景名')`（capture 服务在跑则同时落盘 .glb）；
+导出前隐藏标注层与 gizmo——GLB 会把画面里的一切原样带出。InstancedMesh/CanvasTexture 均随模板导出。
 演示时现场换 seed（"再抽一座城"）是最有说服力的环节。
+
+### 相机 JSON / 命名机位 / 剖切 / window 命令通道（v1.2 新增，借鉴 SolidCraft camera 合同）
+
+拍特写、复现机位、看内部结构时用这套 API（与 1~6 预设机位并存；控制台/editor/agent 皆可调）：
+
+```js
+CITY.camera({ target:[0,20,0], yaw:0.6, pitch:0.35, distance:320, fov:1.0 })  // 立即到位（无 tween）
+// yaw 0 = 正面（相机在 -Z 看向 +Z，+X 朝右）；pitch=仰角，π/2=顶视；角一律弧度，距离=场景单位
+// fov=垂直视场(弧度)；0/缺省 = 正交观感（半高 0.4×distance，窄视场远距模拟），特写拍立面用它
+CITY.cam()              // 读回当前 {target,yaw,pitch,distance,fov}——与 camera() 互逆，可存盘复现
+CITY.saveView('hero')   // 存命名机位（存 cam() 快照）；CITY.view('hero') 回放；CITY.views() 列表
+CITY.section({ axis:'y', at:12 })            // 剖切：保留法向指向侧（看楼层内部用 axis:'y'+flip）
+CITY.section({ origin:[0,12,0], normal:[0,1,0], flip:true })
+CITY.section(null)                            // 关闭
+CITY.execute('camera', { yaw:0.6, pitch:0.35, distance:320, fov:1.0 })  // 统一命令通道（人机同源）
+CITY.commands()   // 目录：camera/cam/view/saveView/views/section/set/snap/shot/stats/measure/dims/glb
+```
+
+**特写/剖视配方**（SolidCraft close-up recipe 的移植）：`section` 开剖切 → `camera` 用 `fov:0` 正交 +
+`target` 对准剖面中心、`pitch` 压低 → `shot(1280,800)` 落图 → PIL/目检 → 微调 yaw/pitch 再拍。
+剖切面在 rebuild 后仍有效（全局裁剪面），改参数看内部结构不用重开。
+
 
 
 ## 工作流 B：编辑已有场景（B1→B4，禁止全文重写）
@@ -182,7 +247,7 @@ agent 改完 → 用户刷新页面看到同样的结果。交付时提醒"改�
 4. **调色类需求优先走 P1 参数**（`pal.*`），别用 P2 实体 `color`：实体色会在 rebuild 后盖住 CONFIG 色。
 5. **实例实体必须带 index**：一条 `scale` 补丁让整城消失，十有八九是实体登记成了"整体"而不是"实例"。
 6. 渲染复核要本地 http + 浏览器；纯离线只能静态校验（find/manifest/list），交付时如实说明"未做视觉复核"。
-7. 一次一个 HTML；不做 GLTF/其他引擎文件的编辑。
+7. 一次一个 HTML；GLB 只导出不回读（不做 GLTF/其他引擎文件的编辑）。
 
 ## 常见障碍速查（详见 checklist 故障表）
 
@@ -191,6 +256,7 @@ agent 改完 → 用户刷新页面看到同样的结果。交付时提醒"改�
 | token 装不下大场景 | 写生成规则不写结果：几十 KB 代码 → 几十万栋楼 |
 | 万级物体掉帧 | InstancedMesh：1 次 draw call 画一整城 |
 | 缺素材/CORS/图裂 | Canvas 画贴图 + shader 画天空水面，全文件零外链素材 |
+| 真实感日常物件（杯/工具/器械）手搓费 token 还假 | assetlib 先查库（第 1.6 步）：search → fetch → GLTFLoader+MeshoptDecoder；查无再程序化 |
 | 灰绿盒子城(丑) | 夜景三板斧：冷暖对比 + FogExp2 + Bloom + ACES 色调映射 |
 | 穿模/悬空楼 | 实例几何 translate 到脚底 + 建筑先采样地形高 + 截图专查 |
 | 模型看不见结果瞎改 | 强制渲染反馈闭环：console 锚点日志 + 截图体检单 |
@@ -220,6 +286,19 @@ agent 改完 → 用户刷新页面看到同样的结果。交付时提醒"改�
 | 隐藏 group 实体永远关不掉 | `SCENE.reg()` 会按 DEFV 把 object/group 复位成 `visible:true`；注册时显式带 `props:{visible:!!CONFIG.xxx}` |
 | P3 改完尺寸公式，某个预设机位糊成微距/物体出画 | 机位表是按旧外形算的：改 `@*-rule@` 里任何尺寸后，重算 `@presets@` 并 1~6 全机位重拍 |
 | 自验证跑完，用户打开页面弹"有 N 条草稿待恢复" | agent 探针里的 `CITY.set()` 会写 localStorage 草稿。交付前 `Object.keys(localStorage).forEach(k=>localStorage.removeItem(k))` 并重载确认 console 无 `pendingRestore` 警告 |
+| 生成脚本做锚点区块手术，产物报 Unexpected end of input（报错行=`</script>` 行） | OLD 切片（锚点→下一地标）夹带的**函数收尾 `}`** 被 NEW 串漏带（如 `@presets@` 块的 `}` 在 `];` 之后、`refreshPresets();` 之前） | NEW 串必须原样带回切片内全部闭合结构；生成后立即过语法闸（见下一行） |
+| `node --check` 报 OK，浏览器却报语法错 | node 22 对 .js 的 ESM 自动检测不可靠，坏文件会静默通过 | 提取 `<script type="module">` 内容存成 **.mjs** 再 `node --check`，才是真实 ESM 校验 |
+| 沙箱没有浏览器（capture.mjs 也无宿主页可挂） | 无头环境缺渲染通道 | `apt-get install -y chromium fonts-noto-cjk`（Noto CJK 是 Canvas 中文贴图前提）→ 按 checklist「无浏览器环境」配方渲染截图 |
+| 无头截图拿不到 `[3d-edit] OK` 日志 | swiftshader 软渲染帧慢，默认 30 帧阈值在 --virtual-time-budget 内跑不满 | 生成侧把 logOK 阈值降到 3（足以证明主循环存活）或加大 budget；grep stderr 拿锚点日志与统计 |
+| 夜景楼体黑成一坨、只有窗亮 | r155+ 物理光照下 0.5 级强度真的弱，且可见立面正好背光 | 主光移到相机所在象限并上探强度（moon 1.6 + fill 0.9 实测有效）、立面材质加微 emissive 兜底；判据=主体区平均 luma（像素统计 27→40 达标） |
+| 执行环境无法目检图片（read 图像不可用） | 模型无视觉输入 | PIL 像素统计客观验证：分区 luma/近黑占比/暖冷像素计数 + 轮间趋势对比，叠锚点日志统计数；向用户如实说明"像素统计验证，非目检" |
+
+## 自检与回归（v1.1 新增）
+
+```bash
+node scripts/edit3d.mjs doctor     # 技能环境自检：模板/kit 同步/编辑器/配方/GLB/测量 在位性（JSON 输出）
+node test/run-tests.js             # 回归：check 全绿 + patch 写入/撤销闭环 + kit 区零污染 → ALL_PASS
+```
 
 ## 版本与兼容（合并说明，别"顺手修"）
 
@@ -233,7 +312,7 @@ agent 改完 → 用户刷新页面看到同样的结果。交付时提醒"改�
 
 ## 边界
 
-- 需要联网加载 three.js CDN；完全离线环境需把 three.module.js 下载到同目录并改 importmap。
+- 需要联网加载 three.js CDN；完全离线环境需把 three.module.js 下载到同目录并改 importmap。assetlib 首次 fetch 需联网（HuggingFace），缓存后离线可用。
 - 本 skill 产出"可视化场景"，不是游戏引擎项目：无物理、无关卡、无多人。用户要玩法时明确降级预期或建议接 Unity/UE。
 - 超大规模真实测绘数据（激光点云、实景三维）超出本配方，只做简化体量/高程表插值。
 
@@ -243,8 +322,12 @@ agent 改完 → 用户刷新页面看到同样的结果。交付时提醒"改�
 - `assets/editkit.js` — 3d-edit kit v1.3 运行时源码（find/set/nudge/entity/patch/pick/select/gizmo/add/remove/history/undo/saveFile/surface，由 `edit3d.mjs sync` 注入模板）
 - `assets/editor.html` — 人工编辑宿主页（零 three 依赖，只调 `CITY.*`；`edit3d.mjs editor --install` 装到场景同目录，场景文件不增一字）
 - `scripts/edit3d.mjs` — 离线操作产物文件的命令行套件：find/manifest/entities/apply/undo/clear/**check**/sync/upgrade/**editor**/serve（serve 带 `POST /__save` 写回）
-- `scripts/capture.mjs` — 后台标签页的截图落盘服务：页内 `CITY.shot()` POST dataURL → PNG（自验证目检用）
+- `scripts/capture.mjs` — 后台标签页的截图/导出落盘服务：`CITY.shot()` PNG dataURL 与 `CITY.saveGlb()` 二进制 GLB 都 POST 到这里落盘（自验证目检 / 资产交付用）
 - `references/editor-enhance.md` — 人工编辑通道架构：三层职责、patch op 契约、撤销语义、ShadowEditor/three.js Editor/threepipe 借鉴与淘汰对照、已知边界
 - `references/edit-playbook.md` — 局部修改路由手册：P1/P2/P3 三级优先级、诉求→手术位置路由表、pick 定位流程、对照对复核规程
-- `references/recipes.md` — 配方库：按 `##` 标题 grep 取用（地形/水面/辉光/地标/性能/数字孪生改造/**产品·装置效果图（S 档）**）
+- `references/recipes.md` — 配方库：按 `##` 标题 grep 取用（地形/水面/辉光/地标/性能分级预算/数字孪生改造/**标准件参数注册表（桥/起重机/冷却塔/变压器/大坝）**/**产品·装置效果图（S 档）**）
+- `assetlib/` — SimReady 物体资产库（v1.3）：catalog.jsonl（2,595 条，中英检索）+ search.py/fetch.py（本地缓存下载）+ build_catalog.py（目录再生）；GLB 来自 NVIDIA SimReady Assets（CC BY 4.0）
+- `references/assetlib.md` — 资产库手册：检索/缓存用法、meshopt 加载配方、base64 单文件内嵌、归一化落地、KTX2/lods 档位、性能取舍与署名要求
+- `test/run-tests.js` — 回归测试：doctor + check + patch 写入/撤销闭环 + kit 区零污染（期望 ALL_PASS）
+- `CHANGELOG.md` — 版本更新日志
 - `references/checklist.md` — 自验证循环规程、视觉体检单、故障对照表、交付标准
