@@ -1,5 +1,5 @@
 {
-  "total": 54,
+  "total": 55,
   "categories": [
     "写作工具",
     "前端开发",
@@ -127,6 +127,76 @@
         }
       ],
       "needsKey": false
+    },
+    {
+      "id": "agent-file-transfer",
+      "name": "agent-file-transfer",
+      "description": "多台电脑的智能体之间端到端加密传文件——发送端 agent 一条命令建箱上传，配对码经聊天转告，接收端 agent 一条命令下载校验解密落盘。当用户说\"把这份文件/目录传给另一台电脑的 agent\"\"帮我接收对端 agent 发来的文件\"\"两台机器的智能体怎么交换文件\"\"把这个大文件跨设备发给另一个智能体\"\"用 aft 传一下\"时使用。邮箱中转模型（双方只走出站 HTTPS，无需公网入站/SSH 可达），三通道可切换（GitHub 私库 Releases / 自建 relay / 本地回环），AES-256-CTR + HMAC-SHA256 端到端加密（中转只见密文），分片 + sha256 校验 + 幂等续传，纯 Python 标准库零第三方依赖。",
+      "version": "1.0.0",
+      "category": "开发工具",
+      "tags": [
+        "文件传输",
+        "智能体协作",
+        "端到端加密",
+        "跨机器",
+        "GitHub Releases",
+        "中继",
+        "断点续传",
+        "零依赖"
+      ],
+      "downloads": 0,
+      "updatedAt": "2026-11-10T16:18:07.000Z",
+      "files": [
+        {
+          "path": ".gitignore",
+          "size": 31
+        },
+        {
+          "path": "CHANGELOG.md",
+          "size": 1542
+        },
+        {
+          "path": "SKILL.md",
+          "size": 6896
+        },
+        {
+          "path": "references/protocol.md",
+          "size": 4976
+        },
+        {
+          "path": "references/security.md",
+          "size": 3240
+        },
+        {
+          "path": "scripts/crypto.py",
+          "size": 4265
+        },
+        {
+          "path": "scripts/providers/github.py",
+          "size": 6348
+        },
+        {
+          "path": "scripts/providers/local.py",
+          "size": 1898
+        },
+        {
+          "path": "scripts/providers/relay.py",
+          "size": 2761
+        },
+        {
+          "path": "scripts/relay-server.py",
+          "size": 5961
+        },
+        {
+          "path": "scripts/transfer.py",
+          "size": 13831
+        },
+        {
+          "path": "test/run-tests.js",
+          "size": 5827
+        }
+      ],
+      "needsKey": true
     },
     {
       "id": "anysearch",

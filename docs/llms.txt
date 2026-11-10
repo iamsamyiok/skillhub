@@ -6,6 +6,8 @@
 
 - [3d-edit](./skills-md/3d-edit.md): 一个技能管住 3D 图的两件事——用单文件 HTML + Three.js 程序化生成宏大、精美、可交互的 3D 场景（城市/滨水/山地/数字孪生/游戏原型/单物体产品图），以及对已有场景做确定性局部修改，并按需交付给用户自己动手的可视化编辑器。当用户要求"画一个3D城市/3D场景/三维可视化""像 Claude 一键
   - 下载: ./downloads/3d-edit.zip
+- [agent-file-transfer](./skills-md/agent-file-transfer.md): 多台电脑的智能体之间端到端加密传文件——发送端 agent 一条命令建箱上传，配对码经聊天转告，接收端 agent 一条命令下载校验解密落盘。当用户说"把这份文件/目录传给另一台电脑的 agent""帮我接收对端 agent 发来的文件""两台机器的智能体怎么交换文件""把这个大文件跨设备发给另一个智能体""用 aft
+  - 下载: ./downloads/agent-file-transfer.zip
 - [anysearch](./skills-md/anysearch.md): 统一实时搜索引擎技能：通用网页搜索、垂直领域搜索（金融/学术/旅行/法律/代码等 17 个领域，先 get_sub_domains 发现子域再搜索）、并行批量搜索、整页内容提取。内置跨平台 CLI 脚本直接调用公开 HTTP 端点，无需安装 MCP 服务器。当用户需要「搜索/查资料/事实核查/读取网页内容/按股票号、C
   - 下载: ./downloads/anysearch.zip
 - [book-to-skill](./skills-md/book-to-skill.md): 书籍→技能包转化（Book-to-Skill）：把一本书、长文档或章节笔记提炼成符合规范的可复用 SKILL.md 技能包。当用户要求"把这本书变成技能""从文档提取方法论""生成 SKILL.md""把知识转化为工作流"或类似意图时使用。convert a book or long document into a r
